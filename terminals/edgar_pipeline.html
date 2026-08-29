@@ -5,110 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adam OS | SEC EDGAR Automated Parser & Pipeline</title>
 
+    <!-- Google Fonts for Terminal Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"Fira Code"', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        os: {
+                            bg: '#0d1117',
+                            surface: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9',
+                            textMuted: '#8b949e',
+                            accent: '#58a6ff',
+                            success: '#3fb950',
+                            warning: '#d29922',
+                            danger: '#f85149',
+                            terminalBg: '#010409'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scanline': 'scanline 8s linear infinite',
+                    },
+                    keyframes: {
+                        scanline: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100vh)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --border: #30363d;
-            --text-primary: #c9d1d9;
-            --accent: #58a6ff;
-            --success: #3fb950;
-            --warning: #d29922;
-            --danger: #f85149;
-            --font-mono: 'Courier New', Consolas, monospace;
-        }
-
         body {
-            background-color: var(--bg);
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
+        /* CRT/Terminal Scanline Effect */
+        .scanline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.3;
         }
 
-        header {
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        h1, h2, h3 {
-            margin: 0;
-            color: var(--accent);
-        }
-
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 20px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th { color: var(--accent); }
-
-        .status-pass { color: var(--success); font-weight: bold; }
-        .status-warn { color: var(--warning); font-weight: bold; }
-        .status-fail { color: var(--danger); font-weight: bold; }
-
-        .pipeline-code {
+        .custom-scrollbar::-webkit-scrollbar-track {
             background: #010409;
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-            color: #8b949e;
-            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #58a6ff;
         }
 
-        .metric-card {
-            background: #010409;
-            padding: 15px;
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
-            margin-top: 10px;
-        }
-
-        .metric-value {
-            font-size: 1.8em;
-            color: var(--text-primary);
-            font-weight: bold;
-        }
+        /* Glowing text effect for status */
+        .glow-success { text-shadow: 0 0 10px rgba(63, 185, 80, 0.5); }
+        .glow-warning { text-shadow: 0 0 10px rgba(210, 153, 34, 0.5); }
+        .glow-danger { text-shadow: 0 0 10px rgba(248, 81, 73, 0.5); }
+        .glow-accent { text-shadow: 0 0 10px rgba(88, 166, 255, 0.5); }
     </style>
 </head>
-<body>
+<body class="font-mono min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col items-center">
+
+    <div class="scanline-overlay"></div>
 
     <!-- =========================================================================
          AGENT PIPELINE PROMPT (MACHINE UI)
-         This block is intentionally structured for a LLM/Agent to read and execute.
          ========================================================================= -->
     <template id="agent-execution-directive">
         # SYSTEM ROLE: SEC EDGAR DATA PIPELINE ORCHESTRATOR
@@ -140,7 +141,6 @@
 
     <!-- =========================================================================
          STATE DATA (MACHINE & HUMAN UI BINDING)
-         Agents modify this block; the UI renders from it.
          ========================================================================= -->
     <script type="application/json" id="edgar-state">
         {
@@ -174,138 +174,477 @@
     <!-- =========================================================================
          PRESENTATION LAYER (HUMAN UI)
          ========================================================================= -->
-    <div class="container">
-        <header>
-            <div>
-                <h1>ADAM_OS // EDGAR PIPELINE TERMINAL</h1>
-                <p>Automated 10-Q/10-K Parsing & SNC Credit Evaluation</p>
+    <div class="w-full max-w-7xl z-10 space-y-6">
+
+        <!-- Header Section -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-os-border pb-4 mb-6">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-2xl sm:text-3xl font-bold text-os-accent flex items-center gap-3">
+                    <i class="ph-fill ph-terminal-window text-3xl"></i>
+                    ADAM_OS // EDGAR PIPELINE TERMINAL
+                </h1>
+                <p class="text-os-textMuted text-sm mt-1">Automated 10-Q/10-K Parsing & SNC Credit Evaluation Engine</p>
             </div>
-            <div style="text-align: right;">
-                <span style="color: var(--border);">PIPELINE STATUS:</span>
-                <span class="status-pass" id="ui-status">READY</span><br>
-                <span style="font-size: 0.8em; color: var(--border);" id="ui-last-run"></span>
+
+            <div class="text-left md:text-right bg-os-surface px-4 py-2 rounded-lg border border-os-border">
+                <div class="text-xs text-os-textMuted uppercase tracking-wider mb-1">Pipeline Status</div>
+                <div class="flex items-center gap-2 md:justify-end">
+                    <div id="ui-status-dot" class="w-2.5 h-2.5 rounded-full bg-os-success animate-pulse-slow"></div>
+                    <span id="ui-status" class="font-bold text-os-success tracking-wide glow-success">READY</span>
+                </div>
+                <div id="ui-last-run" class="text-xs text-os-textMuted mt-1 font-sans"></div>
             </div>
         </header>
 
-        <div class="grid-2">
-            <!-- Parsing Target Info -->
-            <div class="panel">
-                <h2>Target Entity Data</h2>
-                <table id="ui-metadata-table">
-                    <tr><th>Entity Name</th><td id="ui-entity">--</td></tr>
-                    <tr><th>CIK</th><td id="ui-cik">--</td></tr>
-                    <tr><th>Form Type</th><td id="ui-form">--</td></tr>
-                    <tr><th>Filing Date</th><td id="ui-date">--</td></tr>
-                </table>
+        <div class="bg-os-surface border border-os-border rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-lg">
+            <div class="flex-1 w-full">
+                <label class="block text-xs text-os-textMuted uppercase tracking-wider mb-2">Target CIK or Ticker</label>
+                <div class="flex relative">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-os-textMuted"></i>
+                    <input type="text" id="target-input" placeholder="e.g. 0001018724 (AMZN)" value="0001018724" class="w-full bg-os-terminalBg border border-os-border rounded-l-lg py-2 pl-10 pr-4 text-os-text focus:outline-none focus:border-os-accent focus:ring-1 focus:ring-os-accent transition-colors">
+                    <button onclick="triggerPipeline()" id="run-btn" class="bg-os-accent hover:bg-blue-400 text-slate-900 font-bold px-6 py-2 rounded-r-lg transition-colors flex items-center gap-2 whitespace-nowrap">
+                        <i class="ph-bold ph-play"></i> Run Agent
+                    </button>
+                </div>
             </div>
+            <div class="hidden md:flex text-os-textMuted text-sm border-l border-os-border pl-6 space-y-1">
+                <div><i class="ph-fill ph-cpu text-os-accent mr-2"></i> Model: Claude 3.5 Sonnet / MCP</div>
+                <div><i class="ph-fill ph-hard-drives text-os-warning mr-2"></i> DB: EDGAR Master Index</div>
+            </div>
+        </div>
 
-            <!-- Quantitative Risk Output -->
-            <div class="panel">
-                <h2>SNC & Basel III Evaluation</h2>
-                <div class="metric-card" style="border-color: var(--warning);">
-                    <div>Total Leverage Ratio (Debt/Adj. EBITDA)</div>
-                    <div class="metric-value" id="ui-leverage">--x</div>
-                    <div style="font-size: 0.8em;" class="status-warn" id="ui-snc-class">CLASSIFICATION: --</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Left Column: Target Info & Logs -->
+            <div class="space-y-6 flex flex-col h-full">
+
+                <!-- Target Entity Data Panel -->
+                <div class="bg-os-surface border border-os-border rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-buildings text-6xl text-os-text"></i>
+                    </div>
+                    <h2 class="text-os-accent font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i class="ph ph-identification-card"></i> Entity Metadata
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-sm z-10 relative">
+                        <div class="text-os-textMuted">Entity Name</div>
+                        <div id="ui-entity" class="font-semibold text-right sm:text-left text-os-text break-words">--</div>
+
+                        <div class="text-os-textMuted">CIK Number</div>
+                        <div id="ui-cik" class="font-mono text-os-accent text-right sm:text-left">--</div>
+
+                        <div class="text-os-textMuted">Form Type</div>
+                        <div id="ui-form" class="font-semibold text-right sm:text-left bg-os-border/50 inline-block px-2 rounded max-w-max">--</div>
+
+                        <div class="text-os-textMuted">Filing Date</div>
+                        <div id="ui-date" class="text-right sm:text-left text-os-text">--</div>
+                    </div>
                 </div>
 
-                <table id="ui-risk-table">
-                    <tr><th>Basel III LCR</th><td id="ui-lcr">--%</td></tr>
-                    <tr><th>Subordinate Tranche Risk</th><td id="ui-sub-risk">--</td></tr>
-                    <tr><th>Covenant Headroom</th><td id="ui-covenant">-- bps</td></tr>
-                </table>
+                <!-- jsonLogic Execution Logs / Terminal -->
+                <div class="bg-os-surface border border-os-border rounded-xl p-5 shadow-lg flex-1 flex flex-col min-h-[300px]">
+                    <h2 class="text-os-accent font-semibold text-lg mb-3 flex items-center gap-2">
+                        <i class="ph ph-terminal"></i> Pipeline Execution Logs
+                    </h2>
+
+                    <div class="bg-os-terminalBg border border-os-border rounded-lg p-4 flex-1 overflow-y-auto custom-scrollbar relative shadow-inner h-full" id="terminal-container">
+                        <div class="text-xs text-os-textMuted mb-2 border-b border-os-border pb-2 opacity-50 flex justify-between">
+                            <span>BASH // MCP_GATEWAY</span>
+                            <span>v2.1.4</span>
+                        </div>
+                        <div id="ui-logs" class="space-y-1.5 text-sm font-mono leading-relaxed">
+                            <!-- Logs injected here -->
+                            <div class="text-os-textMuted">> Awaiting manual trigger or scheduled cron job...</div>
+                        </div>
+                        <div id="terminal-cursor" class="w-2 h-4 bg-os-accent animate-pulse mt-1 hidden"></div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- jsonLogic Output -->
-        <div class="panel">
-            <h2>jsonLogic Guardrail Execution Logs</h2>
-            <div class="pipeline-code" id="ui-logs">
-                > Awaiting pipeline execution...
+            <!-- Right Column: Quantitative Risk & Eval -->
+            <div class="space-y-6 flex flex-col h-full">
+
+                <div class="bg-os-surface border border-os-border rounded-xl p-5 shadow-lg h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="text-os-accent font-semibold text-lg flex items-center gap-2">
+                            <i class="ph ph-shield-warning"></i> SNC & Basel III Risk Evaluation
+                        </h2>
+                        <span class="bg-os-terminalBg px-2 py-1 rounded text-xs border border-os-border">CONFIDENCE: 98.4%</span>
+                    </div>
+
+                    <!-- Highlight Metric Card -->
+                    <div id="leverage-card" class="bg-os-terminalBg p-5 rounded-lg border-l-4 border-os-warning mb-6 relative overflow-hidden transition-colors duration-500">
+                        <div class="absolute -right-4 -top-4 opacity-5">
+                            <i class="ph-fill ph-chart-line-down text-8xl"></i>
+                        </div>
+                        <div class="text-os-textMuted text-sm uppercase tracking-wider mb-1 z-10 relative">Total Leverage Ratio</div>
+                        <div class="text-xs text-os-textMuted mb-3 z-10 relative">(Total Debt / Adj. EBITDA)</div>
+
+                        <div class="flex items-end gap-4 z-10 relative">
+                            <div id="ui-leverage" class="text-5xl font-bold text-os-text tracking-tighter">--x</div>
+                            <div id="ui-snc-class" class="text-sm font-bold text-os-warning mb-1 glow-warning bg-os-warning/10 px-2 py-1 rounded border border-os-warning/30">CLASS: --</div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Risk Table -->
+                    <div class="bg-os-terminalBg rounded-lg border border-os-border overflow-hidden flex-1">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-os-textMuted uppercase bg-os-border/20 border-b border-os-border">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3">Risk Metric</th>
+                                    <th scope="col" class="px-4 py-3 text-right">Computed Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-os-border">
+                                <tr class="hover:bg-os-border/10 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-os-text flex items-center gap-2">
+                                        <i class="ph ph-bank text-os-accent"></i> Basel III LCR
+                                    </td>
+                                    <td id="ui-lcr" class="px-4 py-3 text-right font-mono">--%</td>
+                                </tr>
+                                <tr class="hover:bg-os-border/10 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-os-text flex items-center gap-2">
+                                        <i class="ph ph-stack text-os-accent"></i> Subordinate Tranche
+                                    </td>
+                                    <td id="ui-sub-risk" class="px-4 py-3 text-right font-bold">--</td>
+                                </tr>
+                                <tr class="hover:bg-os-border/10 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-os-text flex items-center gap-2">
+                                        <i class="ph ph-arrows-out-line-horizontal text-os-accent"></i> Covenant Headroom
+                                    </td>
+                                    <td id="ui-covenant" class="px-4 py-3 text-right font-mono">-- bps</td>
+                                </tr>
+                                <tr class="hover:bg-os-border/10 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-os-text flex items-center gap-2">
+                                        <i class="ph ph-money text-os-accent"></i> Est. Total Debt
+                                    </td>
+                                    <td id="ui-debt" class="px-4 py-3 text-right font-mono">--</td>
+                                </tr>
+                                <tr class="hover:bg-os-border/10 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-os-text flex items-center gap-2">
+                                        <i class="ph ph-chart-bar text-os-accent"></i> Adj. EBITDA
+                                    </td>
+                                    <td id="ui-ebitda" class="px-4 py-3 text-right font-mono">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Self-Executing Prompt View -->
-        <div class="panel">
-            <h2>Pipeline Orchestration Prompt</h2>
-            <p><em>Submit this raw text to an Adam OS Agent via the MCP Gateway to trigger a live parsing run.</em></p>
-            <div class="pipeline-code">
-import json
-import httpx
-from pydantic import BaseModel
+            <!-- Self-Executing Prompt View (Full width at bottom) -->
+            <div class="bg-os-surface border border-os-border rounded-xl p-5 shadow-lg lg:col-span-2">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-os-accent font-semibold text-lg flex items-center gap-2">
+                        <i class="ph ph-code"></i> Pipeline Orchestration Prompt (MCP Implementation)
+                    </h2>
+                    <button onclick="copyCode()" class="text-xs bg-os-border/50 hover:bg-os-border text-os-text px-3 py-1.5 rounded transition-colors flex items-center gap-1">
+                        <i class="ph ph-copy"></i> Copy
+                    </button>
+                </div>
+                <p class="text-sm text-os-textMuted mb-4"><em>This snippet defines the deterministic extraction routines invoked by the LLM agent during evaluation.</em></p>
 
-async def trigger_edgar_pipeline(cik: str):
-    """
+                <div class="bg-[#0d1117] p-4 rounded-lg overflow-x-auto border border-os-border custom-scrollbar relative">
+                    <pre class="text-sm font-mono leading-relaxed"><code class="language-python">
+<span class="text-[#ff7b72]">import</span> json
+<span class="text-[#ff7b72]">import</span> httpx
+<span class="text-[#ff7b72]">from</span> pydantic <span class="text-[#ff7b72]">import</span> BaseModel
+
+<span class="text-[#ff7b72]">async def</span> <span class="text-[#d2a8ff]">trigger_edgar_pipeline</span>(cik: <span class="text-[#79c0ff]">str</span>):
+    <span class="text-[#a5d6ff]">"""
     Agent executes this Python block to fetch SEC data, calculate leverage,
     evaluate against jsonLogic risk rules, and mutate the HTML state JSON.
-    """
-    headers = {"User-Agent": "AdamOS-Risk-Agent/1.0"}
-    url = f"https://data.sec.gov/submissions/CIK{cik.zfill(10)}.json"
+    """</span>
+    headers = {<span class="text-[#a5d6ff]">"User-Agent"</span>: <span class="text-[#a5d6ff]">"AdamOS-Risk-Agent/1.0"</span>}
+    url = <span class="text-[#79c0ff]">f</span><span class="text-[#a5d6ff]">"https://data.sec.gov/submissions/CIK</span><span class="text-[#79c0ff]">{</span>cik.zfill(<span class="text-[#79c0ff]">10</span>)<span class="text-[#79c0ff]">}</span><span class="text-[#a5d6ff]">.json"</span>
 
-    # 1. Fetch
+    <span class="text-[#8b949e]"># 1. Fetch SEC Data</span>
     response = httpx.get(url, headers=headers)
     data = response.json()
 
-    # 2. Extract & Compute (Mocked logic)
-    # total_debt = ...
-    # adjusted_ebitda = ...
+    <span class="text-[#8b949e]"># 2. Extract & Compute Financials via XBRL Parsing Node</span>
+    <span class="text-[#8b949e]"># total_debt = extract_xbrl_tag(data, 'LongTermDebt')</span>
+    <span class="text-[#8b949e]"># adjusted_ebitda = calculate_ebitda_with_addbacks(data)</span>
 
-    # 3. jsonLogic Evaluation (SNC)
-    # result = apply_guardrails(total_debt / adjusted_ebitda)
+    <span class="text-[#8b949e]"># 3. jsonLogic Evaluation (SNC Classification Engine)</span>
+    <span class="text-[#8b949e]"># risk_flags = evaluate_covenants(total_debt / adjusted_ebitda, sector=data['sicDescription'])</span>
 
-    # 4. State Mutation
-    # write_to_html_dom(cik, result)
+    <span class="text-[#8b949e]"># 4. State Mutation (Writes to DOM &lt;script id="edgar-state"&gt;)</span>
+    <span class="text-[#8b949e]"># commit_to_adam_os_ui(cik, financials, risk_flags)</span>
+                    </code></pre>
+                </div>
             </div>
+
         </div>
     </div>
 
     <!-- =========================================================================
-         DOM BINDING SCRIPT (Renders JSON State to Human UI)
+         DOM BINDING & INTERACTIVITY SCRIPT
          ========================================================================= -->
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        // Formatter utilities
+        const formatCurrency = (num) => {
+            if(num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+            if(num >= 1e6) return '$' + (num / 1e6).toFixed(2) + 'M';
+            return '$' + num.toLocaleString();
+        };
+
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        };
+
+        // Render UI from JSON State
+        function renderUI() {
             const rawData = document.getElementById("edgar-state").textContent;
-            const state = JSON.parse(rawData);
+            let state;
+            try {
+                state = JSON.parse(rawData);
+            } catch (e) {
+                console.error("Failed to parse edgar-state JSON");
+                return;
+            }
 
             // Populate Metadata
             document.getElementById("ui-entity").textContent = state.metadata.entity_name;
             document.getElementById("ui-cik").textContent = state.metadata.cik;
             document.getElementById("ui-form").textContent = state.metadata.form_type;
             document.getElementById("ui-date").textContent = state.metadata.filing_date;
-            document.getElementById("ui-status").textContent = state.metadata.pipeline_status;
-            document.getElementById("ui-last-run").textContent = "LAST RUN: " + state.metadata.last_run;
 
-            // Populate Financials
-            document.getElementById("ui-leverage").textContent = state.financials.leverage_ratio + "x";
-            document.getElementById("ui-lcr").textContent = state.financials.lcr + "%";
-            document.getElementById("ui-covenant").textContent = state.risk_evaluation.covenant_headroom_bps;
+            // Status Bar Updates
+            const statusEl = document.getElementById("ui-status");
+            const statusDot = document.getElementById("ui-status-dot");
+            statusEl.textContent = state.metadata.pipeline_status;
 
-            // Populate Risk
-            const sncClass = state.risk_evaluation.snc_classification;
-            const sncEl = document.getElementById("ui-snc-class");
-            sncEl.textContent = "CLASSIFICATION: " + sncClass;
-            if(sncClass === "SPECIAL_MENTION") {
-                sncEl.className = "status-warn";
-            } else if (sncClass === "SUBSTANDARD" || sncClass === "DOUBTFUL") {
-                sncEl.className = "status-fail";
-                document.getElementById("ui-leverage").parentElement.style.borderColor = "var(--danger)";
+            // Reset status classes
+            statusEl.className = "font-bold tracking-wide transition-colors ";
+            statusDot.className = "w-2.5 h-2.5 rounded-full ";
+
+            if (state.metadata.pipeline_status === "COMPLETED") {
+                statusEl.classList.add("text-os-success", "glow-success");
+                statusDot.classList.add("bg-os-success");
+            } else if (state.metadata.pipeline_status === "FAILED") {
+                statusEl.classList.add("text-os-danger", "glow-danger");
+                statusDot.classList.add("bg-os-danger");
+            } else {
+                statusEl.classList.add("text-os-warning", "glow-warning");
+                statusDot.classList.add("bg-os-warning", "animate-pulse");
             }
 
-            document.getElementById("ui-sub-risk").textContent = state.risk_evaluation.subordinate_tranche_risk;
+            document.getElementById("ui-last-run").innerHTML = `<i class="ph ph-clock mr-1"></i> LAST RUN: ${formatDate(state.metadata.last_run)}`;
+
+            // Populate Financials
+            document.getElementById("ui-leverage").textContent = state.financials.leverage_ratio.toFixed(2) + "x";
+            document.getElementById("ui-lcr").textContent = state.financials.lcr + "%";
+            document.getElementById("ui-covenant").textContent = state.risk_evaluation.covenant_headroom_bps;
+            document.getElementById("ui-debt").textContent = formatCurrency(state.financials.total_debt);
+            document.getElementById("ui-ebitda").textContent = formatCurrency(state.financials.adjusted_ebitda);
+
+            // Populate Risk & Colors
+            const sncClass = state.risk_evaluation.snc_classification;
+            const sncEl = document.getElementById("ui-snc-class");
+            const leverageCard = document.getElementById("leverage-card");
+
+            sncEl.textContent = "CLASS: " + sncClass;
+
+            // Clear previous risk classes
+            sncEl.className = "text-sm font-bold mb-1 px-2 py-1 rounded border transition-colors ";
+            leverageCard.className = "bg-os-terminalBg p-5 rounded-lg border-l-4 mb-6 relative overflow-hidden transition-colors duration-500 ";
+
+            if(sncClass === "PASS" || sncClass === "SATISFACTORY") {
+                sncEl.classList.add("text-os-success", "glow-success", "bg-os-success/10", "border-os-success/30");
+                leverageCard.classList.add("border-os-success");
+            } else if(sncClass === "SPECIAL_MENTION") {
+                sncEl.classList.add("text-os-warning", "glow-warning", "bg-os-warning/10", "border-os-warning/30");
+                leverageCard.classList.add("border-os-warning");
+            } else if (sncClass === "SUBSTANDARD" || sncClass === "DOUBTFUL" || sncClass === "LOSS") {
+                sncEl.classList.add("text-os-danger", "glow-danger", "bg-os-danger/10", "border-os-danger/30");
+                leverageCard.classList.add("border-os-danger");
+            }
+
+            // Subordinate Risk color mapping
+            const subRiskEl = document.getElementById("ui-sub-risk");
+            subRiskEl.textContent = state.risk_evaluation.subordinate_tranche_risk;
+            subRiskEl.className = "px-4 py-3 text-right font-bold transition-colors ";
+
             if(state.risk_evaluation.subordinate_tranche_risk === "ELEVATED") {
-                document.getElementById("ui-sub-risk").className = "status-warn";
+                subRiskEl.classList.add("text-os-warning");
+            } else if(state.risk_evaluation.subordinate_tranche_risk === "SEVERE") {
+                subRiskEl.classList.add("text-os-danger");
+            } else {
+                subRiskEl.classList.add("text-os-success");
             }
 
             // Populate Logs
             const logsContainer = document.getElementById("ui-logs");
-            logsContainer.innerHTML = "";
+            logsContainer.innerHTML = ""; // Clear existing
             state.jsonLogic_flags.forEach(flag => {
                 const div = document.createElement("div");
+                div.className = "pl-2 border-l-2 mb-1 opacity-0 animate-[fadeIn_0.3s_forwards]";
                 div.textContent = "> " + flag;
-                if(flag.startsWith("WARN")) div.style.color = "var(--warning)";
-                if(flag.startsWith("ERR")) div.style.color = "var(--danger)";
+
+                if(flag.startsWith("WARN")) {
+                    div.classList.add("text-os-warning", "border-os-warning");
+                } else if(flag.startsWith("ERR") || flag.startsWith("CRIT")) {
+                    div.classList.add("text-os-danger", "border-os-danger");
+                } else if(flag.startsWith("PASS")) {
+                    div.classList.add("text-os-success", "border-os-success");
+                } else {
+                    div.classList.add("text-os-accent", "border-os-accent");
+                }
                 logsContainer.appendChild(div);
             });
-        });
+
+            // Scroll logs to bottom
+            const terminal = document.getElementById("terminal-container");
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Add tailwind keyframe programmatically for log fade in
+        tailwind.config.theme.extend.keyframes.fadeIn = {
+            '0%': { opacity: '0', transform: 'translateX(-10px)' },
+            '100%': { opacity: '1', transform: 'translateX(0)' }
+        };
+
+        // Initialize UI on load
+        document.addEventListener("DOMContentLoaded", renderUI);
+
+        // Copy Code Functionality
+        function copyCode() {
+            const codeBlock = document.querySelector('code').innerText;
+            navigator.clipboard.writeText(codeBlock).then(() => {
+                const btn = document.querySelector('button[onclick="copyCode()"]');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-check"></i> Copied!';
+                btn.classList.add('bg-os-success/20', 'text-os-success');
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('bg-os-success/20', 'text-os-success');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // =========================================================================
+        // PIPELINE SIMULATION ENGINE (Demonstrates Agent Behavior)
+        // =========================================================================
+
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        async function triggerPipeline() {
+            const btn = document.getElementById('run-btn');
+            const targetInput = document.getElementById('target-input');
+            const cikVal = targetInput.value || "0001018724";
+
+            // UI state: Running
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Executing...';
+            btn.classList.replace('bg-os-accent', 'bg-os-border');
+
+            document.getElementById("ui-status").textContent = "PROCESSING...";
+            document.getElementById("ui-status").className = "font-bold tracking-wide text-os-warning glow-warning";
+            document.getElementById("ui-status-dot").className = "w-2.5 h-2.5 rounded-full bg-os-warning animate-spin";
+
+            const logsContainer = document.getElementById("ui-logs");
+            const cursor = document.getElementById("terminal-cursor");
+            logsContainer.innerHTML = "";
+            cursor.classList.remove("hidden");
+
+            // Mock Log Sequence
+            const logSequence = [
+                { text: `INIT: Booting MCP SEC Tool. Target CIK [${cikVal}]`, delay: 300, type: 'info' },
+                { text: `REQ: GET https://data.sec.gov/submissions/CIK${cikVal.padStart(10, '0')}.json`, delay: 800, type: 'info' },
+                { text: `RES: 200 OK. Locating most recent 10-Q/10-K...`, delay: 600, type: 'info' },
+                { text: `PARSE: XBRL taxonomy identified (us-gaap_2026). Extracting nodes...`, delay: 1000, type: 'info' },
+                { text: `EXTRACT: LongTermDebt detected. Assessing off-balance sheet liabilities.`, delay: 700, type: 'info' },
+                { text: `CALC: Computing Adjusted EBITDA based on sector specific add-backs...`, delay: 900, type: 'info' },
+                { text: `EVAL: Running JSON Logic against SNC ruleset (v4.2.1)`, delay: 1200, type: 'info' }
+            ];
+
+            // Execute mock log streaming
+            for (const log of logSequence) {
+                await sleep(log.delay);
+                const logEl = document.createElement("div");
+                logEl.className = "pl-2 border-l-2 mb-1 text-os-textMuted border-os-border font-mono";
+                logEl.textContent = "> " + log.text;
+                logsContainer.appendChild(logEl);
+
+                const terminal = document.getElementById("terminal-container");
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+
+            await sleep(1000); // Final processing delay
+
+            // Generate dynamic "mock" result data based on random chance
+            const debt = Math.floor(Math.random() * 8000000000) + 1000000000;
+            const ebitda = Math.floor(Math.random() * 1500000000) + 100000000;
+            const leverage = (debt / ebitda);
+
+            let snc, subRisk, flags;
+            if (leverage < 4.0) {
+                snc = "PASS";
+                subRisk = "LOW";
+                flags = [
+                    `PASS: Leverage (${leverage.toFixed(2)}x) well within SNC guidelines.`,
+                    `INFO: Liquidity coverage robust. No immediate action required.`
+                ];
+            } else if (leverage < 6.0) {
+                snc = "SPECIAL_MENTION";
+                subRisk = "ELEVATED";
+                flags = [
+                    `WARN: Leverage (${leverage.toFixed(2)}x) approaching SNC critical threshold.`,
+                    `INFO: Added to enhanced monitoring watchlist.`
+                ];
+            } else {
+                snc = "SUBSTANDARD";
+                subRisk = "SEVERE";
+                flags = [
+                    `CRIT: Leverage (${leverage.toFixed(2)}x) exceeds Basel III / SNC mandate!`,
+                    `WARN: High probability of covenant breach within 12 months.`,
+                    `ERR: Subordinate tranche modeled at < 20% recovery.`
+                ];
+            }
+
+            // Define the new state object
+            const newState = {
+                metadata: {
+                    cik: cikVal.padStart(10, '0'),
+                    entity_name: "ACME DYNAMICS CORP (DYNAMIC DATA)",
+                    form_type: Math.random() > 0.5 ? "10-Q" : "10-K",
+                    filing_date: new Date(Date.now() - Math.random() * 10000000000).toISOString().split('T')[0],
+                    pipeline_status: "COMPLETED",
+                    last_run: new Date().toISOString()
+                },
+                financials: {
+                    total_debt: debt,
+                    adjusted_ebitda: ebitda,
+                    leverage_ratio: leverage,
+                    lcr: (Math.random() * 80 + 70).toFixed(1)
+                },
+                risk_evaluation: {
+                    snc_classification: snc,
+                    basel_iii_compliance: leverage < 6 ? "PASS" : "FAIL",
+                    subordinate_tranche_risk: subRisk,
+                    covenant_headroom_bps: Math.floor(Math.random() * 400) + (leverage > 6 ? -50 : 50)
+                },
+                jsonLogic_flags: flags
+            };
+
+            // Write to the DOM state tag (Mutating the Machine UI)
+            document.getElementById("edgar-state").textContent = JSON.stringify(newState, null, 4);
+
+            cursor.classList.add("hidden");
+
+            // Trigger re-render of the Human UI
+            renderUI();
+
+            // Reset Button State
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ph-bold ph-play"></i> Run Agent';
+            btn.classList.replace('bg-os-border', 'bg-os-accent');
+        }
     </script>
 </body>
 </html>
