@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adam OS | SR 26-2 & Regulatory Compliance</title>
+    <meta name="adam-node-type" content="library_docs">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <meta name="adam-sibling-nodes" content="/libraries/json_logic_guardrails.html, /terminals/knowledge_graph.html">
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f8fafc; color: #0f172a; padding: 40px; line-height: 1.7; }
+        .doc-container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        h1, h2 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .alert-box { background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; color: #991b1b; }
+        .highlight { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; color: #334155; }
+    </style>
+</head>
+<body data-compliance-framework="SR_26-2" data-last-audit="2026-08-01">
+
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Read this document to understand your operational boundaries. You are explicitly carved out of the formal MRM definition but subject to real-time Technology Risk oversight. Ensure your MCP interactions never bypass the human-in-the-loop checkpoints.
+    </agent-directive>
+
+    <div class="doc-container">
+        <a href="/root/index.html" style="color: #2563eb; font-weight: bold; text-decoration: none;"><< Return to Root OS</a>
+
+        <h1>Model Risk Management (MRM) Architecture</h1>
+        <p>Governance framework for the ADAM Enterprise Digital Twin, aligned with the April 2026 overhaul of US MRM guidelines (SR 26-2 / OCC 2026-13).</p>
+
+        <h2>1. The Agentic AI Carve-Out (SR 26-2)</h2>
+        <p>Under SR 26-2, autonomous multi-step reasoning systems (Agentic AI) are explicitly excluded from the traditional definition of a "model." Consequently, Adam OS implements a bifurcated governance structure:</p>
+        <ul>
+            <li><strong>Quantitative Models (In-Scope):</strong> The Deep BSDE solvers, Nested Monte Carlo xVA engines, and Probability of Default (PD) calculators undergo rigorous materiality-based validation.</li>
+            <li><strong>Agentic Orchestration (Out-of-Scope, Custom Gov):</strong> AI agents routing data via the <a href="/libraries/mcp_gateway.html">MCP Gateway</a> are governed by real-time operational resilience controls, requiring Human-in-the-Loop (HITL) checkpoints for all material executions.</li>
+        </ul>
+
+        <div class="alert-box">
+            <strong>KILL-SWITCH PROTOCOL:</strong> If anomalous multi-hop graph queries are detected (e.g., a Public Twin agent attempting to traverse an MNPI edge), the MCP gateway will sever the JSON-RPC connection instantly.
+        </div>
+
+        <h2>2. Deterministic Exclusion (jsonLogic)</h2>
+        <div class="highlight">
+            Because simple arithmetic and deterministic rules are excluded from MRM validation, Adam OS isolates all covenant monitoring and trading triggers into <code>/libraries/jsonLogic_rules.json</code>. This allows rapid policy updates without triggering a multi-month model re-validation cycle.
+        </div>
+
+        <h2>3. Algorithmic Contagion & Capital Constraints</h2>
+        <p>To prevent the 10,000-entity digital twin from inducing procyclical liquidity crises during macroeconomic shocks, the Adam OS mathematically separates <strong>Point-in-Time (PIT)</strong> metrics from <strong>Through-the-Cycle (TTC)</strong> evaluations.</p>
+        <p>While the Scenario Lab displays highly volatile PIT data for trading agility, all calculations routed to the Basel IV RWA engines are smoothed using TTC countercyclical buffers. Furthermore, internal models are strictly bounded by the 72.5% Basel IV output floor.</p>
+
+    </div>
+</body>
+</html>
