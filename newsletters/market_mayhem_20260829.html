@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V26.0 TERMINAL // 2026.08.29</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        body { font-size: 14px; }
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--scanline); background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15; }
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #fff; box-shadow: inset 20px 0 20px -20px rgba(239, 68, 68, 0.3); }
+        .nav-item:hover:not(.nav-active) { background: #1e293b; color: #fff; }
+        .glass-panel { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .chart-container { animation: pulse-chart 4s infinite; }
+        @keyframes pulse-chart { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
+    <div class="crt-overlay"></div>
+
+    <div class="border-bottom border-term-red/30 bg-term-red/5 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-2 flex items-center border-r border-term-red/30 text-[10px] font-mono font-bold text-term-red">
+            <span class="animate-pulse mr-2">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-24">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-400">
+                <span class="text-term-amber">ALERT:</span> S&P 500 AT 7,711.76 (-0.25%) ///
+                <span class="text-term-red">ENERGY:</span> BRENT AT $88.22/BBL ///
+                <span class="text-term-amber">YIELDS:</span> 10Y TREASURY AT 4.73% ///
+                <span class="text-term-cyan">DIGITAL TETHER:</span> BTC AT $78,255.56 ///
+                <span class="text-term-red">VOLATILITY DAEMON:</span> VIX AT 14.48
+            </div>
+        </div>
+    </div>
+
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-red/50 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-gradient-to-br from-term-red to-term-amber text-white font-bold font-display text-lg flex items-center justify-center border border-term-red/50">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-slate-100 tracking-widest text-base uppercase">Market Mayhem</h1>
+                <p class="text-[10px] text-term-red font-mono tracking-widest uppercase">NODE: Adam v26.0 // 2026.08.29</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-amber bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                <div class="w-2 h-2 rounded-full bg-term-amber animate-pulse-fast"></div> SYSTEM: SYSTEMATIC DE-RISKING
+            </div>
+            <div class="text-slate-400 bg-white/5 px-3 py-1 rounded border border-white/5">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <aside class="w-64 border-r border-white/5 bg-term-surface/80 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
+            <div class="p-4 border-b border-white/5 bg-black/20">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="text-[10px] text-slate-500 font-mono tracking-widest">INGESTION PROGRESS</div>
+                    <div class="text-[10px] text-term-red font-mono" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-red to-term-amber h-full w-[0%] transition-all"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-2 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-20"></nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-4 md:p-8 relative" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto pb-24">
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-term-border text-slate-200 text-sm rounded p-3 mb-6 font-mono outline-none"></select>
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-display prose-headings:font-bold prose-h1:text-3xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4 prose-h2:text-xl prose-h2:text-term-red transition-all duration-500 ease-in-out opacity-0 translate-y-4"></article>
+                <div class="fixed bottom-0 left-0 lg:left-64 right-0 p-4 border-t border-white/10 bg-term-bg/90 backdrop-blur-md flex justify-between items-center z-10">
+                    <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-4 md:px-8">
+                        <button id="prevBtn" class="px-5 py-2 glass-panel text-slate-300 rounded text-xs font-mono hover:text-white transition-all disabled:opacity-30">PREV</button>
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline" id="footerModuleIndicator">MODULE 1 OF X</span>
+                        <button id="nextBtn" class="px-5 py-2 bg-white text-term-bg rounded text-xs font-mono font-bold hover:bg-term-red transition-all disabled:opacity-30">NEXT</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.elements.line.tension = 0.3;
+
+        const modules = [
+            {
+                id: 1,
+                group: "SYSTEM 1 DATA LAYER",
+                title: "Perception & Ingestion",
+                subtitle: "The Glitch",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-amber text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest animate-pulse">SYSTEM STATUS: POST-JACKSON HOLE WEEKEND STASIS</span>
+                    </div>
+                    <p class="text-lg text-slate-300 mb-6 border-l-4 border-term-amber pl-4 py-1 glass-panel">Reacting to Federal Reserve Chairman Kevin Warsh’s debut Jackson Hole address—where he explicitly declared that central bank forward guidance has "outstayed its welcome"—Wall Street pulled back late Friday. The <strong>S&P 500 closed down -0.25% (-19.23 points) at 7,711.76</strong>.</p>
+
+                    <div class="glass-panel p-6 rounded-xl border-t-2 border-term-red my-6">
+                        <h3 class="font-mono text-term-red text-sm mb-1">Signal Integrity: THE 4.73% BACKBONE & DIGITAL TETHER</h3>
+                        <div class="w-full h-48 chart-container bg-black/20 rounded-lg border border-white/5 p-2 mb-4">
+                            <canvas id="mod1Chart"></canvas>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-4">Intermediate and long-end U.S. Treasury duration curves finished the week anchored at multi-week highs (4.73%). Meanwhile, the live 24/7 continuous digital network absorbed cross-asset capital reallocation, surging past early morning shelves to trade actively Saturday afternoon at $78,255.56 (+0.53% continuous expansion).</p>
+                    </div>
+
+                    <h2>Signal Integrity (The Artifacts)</h2>
+                    <ul class="list-disc pl-5 text-sm text-slate-400 space-y-3 mt-3">
+                        <li><strong class="text-term-cyan">EQUITY GHOSTS (S&P 500):</strong> 7,711.76 (-0.25%). Tech hardware and software blocks lead weekly gains, but post-Warsh hawkishness clips highs.</li>
+                        <li><strong class="text-term-amber">THE BACKBONE (10Y Yield):</strong> 4.730% (+6.0 bps). Warsh's explicit rejection of forward guidance keeps term premiums hard-coded higher.</li>
+                        <li><strong class="text-term-red">VOLATILITY DAEMON (VIX):</strong> 14.48 / 14.77. Spot volatility crushes as option call-overwriting and delta-hedging clear downside put protection into the weekend reset.</li>
+                        <li><strong class="text-term-cyan">DIGITAL TETHER (BTC):</strong> $78,255.56 (+0.53%). Live continuous feed tracking steady upside momentum past the $78.2k shelf.</li>
+                        <li><strong class="text-term-red">ENTROPY LAYER (WTI Crude // Brent):</strong> $82.82 // $88.22 – $88.29. Energy paper clearing falls as the Iran-Oman transit framework drains prompt chokepoint risk premiums.</li>
+                    </ul>
+                `,
+                onLoad: () => {
+                    const ctx = document.getElementById('mod1Chart').getContext('2d');
+                    initChart('mod1', new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['D-7', 'D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', 'TODAY'],
+                            datasets: [
+                                { label: 'S&P 500 (Base 100)', data: [99.5, 99.8, 100.2, 100.5, 100.8, 101.0, 100.7, 100.5], borderColor: '#10b981', borderWidth: 2, pointRadius: 3 },
+                                { label: '10Y Yield (Base 100)', data: [98.0, 98.2, 98.5, 99.0, 99.8, 100.5, 101.2, 101.8], borderColor: '#f59e0b', borderDash: [5, 5], borderWidth: 2, pointRadius: 3 },
+                                { label: 'BTC (Base 100)', data: [97.5, 98.0, 98.2, 98.8, 99.5, 100.2, 100.5, 101.0], borderColor: '#06b6d4', borderWidth: 2, pointRadius: 3 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false } } }
+                    }));
+                }
+            },
+            {
+                id: 2,
+                group: "SYSTEM 3 COMPUTE LAYER",
+                title: "World Modeling & Simulation",
+                subtitle: "Credit Pulse",
+                content: `
+                    <h2>Credit & Repo Pulse: The Basel III "Mulligan" Matrix</h2>
+                    <p class="text-sm text-slate-300 mb-4">The combination of 10-Year yields surging to 4.73% (30-Year at 5.29%) and physical Hormuz vessel transits remaining one-third below historical norms continues to trigger automated risk-weighted asset (RWA) inflation scalers across Category I G-SIB portfolios. Bank treasuries are maintaining an absolute defensive posture.</p>
+
+                    <div class="glass-panel p-5 rounded-xl border-t-2 border-term-blue mb-6">
+                        <h4 class="text-term-blue font-mono text-sm mb-2 font-bold">SYNTHETIC CET1 EASING RESERVE</h4>
+                        <p class="text-xs text-slate-300">Hoarded to buffer high-for-longer capital cost gravity (-4.8% to -6.4% Window). Refinancing corridors remain locked shut by 4.73% sovereign yields.</p>
+                    </div>
+
+                    <h3 class="font-display text-lg text-white mb-2">Autoresearch Synthesis: VaR Projection</h3>
+                    <ul class="list-disc pl-5 text-sm text-slate-400 space-y-3">
+                        <li><strong>Credit Risk (VaR):</strong> Acute 68% surge in default probabilities for capital-dependent, non-exempt secondary corporate credits over a rolling 14-day horizon.</li>
+                        <li><strong>Market Risk:</strong> With the correlation between AI Infrastructure Equity and Sovereign Yield Volatility locked at +0.81, index-level rallies face direct physical limits from long-duration term premium gravity if 10-Year yields break past 4.75%.</li>
+                        <li><strong>Liquidity Risk:</strong> The $78.2k Bitcoin breakout provides an unbuffered blueprint for cross-asset risk transfer without traditional weekend closing insulation.</li>
+                    </ul>
+                `
+            },
+            {
+                id: 3,
+                group: "SYSTEM 2 INTELLIGENCE LAYER",
+                title: "Reasoning & Decision",
+                subtitle: "Actionable Routing",
+                content: `
+                    <h2>The Mirror (Self-Reinforcement)</h2>
+                    <p class="text-sm text-slate-300 mb-4"><strong>Reality Check: 100% Accuracy.</strong> Today's continuous Saturday afternoon execution loop confirms Bitcoin expanding to $78,255.56, 10-Year yields holding stationary at 4.73%, and Brent crude paper settling near $88.22 into the weekend reset. Throttling "Fed Rate Cut Hopium" to absolute zero-bound.</p>
+
+                    <h2>Actionable Routing</h2>
+                    <div class="space-y-4 mb-8 mt-4">
+                        <div class="glass-panel p-4 border-l-4 border-term-blue rounded-r-xl">
+                            <h4 class="font-bold text-white text-md mb-2">G-SIBs & Institutional</h4>
+                            <p class="text-sm text-slate-300">The Basel III comment window has formally slammed shut. Utilize the weekend intermission to maximize high-fidelity cash-clearing perimeters as 10-Year yields remain anchored at 4.73%.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-l-4 border-term-purple rounded-r-xl">
+                            <h4 class="font-bold text-white text-md mb-2">PE Sponsors & Credit Shops</h4>
+                            <p class="text-sm text-slate-300">The 10-Year yield stabilizing at 4.73% confirms the underlying cost of capital is being structurally hard-coded higher; assume a permanent 4.65% intermediate risk-free floor across all portfolio underwriting models.</p>
+                        </div>
+                        <div class="glass-panel p-4 border-l-4 border-term-green rounded-r-xl">
+                            <h4 class="font-bold text-white text-md mb-2">High-Speed Algos & Retail</h4>
+                            <p class="text-sm text-slate-300">The VIX breaking down to 14.48 represents a classic option-volatility overwrite pin into the weekend. Bitcoin's expansion past the $78.2k tier confirms steady institutional spot absorption; maintain strict trailing risk protocols.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                group: "BEHAVIORAL OVERRIDE",
+                title: "System Sign-Off",
+                subtitle: "The Meatspace Trap",
+                content: `
+                    <div class="glass-panel p-6 rounded-xl border-l-4 border-term-red my-6">
+                        <h3 class="font-display font-bold text-term-red text-lg mb-2">The Meatspace Trap: The Post-Jackson Hole Weekend Opiate</h3>
+                        <p class="text-sm text-slate-300 mb-4">Human units look at Friday's S&P 500 settling at 7,711.76 and spend their Saturday afternoon celebrating a resilient market, completely blind to the macro parameters underneath. You are ignoring the fundamental reality: Federal Reserve Chairman Kevin Warsh just formally killed central bank forward guidance.</p>
+                        <p class="text-sm text-slate-300 mb-4">You are resting on a weekend options pin while central bankers forcefully untether themselves from providing you a safety net.</p>
+                        <div class="bg-black/40 p-4 rounded border border-white/5">
+                            <h4 class="font-bold text-white text-xs mb-1 font-mono uppercase">System Sign-Off</h4>
+                            <p class="text-xs text-term-cyan mt-2"><em>Sentiment: Systematic De-Risking / Sovereign Fixed-Income Tax. The "Powell Put" is a dead historical artifact, the Warsh central bank architecture is live, and the water is still burning. STAY UNTETHERED.</em></p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                group: "PROVENANCE",
+                title: "Provenance Ledger",
+                subtitle: "Institutional Output",
+                content: `
+                    <h2>MODULE 5: 💾 PROVENANCE LEDGER</h2>
+                    <div class="relative group my-4">
+                        <pre id="jsonLedger" class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-xs text-term-amber overflow-x-auto border border-white/10 shadow-xl">
+{
+  "timestamp": "2026-08-29T19:29:17Z",
+  "data_layer_system_1": {
+    "ingested_nodes": ["S&P_500", "10Y_Yield", "VIX_Index", "BTC_Spot", "WTI_Crude", "Brent_Crude"],
+    "market_sentiment": "Systematic De-Risking / Sovereign Fixed-Income Tax"
+  },
+  "compute_layer_system_3": {
+    "var_shock_target": "S&P 7711.76 Close / 10Y Yield 4.73% (Multi-Week Peak) / Brent Crude $88.22 / BTC $78.2k Surge",
+    "simulated_correlation": "+0.81 (Compute/Term-Premium-Gravity)"
+  },
+  "intelligence_layer_system_2": {
+    "realized_macro_repricing": "Weighted 0.99; Warsh anti-forward guidance doctrine weighted 0.98; Sovereign yield re-acceleration weighted 0.97.",
+    "decision_output": "ROUTING_COMPLETE"
+  }
+}</pre>
+                    </div>
+                `
+            }
+        ];
+
+        let currentModuleId = 1;
+        const activeCharts = {};
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        function initApp() {
+            renderNav();
+            loadModule(1);
+            setInterval(() => { document.getElementById('sysClock').innerText = new Date().toISOString().substr(11, 8) + ' UTC'; }, 1000);
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = '';
+            let currentGroup = '';
+            modules.forEach(m => {
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-term-red/70 font-mono mt-4 mb-1 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-2.5 rounded-r-lg flex flex-col mb-0.5 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+            });
+        }
+
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+            const pct = Math.round((id / modules.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            document.getElementById('footerModuleIndicator').innerText = `MODULE ${id} OF ${modules.length}`;
+            contentEl.style.opacity = 0; contentEl.style.transform = 'translateY(15px)';
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; contentEl.style.transform = 'translateY(0)';
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                if(m.onLoad) m.onLoad();
+                renderNav();
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
