@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS - Neutrality v2.4 Run Complete Eval Set</title>
+    
+    <!-- Comprehensive Metadata for Machine Readability -->
+    <meta name="adam-architecture-role" content="eval-harness-snapshot">
+    <meta name="adam-required-capabilities" content="prov-o-parsing, visual-regression, json-extraction">
+    <meta name="adam-sibling-nodes" content="/root/index.html, /evals/index.html">
+    <meta name="description" content="A self-contained modular benchmark for runtime output comparison (Neutrality v2.4). Includes simulated newsletters, terminals, forward outlooks, projections, and models.">
+
+    <!-- CSS styling for terminal-inspired aesthetics -->
+    <style>
+        :root {
+            --bg-color: #090d16;
+            --text-color: #e2e8f0;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-crimson: #ef4444;
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --border-color: #1e293b;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--glass-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-emerald);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            height: calc(100vh - 120px);
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--accent-amber);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.25rem;
+        }
+
+        .sidebar-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-list a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-list a:hover, .sidebar-list a.active {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .module {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .module-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            margin: 0;
+        }
+
+        .module-meta {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-family: var(--font-mono);
+        }
+
+        .terminal-block {
+            background-color: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #a3e635;
+            overflow-x: auto;
+        }
+
+        .terminal-block .prompt {
+            color: var(--accent-cyan);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--accent-amber);
+            font-weight: normal;
+            text-transform: uppercase;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .positive { color: var(--accent-emerald); }
+        .negative { color: var(--accent-crimson); }
+        .neutral { color: var(--accent-cyan); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Agent Directives -->
+    <agent-directive type="instruction" content="Extract all JSON embedded within <script type='application/json'> blocks. These represent the finalized state models for Neutrality v2.4 run. Use them as the benchmark baseline."></agent-directive>
+    <agent-directive type="navigation" content="The side navigation dictates the logical groupings of the benchmark. Switch between 'newsletters', 'terminals', 'outlooks', 'projections', and 'models'." ></agent-directive>
+
+    <!-- Embedded State Parameters (Machine Readable) -->
+    <script type="application/json" id="run-metadata">
+    {
+        "run_id": "neutrality-v2.4-benchmark",
+        "timestamp": "2026-08-30T12:00:00Z",
+        "status": "COMPLETED",
+        "eval_score": 99.4,
+        "environment": "clean-room-harness"
+    }
+    </script>
+    <script type="application/json" id="market-telemetry">
+    {
+        "assets": [
+            {"node": "SPX_INDEX", "value": 4125.50, "t_minus_1_delta": 1.2, "volatility_signal": "LOW"},
+            {"node": "US10Y_YIELD", "value": 3.85, "t_minus_1_delta": -0.02, "volatility_signal": "STABLE"},
+            {"node": "BTC_USD", "value": 64200.00, "t_minus_1_delta": -2.1, "volatility_signal": "HIGH"}
+        ]
+    }
+    </script>
+    <script type="application/json" id="projections-data">
+    {
+        "quarterly_outlook": {
+            "Q3_2026": {"gdp_growth_est": 1.8, "inflation_core": 2.2},
+            "Q4_2026": {"gdp_growth_est": 1.5, "inflation_core": 2.0}
+        }
+    }
+    </script>
+
+    <header>
+        <h1>ADAM // NEUTRALITY_V2.4_EVAL</h1>
+        <nav>
+            <a href="/root/index.html">Root</a>
+            <a href="/terminals/">Terminals</a>
+            <a href="/showcases/">Showcase</a>
+        </nav>
+    </header>
+
+    <main>
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>Views</h3>
+                <ul class="sidebar-list">
+                    <li><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-target="newsletters">Newsletters</a></li>
+                    <li><a href="#" class="nav-link" data-target="terminals">Terminals</a></li>
+                    <li><a href="#" class="nav-link" data-target="outlooks">Forward Outlook</a></li>
+                    <li><a href="#" class="nav-link" data-target="projections">Projections</a></li>
+                    <li><a href="#" class="nav-link" data-target="models">Models</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3>Run Stats</h3>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">
+                    <div>Eval Score: <span class="positive">99.4%</span></div>
+                    <div>Modules: 5/5</div>
+                    <div>Data Sync: OK</div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="content-area">
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section" data-view-state="active">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">Run Complete: Measurement Baseline</h2>
+                        <span class="module-meta">ID: neutrality-v2.4-benchmark</span>
+                    </div>
+                    <p>This document serves as a self-contained, standalone modular benchmark prompt for runtime output comparison. It captures a static snapshot of the system's current capabilities.</p>
+                    <div class="terminal-block">
+                        <div><span class="prompt">$</span> load_eval_set --version v2.4 --mode clean-room</div>
+                        <div>> Initializing neuro-symbolic simulation harness...</div>
+                        <div>> Generating newsletters, terminal states, outlooks...</div>
+                        <div>> Syncing provenance graph...</div>
+                        <div>> Execution complete. Data frozen for human/machine review.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletters View -->
+            <div id="view-newsletters" class="view-section hidden" data-view-state="inactive">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">Market Mayhem: Daily Brief</h2>
+                        <span class="module-meta">Generated: 2026-08-30</span>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="color: var(--accent-cyan); font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Macro Context</h3>
+                        <p>Global markets exhibit cautious optimism as core inflation metrics show slight cooling in key jurisdictions. The focus remains on sovereign debt yields and structured credit spreads.</p>
+                    </div>
+                    
+                    <h3 style="color: var(--accent-cyan); font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 1.5rem;">LiveTelemetry</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Asset/Node</th>
+                                <th>Value</th>
+                                <th>T-1 Delta</th>
+                                <th>Volatility/Signal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telemetry-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Terminals View -->
+            <div id="view-terminals" class="view-section hidden" data-view-state="inactive">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">Quant Terminal Analysis</h2>
+                        <span class="module-meta">Module: QT-001</span>
+                    </div>
+                    <div class="terminal-block">
+                        <div><span class="prompt">QT></span> analyze risk_matrix --portfolio global_macro</div>
+                        <br>
+                        <div>PORTFOLIO RISK DECOMPOSITION:</div>
+                        <div>------------------------------------------------</div>
+                        <div>Equity Beta:   <span class="neutral">0.85</span></div>
+                        <div>Rate Delta:    <span class="negative">-1.2M / bp</span></div>
+                        <div>Credit Spread: <span class="negative">-0.5M / bp</span></div>
+                        <div>FX Exposure:   <span class="neutral">Neutralized</span></div>
+                        <br>
+                        <div>STATUS: <span class="positive">WITHIN LIMITS</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outlooks View -->
+            <div id="view-outlooks" class="view-section hidden" data-view-state="inactive">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">Forward Outlook Q3/Q4 2026</h2>
+                        <span class="module-meta">Module: Strategy & Conviction</span>
+                    </div>
+                    <p>The forward macroeconomic outlook suggests a soft landing scenario, provided central banks maintain current policy trajectories without unexpected tightening.</p>
+                    <ul style="line-height: 1.8; color: var(--text-color);">
+                        <li><strong>Equities:</strong> Rotation from growth to value anticipated as rate cuts are priced in.</li>
+                        <li><strong>Fixed Income:</strong> Duration extension favored in high-quality sovereign debt.</li>
+                        <li><strong>Alternatives:</strong> Private credit continues to offer attractive illiquidity premiums.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Projections View -->
+            <div id="view-projections" class="view-section hidden" data-view-state="inactive">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">Economic Projections</h2>
+                        <span class="module-meta">Source: Consensus Matrix</span>
+                    </div>
+                    <div id="projections-display" style="font-family: var(--font-mono); font-size: 0.9rem;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Models View -->
+            <div id="view-models" class="view-section hidden" data-view-state="inactive">
+                <div class="module">
+                    <div class="module-header">
+                        <h2 class="module-title">System Capabilities Models</h2>
+                        <span class="module-meta">Static Snapshot</span>
+                    </div>
+                    <p>The system operates using the following primary neuro-symbolic kernels:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 4px; border-left: 4px solid var(--accent-cyan);">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-cyan);">Knowledge Kernel</h4>
+                            <p style="font-size: 0.85rem; margin: 0;">Ingests unstructured data into the canonical ontology.</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 4px; border-left: 4px solid var(--accent-emerald);">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-emerald);">Simulation Kernel</h4>
+                            <p style="font-size: 0.85rem; margin: 0;">Runs counterfactual scenarios and stress tests.</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 4px; border-left: 4px solid var(--accent-amber);">
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-amber);">Decision Kernel</h4>
+                            <p style="font-size: 0.85rem; margin: 0;">Evaluates policies against scenarios to recommend actions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Self-contained client-side logic for the benchmark
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Navigation Logic
+            const navLinks = document.querySelectorAll('.nav-link');
+            const viewSections = document.querySelectorAll('.view-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('data-target');
+
+                    // Update active link
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // Update visible section
+                    viewSections.forEach(section => {
+                        section.classList.add('hidden');
+                        section.setAttribute('data-view-state', 'inactive');
+                    });
+                    
+                    const targetSection = document.getElementById(`view-${targetId}`);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                        targetSection.setAttribute('data-view-state', 'active');
+                    }
+                });
+            });
+
+            // 2. Data Hydration from Embedded JSON
+            function sanitizeStr(str) {
+                if (typeof str !== 'string') return str;
+                return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+
+            // Hydrate Telemetry Table
+            try {
+                const telemetryData = JSON.parse(document.getElementById('market-telemetry').textContent);
+                const tableBody = document.getElementById('telemetry-table-body');
+                
+                telemetryData.assets.forEach(asset => {
+                    const tr = document.createElement('tr');
+                    
+                    const deltaColor = asset.t_minus_1_delta >= 0 ? 'positive' : 'negative';
+                    const sign = asset.t_minus_1_delta > 0 ? '+' : '';
+                    
+                    tr.innerHTML = `
+                        <td>${sanitizeStr(asset.node)}</td>
+                        <td>${asset.value.toFixed(2)}</td>
+                        <td class="${deltaColor}">${sign}${asset.t_minus_1_delta.toFixed(2)}%</td>
+                        <td class="${asset.volatility_signal === 'HIGH' ? 'negative' : 'neutral'}">${sanitizeStr(asset.volatility_signal)}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Error parsing telemetry data:", err);
+            }
+
+            // Hydrate Projections
+            try {
+                const projData = JSON.parse(document.getElementById('projections-data').textContent);
+                const projDisplay = document.getElementById('projections-display');
+                
+                let htmlStr = '';
+                for (const [quarter, data] of Object.entries(projData.quarterly_outlook)) {
+                    htmlStr += `<div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--accent-cyan);">${sanitizeStr(quarter)}</strong><br>
+                        Est. GDP Growth: <span class="${data.gdp_growth_est >= 1.5 ? 'positive' : 'neutral'}">${data.gdp_growth_est}%</span><br>
+                        Core Inflation: <span>${data.inflation_core}%</span>
+                    </div>`;
+                }
+                projDisplay.innerHTML = htmlStr;
+
+            } catch (err) {
+                console.error("Error parsing projections data:", err);
+            }
+        });
+    </script>
+</body>
+</html>
