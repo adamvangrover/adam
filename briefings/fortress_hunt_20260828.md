@@ -122,3 +122,4 @@ With zero new regulatory filing drift reported over the past seven days, the fun
 
 * **Zero-Action Drift:** The execution critic confirms that 100% of the minor mark-to-market net asset value fluctuations tracked this week are exclusively an organic function of underlying equity pricing mechanics and broad macro beta. There is zero evidence of active dark-pool block accumulation or discrete distribution pipelines during this window.
 * **Derivative Decay Monitoring:** Systematic tracking of the broader options matrix indicates that the defensive, short-dated index puts used for structural portfolio insulation continue to experience smooth thematic time decay. They remain categorized strictly as statistical armor rather than structural directional indicators.
+```

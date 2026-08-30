@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InstitutionalAITrainingLedger",
+  "description": "Schema for parsing Module 8 Addendum data into downstream risk and valuation models.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "data_variable_node": {
+        "type": "string",
+        "description": "The specific market variable or index node name."
+      },
+      "market_level_value": {
+        "type": "string",
+        "description": "Current numerical level, spread, or yield value."
+      },
+      "primary_model_target": {
+        "type": "string",
+        "enum": ["PD", "LGD", "DCF", "EV", "PD / LGD", "DCF / EV"],
+        "description": "Target quantitative model utilizing the feature."
+      },
+      "unstructured_context_provenance": {
+        "type": "string",
+        "description": "Contextual narrative, source, or structural driver."
+      }
+    },
+    "required": [
+      "data_variable_node",
+      "market_level_value",
+      "primary_model_target",
+      "unstructured_context_provenance"
+    ]
+  }
+}

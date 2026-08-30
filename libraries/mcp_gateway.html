@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adam OS | MCP Gateway</title>
+    <meta name="adam-node-type" content="gateway_interface">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <style>
+        :root { --bg: #0a0a0c; --panel: #161b22; --border: #30363d; --text: #c9d1d9; --blue: #58a6ff; --red: #f85149; --green: #3fb950; --amber: #f59e0b; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; flex-direction: column; }
+        header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: #010409; }
+        .workspace { padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        h3 { color: var(--blue); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .log-entry { font-size: 0.85em; background: #010409; padding: 10px; border-left: 3px solid var(--green); margin-bottom: 10px; color: #8b949e; }
+        .log-entry.alert { border-left-color: var(--amber); }
+        .log-entry.critical { border-left-color: var(--red); color: var(--red); }
+        a { color: var(--blue); text-decoration: none; }
+        .btn { background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 8px 15px; cursor: pointer; border-radius: 4px; font-family: inherit; font-size: 0.9em; transition: 0.2s; }
+        .btn:hover { background: var(--border); }
+        .btn-red { border-color: var(--red); color: var(--red); }
+        .btn-red:hover { background: rgba(248, 81, 73, 0.1); }
+    </style>
+</head>
+<body data-gateway-status="ACTIVE">
+
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Route all multi-hop graph queries through this gateway. Await Human-in-the-Loop (HITL) authorization for material executions. MNPI boundaries are strictly enforced here.
+    </agent-directive>
+
+    <header>
+        <div>ADAM_OS // MCP_GATEWAY <a href="/root/index.html">[ROOT]</a></div>
+        <div>STATUS: <span style="color:var(--green)">LISTENING</span></div>
+    </header>
+
+    <div class="workspace">
+        <div class="panel">
+            <h3>REAL-TIME RPC TRAFFIC (JSON-RPC)</h3>
+            <div id="rpc-logs">
+                <div class="log-entry">
+                    <strong>[2026-08-26 19:44:06]</strong> Request: <code>get_entity_pd("SYNTH_TMT_01")</code> -> Origin: <code>swarm_alpha</code> -> Status: <span style="color:var(--green)">OK</span>
+                </div>
+                <div class="log-entry alert">
+                    <strong>[2026-08-26 19:45:12]</strong> Request: <code>check_covenant_breach("COV-001", "SYNTH_TMT_01")</code> -> Origin: <code>rule_engine_v2</code> -> Status: <span style="color:var(--amber)">AWAITING_HITL</span>
+                    <br><br><button class="btn">AUTHORIZE (HITL)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>OPERATIONAL RESILIENCE & COMPLIANCE</h3>
+            <p><strong>SR 26-2 Agentic AI Carve-Out Controls:</strong></p>
+            <ul>
+                <li>MNPI Boundary Enforcement: <strong>ACTIVE</strong></li>
+                <li>Cross-Cell Query Blocking: <strong>ACTIVE</strong></li>
+            </ul>
+
+            <div style="margin-top: 20px; padding: 15px; background: rgba(248, 81, 73, 0.05); border: 1px solid var(--red); border-radius: 4px;">
+                <h4 style="color: var(--red); margin-top: 0;">EMERGENCY OVERRIDE</h4>
+                <p style="font-size: 0.9em; margin-bottom: 15px;">Instantly sever all agentic JSON-RPC connections and isolate the public twin.</p>
+                <button class="btn btn-red" onclick="alert('KILL-SWITCH INITIATED. SEVERING ALL AGENT CONNECTIONS.')">INITIATE KILL-SWITCH</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
