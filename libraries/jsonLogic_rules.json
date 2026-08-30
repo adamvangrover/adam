@@ -1,0 +1,28 @@
+{
+  "covenants": [
+    {
+      "id": "COV-001",
+      "name": "Probability of Default (PD) Limit",
+      "description": "SR 26-2 Excluded Deterministic Rule: Flags entities whose 12-month forward PD exceeds the 5.0% threshold.",
+      "rule": {
+        ">": [
+          { "var": "pd_12m_forward" },
+          0.05
+        ]
+      },
+      "action": "GENERATE_SAR"
+    },
+    {
+      "id": "COV-002",
+      "name": "Basel IV Output Floor Check",
+      "description": "SR 26-2 Excluded Deterministic Rule: Ensures internal models do not fall below the 72.5% Basel IV output floor.",
+      "rule": {
+        "<": [
+          { "var": "internal_model_rwa" },
+          0.725
+        ]
+      },
+      "action": "TRIGGER_FLOOR_OVERRIDE"
+    }
+  ]
+}
