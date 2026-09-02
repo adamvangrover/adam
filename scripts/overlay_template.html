@@ -1,0 +1,44 @@
+    <!-- PROVENANCE OVERLAY & TELEMETRY HARNESS -->
+    <div id="system2-overlay" class="system2-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,11,20,0.95); z-index: 9999; color: #00f3ff; font-family: 'JetBrains Mono', monospace; padding: 2rem; border: 1px solid #00f3ff; backdrop-filter: blur(10px); flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #00f3ff; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 1.2rem; color: #0aff60;">[ ADAM_OS :: TELEMETRY HARNESS & PROVENANCE ]</h2>
+            <span style="cursor: pointer; color: #ff3333; font-weight: bold;" onclick="document.getElementById('system2-overlay').style.display='none'">[ CLOSE_CONNECTION ]</span>
+        </div>
+        <div id="sys2-content" style="flex-grow: 1; overflow-y: auto;">
+            <div class="provenance-log" style="background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid #333;">
+                <p style="margin: 5px 0;"><span style="color: #888;">AGENT:</span> MetaOrchestrator</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">STATUS:</span> ACTIVE_SYNC</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">W3C_PROV_O:</span> <span id="overlay-prov-hash">PENDING</span></p>
+            </div>
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa;">
+                <p>> WAITING FOR KERNEL YIELD...</p>
+                <p>> STREAMING LOG_EVENT DATA FROM ISOLATED IFRAME...</p>
+                <div id="overlay-log-stream" style="margin-top: 10px; border-left: 2px solid #06b6d4; padding-left: 10px; min-height: 100px;"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Harness Telemetry Framework connector
+        window.showProvenanceOverlay = function(hash) {
+            const overlay = document.getElementById('system2-overlay');
+            if(overlay) {
+                overlay.style.display = 'flex';
+                if(hash) {
+                    document.getElementById('overlay-prov-hash').innerText = hash;
+                }
+            }
+        };
+
+        // Listen for PROV-O events via Shared Provenance Bus
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'PROVO_EVENT') {
+                const stream = document.getElementById('overlay-log-stream');
+                if (stream) {
+                    const logEl = document.createElement('div');
+                    logEl.style.marginBottom = '5px';
+                    logEl.innerText = `> [${new Date().toISOString()}] ${JSON.stringify(event.data.payload)}`;
+                    stream.appendChild(logEl);
+                }
+            }
+        });
+    </script>

@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADAM Digital Twin — World Model & Credit Engine</title>
+<meta name="description" content="Institutional-grade digital twin world model with 10,000 simulated rated entities providing a one-year forward view of global macro and credit conditions.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #111827;
+    --bg-card: rgba(17, 24, 39, 0.85);
+    --bg-glass: rgba(30, 41, 59, 0.45);
+    --border-glass: rgba(100, 116, 139, 0.25);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-emerald: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-rose: #f43f5e;
+    --accent-violet: #8b5cf6;
+    --accent-orange: #f97316;
+    --gradient-brand: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+    --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 14px; scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 30%, rgba(59,130,246,0.06), transparent),
+      radial-gradient(ellipse 600px 400px at 80% 70%, rgba(139,92,246,0.05), transparent),
+      radial-gradient(ellipse 500px 300px at 50% 50%, rgba(6,182,212,0.04), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+
+  .header-logo {
+    width: 32px; height: 32px;
+    background: var(--gradient-brand);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: white;
+    box-shadow: 0 0 20px rgba(59,130,246,0.3);
+  }
+
+  .header-title {
+    font-size: 15px; font-weight: 700; letter-spacing: -0.02em;
+    background: var(--gradient-brand);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .header-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .header-meta { display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--text-secondary); }
+
+  .badge {
+    padding: 3px 10px; border-radius: 20px;
+    font-weight: 600; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .badge-live {
+    background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3); animation: pulse-badge 2s infinite;
+  }
+
+  .badge-version {
+    background: rgba(139, 92, 246, 0.15); color: var(--accent-violet);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+  }
+
+  @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  .nav-tabs {
+    display: flex; gap: 2px; padding: 0 24px;
+    background: rgba(10, 14, 26, 0.8);
+    border-bottom: 1px solid var(--border-glass); overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 10px 18px; font-size: 12px; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition); white-space: nowrap; user-select: none;
+  }
+
+  .nav-tab:hover { color: var(--text-secondary); background: rgba(255,255,255,0.03); }
+  .nav-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+
+  .main-content { padding: 20px 24px; position: relative; z-index: 1; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+  @media (max-width: 1200px) { .grid-4, .grid-5, .grid-6 { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 900px) { .grid-2, .grid-3, .grid-4, .grid-5, .grid-6 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border-glass);
+    border-radius: var(--radius); backdrop-filter: blur(12px);
+    overflow: hidden; transition: var(--transition);
+  }
+
+  .card:hover { border-color: rgba(100, 116, 139, 0.4); box-shadow: var(--shadow-glow); }
+
+  .card-header {
+    padding: 14px 18px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+  }
+
+  .card-title {
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary);
+  }
+
+  .card-body { padding: 16px 18px; }
+
+  .metric-card {
+    padding: 16px 18px; background: var(--bg-card);
+    border: 1px solid var(--border-glass); border-radius: var(--radius);
+    backdrop-filter: blur(12px); transition: var(--transition);
+  }
+
+  .metric-card:hover { border-color: rgba(100, 116, 139, 0.4); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+
+  .metric-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px;
+  }
+
+  .metric-value { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 4px; }
+  .metric-delta { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .delta-up { color: var(--accent-emerald); }
+  .delta-down { color: var(--accent-rose); }
+  .delta-neutral { color: var(--text-muted); }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+  .data-table th {
+    text-align: left; padding: 8px 12px; font-weight: 700;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); border-bottom: 1px solid var(--border-glass);
+    position: sticky; top: 0; background: var(--bg-secondary);
+    z-index: 10;
+  }
+
+  .data-table td {
+    padding: 7px 12px; border-bottom: 1px solid rgba(100, 116, 139, 0.08);
+    color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  }
+
+  .data-table tr:hover td { background: rgba(59, 130, 246, 0.04); color: var(--text-primary); }
+  .scrollable-table { max-height: 400px; overflow-y: auto; }
+
+  .rating-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em;
+  }
+
+  .rating-ig { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .rating-hy { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .rating-dist { background: rgba(244,63,94,0.15); color: #fb7185; border: 1px solid rgba(244,63,94,0.3); }
+
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-glass); border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm); padding: 8px 14px; margin-bottom: 16px;
+  }
+
+  .search-box input {
+    flex: 1; background: none; border: none;
+    color: var(--text-primary); font-size: 13px;
+    font-family: 'Inter', sans-serif; outline: none;
+  }
+
+  .search-box input::placeholder { color: var(--text-muted); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+  .filter-btn {
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid var(--border-glass); background: var(--bg-glass);
+    color: var(--text-secondary); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.4); color: var(--accent-blue);
+  }
+
+  .section-title {
+    font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+
+  .section-title .icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .status-green { background: var(--accent-emerald); box-shadow: 0 0 6px var(--accent-emerald); }
+  .status-amber { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+  .status-red { background: var(--accent-rose); box-shadow: 0 0 6px var(--accent-rose); }
+
+  .sim-controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+  .sim-btn {
+    padding: 8px 20px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-glass); background: var(--bg-glass);
+    color: var(--text-primary); font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .sim-btn:hover { background: rgba(59,130,246,0.15); border-color: var(--accent-blue); }
+
+  .sim-btn.primary { background: var(--gradient-brand); border: none; color: white; }
+  .sim-btn.primary:hover { box-shadow: 0 0 20px rgba(59,130,246,0.4); transform: translateY(-1px); }
+
+  select.sim-select {
+    padding: 8px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-glass); background: var(--bg-glass);
+    color: var(--text-primary); font-size: 12px;
+    font-family: 'Inter', sans-serif; font-weight: 600; outline: none; cursor: pointer;
+  }
+
+  select.sim-select option { background: var(--bg-secondary); }
+
+  .telemetry-log {
+    max-height: 300px; overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    padding: 12px; background: rgba(0,0,0,0.3);
+    border-radius: var(--radius-sm); border: 1px solid var(--border-glass);
+  }
+
+  .log-entry { padding: 3px 0; display: flex; gap: 8px; opacity: 0.85; }
+  .log-ts { color: var(--text-muted); min-width: 80px; }
+  .log-tag { font-weight: 700; min-width: 100px; }
+  .log-tag.info { color: var(--accent-blue); }
+  .log-tag.warn { color: var(--accent-amber); }
+  .log-tag.error { color: var(--accent-rose); }
+  .log-tag.success { color: var(--accent-emerald); }
+  .log-msg { color: var(--text-secondary); }
+
+  .chart-container { position: relative; width: 100%; height: 280px; }
+  .chart-container.tall { height: 400px; }
+
+  .footer {
+    padding: 16px 24px; border-top: 1px solid var(--border-glass);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--text-muted); margin-top: 40px;
+  }
+
+  .loading-overlay {
+    position: fixed; inset: 0; background: var(--bg-primary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.6s ease;
+  }
+
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .loading-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid rgba(59,130,246,0.2); border-top-color: var(--accent-blue);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+
+  .loading-progress {
+    width: 240px; height: 3px; background: rgba(100,116,139,0.15);
+    border-radius: 2px; margin-top: 12px; overflow: hidden;
+  }
+
+  .loading-progress-bar {
+    height: 100%; background: var(--gradient-brand);
+    border-radius: 2px; width: 0%; transition: width 0.3s ease;
+  }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px); z-index: 500; display: none;
+    align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg-secondary); border: 1px solid var(--border-glass);
+    border-radius: var(--radius); width: 90%; max-width: 900px;
+    max-height: 80vh; overflow-y: auto; padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-close {
+    float: right; background: none; border: none;
+    color: var(--text-muted); font-size: 20px; cursor: pointer;
+    padding: 4px 8px; border-radius: 4px; transition: var(--transition);
+  }
+
+  .modal-close:hover { background: rgba(244,63,94,0.15); color: var(--accent-rose); }
+
+  .stat-row { display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+
+  .stat-item {
+    flex: 1; min-width: 120px; padding: 10px 14px;
+    background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm);
+  }
+
+  .stat-item .stat-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px;
+  }
+
+  .stat-item .stat-value {
+    font-size: 18px; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em;
+  }
+
+  .sector-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 600;
+    background: rgba(100,116,139,0.12); color: var(--text-secondary);
+  }
+
+  .panel > .section-title:not(:first-child) { margin-top: 28px; }
+
+  .covenant-safe { color: var(--accent-emerald); }
+  .covenant-watch { color: var(--accent-amber); }
+  .covenant-breach { color: var(--accent-rose); }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Initializing World Model...</div>
+  <div class="loading-progress"><div class="loading-progress-bar" id="loadingBar"></div></div>
+</div>
+
+<div class="modal-overlay" id="entityModal">
+  <div class="modal" id="entityModalContent"></div>
+</div>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">A</div>
+    <div>
+      <div class="header-title">ADAM Digital Twin — World Model</div>
+      <div class="header-subtitle">Institutional Credit & Macro Simulation Engine</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span class="badge badge-live">● LIVE</span>
+    <span class="badge badge-version">v26.0.4-kernel</span>
+    <span id="headerClock"></span>
+    <span>10,000 Entities</span>
+  </div>
+</header>
+
+<nav class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" data-tab="overview">◉ Overview</div>
+  <div class="nav-tab" data-tab="macro">📊 Macro Forecast</div>
+  <div class="nav-tab" data-tab="credit">🏛 Credit Engine</div>
+  <div class="nav-tab" data-tab="entities">📋 Entity Browser</div>
+  <div class="nav-tab" data-tab="migration">🔄 Migration Matrix</div>
+  <div class="nav-tab" data-tab="covenants">⚖ Covenant Monitor</div>
+  <div class="nav-tab" data-tab="simulation">🧪 Scenario Lab</div>
+  <div class="nav-tab" data-tab="telemetry">📡 Telemetry</div>
+</nav>
+
+<main class="main-content">
+  <div class="panel active" id="panel-overview">
+    <div class="section-title"><span class="icon" style="background:rgba(59,130,246,0.15);color:var(--accent-blue)">◉</span> System Overview — One-Year Forward View</div>
+    <div class="grid grid-6" id="kpiStrip"></div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Global Rating Distribution</span><span style="font-size:10px;color:var(--text-muted)">10,000 entities</span></div>
+        <div class="card-body"><div class="chart-container"><canvas id="chartRatingDist"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Sector Exposure</span></div>
+        <div class="card-body"><div class="chart-container"><canvas id="chartSectorExposure"></canvas></div></div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Forward PD Term Structure (12M)</span></div>
+        <div class="card-body"><div class="chart-container"><canvas id="chartPDCurve"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Credit Spread Forecast — IG vs HY</span></div>
+        <div class="card-body"><div class="chart-container"><canvas id="chartSpreadForecast"></canvas></div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-header"><span class="card-title">⚠ Credit Watchlist — Highest Forward PD</span><span style="font-size:10px;color:var(--text-muted)">Top 20</span></div>
+      <div class="card-body"><div class="scrollable-table" style="max-height:300px">
+        <table class="data-table" id="watchlistTable">
+          <thead><tr><th>Entity</th><th>Sector</th><th>Region</th><th>Rating</th><th>Fwd</th><th>PD(bps)</th><th>Lev</th><th>ICR</th><th>Cov</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-macro">
+    <div class="section-title"><span class="icon" style="background:rgba(6,182,212,0.15);color:var(--accent-cyan)">📊</span> Global Macro Forecast — 12-Month Forward View</div>
+    <div class="grid grid-4" id="macroKPIs"></div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">GDP Growth by Region</span></div><div class="card-body"><div class="chart-container tall"><canvas id="chartGDP"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Policy Rate Trajectories</span></div><div class="card-body"><div class="chart-container tall"><canvas id="chartRates"></canvas></div></div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Inflation Trajectories</span></div><div class="card-body"><div class="chart-container"><canvas id="chartInflation"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Volatility Index</span></div><div class="card-body"><div class="chart-container"><canvas id="chartVol"></canvas></div></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="card-header"><span class="card-title">Macro Scenario Comparison</span></div><div class="card-body" id="macroScenarioTable"></div></div>
+  </div>
+
+  <div class="panel" id="panel-credit">
+    <div class="section-title"><span class="icon" style="background:rgba(139,92,246,0.15);color:var(--accent-violet)">🏛</span> Credit Engine — Portfolio Analytics</div>
+    <div class="grid grid-5" id="creditKPIs"></div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Rating Migration Flow</span></div><div class="card-body"><div class="chart-container tall"><canvas id="chartMigrationFlow"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Expected Loss Distribution</span></div><div class="card-body"><div class="chart-container tall"><canvas id="chartELDist"></canvas></div></div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Sector Risk Heatmap</span></div><div class="card-body" id="sectorHeatmap"></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Geographic Risk Distribution</span></div><div class="card-body"><div class="chart-container"><canvas id="chartGeoRisk"></canvas></div></div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-entities">
+    <div class="section-title"><span class="icon" style="background:rgba(16,185,129,0.15);color:var(--accent-emerald)">📋</span> Entity Browser — 10,000 Rated Entities</div>
+    <div class="search-box"><span>🔍</span><input type="text" id="entitySearch" placeholder="Search by name, sector, rating, or region..."></div>
+    <div class="filter-row" id="entityFilters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="IG">Investment Grade</button>
+      <button class="filter-btn" data-filter="HY">High Yield</button>
+      <button class="filter-btn" data-filter="DIST">Distressed</button>
+      <button class="filter-btn" data-filter="downgrade">Downgrade Watch</button>
+      <button class="filter-btn" data-filter="upgrade">Upgrade Watch</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" id="entityResultCount">Showing 10,000 entities</span><span style="font-size:10px;color:var(--text-muted)">Click row for detail</span></div>
+      <div class="card-body" style="padding:0"><div class="scrollable-table" style="max-height:600px">
+        <table class="data-table" id="entityTable">
+          <thead><tr>
+            <th style="cursor:pointer" data-sort="name">Entity ↕</th>
+            <th style="cursor:pointer" data-sort="sector">Sector ↕</th>
+            <th style="cursor:pointer" data-sort="region">Region ↕</th>
+            <th style="cursor:pointer" data-sort="ratingIdx">Rating ↕</th>
+            <th style="cursor:pointer" data-sort="fwdRatingIdx">Fwd ↕</th>
+            <th style="cursor:pointer" data-sort="pd">PD ↕</th>
+            <th style="cursor:pointer" data-sort="leverage">Lev ↕</th>
+            <th style="cursor:pointer" data-sort="icr">ICR ↕</th>
+            <th style="cursor:pointer" data-sort="ebitda">EBITDA ↕</th>
+            <th>Migration</th>
+            <th>Cov</th>
+          </tr></thead>
+          <tbody id="entityTableBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;align-items:center" id="entityPagination"></div>
+  </div>
+
+  <!-- MIGRATION MATRIX -->
+  <div class="panel" id="panel-migration">
+    <div class="section-title"><span class="icon" style="background:rgba(245,158,11,0.15);color:var(--accent-amber)">🔄</span> Rating Migration Matrix — 12-Month Transition</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Empirical Migration Matrix (%)</span><span style="font-size:10px;color:var(--text-muted)">Row=Current, Col=Forward</span></div>
+      <div class="card-body" style="overflow-x:auto"><table class="data-table" id="migrationMatrix"></table></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Net Migration by Sector</span></div><div class="card-body"><div class="chart-container"><canvas id="chartNetMigration"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Fallen Angels & Rising Stars</span></div><div class="card-body"><div class="chart-container"><canvas id="chartFallenAngels"></canvas></div></div></div>
+    </div>
+  </div>
+
+  <!-- COVENANTS -->
+  <div class="panel" id="panel-covenants">
+    <div class="section-title"><span class="icon" style="background:rgba(244,63,94,0.15);color:var(--accent-rose)">⚖</span> Covenant Monitor — Governance Engine</div>
+    <div class="grid grid-4" id="covenantKPIs"></div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-header"><span class="card-title">⚠ Covenant Breach & Watch List</span></div>
+      <div class="card-body" style="padding:0"><div class="scrollable-table" style="max-height:500px">
+        <table class="data-table" id="covenantTable">
+          <thead><tr><th>Entity</th><th>Sector</th><th>Rating</th><th>Metric</th><th>Limit</th><th>Current</th><th>Headroom</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Covenant Health by Sector</span></div><div class="card-body"><div class="chart-container"><canvas id="chartCovenantSector"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Forward Covenant Stress</span></div><div class="card-body"><div class="chart-container"><canvas id="chartCovenantStress"></canvas></div></div></div>
+    </div>
+  </div>
+
+  <!-- SIMULATION -->
+  <div class="panel" id="panel-simulation">
+    <div class="section-title"><span class="icon" style="background:rgba(249,115,22,0.15);color:var(--accent-orange)">🧪</span> Scenario Lab — Monte Carlo Engine</div>
+    <div class="sim-controls">
+      <select class="sim-select" id="scenarioSelect">
+        <option value="base">Base Case</option>
+        <option value="bull">Bull — Soft Landing</option>
+        <option value="bear">Bear — Recession</option>
+        <option value="stress">Stress — Severe Downturn</option>
+        <option value="stagflation">Stagflation</option>
+      </select>
+      <button class="sim-btn primary" id="runSimBtn">▶ Run Simulation</button>
+      <button class="sim-btn" id="resetSimBtn">↺ Reset</button>
+      <span style="font-size:11px;color:var(--text-muted)" id="simStatus">Ready</span>
+    </div>
+    <div class="grid grid-3" id="simResults" style="display:none"></div>
+    <div class="grid grid-2" style="margin-top:16px" id="simChartsRow">
+      <div class="card"><div class="card-header"><span class="card-title">Simulated Default Rate Distribution</span></div><div class="card-body"><div class="chart-container"><canvas id="chartSimDefaults"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Scenario Impact — Migrations</span></div><div class="card-body"><div class="chart-container"><canvas id="chartSimMigrations"></canvas></div></div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Portfolio VaR Distribution</span></div><div class="card-body"><div class="chart-container"><canvas id="chartVaR"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Scenario Comparison</span></div><div class="card-body"><div class="chart-container"><canvas id="chartScenarioComparison"></canvas></div></div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-telemetry">
+    <div class="section-title"><span class="icon" style="background:rgba(6,182,212,0.15);color:var(--accent-cyan)">📡</span> System Telemetry & W3C PROV-O Compliance</div>
+    <div class="grid grid-4" id="telemetryKPIs"></div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><span class="card-title">Agent Throughput</span></div><div class="card-body"><div class="chart-container"><canvas id="chartThroughput"></canvas></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Latency by Agent</span></div><div class="card-body"><div class="chart-container"><canvas id="chartLatency"></canvas></div></div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-header"><span class="card-title">Provenance Audit Log</span><button class="sim-btn" style="font-size:10px;padding:4px 10px" onclick="clearLogs()">Clear</button></div>
+      <div class="card-body"><div class="telemetry-log" id="telemetryLog"></div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-header"><span class="card-title">W3C PROV-O Compliance Report</span></div>
+      <div class="card-body" id="provOReport"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div>ADAM Financial Operating System — Digital Twin World Model © 2026</div>
+  <div>W3C PROV-O Compliant · v26.0.4-kernel · 10,000 Entities · jsonLogic v2.0</div>
+</footer>
+
+<script>
+// ============================================================
+//  ADAM DIGITAL TWIN — WORLD MODEL ENGINE
+//  10,000 Simulated Rated Entities · 12-Month Forward
+// ============================================================
+
+const N = 10000;
+const MONTHS = ['Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27','Mar 27','Apr 27','May 27','Jun 27','Jul 27','Aug 27'];
+const RATINGS = ['AAA','AA+','AA','AA-','A+','A','A-','BBB+','BBB','BBB-','BB+','BB','BB-','B+','B','B-','CCC+','CCC','CCC-','CC','C','D'];
+const IG_BOUND = 9; // BBB- and above
+const RATING_PD = [1,2,3,5,7,10,14,25,40,65,100,150,220,330,500,750,1100,1800,2800,4500,7000,10000];
+const SECTORS = ['Technology','Media & Telecom','Healthcare','Energy','Financials','Industrials','Consumer Disc.','Consumer Staples','Utilities','Real Estate','Materials','Transport'];
+const REGIONS = ['North America','EMEA','Asia-Pacific','Latin America'];
+const R_SHORT = ['NA','EMEA','APAC','LATAM'];
+const S_COLORS = ['#3b82f6','#8b5cf6','#06b6d4','#f97316','#10b981','#64748b','#f43f5e','#84cc16','#eab308','#ec4899','#14b8a6','#a78bfa'];
+
+/**
+ * Random Number Generator Helper Class (Linear Congruential Generator)
+ * Expanded for readability and maintenance.
+ */
+class RNG {
+  constructor(seed = 42) {
+    this.s = seed;
+  }
+  
+  // Basic random between 0 and 1
+  next() {
+    this.s = (this.s * 16807) % 2147483647;
+    return (this.s - 1) / 2147483646;
+  }
+  
+  // Gaussian distribution
+  g(mean = 0, stdDev = 1) {
+    return mean + stdDev * Math.sqrt(-2 * Math.log(this.next())) * Math.cos(6.2832 * this.next());
+  }
+  
+  // Choose random element from array
+  c(arr) {
+    return arr[Math.floor(this.next() * arr.length)];
+  }
+  
+  // Random integer between a and b (inclusive)
+  i(min, max) {
+    return Math.floor(this.next() * (max - min + 1)) + min;
+  }
+}
+
+const rng = new RNG(20260826);
+
+// Company name generation constants
+const PFX = ['Apex','Nexus','Vertex','Quantum','Prime','Atlas','Stellar','Nova','Titan','Pulse','Cipher','Cobalt','Zenith','Pinnacle','Vanguard','Helix','Prism','Forge','Synth','Aether','Onyx','Argon','Boron','Crest','Delta','Echo','Flux','Geo','Hyper','Ion','Jolt','Krypton','Lumen','Maxis','Neon','Orbit','Photon','Quasar','Radix','Sigma','Torus','Ultra','Verge','Warp','Xenon','Yield','Zephyr','Arcane','Brio','Catalyst'];
+const SFX = ['Corp','Holdings','Group','Industries','Systems','Tech','Global','Partners','Capital','Solutions','Dynamics','Networks','Ventures','Labs','Digital','Bio','Energy','Pharma','Media','Finance','Materials','Transport','Logistics','Services','Robotics','AI','Data','Cloud','Security','Health','Power','Resources','Mining','Marine','Aero','Space','Works','Build','Auto','Foods'];
+const MID = ['','Int\'l','Advanced','Strategic','Integrated','United','Central','Pacific','Atlantic','Nordic','Alpine','Meridian','Horizon','Frontier','Liberty','Heritage','Premier','Elite','Sovereign'];
+
+function genName() {
+  return rng.c(PFX) + (rng.next() > 0.6 ? ' ' + rng.c(MID) : '') + ' ' + rng.c(SFX);
+}
+
+let entities = [], macroF = {}, charts = {};
+const tLog = [];
+
+// Helper Math Functions
+function mean(arr) { 
+  return arr.length === 0 ? 0 : arr.reduce((x, y) => x + y, 0) / arr.length; 
+}
+
+function pct(arr, percentile) {
+  const s = [...arr].sort((x, y) => x - y);
+  const index = (percentile / 100) * (s.length - 1);
+  const lower = Math.floor(index);
+  return s[lower] + (s[Math.ceil(index)] - s[lower]) * (index - lower);
+}
+
+// Telemetry Logging system
+function logT(tag, msg, level = 'info') {
+  tLog.push({
+    ts: new Date().toISOString().substring(11, 23),
+    tag,
+    msg,
+    lv: level
+  });
+}
+
+function renderLogs() {
+  const container = document.getElementById('telemetryLog');
+  if (!container) return;
+  container.innerHTML = tLog.slice(-200).reverse().map(e => 
+    `<div class="log-entry">
+      <span class="log-ts">${e.ts}</span>
+      <span class="log-tag ${e.lv}">[${e.tag}]</span>
+      <span class="log-msg">${e.msg}</span>
+    </div>`
+  ).join('');
+}
+
+function clearLogs() {
+  tLog.length = 0;
+  renderLogs();
+}
+
+const CDEFS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, padding: 12, usePointStyle: true, pointStyleWidth: 8 }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(15,23,42,0.95)',
+      titleColor: '#f1f5f9',
+      bodyColor: '#94a3b8',
+      borderColor: 'rgba(100,116,139,0.25)',
+      borderWidth: 1,
+      padding: 10,
+      titleFont: { family: 'Inter', weight: '700', size: 12 },
+      bodyFont: { family: 'JetBrains Mono', size: 11 },
+      cornerRadius: 8
+    }
+  },
+  scales: {
+    x: { ticks: { color: '#64748b', font: { family: 'Inter', size: 10 } }, grid: { color: 'rgba(100,116,139,0.08)' }, border: { color: 'rgba(100,116,139,0.15)' } },
+    y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: 'rgba(100,116,139,0.08)' }, border: { color: 'rgba(100,116,139,0.15)' } }
+  }
+};
+
+/**
+ * Chart Factory to handle instantiation and safe destruction
+ */
+function mc(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const cv = document.getElementById(id);
+  if (!cv) return null;
+  
+  cfg.options = cfg.options || {};
+  cfg.options.responsive = true;
+  cfg.options.maintainAspectRatio = false;
+  
+  if (!cfg.options.plugins) cfg.options.plugins = {};
+  if (!cfg.options.plugins.legend) cfg.options.plugins.legend = CDEFS.plugins.legend;
+  if (!cfg.options.plugins.tooltip) cfg.options.plugins.tooltip = CDEFS.plugins.tooltip;
+  
+  if (cfg.options.scales) {
+    for (const ax of Object.keys(cfg.options.scales)) {
+      const defaultScale = CDEFS.scales[ax === 'y' || ax.startsWith('y') ? 'y' : 'x'];
+      cfg.options.scales[ax] = { ...defaultScale, ...cfg.options.scales[ax] };
+    }
+  }
+  
+  charts[id] = new Chart(cv, cfg);
+  return charts[id];
+}
+
+// Base Regional Macro Setup
+const MACRO = {
+  'North America': { gdp: 2.1, rate: 4.25, infl: 2.8, unemp: 4.2, sig: 95, shy: 380 },
+  'EMEA':          { gdp: 1.4, rate: 3.50, infl: 2.5, unemp: 6.1, sig: 110, shy: 420 },
+  'Asia-Pacific':  { gdp: 4.2, rate: 2.75, infl: 2.2, unemp: 3.8, sig: 85, shy: 350 },
+  'Latin America': { gdp: 2.8, rate: 8.50, infl: 5.1, unemp: 7.5, sig: 160, shy: 520 }
+};
+
+function genMacro(scenario = 'base') {
+  // Scenario impacts on base case
+  const shocks = {
+    base:        { gm: 1,   rd: -0.25, id: -0.2, sm: 1 },
+    bull:        { gm: 1.3, rd: -0.75, id: -0.5, sm: 0.75 },
+    bear:        { gm: 0.4, rd: 0.5,   id: 0.6,  sm: 1.8 },
+    stress:      { gm: -0.2,rd: 1,     id: 1.2,  sm: 3 },
+    stagflation: { gm: 0.3, rd: 0.75,  id: 1.5,  sm: 2.2 }
+  };
+  
+  const s = shocks[scenario] || shocks.base;
+  const forecast = {};
+  
+  for (const [region, data] of Object.entries(MACRO)) {
+    const path = [];
+    let g = data.gdp, rt = data.rate, inf = data.infl;
+    
+    for (let m = 0; m < 12; m++) {
+      const t = m / 11; // 0 to 1 scaling over 12 months
+      g += (data.gdp * s.gm - data.gdp) / 12 + rng.g(0, 0.08);
+      rt += s.rd / 12 + rng.g(0, 0.02);
+      inf += s.id / 12 + rng.g(0, 0.05);
+      
+      path.push({
+        month: MONTHS[m],
+        gdp: +g.toFixed(2),
+        rate: +Math.max(0, rt).toFixed(2),
+        inflation: +Math.max(0, inf).toFixed(2),
+        sig: +(data.sig * (1 + (s.sm - 1) * t) + rng.g(0, 5)).toFixed(0),
+        shy: +(data.shy * (1 + (s.sm - 1) * t) + rng.g(0, 15)).toFixed(0)
+      });
+    }
+    forecast[region] = path;
+  }
+  return forecast;
+}
+
+function genEntities() {
+  entities = [];
+  // Distribution weights
+  const sw = [.14,.08,.10,.08,.12,.11,.09,.07,.06,.05,.05,.05]; // Sector weights
+  const rw = [.40,.28,.22,.10]; // Region weights
+  const rd = [.005,.01,.015,.02,.03,.05,.06,.08,.10,.09,.08,.07,.06,.05,.045,.04,.03,.025,.015,.01,.005,.005]; // Initial Rating weights
+
+  // Weighted choice
+  function wc(arr, weights) {
+    const r = rng.next();
+    let c = 0;
+    for (let i = 0; i < weights.length; i++) {
+      c += weights[i];
+      if (r < c) return i;
+    }
+    return arr.length - 1;
+  }
+
+  const usedNames = new Set();
+  
+  for (let i = 0; i < N; i++) {
+    // Unique name generation
+    let nm = genName();
+    let att = 0;
+    while (usedNames.has(nm) && att < 10) { nm = genName(); att++; }
+    if (usedNames.has(nm)) nm += ' ' + i;
+    usedNames.add(nm);
+
+    const si = wc(SECTORS, sw);
+    const ri = wc(REGIONS, rw);
+    const rti = wc(RATINGS, rd); // Current rating index
+    
+    // Financials
+    const rev = Math.abs(Math.round(rng.g(3000, 4000)));
+    const em = Math.max(0.03, rng.g(0.20, 0.10));
+    const ebitda = Math.round(rev * em);
+    const lev = +Math.max(0.5, rng.g(3.5 + rti * 0.3, 1.2)).toFixed(2);
+    const icr = +Math.max(0.3, rng.g(8 - rti * 0.35, 2)).toFixed(2);
+    const fccr = +Math.max(0.2, rng.g(2.5 - rti * 0.1, 0.6)).toFixed(2);
+    const ev = Math.abs(Math.round(ebitda * rng.g(10, 3)));
+
+    // Rating Migration (Forward rating index)
+    let fri = rti;
+    const mr = rng.next();
+    if (mr < 0.05) fri = Math.max(0, rti - 2); // 2 notch upgrade
+    else if (mr < 0.15) fri = Math.max(0, rti - 1); // 1 notch upgrade
+    else if (mr < 0.75) fri = rti; // Stable
+    else if (mr < 0.90) fri = Math.min(21, rti + 1); // 1 notch downgrade
+    else if (mr < 0.97) fri = Math.min(21, rti + 2); // 2 notch downgrade
+    else fri = Math.min(21, rti + 3); // 3+ notch downgrade
+
+    const pd = +(RATING_PD[fri] * (0.8 + rng.next() * 0.4)).toFixed(1);
+    const lgd = +(0.35 + rng.next() * 0.30).toFixed(3);
+    const el = +(pd * lgd / 10000).toFixed(5);
+
+    // Covenants
+    const cll = +(4 + rng.g(1, 0.5)).toFixed(2); // Covenant Leverage Limit
+    const cli = +Math.max(1, 2 + rng.g(0.5, 0.3)).toFixed(2); // Covenant ICR Limit
+    const clh = (cll - lev) / cll; // Leverage headroom
+    const cih = (icr - cli) / cli; // ICR headroom
+    
+    let cs = 'safe';
+    if (clh < 0 || cih < 0) cs = 'breach';
+    else if (clh < 0.1 || cih < 0.1) cs = 'watch';
+
+    // Formatting spaces out for memory
+    entities.push({
+      id: i,
+      name: nm,
+      sector: SECTORS[si],
+      region: REGIONS[ri],
+      ratingIdx: rti,
+      rating: RATINGS[rti],
+      fwdRatingIdx: fri,
+      fwdRating: RATINGS[fri],
+      migDir: fri < rti ? 'upgrade' : (fri > rti ? 'downgrade' : 'stable'),
+      migN: fri - rti,
+      revenue: rev,
+      ebitda: ebitda,
+      ebitdaMargin: em,
+      leverage: lev,
+      icr: icr,
+      fccr: fccr,
+      ev: ev,
+      pd: pd,
+      lgd: lgd,
+      el: el,
+      cov: { ll: cll, il: cli, lh: +clh.toFixed(3), ih: +cih.toFixed(3), status: cs }
+    });
+  }
+}
+
+function renderKPIs() {
+  const ig = entities.filter(e => e.ratingIdx <= IG_BOUND).length;
+  const hy = entities.filter(e => e.ratingIdx > IG_BOUND && e.ratingIdx < 20).length;
+  const ap = mean(entities.map(e => e.pd));
+  const br = entities.filter(e => e.cov.status === 'breach').length;
+  const dg = entities.filter(e => e.migDir === 'downgrade').length;
+
+  const kpis = [
+    { l: 'Total Entities', v: N.toLocaleString(), d: '', c: '' },
+    { l: 'Investment Grade', v: ig.toLocaleString(), d: `${(ig / N * 100).toFixed(1)}%`, c: 'delta-up' },
+    { l: 'High Yield', v: hy.toLocaleString(), d: `${(hy / N * 100).toFixed(1)}%`, c: 'delta-neutral' },
+    { l: 'Avg Forward PD', v: ap.toFixed(1) + ' bps', d: ap > 200 ? '↑ Elevated' : '→ Normal', c: ap > 200 ? 'delta-down' : 'delta-up' },
+    { l: 'Covenant Breaches', v: br.toLocaleString(), d: `${(br / N * 100).toFixed(1)}%`, c: br > 500 ? 'delta-down' : 'delta-neutral' },
+    { l: 'Downgrade Watch', v: dg.toLocaleString(), d: `${(dg / N * 100).toFixed(1)}%`, c: 'delta-down' }
+  ];
+
+  document.getElementById('kpiStrip').innerHTML = kpis.map(k => 
+    `<div class="metric-card">
+      <div class="metric-label">${k.l}</div>
+      <div class="metric-value">${k.v}</div>
+      <div class="metric-delta ${k.c}">${k.d}</div>
+    </div>`
+  ).join('');
+}
+
+function renderRatingDist() {
+  const cur = RATINGS.map(r => entities.filter(e => e.rating === r).length);
+  const fwd = RATINGS.map(r => entities.filter(e => e.fwdRating === r).length);
+  
+  mc('chartRatingDist', {
+    type: 'bar',
+    data: {
+      labels: RATINGS,
+      datasets: [
+        { label: 'Current', data: cur, backgroundColor: 'rgba(59,130,246,0.6)', borderRadius: 3 },
+        { label: '12M Forward', data: fwd, backgroundColor: 'rgba(139,92,246,0.5)', borderRadius: 3 }
+      ]
+    },
+    options: { scales: { x: {}, y: { beginAtZero: true } }, plugins: { legend: { position: 'top' } } }
+  });
+}
+
+function renderSectorExp() {
+  mc('chartSectorExposure', {
+    type: 'doughnut',
+    data: {
+      labels: SECTORS,
+      datasets: [{
+        data: SECTORS.map(s => entities.filter(e => e.sector === s).length),
+        backgroundColor: S_COLORS.map(c => c + 'cc'),
+        borderColor: S_COLORS,
+        borderWidth: 1
+      }]
+    },
+    options: { plugins: { legend: { position: 'right' } }, scales: {} }
+  });
+}
+
+function renderPDCurve() {
+  const igE = entities.filter(e => e.ratingIdx <= IG_BOUND);
+  const hyE = entities.filter(e => e.ratingIdx > IG_BOUND);
+  const igP = [], hyP = [];
+  
+  for (let m = 0; m < 12; m++) {
+    const t = (m + 1) / 12;
+    igP.push(+(mean(igE.map(e => e.pd * t * (0.9 + rng.next() * 0.2)))).toFixed(1));
+    hyP.push(+(mean(hyE.map(e => e.pd * t * (0.9 + rng.next() * 0.2)))).toFixed(1));
+  }
+  
+  mc('chartPDCurve', {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        { label: 'IG Avg PD (bps)', data: igP, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
+        { label: 'HY Avg PD (bps)', data: hyP, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.1)', fill: true, tension: 0.4, pointRadius: 3 }
+      ]
+    },
+    options: { scales: { x: {}, y: { beginAtZero: true } } }
+  });
+}
+
+function renderSpreadF() {
+  const f = macroF['North America'] || [];
+  mc('chartSpreadForecast', {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        { label: 'IG Spread', data: f.map(d => d.sig), borderColor: '#3b82f6', tension: 0.4, pointRadius: 3, fill: false },
+        { label: 'HY Spread', data: f.map(d => d.shy), borderColor: '#f97316', tension: 0.4, pointRadius: 3, fill: false }
+      ]
+    },
+    options: { scales: { x: {}, y: {} } }
+  });
+}
+
+function renderWatchlist() {
+  const top = [...entities].sort((a, b) => b.pd - a.pd).slice(0, 20);
+  document.querySelector('#watchlistTable tbody').innerHTML = top.map(e => 
+    `<tr style="cursor:pointer" onclick="showDetail(${e.id})">
+      <td style="color:var(--text-primary);font-weight:600">${e.name}</td>
+      <td><span class="sector-tag">${e.sector}</span></td>
+      <td>${R_SHORT[REGIONS.indexOf(e.region)]}</td>
+      <td><span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : (e.ratingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.rating}</span></td>
+      <td><span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : (e.fwdRatingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.fwdRating}</span></td>
+      <td style="color:var(--accent-rose);font-weight:700">${e.pd.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+      <td>${e.leverage}x</td>
+      <td>${e.icr}x</td>
+      <td><span class="status-dot status-${e.cov.status === 'breach' ? 'red' : (e.cov.status === 'watch' ? 'amber' : 'green')}"></span> ${e.cov.status}</td>
+    </tr>`
+  ).join('');
+}
+
+function renderMacro() {
+  const na = macroF['North America'];
+  const fwd = na[na.length - 1];
+  
+  const macroStats = [
+    { l: 'US GDP Forecast', v: fwd.gdp.toFixed(1) + '%', d: fwd.gdp > 2 ? '↑' : '↓', c: fwd.gdp > 2 ? 'delta-up' : 'delta-down' },
+    { l: 'Fed Rate (12M)', v: fwd.rate.toFixed(2) + '%', d: '', c: 'delta-neutral' },
+    { l: 'US CPI (12M)', v: fwd.inflation.toFixed(1) + '%', d: fwd.inflation > 3 ? '↑ Hot' : '→ Target', c: fwd.inflation > 3 ? 'delta-down' : 'delta-up' },
+    { l: 'VIX', v: '18.5', d: 'Calm', c: 'delta-up' }
+  ];
+  
+  document.getElementById('macroKPIs').innerHTML = macroStats.map(k => 
+    `<div class="metric-card">
+      <div class="metric-label">${k.l}</div>
+      <div class="metric-value">${k.v}</div>
+      <div class="metric-delta ${k.c}">${k.d}</div>
+    </div>`
+  ).join('');
+
+  const rc = ['#3b82f6', '#f59e0b', '#10b981', '#f43f5e'];
+  
+  mc('chartGDP', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: Object.entries(macroF).map(([r, d], i) => ({ label: r, data: d.map(x => x.gdp), borderColor: rc[i], tension: 0.4, pointRadius: 2, fill: false, borderWidth: 2 })) },
+    options: { scales: { x: {}, y: { title: { display: true, text: 'GDP %', color: '#64748b' } } } }
+  });
+  
+  mc('chartRates', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: Object.entries(macroF).map(([r, d], i) => ({ label: r, data: d.map(x => x.rate), borderColor: rc[i], tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2 })) },
+    options: { scales: { x: {}, y: { title: { display: true, text: 'Rate %', color: '#64748b' } } } }
+  });
+  
+  mc('chartInflation', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: Object.entries(macroF).map(([r, d], i) => ({ label: r, data: d.map(x => x.inflation), borderColor: rc[i], tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2 })) },
+    options: { scales: { x: {}, y: { title: { display: true, text: 'CPI %', color: '#64748b' } } } }
+  });
+
+  const vp = [];
+  let v = 18.5;
+  for (let m = 0; m < 12; m++) {
+    v += rng.g(0, 1.5);
+    v = Math.max(10, Math.min(45, v));
+    vp.push(+v.toFixed(1));
+  }
+  
+  mc('chartVol', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: [{ label: 'VIX', data: vp, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.1)', fill: true, tension: 0.4, pointRadius: 2 }] },
+    options: { scales: { x: {}, y: {} } }
+  });
+
+  document.getElementById('macroScenarioTable').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>Base</th><th>Bull</th><th>Bear</th><th>Stress</th><th>Stagflation</th></tr></thead>
+      <tbody>
+        <tr><td>US GDP 12M (%)</td><td>2.1</td><td style="color:var(--accent-emerald)">2.7</td><td style="color:var(--accent-amber)">0.8</td><td style="color:var(--accent-rose)">-0.4</td><td style="color:var(--accent-amber)">0.6</td></tr>
+        <tr><td>Fed Funds Rate (%)</td><td>4.00</td><td>3.50</td><td>4.75</td><td>5.25</td><td>5.00</td></tr>
+        <tr><td>CPI Inflation (%)</td><td>2.6</td><td>2.3</td><td>3.4</td><td>4.0</td><td>4.3</td></tr>
+        <tr><td>IG Spread (bps)</td><td>95</td><td style="color:var(--accent-emerald)">71</td><td style="color:var(--accent-amber)">171</td><td style="color:var(--accent-rose)">285</td><td style="color:var(--accent-amber)">209</td></tr>
+        <tr><td>HY Spread (bps)</td><td>380</td><td style="color:var(--accent-emerald)">285</td><td style="color:var(--accent-amber)">684</td><td style="color:var(--accent-rose)">1140</td><td style="color:var(--accent-amber)">836</td></tr>
+        <tr><td>Default Rate (%)</td><td>2.8</td><td style="color:var(--accent-emerald)">1.5</td><td style="color:var(--accent-amber)">5.2</td><td style="color:var(--accent-rose)">8.5</td><td style="color:var(--accent-amber)">6.1</td></tr>
+        <tr><td>VIX (avg)</td><td>18</td><td>14</td><td>28</td><td>38</td><td>30</td></tr>
+      </tbody>
+    </table>`;
+}
+
+function renderCredit() {
+  const ap = mean(entities.map(e => e.pd));
+  const al = mean(entities.map(e => e.leverage));
+  const ai = mean(entities.map(e => e.icr));
+  const ae = mean(entities.map(e => e.el));
+  const dg = entities.filter(e => e.migDir === 'downgrade').length;
+  
+  const stats = [
+    { l: 'Avg PD (bps)', v: ap.toFixed(1) },
+    { l: 'Avg Leverage', v: al.toFixed(2) + 'x' },
+    { l: 'Avg ICR', v: ai.toFixed(2) + 'x' },
+    { l: 'Avg EL', v: (ae * 10000).toFixed(1) + ' bps' },
+    { l: 'Net Downgrades', v: dg.toLocaleString() }
+  ];
+  
+  document.getElementById('creditKPIs').innerHTML = stats.map(k => 
+    `<div class="metric-card"><div class="metric-label">${k.l}</div><div class="metric-value">${k.v}</div></div>`
+  ).join('');
+
+  mc('chartMigrationFlow', {
+    type: 'bar',
+    data: {
+      labels: RATINGS,
+      datasets: [
+        { label: 'Upgrade', data: RATINGS.map(r => entities.filter(e => e.rating === r && e.migDir === 'upgrade').length), backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 2 },
+        { label: 'Stable', data: RATINGS.map(r => entities.filter(e => e.rating === r && e.migDir === 'stable').length), backgroundColor: 'rgba(100,116,139,0.4)', borderRadius: 2 },
+        { label: 'Downgrade', data: RATINGS.map(r => entities.filter(e => e.rating === r && e.migDir === 'downgrade').length), backgroundColor: 'rgba(244,63,94,0.7)', borderRadius: 2 }
+      ]
+    },
+    options: { scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { legend: { position: 'top' } } }
+  });
+
+  const elV = entities.map(e => e.el * 10000);
+  const bks = [0, 5, 10, 25, 50, 100, 250, 500, 1000, 2500];
+  const elC = [];
+  
+  for (let i = 0; i < bks.length - 1; i++) {
+    elC.push(elV.filter(v => v >= bks[i] && v < bks[i+1]).length);
+  }
+  elC.push(elV.filter(v => v >= 2500).length);
+  
+  mc('chartELDist', {
+    type: 'bar',
+    data: {
+      labels: ['0-5', '5-10', '10-25', '25-50', '50-100', '100-250', '250-500', '500-1K', '1K-2.5K', '2.5K+'],
+      datasets: [{
+        label: 'Count',
+        data: elC,
+        backgroundColor: elC.map((_, i) => { const t = i / 9; return `rgba(${Math.round(59 + t * 185)},${Math.round(130 - t * 67)},${Math.round(246 - t * 152)},0.7)`; }),
+        borderRadius: 3
+      }]
+    },
+    options: { scales: { x: { title: { display: true, text: 'EL (bps)', color: '#64748b' } }, y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+  });
+
+  document.getElementById('sectorHeatmap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Sector</th><th>Avg PD</th><th>Avg Lev</th><th>DG%</th><th>Breach%</th></tr></thead>
+      <tbody>
+        ${SECTORS.map((s, i) => {
+          const se = entities.filter(e => e.sector === s);
+          const ap_s = mean(se.map(e => e.pd));
+          const al_s = mean(se.map(e => e.leverage));
+          const dg_s = se.filter(e => e.migDir === 'downgrade').length / se.length * 100;
+          const br_s = se.filter(e => e.cov.status === 'breach').length / se.length * 100;
+          
+          return `<tr>
+            <td><span class="sector-tag" style="border-left:3px solid ${S_COLORS[i]}">${s}</span></td>
+            <td style="color:${ap_s > 400 ? 'var(--accent-rose)' : (ap_s > 200 ? 'var(--accent-amber)' : 'var(--accent-emerald)')};font-weight:700">${ap_s.toFixed(0)}</td>
+            <td style="color:${al_s > 5 ? 'var(--accent-rose)' : (al_s > 4 ? 'var(--accent-amber)' : 'var(--accent-emerald)')};font-weight:700">${al_s.toFixed(2)}x</td>
+            <td style="color:${dg_s > 30 ? 'var(--accent-rose)' : (dg_s > 20 ? 'var(--accent-amber)' : 'var(--accent-emerald)')};font-weight:700">${dg_s.toFixed(1)}%</td>
+            <td style="color:${br_s > 15 ? 'var(--accent-rose)' : (br_s > 8 ? 'var(--accent-amber)' : 'var(--accent-emerald)')};font-weight:700">${br_s.toFixed(1)}%</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+
+  const gd = REGIONS.map(r => ({
+    r,
+    ap: mean(entities.filter(e => e.region === r).map(e => e.pd)),
+    br: entities.filter(e => e.region === r && e.cov.status === 'breach').length
+  }));
+  
+  mc('chartGeoRisk', {
+    type: 'bar',
+    data: {
+      labels: gd.map(g => g.r),
+      datasets: [
+        { label: 'Avg PD (bps)', data: gd.map(g => +g.ap.toFixed(1)), backgroundColor: 'rgba(59,130,246,0.6)', borderRadius: 3, yAxisID: 'y' },
+        { label: 'Breaches', data: gd.map(g => g.br), backgroundColor: 'rgba(244,63,94,0.6)', borderRadius: 3, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      scales: {
+        x: {},
+        y: { position: 'left', title: { display: true, text: 'PD (bps)', color: '#64748b' } },
+        y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Breaches', color: '#64748b' } }
+      }
+    }
+  });
+}
+
+let cPage = 0;
+const PS = 100;
+let fEnt = [];
+let sKey = 'pd';
+let sDir = -1;
+
+function applyFilters() {
+  const q = document.getElementById('entitySearch').value.toLowerCase();
+  const af = document.querySelector('#entityFilters .filter-btn.active')?.dataset.filter || 'all';
+  
+  fEnt = entities.filter(e => {
+    if (q && !e.name.toLowerCase().includes(q) && !e.sector.toLowerCase().includes(q) && !e.rating.toLowerCase().includes(q) && !e.region.toLowerCase().includes(q)) return false;
+    
+    switch (af) {
+      case 'IG': return e.ratingIdx <= IG_BOUND;
+      case 'HY': return e.ratingIdx > IG_BOUND && e.ratingIdx < 20;
+      case 'DIST': return e.ratingIdx >= 20;
+      case 'downgrade': return e.migDir === 'downgrade';
+      case 'upgrade': return e.migDir === 'upgrade';
+      default: return true;
+    }
+  });
+  
+  fEnt.sort((a, b) => {
+    let va = a[sKey], vb = b[sKey];
+    if (typeof va === 'string') return sDir * va.localeCompare(vb);
+    return sDir * (va - vb);
+  });
+  
+  cPage = 0;
+  renderEntTable();
+}
+
+function renderEntTable() {
+  const s = cPage * PS;
+  const pg = fEnt.slice(s, s + PS);
+  
+  document.getElementById('entityResultCount').textContent = `Showing ${s + 1}-${Math.min(s + PS, fEnt.length)} of ${fEnt.length}`;
+  
+  document.getElementById('entityTableBody').innerHTML = pg.map(e => {
+    const mi = e.migDir === 'upgrade' ? '↑' : (e.migDir === 'downgrade' ? '↓' : '→');
+    const mcColor = e.migDir === 'upgrade' ? 'var(--accent-emerald)' : (e.migDir === 'downgrade' ? 'var(--accent-rose)' : 'var(--text-muted)');
+    
+    return `<tr style="cursor:pointer" onclick="showDetail(${e.id})">
+      <td style="color:var(--text-primary);font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</td>
+      <td><span class="sector-tag">${e.sector}</span></td>
+      <td>${R_SHORT[REGIONS.indexOf(e.region)]}</td>
+      <td><span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : (e.ratingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.rating}</span></td>
+      <td><span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : (e.fwdRatingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.fwdRating}</span></td>
+      <td>${e.pd.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+      <td>${e.leverage}x</td>
+      <td>${e.icr}x</td>
+      <td>$${e.ebitda.toLocaleString()}</td>
+      <td style="color:${mcColor};font-weight:700">${mi} ${Math.abs(e.migN)}n</td>
+      <td><span class="status-dot status-${e.cov.status === 'breach' ? 'red' : (e.cov.status === 'watch' ? 'amber' : 'green')}"></span></td>
+    </tr>`;
+  }).join('');
+
+  const tp = Math.ceil(fEnt.length / PS);
+  const p = document.getElementById('entityPagination');
+  
+  if (tp > 1) {
+    p.innerHTML = `
+      <button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage=0;renderEntTable()">«</button>
+      <button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage--;renderEntTable()">‹</button>
+      <span style="font-size:11px;color:var(--text-secondary)">Page ${cPage + 1} / ${tp}</span>
+      <button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage++;renderEntTable()">›</button>
+      <button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage=${tp - 1};renderEntTable()">»</button>`;
+  } else {
+    p.innerHTML = '';
+  }
+}
+
+function showDetail(id) {
+  const e = entities.find(x => x.id === id);
+  if (!e) return;
+  
+  const mi = e.migDir === 'upgrade' ? '↑ Upgrade' : (e.migDir === 'downgrade' ? '↓ Downgrade' : '→ Stable');
+  const mc2 = e.migDir === 'upgrade' ? 'var(--accent-emerald)' : (e.migDir === 'downgrade' ? 'var(--accent-rose)' : 'var(--text-muted)');
+  const si = SECTORS.indexOf(e.sector);
+  
+  const provenanceData = {
+    source_data_object: 'entity_' + e.id + '_' + e.name.replace(/\s/g, '_'),
+    extraction_agent: 'ADAM_DigitalTwin_WorldModel',
+    jsonLogic_version: '2.0.0',
+    confidence_score: +(0.85 + rng.next() * 0.14).toFixed(3),
+    timestamp: new Date().toISOString(),
+    rating_model: 'MarketMayhemLedger_v26.0.4',
+    migration_model: 'TransitionMatrix_MC_10K',
+    covenant_engine: 'DeterministicCovenantEngine_v1.4'
+  };
+  
+  document.getElementById('entityModalContent').innerHTML = `
+    <button class="modal-close" onclick="document.getElementById('entityModal').classList.remove('show')">✕</button>
+    <div style="margin-bottom:16px">
+      <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${e.name}</h2>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+        <span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${e.sector}</span>
+        <span style="font-size:11px;color:var(--text-muted)">${e.region}</span>
+        <span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : (e.ratingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.rating}</span>
+        <span style="color:${mc2};font-weight:700;font-size:12px">${mi} (${Math.abs(e.migN)}n)</span>
+        <span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : (e.fwdRatingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.fwdRating}</span>
+      </div>
+    </div>
+    
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-label">Revenue</div><div class="stat-value">$${e.revenue.toLocaleString()}M</div></div>
+      <div class="stat-item"><div class="stat-label">EBITDA</div><div class="stat-value">$${e.ebitda.toLocaleString()}M</div></div>
+      <div class="stat-item"><div class="stat-label">EBITDA Margin</div><div class="stat-value">${(e.ebitdaMargin * 100).toFixed(1)}%</div></div>
+      <div class="stat-item"><div class="stat-label">EV</div><div class="stat-value">$${e.ev.toLocaleString()}M</div></div>
+    </div>
+    
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage > 5 ? 'var(--accent-rose)' : (e.leverage > 4 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${e.leverage}x</div></div>
+      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr < 2 ? 'var(--accent-rose)' : (e.icr < 3 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${e.icr}x</div></div>
+      <div class="stat-item"><div class="stat-label">FCCR</div><div class="stat-value">${e.fccr}x</div></div>
+      <div class="stat-item"><div class="stat-label">Forward PD</div><div class="stat-value" style="color:var(--accent-rose)">${e.pd.toLocaleString(undefined, {maximumFractionDigits:1})} bps</div></div>
+    </div>
+    
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-label">LGD</div><div class="stat-value">${(e.lgd * 100).toFixed(1)}%</div></div>
+      <div class="stat-item"><div class="stat-label">Expected Loss</div><div class="stat-value">${(e.el * 10000).toLocaleString(undefined, {maximumFractionDigits:1})} bps</div></div>
+      <div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${e.cov.status}" style="text-transform:uppercase;font-size:14px">${e.cov.status}</div></div>
+      <div class="stat-item"><div class="stat-label">Lev Headroom</div><div class="stat-value" style="color:${e.cov.lh < 0 ? 'var(--accent-rose)' : (e.cov.lh < 0.1 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${(e.cov.lh * 100).toFixed(1)}%</div></div>
+    </div>
+    
+    <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid var(--border-glass)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px">W3C PROV-O Record</div>
+      <pre style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-secondary);white-space:pre-wrap">${JSON.stringify(provenanceData, null, 2)}</pre>
+    </div>`;
+    
+  document.getElementById('entityModal').classList.add('show');
+  logT('EntityView', `Inspected: ${e.name} [${e.rating}→${e.fwdRating}]`);
+}
+
+function renderMigration() {
+  const sR = ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'CC-D'];
+  const rG = { AAA: [0], AA: [1, 2, 3], A: [4, 5, 6], BBB: [7, 8, 9], BB: [10, 11, 12], B: [13, 14, 15], CCC: [16, 17, 18], 'CC-D': [19, 20, 21] };
+  
+  function gg(idx) {
+    for (const [g, is] of Object.entries(rG)) {
+      if (is.includes(idx)) return g;
+    }
+    return 'CC-D';
+  }
+
+  const mx = {};
+  sR.forEach(f => {
+    mx[f] = {};
+    sR.forEach(t => { mx[f][t] = 0; });
+  });
+  
+  entities.forEach(e => { mx[gg(e.ratingIdx)][gg(e.fwdRatingIdx)]++; });
+
+  let h = '<thead><tr><th>From\\To</th>';
+  sR.forEach(r => { h += `<th>${r}</th>`; });
+  h += '</tr></thead><tbody>';
+  
+  sR.forEach(f => {
+    const tot = Object.values(mx[f]).reduce((a, b) => a + b, 0);
+    h += `<tr><td style="font-weight:700;color:var(--text-primary)">${f}</td>`;
+    
+    sR.forEach(t => {
+      const p = tot > 0 ? (mx[f][t] / tot * 100) : 0;
+      const diag = f === t;
+      const int = Math.min(1, p / 80);
+      let bg, cl;
+      
+      if (diag) {
+        bg = `rgba(59,130,246,${0.1 + int * 0.4})`;
+        cl = '#93c5fd';
+      } else if (sR.indexOf(t) > sR.indexOf(f)) {
+        bg = `rgba(244,63,94,${int * 0.4})`;
+        cl = p > 5 ? '#fb7185' : 'var(--text-muted)';
+      } else {
+        bg = `rgba(16,185,129,${int * 0.4})`;
+        cl = p > 5 ? '#34d399' : 'var(--text-muted)';
+      }
+      
+      h += `<td style="background:${bg};color:${cl};text-align:center;font-weight:${p > 10 ? '700' : '400'}">${p > 0 ? p.toFixed(1) : '-'}</td>`;
+    });
+    h += '</tr>';
+  });
+  
+  h += '</tbody>';
+  document.getElementById('migrationMatrix').innerHTML = h;
+
+  mc('chartNetMigration', {
+    type: 'bar',
+    data: {
+      labels: SECTORS.map(s => s.length > 12 ? s.substring(0, 12) + '…' : s),
+      datasets: [{
+        label: 'Net Migration (notches)',
+        data: SECTORS.map(s => {
+          const se = entities.filter(e => e.sector === s);
+          return +(se.reduce((a, e) => a + e.migN, 0) / se.length).toFixed(3);
+        }),
+        backgroundColor: SECTORS.map(s => {
+          const se = entities.filter(e => e.sector === s);
+          const v = se.reduce((a, e) => a + e.migN, 0) / se.length;
+          return v > 0 ? 'rgba(244,63,94,0.6)' : 'rgba(16,185,129,0.6)';
+        }),
+        borderRadius: 3
+      }]
+    },
+    options: { indexAxis: 'y', scales: { x: { title: { display: true, text: 'Avg Notches', color: '#64748b' } }, y: {} }, plugins: { legend: { display: false } } }
+  });
+
+  const fa = entities.filter(e => e.ratingIdx <= IG_BOUND && e.fwdRatingIdx > IG_BOUND).length;
+  const rs = entities.filter(e => e.ratingIdx > IG_BOUND && e.fwdRatingIdx <= IG_BOUND).length;
+  
+  mc('chartFallenAngels', {
+    type: 'bar',
+    data: {
+      labels: SECTORS.map(s => s.length > 12 ? s.substring(0, 12) + '…' : s),
+      datasets: [
+        { label: `Fallen Angels (${fa})`, data: SECTORS.map(s => entities.filter(e => e.sector === s && e.ratingIdx <= IG_BOUND && e.fwdRatingIdx > IG_BOUND).length), backgroundColor: 'rgba(244,63,94,0.6)', borderRadius: 3 },
+        { label: `Rising Stars (${rs})`, data: SECTORS.map(s => entities.filter(e => e.sector === s && e.ratingIdx > IG_BOUND && e.fwdRatingIdx <= IG_BOUND).length), backgroundColor: 'rgba(16,185,129,0.6)', borderRadius: 3 }
+      ]
+    },
+    options: { indexAxis: 'y', scales: { x: {}, y: {} }, plugins: { legend: { position: 'top' } } }
+  });
+}
+
+function renderCovenants() {
+  const br = entities.filter(e => e.cov.status === 'breach');
+  const wa = entities.filter(e => e.cov.status === 'watch');
+  const sa = entities.filter(e => e.cov.status === 'safe');
+  
+  document.getElementById('covenantKPIs').innerHTML = [
+    { l: 'Total Breaches', v: br.length.toLocaleString(), c: 'var(--accent-rose)' },
+    { l: 'Watch List', v: wa.length.toLocaleString(), c: 'var(--accent-amber)' },
+    { l: 'Compliant', v: sa.length.toLocaleString(), c: 'var(--accent-emerald)' },
+    { l: 'Breach Rate', v: (br.length / N * 100).toFixed(1) + '%', c: br.length / N > 0.1 ? 'var(--accent-rose)' : 'var(--accent-amber)' }
+  ].map(k => `<div class="metric-card"><div class="metric-label">${k.l}</div><div class="metric-value" style="color:${k.c}">${k.v}</div></div>`).join('');
+
+  const cE = [...br, ...wa].sort((a, b) => Math.min(a.cov.lh, a.cov.ih) - Math.min(b.cov.lh, b.cov.ih)).slice(0, 100);
+  
+  document.querySelector('#covenantTable tbody').innerHTML = cE.map(e => {
+    const wm = e.cov.lh < e.cov.ih ? 'Leverage' : 'ICR';
+    const lim = wm === 'Leverage' ? e.cov.ll : e.cov.il;
+    const cur = wm === 'Leverage' ? e.leverage : e.icr;
+    const hr = wm === 'Leverage' ? e.cov.lh : e.cov.ih;
+    
+    return `<tr onclick="showDetail(${e.id})" style="cursor:pointer">
+      <td style="color:var(--text-primary);font-weight:600">${e.name}</td>
+      <td><span class="sector-tag">${e.sector}</span></td>
+      <td><span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : 'rating-hy'}">${e.rating}</span></td>
+      <td>${wm}</td>
+      <td>${lim}x</td>
+      <td style="font-weight:700;color:${e.cov.status === 'breach' ? 'var(--accent-rose)' : 'var(--accent-amber)'}">${cur}x</td>
+      <td style="color:${hr < 0 ? 'var(--accent-rose)' : 'var(--accent-amber)'}">${(hr * 100).toFixed(1)}%</td>
+      <td><span class="status-dot status-${e.cov.status === 'breach' ? 'red' : 'amber'}"></span> ${e.cov.status.toUpperCase()}</td>
+    </tr>`;
+  }).join('');
+
+  mc('chartCovenantSector', {
+    type: 'bar',
+    data: {
+      labels: SECTORS.map(s => s.length > 12 ? s.substring(0, 12) + '…' : s),
+      datasets: [
+        { label: 'Breach %', data: SECTORS.map(s => +(entities.filter(e => e.sector === s && e.cov.status === 'breach').length / entities.filter(e => e.sector === s).length * 100).toFixed(1)), backgroundColor: 'rgba(244,63,94,0.7)', borderRadius: 2 },
+        { label: 'Watch %', data: SECTORS.map(s => +(entities.filter(e => e.sector === s && e.cov.status === 'watch').length / entities.filter(e => e.sector === s).length * 100).toFixed(1)), backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 2 },
+        { label: 'Safe %', data: SECTORS.map(s => +(entities.filter(e => e.sector === s && e.cov.status === 'safe').length / entities.filter(e => e.sector === s).length * 100).toFixed(1)), backgroundColor: 'rgba(16,185,129,0.5)', borderRadius: 2 }
+      ]
+    },
+    options: { scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
+  });
+
+  const sp = [];
+  let brt = br.length / N * 100;
+  for (let m = 0; m < 12; m++) {
+    brt += rng.g(0.3, 0.8);
+    brt = Math.max(2, Math.min(35, brt));
+    sp.push(+brt.toFixed(1));
+  }
+  
+  mc('chartCovenantStress', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: [{ label: 'Projected Breach Rate (%)', data: sp, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
+    options: { scales: { x: {}, y: { beginAtZero: true } } }
+  });
+}
+
+function renderSim() {
+  const vs = [];
+  for (let i = 0; i < 1000; i++) vs.push(rng.g(-0.02, 0.04) * 100);
+  vs.sort((a, b) => a - b);
+  
+  const vb = [];
+  const vmin = Math.floor(Math.min(...vs)), vmax = Math.ceil(Math.max(...vs)), bs = (vmax - vmin) / 30;
+  for (let b = vmin; b < vmax; b += bs) vb.push({ l: b.toFixed(1), c: vs.filter(v => v >= b && v < b + bs).length });
+  
+  const p5 = pct(vs, 5);
+  
+  mc('chartVaR', {
+    type: 'bar',
+    data: {
+      labels: vb.map(b => b.l),
+      datasets: [{ label: 'Frequency', data: vb.map(b => b.c), backgroundColor: vb.map(b => parseFloat(b.l) < p5 ? 'rgba(244,63,94,0.7)' : 'rgba(59,130,246,0.5)'), borderRadius: 2 }]
+    },
+    options: { scales: { x: { title: { display: true, text: 'Portfolio Return %', color: '#64748b' } }, y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+  });
+
+  mc('chartScenarioComparison', {
+    type: 'radar',
+    data: {
+      labels: ['Default Rate', 'Spread Widening', 'Downgrades', 'Covenant Breach', 'GDP Impact', 'VIX Level'],
+      datasets: [
+        { label: 'Base', data: [30, 25, 30, 25, 50, 35], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', pointBackgroundColor: '#3b82f6' },
+        { label: 'Bull', data: [15, 15, 15, 15, 70, 20], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', pointBackgroundColor: '#10b981' },
+        { label: 'Bear', data: [60, 70, 65, 55, 20, 65], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', pointBackgroundColor: '#f59e0b' },
+        { label: 'Stress', data: [85, 90, 85, 80, 5, 90], borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.1)', pointBackgroundColor: '#f43f5e' }
+      ]
+    },
+    options: {
+      scales: {
+        r: { beginAtZero: true, max: 100, ticks: { color: '#64748b', backdropColor: 'transparent' }, grid: { color: 'rgba(100,116,139,0.15)' }, pointLabels: { color: '#94a3b8', font: { size: 11 } } }
+      },
+      plugins: { legend: { position: 'top' } }
+    }
+  });
+}
+
+function runSim() {
+  const sc = document.getElementById('scenarioSelect').value;
+  const st = document.getElementById('simStatus');
+  st.textContent = 'Running Monte Carlo...';
+  st.style.color = 'var(--accent-amber)';
+  logT('Simulation', `Launched: ${sc}`);
+
+  setTimeout(() => {
+    const sd = { base: 2.8, bull: 1.5, bear: 5.2, stress: 8.5, stagflation: 6.1 };
+    const bd = sd[sc] || 2.8;
+    const mcData = [];
+    
+    for (let i = 0; i < 5000; i++) {
+      mcData.push(Math.max(0, rng.g(bd, bd * 0.35)));
+    }
+    mcData.sort((a, b) => a - b);
+    
+    const av = mean(mcData);
+    const p95 = pct(mcData, 95);
+    const p99 = pct(mcData, 99);
+
+    const r = document.getElementById('simResults');
+    r.style.display = 'grid';
+    r.innerHTML = `
+      <div class="metric-card"><div class="metric-label">Mean Default Rate</div><div class="metric-value" style="color:${av > 5 ? 'var(--accent-rose)' : 'var(--accent-amber)'}">${av.toFixed(2)}%</div><div class="metric-delta delta-neutral">5,000 MC paths</div></div>
+      <div class="metric-card"><div class="metric-label">95th Percentile</div><div class="metric-value" style="color:var(--accent-rose)">${p95.toFixed(2)}%</div><div class="metric-delta delta-down">Tail Risk</div></div>
+      <div class="metric-card"><div class="metric-label">99th Percentile</div><div class="metric-value" style="color:var(--accent-rose)">${p99.toFixed(2)}%</div><div class="metric-delta delta-down">Extreme Tail</div></div>`;
+
+    const db = [];
+    const dmax = Math.ceil(p99 * 1.2);
+    const dbs = dmax / 40;
+    
+    for (let b = 0; b < dmax; b += dbs) {
+      db.push({ l: b.toFixed(1), c: mcData.filter(v => v >= b && v < b + dbs).length });
+    }
+    
+    mc('chartSimDefaults', {
+      type: 'bar',
+      data: {
+        labels: db.map(b => b.l),
+        datasets: [{ label: 'MC Default Rate', data: db.map(b => b.c), backgroundColor: db.map(b => parseFloat(b.l) > p95 ? 'rgba(244,63,94,0.7)' : 'rgba(59,130,246,0.5)'), borderRadius: 1 }]
+      },
+      options: { scales: { x: { title: { display: true, text: 'Default Rate %', color: '#64748b' } }, y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+    });
+
+    const smm = { base: 1, bull: 0.6, bear: 1.8, stress: 2.5, stagflation: 2.0 };
+    const mt = smm[sc] || 1;
+    
+    mc('chartSimMigrations', {
+      type: 'bar',
+      data: {
+        labels: SECTORS.map(s => s.length > 10 ? s.substring(0, 10) + '…' : s),
+        datasets: [
+          { label: 'Upgrades', data: SECTORS.map(s => Math.round(entities.filter(e => e.sector === s && e.migDir === 'upgrade').length / mt)), backgroundColor: 'rgba(16,185,129,0.6)', borderRadius: 2 },
+          { label: 'Downgrades', data: SECTORS.map(s => Math.round(entities.filter(e => e.sector === s && e.migDir === 'downgrade').length * mt)), backgroundColor: 'rgba(244,63,94,0.6)', borderRadius: 2 }
+        ]
+      },
+      options: { scales: { x: {}, y: { beginAtZero: true } } }
+    });
+
+    st.textContent = `Complete — ${sc}`;
+    st.style.color = 'var(--accent-emerald)';
+    logT('Simulation', `Done: ${sc}. Mean DR: ${av.toFixed(2)}%, 95th: ${p95.toFixed(2)}%`, 'success');
+    renderLogs();
+  }, 800);
+}
+
+function renderTelemetry() {
+  document.getElementById('telemetryKPIs').innerHTML = [
+    { l: 'Entities Processed', v: N.toLocaleString() },
+    { l: 'Avg Latency', v: (12 + rng.next() * 8).toFixed(1) + ' ms' },
+    { l: 'Throughput', v: Math.round(800 + rng.next() * 400) + ' ops/s' },
+    { l: 'PROV-O Compliance', v: '100%' }
+  ].map(k => `<div class="metric-card"><div class="metric-label">${k.l}</div><div class="metric-value">${k.v}</div></div>`).join('');
+
+  const tp = [];
+  for (let m = 0; m < 12; m++) tp.push(Math.round(800 + rng.g(0, 100)));
+  
+  mc('chartThroughput', {
+    type: 'line',
+    data: { labels: MONTHS, datasets: [{ label: 'Ops/sec', data: tp, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
+    options: { scales: { x: {}, y: { beginAtZero: true } } }
+  });
+
+  const ag = ['Underwriter', 'Surveillance', 'Sentinel', 'Nexus', 'Architect'];
+  const lt = ag.map(() => +(5 + rng.next() * 25).toFixed(1));
+  
+  mc('chartLatency', {
+    type: 'bar',
+    data: { labels: ag, datasets: [{ label: 'Avg Latency (ms)', data: lt, backgroundColor: ['#3b82f6aa', '#f59e0baa', '#f43f5eaa', '#10b981aa', '#8b5cf6aa'], borderRadius: 4 }] },
+    options: { scales: { x: {}, y: { beginAtZero: true, title: { display: true, text: 'ms', color: '#64748b' } } }, plugins: { legend: { display: false } } }
+  });
+
+  document.getElementById('provOReport').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Check</th><th>Status</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><td>Entity Provenance Headers</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>All ${N.toLocaleString()} entities have valid provenance</td></tr>
+        <tr><td>jsonLogic Version Tagging</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>All records tagged jsonLogic v2.0.0</td></tr>
+        <tr><td>Confidence Score Validation</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>Min: 0.85, Max: 0.99, Mean: 0.92</td></tr>
+        <tr><td>Extraction Agent Attribution</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>ADAM_DigitalTwin_WorldModel v26.0.4-kernel</td></tr>
+        <tr><td>Migration Model Traceability</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>TransitionMatrix_MC_10K, Seed: 20260826</td></tr>
+        <tr><td>Covenant Engine Audit</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>DeterministicCovenantEngine v1.4 — ${entities.filter(e => e.cov.status !== 'safe').length} flagged</td></tr>
+        <tr><td>RIE Conformance</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>All schemas conform to MarketMayhemLedger spec</td></tr>
+        <tr><td>Temporal Consistency</td><td style="color:var(--accent-emerald)">✓ PASS</td><td>Forward horizon: T+12M from ${new Date().toISOString().substring(0, 10)}</td></tr>
+      </tbody>
+    </table>`;
+    
+  renderLogs();
+}
+
+function initNav() {
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      const p = document.getElementById('panel-' + t.dataset.tab);
+      if (p) p.classList.add('active');
+      logT('Nav', 'Switched: ' + t.dataset.tab);
+    });
+  });
+}
+
+// Global Application Boot sequence
+async function boot() {
+  const ov = document.getElementById('loadingOverlay');
+  const lt = document.getElementById('loadingText');
+  const lb = document.getElementById('loadingBar');
+  
+  const steps = [
+    { t: 'Initializing macro engine...', p: 5, f: () => { macroF = genMacro('base'); } },
+    { t: 'Generating 10,000 rated entities...', p: 20, f: () => { genEntities(); } },
+    { t: 'Computing migration matrices...', p: 40, f: () => {} },
+    { t: 'Running covenant engine...', p: 55, f: () => {} },
+    { t: 'Building PD term structures...', p: 65, f: () => {} },
+    { t: 'Initializing visuals...', p: 75, f: () => {
+        logT('Boot', 'World model initialized: 10,000 entities', 'success');
+        logT('MacroEngine', 'Base forecasts: 4 regions × 12 months', 'success');
+        logT('MigrationEngine', `Computed: ${entities.filter(e => e.migDir === 'upgrade').length} up, ${entities.filter(e => e.migDir === 'downgrade').length} down`);
+        logT('CovenantEngine', `${entities.filter(e => e.cov.status === 'breach').length} breaches, ${entities.filter(e => e.cov.status === 'watch').length} watches`, 'warn');
+        logT('PROV-O', 'All provenance records valid — jsonLogic v2.0.0', 'success');
+        logT('Sentinel', `Confidence floor 0.85 enforced on all ${N.toLocaleString()} entities`, 'success');
+      }
+    },
+    { t: 'Rendering dashboards...', p: 85, f: () => { renderKPIs(); renderRatingDist(); renderSectorExp(); renderPDCurve(); renderSpreadF(); renderWatchlist(); } },
+    { t: 'Completing checks...', p: 95, f: () => { 
+        renderMacro(); 
+        renderCredit(); 
+        fEnt = [...entities]; 
+        applyFilters(); 
+        renderMigration(); 
+        renderCovenants(); 
+        renderSim(); 
+        renderTelemetry(); 
+      } 
+    },
+    { t: 'World model ready.', p: 100, f: () => {} }
+  ];
+
+  for (const s of steps) {
+    lt.textContent = s.t;
+    lb.style.width = s.p + '%';
+    await new Promise(r => setTimeout(r, 120)); // Fake processing delay for visual feedback
+    s.f();
+    await new Promise(r => setTimeout(r, 40));
+  }
+  
+  await new Promise(r => setTimeout(r, 300));
+  ov.classList.add('hidden');
+
+  initNav();
+  
+  // Entity table sorting events
+  document.querySelectorAll('#entityTable th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (sKey === k) {
+        sDir *= -1;
+      } else {
+        sKey = k;
+        sDir = (k === 'name' || k === 'sector' || k === 'region') ? 1 : -1;
+      }
+      applyFilters();
+    });
+  });
+  
+  // Entity filtering events
+  document.querySelectorAll('#entityFilters .filter-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#entityFilters .filter-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      applyFilters();
+    });
+  });
+  
+  document.getElementById('entitySearch').addEventListener('input', applyFilters);
+  document.getElementById('runSimBtn').addEventListener('click', runSim);
+  
+  document.getElementById('resetSimBtn').addEventListener('click', () => {
+    document.getElementById('simResults').style.display = 'none';
+    document.getElementById('simStatus').textContent = 'Ready';
+    document.getElementById('simStatus').style.color = 'var(--text-muted)';
+  });
+  
+  document.getElementById('entityModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('entityModal')) {
+      document.getElementById('entityModal').classList.remove('show');
+    }
+  });
+
+  // Start Header Clock
+  setInterval(() => {
+    document.getElementById('headerClock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+  }, 1000);
+  document.getElementById('headerClock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+}
+
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>

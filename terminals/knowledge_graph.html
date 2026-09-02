@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adam OS | Digital Twin Knowledge Graph</title>
+    <meta name="adam-node-type" content="graph_visualization">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <style>
+        :root { --bg: #0a0a0c; --panel: #161b22; --border: #30363d; --text: #c9d1d9; --blue: #58a6ff; --red: #f85149; --green: #3fb950; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; flex-direction: column; }
+        header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: #010409; }
+        .workspace { display: grid; grid-template-columns: 3fr 1fr; flex-grow: 1; overflow: hidden; }
+        .graph-view { background: #000; position: relative; border-right: 1px solid var(--border); }
+        .sidebar { background: var(--panel); padding: 20px; overflow-y: auto; }
+        .node-tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-bottom: 10px; }
+        .public { background: rgba(88, 166, 255, 0.2); border: 1px solid var(--blue); color: var(--blue); }
+        .private { background: rgba(248, 81, 73, 0.2); border: 1px solid var(--red); color: var(--red); }
+        h3 { color: var(--blue); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .prov-log { font-size: 0.85em; background: #010409; padding: 10px; border-left: 3px solid var(--green); margin-bottom: 10px; color: #8b949e; }
+        a { color: var(--blue); text-decoration: none; }
+    </style>
+</head>
+<body data-abac-context="PUBLIC_ONLY" data-graph-engine="AWS_Neptune_Operational">
+
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Traverse the graph to identify systemic risk contagions using Louvain community detection. DO NOT attempt to query nodes tagged [MNPI]. If requested, output BCBS 239 lineage trace using W3C PROV-O schema.
+    </agent-directive>
+
+    <header>
+        <div>ADAM_OS // WORLD_MODEL_GRAPH <a href="/root/index.html">[ROOT]</a> | <a href="/libraries/regulatory_mrm.html">[MRM DOCS]</a></div>
+        <div>ENGINE: AWS Neptune (System of Record) | <span style="color:var(--green)">SYNCED</span></div>
+    </header>
+
+    <div class="workspace">
+        <!-- Interactive Graph Canvas Placeholder -->
+        <div class="graph-view">
+            <div style="position: absolute; top: 10px; left: 10px; color: #555;">[ WebGL Graph Render Target - 10,000 Entities ]</div>
+            <!-- Mock visual nodes for human context -->
+            <div style="position: absolute; top: 40%; left: 40%; text-align: center;">
+                <div style="width: 20px; height: 20px; background: var(--blue); border-radius: 50%; margin: 0 auto;"></div>
+                <div style="margin-top: 5px;">SYNTH_TMT_01</div>
+            </div>
+            <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                <line x1="42%" y1="42%" x2="55%" y2="25%" stroke="#30363d" stroke-width="2" stroke-dasharray="4" />
+            </svg>
+            <div style="position: absolute; top: 22%; left: 55%; text-align: center;">
+                <div style="width: 20px; height: 20px; background: var(--red); border-radius: 50%; margin: 0 auto; box-shadow: 0 0 10px var(--red);"></div>
+                <div style="margin-top: 5px; color: var(--red);">[MNPI] TARGET_ACQ</div>
+            </div>
+        </div>
+
+        <!-- Entity & Provenance Sidebar -->
+        <div class="sidebar">
+            <h3>ENTITY INSPECTOR</h3>
+            <div><strong>TICKER:</strong> SYNTH_TMT_01</div>
+            <div class="node-tag public">PUBLIC CELL (Wealth/Comm)</div>
+            <p><strong>Basel IV RWA:</strong> 85% (Optimized via Internal Models)</p>
+            <p><strong>PD (12M Forward):</strong> 4.2%</p>
+
+            <h3 style="margin-top: 30px;">BCBS 239 PROVENANCE TRACE</h3>
+            <div class="prov-log">
+                <strong>[prov:Activity]</strong> Monte Carlo xVA Engine Run<br>
+                <strong>[prov:Agent]</strong> swarm_alpha_gpu_cluster<br>
+                <strong>[prov:Time]</strong> 2026-08-26 19:44:06<br>
+                <strong>[prov:Generated]</strong> PD_Update_v4
+            </div>
+            <div class="prov-log">
+                <strong>[prov:Activity]</strong> jsonLogic Covenant Check<br>
+                <strong>[prov:Agent]</strong> rule_engine_v2<br>
+                <strong>[prov:Used]</strong> PD_Update_v4<br>
+                <strong>Result:</strong> <span style="color:var(--green)">PASSED</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

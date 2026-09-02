@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Adversarial World Model Harness</title>
+
+    <script type="application/json" id="ecosystem-context">
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "ecosystem": "ADAM Institutional Platform",
+      "version": "26.0.5-adversarial",
+      "telemetry": {
+        "status_endpoint": "/api/telemetry.json",
+        "metrics_tracked": ["divergence_delta", "alpha_latency", "beta_latency", "prov_o_retention"]
+      },
+      "w3c_prov_o_compliance": true
+    }
+    </script>
+
+    <script type="application/json" id="registry-schemas">
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "registry_version": "1.5.0",
+      "models": {
+        "Model_Alpha": {
+          "type": "Market Pricing Engine",
+          "characteristics": ["Pro-cyclical", "High Liquidity Assumption", "Base Macro Envelope"]
+        },
+        "Model_Beta": {
+          "type": "Credit Risk Control Discriminator",
+          "characteristics": ["Counter-cyclical", "Severe LGD Tiering", "Covenant Stress Constraints"]
+        }
+      },
+      "schemas": {
+        "AdversarialDivergence": {
+          "type": "object",
+          "properties": {
+            "entity_id": { "type": "string" },
+            "alpha_pd": { "type": "number" },
+            "beta_pd": { "type": "number" },
+            "divergence_spread": { "type": "number", "description": "Absolute delta between Alpha and Beta PD" }
+          }
+        }
+      }
+    }
+    </script>
+
+    <script type="application/ld+json" id="prov-o-trace">
+    {
+      "@context": "http://www.w3.org/ns/prov#",
+      "@type": "Entity",
+      "id": "urn:uuid:adversarial-twin-002",
+      "wasGeneratedBy": {
+        "@type": "Activity",
+        "label": "Concurrent Dual-Model Execution",
+        "used": [{"@type": "Entity", "label": "10k Synthetic TMT/LBO Facilities"}]
+      },
+      "wasAttributedTo": {"@type": "Agent", "label": "ADAM Core Orchestrator"}
+    }
+    </script>
+
+    <agent-directive style="display: none;">
+        SYSTEM PROMPT FOR IN-CONTEXT LEARNING:
+        You are operating within a zero-build-step HTML digital twin.
+        Your primary directive is to monitor the 'Adversarial Divergence Scatter Matrix' rendered on the canvas.
+        - X-Axis represents Model Alpha (Market Pricing) Expected Loss.
+        - Y-Axis represents Model Beta (Risk Control) Expected Loss.
+        - The diagonal line indicates model consensus.
+        Identify clusters that deviate heavily above the line (where Risk Control sees significantly higher default probability than Market Pricing) and formulate underwriting override recommendations based on covenant headroom and capital structure (TLB vs Revolver).
+        Parse W3C PROV-O logs to maintain execution state tracking.
+    </agent-directive>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        obsidian: '#050b14',
+                        glass: 'rgba(11, 17, 32, 0.75)',
+                        cyan: '#06b6d4', emerald: '#10b981', amber: '#f59e0b', crimson: '#e11d48', purple: '#8b5cf6'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050b14; color: #e2e8f0; overflow: hidden;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(6, 182, 212, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(225, 29, 72, 0.03) 0%, transparent 40%);
+        }
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(11, 17, 32, 0.8), rgba(11, 17, 32, 0.5));
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 81, 0.6); border-radius: 0.75rem;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.6); border-radius: 4px; }
+        .terminal-log { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; line-height: 1.5; }
+        .json-key { color: #06b6d4; } .json-string { color: #10b981; } .json-number { color: #f59e0b; }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans">
+
+    <header class="glass-panel border-b border-gray-800 flex justify-between items-center px-6 py-3 z-50 shrink-0 m-4 mb-2">
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 rounded bg-cyan flex items-center justify-center text-obsidian font-bold text-lg border border-cyan/50 shadow-[0_0_10px_rgba(6,182,212,0.5)]">A</div>
+            <div>
+                <h1 class="text-base font-bold tracking-widest text-white uppercase">ADAM <span class="text-gray-500 font-normal">|</span> Adversarial Harness</h1>
+                <div class="text-[10px] font-mono text-gray-400 mt-0.5">LLM Context Mode: <span class="text-purple font-semibold">ACTIVE</span></div>
+            </div>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs text-gray-400">
+            <div class="flex flex-col items-end">
+                <span>Model A (Market): <span class="text-cyan font-bold" id="sys-alpha-state">SYNCING</span></span>
+                <span>Model B (Risk): <span class="text-crimson font-bold" id="sys-beta-state">SYNCING</span></span>
+            </div>
+            <button onclick="runAdversarialEpoch()" class="px-4 py-2 bg-purple/20 hover:bg-purple/30 text-purple border border-purple/50 rounded transition-colors shadow-[0_0_10px_rgba(139,92,246,0.2)]">Execute Epoch</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row gap-4 px-4 pb-4 min-h-0">
+
+        <div class="flex-1 flex flex-col gap-4 min-w-0">
+            <div class="glass-panel flex-1 flex flex-col p-4 relative min-h-[400px]">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400">Adversarial Divergence Scatter Matrix</h2>
+                    <div class="text-[10px] font-mono text-gray-500">Entities: 10,000 | X: Model A (PD) | Y: Model B (PD)</div>
+                </div>
+                <div class="flex-1 bg-obsidian rounded border border-gray-800 relative overflow-hidden">
+                    <canvas id="divergence-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                    <div class="absolute bottom-2 right-4 text-[10px] font-mono text-cyan">Model A (Market) &rarr;</div>
+                    <div class="absolute top-4 left-2 text-[10px] font-mono text-crimson rotate-90 origin-left">&larr; Model B (Risk)</div>
+                </div>
+            </div>
+
+            <div class="glass-panel h-28 p-4 shrink-0 grid grid-cols-4 gap-4">
+                <div class="bg-obsidian/50 p-2 rounded border border-gray-800 flex flex-col justify-center">
+                    <span class="text-[10px] uppercase text-gray-500 mb-1">Mean Spread (Δ)</span>
+                    <span class="text-lg font-mono text-amber" id="metric-spread">0.00%</span>
+                </div>
+                <div class="bg-obsidian/50 p-2 rounded border border-gray-800 flex flex-col justify-center">
+                    <span class="text-[10px] uppercase text-gray-500 mb-1">Max Divergence Node</span>
+                    <span class="text-lg font-mono text-white" id="metric-max-node">---</span>
+                </div>
+                <div class="bg-obsidian/50 p-2 rounded border border-gray-800 flex flex-col justify-center">
+                    <span class="text-[10px] uppercase text-gray-500 mb-1">Worker Latency</span>
+                    <span class="text-lg font-mono text-emerald" id="metric-latency">0ms</span>
+                </div>
+                <div class="bg-obsidian/50 p-2 rounded border border-gray-800 flex flex-col justify-center">
+                    <span class="text-[10px] uppercase text-gray-500 mb-1">PROV-O Sync</span>
+                    <span class="text-lg font-mono text-cyan">VERIFIED</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-[450px] flex flex-col gap-4 shrink-0 min-h-0">
+
+            <div class="glass-panel h-1/2 flex flex-col p-3 border-crimson/30">
+                <div class="border-b border-gray-800 pb-2 mb-2 flex justify-between items-center">
+                    <h2 class="text-xs font-semibold uppercase tracking-widest text-crimson flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Asymmetric Risk Queue
+                    </h2>
+                    <span class="text-[10px] font-mono bg-crimson/20 text-crimson px-2 py-0.5 rounded" id="queue-count">Top 50 Δ</span>
+                </div>
+                <div class="flex-1 overflow-y-auto pr-1 space-y-1.5" id="adversarial-queue">
+                    </div>
+            </div>
+
+            <div class="glass-panel h-1/2 flex flex-col p-3">
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2 border-b border-gray-800 pb-2">LLM Context Trace (Selected Node)</h2>
+                <div class="flex-1 bg-obsidian rounded border border-gray-800 p-3 overflow-y-auto font-mono text-[10px] shadow-inner relative group" id="llm-context-window">
+                    <div class="text-gray-600 italic">Awaiting operator node selection to generate in-context evaluation template...</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script id="worker-script" type="application/javascript">
+        class SeededRNG {
+            constructor(seed) { this.m = 0x80000000; this.a = 1103515245; this.c = 12345; this.state = seed; }
+            nextFloat() { this.state = (this.a * this.state + this.c) % this.m; return this.state / (this.m - 1); }
+            nextGaussian(mean = 0, stdDev = 1) {
+                let u1 = 1.0 - this.nextFloat(), u2 = 1.0 - this.nextFloat();
+                let rand = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+                return mean + stdDev * rand;
+            }
+        }
+
+        let entities = [];
+        const SECTORS = ['Software', 'Digital Media', 'Telecom Infra', 'Cybersecurity', 'FinTech'];
+
+        function initEntities(count) {
+            const rng = new SeededRNG(1337);
+            entities = [];
+            for (let i = 0; i < count; i++) {
+                const ebitda = 50000000 + (rng.nextFloat() * 150000000);
+                const lev = Math.max(2.0, rng.nextGaussian(5.0, 1.5));
+                const debt = ebitda * lev;
+
+                entities.push({
+                    id: `node_${i.toString().padStart(5, '0')}`,
+                    sector: SECTORS[Math.floor(rng.nextFloat() * SECTORS.length)],
+                    ebitda: ebitda,
+                    debt: debt,
+                    baseLev: lev,
+                    // Sub-facilities
+                    tlb: debt * 0.8,
+                    revCap: debt * 0.3,
+                    revDrawn: debt * 0.05
+                });
+            }
+        }
+
+        // --- Model A: Market Pricing Engine (Optimistic/Base) ---
+        function evaluateModelAlpha(e) {
+            const currentLev = e.baseLev;
+            // Logistic curve: midpoint 6.0x, slope 1.2
+            let pd = 1 / (1 + Math.exp(-1.2 * (currentLev - 6.0)));
+            return Math.min(0.99, Math.max(0.005, pd * 0.8)); // 20% discount for market optimism
+        }
+
+        // --- Model B: Underwriting Discriminator (Stress/Conservative) ---
+        function evaluateModelBeta(e) {
+            // Apply severe liquidity grab (Revolver fully drawn in stress)
+            const stressedDebt = e.tlb + e.revCap;
+            const stressedEbitda = e.ebitda * 0.85; // 15% shock
+            const stressedLev = stressedDebt / stressedEbitda;
+
+            // Logistic curve: midpoint 5.0x (stricter), slope 1.8 (steeper penalty)
+            let pd = 1 / (1 + Math.exp(-1.8 * (stressedLev - 5.0)));
+            return Math.min(0.99, Math.max(0.01, pd * 1.5)); // 50% premium for risk control margin
+        }
+
+        self.onmessage = function(e) {
+            if (e.data.action === 'INIT') {
+                initEntities(e.data.count);
+                self.postMessage({ type: 'READY' });
+            }
+            else if (e.data.action === 'RUN_EPOCH') {
+                const start = performance.now();
+                const results = [];
+                let maxSpread = 0;
+                let maxNode = null;
+                let sumSpread = 0;
+
+                for(let i = 0; i < entities.length; i++) {
+                    const ent = entities[i];
+                    const pdA = evaluateModelAlpha(ent);
+                    const pdB = evaluateModelBeta(ent);
+                    const spread = Math.max(0, pdB - pdA); // We care when Beta > Alpha
+
+                    results.push({ id: ent.id, sector: ent.sector, lev: ent.baseLev, pdA, pdB, spread });
+
+                    sumSpread += spread;
+                    if (spread > maxSpread) {
+                        maxSpread = spread;
+                        maxNode = ent.id;
+                    }
+                }
+
+                const latency = performance.now() - start;
+
+                // Sort by highest divergence for the queue
+                const sortedQueue = [...results].sort((a, b) => b.spread - a.spread).slice(0, 50);
+
+                self.postMessage({
+                    type: 'EPOCH_COMPLETE',
+                    results: results,
+                    queue: sortedQueue,
+                    metrics: {
+                        latency: latency.toFixed(0),
+                        meanSpread: (sumSpread / entities.length),
+                        maxNode
+                    }
+                });
+            }
+        };
+    </script>
+
+    <script>
+        let worker;
+        let canvas, ctx;
+        let currentScatterData = [];
+
+        function initCanvas() {
+            canvas = document.getElementById('divergence-canvas');
+            ctx = canvas.getContext('2d', { alpha: false });
+
+            const resize = () => {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                drawScatter();
+            };
+            window.addEventListener('resize', resize);
+            resize();
+        }
+
+        function drawScatter() {
+            if (!ctx || !currentScatterData.length) return;
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Background
+            ctx.fillStyle = '#050b14';
+            ctx.fillRect(0, 0, w, h);
+
+            // Draw consensus line (45 degrees)
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            ctx.lineTo(w, 0);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw Entities
+            for(let i = 0; i < currentScatterData.length; i++) {
+                const d = currentScatterData[i];
+
+                // Map PD (0.0 to 1.0) to canvas dimensions
+                // Model A (X axis)
+                const x = d.pdA * w;
+                // Model B (Y axis - inverted because canvas Y goes down)
+                const y = h - (d.pdB * h);
+
+                // Color based on severity of divergence
+                if (d.spread > 0.4) ctx.fillStyle = '#e11d48'; // Crimson (High Risk)
+                else if (d.spread > 0.2) ctx.fillStyle = '#f59e0b'; // Amber (Watch)
+                else ctx.fillStyle = '#06b6d4'; // Cyan (Consensus/Safe)
+
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+
+        function initWorker() {
+            const blob = new Blob([document.getElementById('worker-script').textContent], {type: 'application/javascript'});
+            worker = new Worker(URL.createObjectURL(blob));
+
+            worker.onmessage = function(e) {
+                const msg = e.data;
+                if (msg.type === 'READY') {
+                    document.getElementById('sys-alpha-state').innerText = "ONLINE";
+                    document.getElementById('sys-alpha-state').className = "text-emerald font-bold";
+                    document.getElementById('sys-beta-state').innerText = "ONLINE";
+                    document.getElementById('sys-beta-state').className = "text-emerald font-bold";
+                    runAdversarialEpoch(); // Auto-run first epoch
+                }
+                else if (msg.type === 'EPOCH_COMPLETE') {
+                    currentScatterData = msg.results;
+                    drawScatter();
+                    updateUI(msg.queue, msg.metrics);
+                }
+            };
+            worker.postMessage({ action: 'INIT', count: 10000 });
+        }
+
+        function runAdversarialEpoch() {
+            document.getElementById('metric-latency').innerText = "Calc...";
+            worker.postMessage({ action: 'RUN_EPOCH' });
+            logTrace("Orchestrator dispatched parallel evaluation request to Models Alpha & Beta.");
+        }
+
+        function updateUI(queue, metrics) {
+            document.getElementById('metric-latency').innerText = `${metrics.latency}ms`;
+            document.getElementById('metric-spread').innerText = `${(metrics.meanSpread * 100).toFixed(2)}%`;
+            document.getElementById('metric-max-node').innerText = metrics.maxNode;
+
+            const frag = document.createDocumentFragment();
+            queue.forEach(item => {
+                const el = document.createElement('div');
+                el.className = `p-2 bg-obsidian rounded border border-gray-800 cursor-pointer hover:border-crimson/50 transition-colors group`;
+                el.onclick = () => selectNodeForLLM(item);
+
+                el.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-mono text-xs text-gray-300 group-hover:text-white">${item.id}</span>
+                        <span class="text-[10px] bg-crimson/10 text-crimson px-1.5 rounded">Δ ${(item.spread * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] mt-1 text-gray-500 font-mono">
+                        <span>A: ${(item.pdA * 100).toFixed(1)}%</span>
+                        <span>B: ${(item.pdB * 100).toFixed(1)}%</span>
+                    </div>
+                `;
+                frag.appendChild(el);
+            });
+
+            const qContainer = document.getElementById('adversarial-queue');
+            qContainer.innerHTML = '';
+            qContainer.appendChild(frag);
+
+            logTrace(`Epoch complete. Canvas rendered. Asymmetric risk queue updated with top 50 divergent nodes.`);
+        }
+
+        function selectNodeForLLM(nodeData) {
+            const contextJSON = {
+                "@context": "http://adam-platform.internal/schemas/eval",
+                "entity": nodeData.id,
+                "sector": nodeData.sector,
+                "base_leverage": parseFloat(nodeData.lev.toFixed(2)),
+                "adversarial_divergence": {
+                    "model_alpha_expected_loss": parseFloat(nodeData.pdA.toFixed(3)),
+                    "model_beta_expected_loss": parseFloat(nodeData.pdB.toFixed(3)),
+                    "delta_spread": parseFloat(nodeData.spread.toFixed(3))
+                },
+                "prov_o_audit": {
+                    "evaluated_at": new Date().toISOString(),
+                    "orchestrator_node": "browser_worker_thread_01"
+                },
+                "directive": "Formulate underwriting covenant override memo based on Beta model constraints."
+            };
+
+            const formatted = JSON.stringify(contextJSON, null, 2)
+                .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+                .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
+                .replace(/: ([0-9.]+)/g, ': <span class="json-number">$1</span>');
+
+            document.getElementById('llm-context-window').innerHTML = `<pre>${formatted}</pre>`;
+            logTrace(`Context extracted for ${nodeData.id}. JSON-LD formatted for LLM harness consumption.`);
+        }
+
+        function logTrace(msg) {
+            console.log(`[PROV-O Trace] ${msg}`);
+        }
+
+        window.onload = () => {
+            initCanvas();
+            initWorker();
+        };
+    </script>
+    <!-- PROVENANCE OVERLAY & TELEMETRY HARNESS -->
+    <div id="system2-overlay" class="system2-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,11,20,0.95); z-index: 9999; color: #00f3ff; font-family: 'JetBrains Mono', monospace; padding: 2rem; border: 1px solid #00f3ff; backdrop-filter: blur(10px); flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #00f3ff; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 1.2rem; color: #0aff60;">[ ADAM_OS :: TELEMETRY HARNESS & PROVENANCE ]</h2>
+            <span style="cursor: pointer; color: #ff3333; font-weight: bold;" onclick="document.getElementById('system2-overlay').style.display='none'">[ CLOSE_CONNECTION ]</span>
+        </div>
+        <div id="sys2-content" style="flex-grow: 1; overflow-y: auto;">
+            <div class="provenance-log" style="background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid #333;">
+                <p style="margin: 5px 0;"><span style="color: #888;">AGENT:</span> MetaOrchestrator</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">STATUS:</span> ACTIVE_SYNC</p>
+                <p style="margin: 5px 0;"><span style="color: #888;">W3C_PROV_O:</span> <span id="overlay-prov-hash">PENDING</span></p>
+            </div>
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa;">
+                <p>> WAITING FOR KERNEL YIELD...</p>
+                <p>> STREAMING LOG_EVENT DATA FROM ISOLATED IFRAME...</p>
+                <div id="overlay-log-stream" style="margin-top: 10px; border-left: 2px solid #06b6d4; padding-left: 10px; min-height: 100px;"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Harness Telemetry Framework connector
+        window.showProvenanceOverlay = function(hash) {
+            const overlay = document.getElementById('system2-overlay');
+            if(overlay) {
+                overlay.style.display = 'flex';
+                if(hash) {
+                    document.getElementById('overlay-prov-hash').innerText = hash;
+                }
+            }
+        };
+
+        // Listen for PROV-O events via Shared Provenance Bus
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'PROVO_EVENT') {
+                const stream = document.getElementById('overlay-log-stream');
+                if (stream) {
+                    const logEl = document.createElement('div');
+                    logEl.style.marginBottom = '5px';
+                    logEl.innerText = `> [${new Date().toISOString()}] ${JSON.stringify(event.data.payload)}`;
+                    stream.appendChild(logEl);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

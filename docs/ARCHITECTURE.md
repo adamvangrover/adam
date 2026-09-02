@@ -34,6 +34,18 @@ The system is composed of three distinct, decoupled layers that can operate stan
 *   **Components**:
     *   **Probabilistic-to-Deterministic Integration Layer (PDIL)**: Acts as a strict gatekeeper and translation layer, mapping stochastic outputs from the Intelligence Layer (System 1/Swarm) into strongly-typed, deterministic parameters for the Compute Layer (System 2/Engine).
 
+## 5. Swarm Environment Layer
+To support long-running autonomous operations, the architecture includes a modular, portable, and async adversarial-aware swarm environment. This environment leverages fine-tuned in-context learning, deeply managed execution loops, and comprehensive harness telemetry.
+
+The environment utilizes a multidimensional 3x5x7 tiered architecture:
+*   **3-Layer Execution:** Data, Reasoning, Execution.
+*   **5-Layer Governance:** Governance, Models, Agents, Environments, Telemetry.
+*   **7-Layer Integration:** Hardware, OS, Kernel, Swarm, App, Interface, User.
+
+Key capabilities include continuous computation of confidence bands around simulated world model probabilities, active tracking of node connection likelihoods across the semantic and execution graphs, and the population of predictive tail scenarios to forecast high-impact, rare events.
+
+*For a detailed breakdown of the tiered architecture and its capabilities, see the [Swarm Environment Layer Deep Dive](architecture/swarm_environment_layer.md).*
+
 ## Architecture Diagram
 
 ```mermaid
