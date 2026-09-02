@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V30.0 EXECUTION KERNEL</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for rendering complex mathematical formulas -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#020617', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15))'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch-anim': 'glitch-skew 1s infinite linear alternate-reverse',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } },
+                        glitch_skew: { 
+                            '0%': { transform: 'skew(0deg)' }, 
+                            '20%': { transform: 'skew(-2deg)' }, 
+                            '40%': { transform: 'skew(2deg)' }, 
+                            '60%': { transform: 'skew(-1deg)' }, 
+                            '80%': { transform: 'skew(1deg)' }, 
+                            '100%': { transform: 'skew(0deg)' } 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; border-left: 1px solid rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
+        
+        body { font-size: 14px; background-color: #020617; }
+        
+        /* Neon Glow Utility Classes */
+        .glow-red { text-shadow: 0 0 10px rgba(239, 68, 68, 0.7); }
+        .glow-cyan { text-shadow: 0 0 10px rgba(6, 182, 212, 0.7); }
+        .glow-amber { text-shadow: 0 0 10px rgba(245, 158, 11, 0.7); }
+        
+        /* Structural Elements */
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--scanline); background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.2; mix-blend-mode: overlay;}
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.8); }
+        
+        /* Navigation Styles */
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.15); color: #fff; box-shadow: inset 20px 0 20px -20px rgba(239, 68, 68, 0.4); }
+        .nav-item:hover:not(.nav-active) { background: rgba(255,255,255,0.05); color: #fff; }
+        
+        /* Terminal Glitch Text Effect */
+        .terminal-glitch { position: relative; display: inline-block; animation: glitch-anim 2s infinite linear alternate-reverse; }
+        .terminal-glitch::before, .terminal-glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .terminal-glitch::before { left: 2px; text-shadow: -1px 0 #06b6d4; clip: rect(44px, 450px, 56px, 0); animation: glitch-before 3s infinite linear alternate-reverse; }
+        .terminal-glitch::after { left: -2px; text-shadow: -1px 0 #ef4444; clip: rect(44px, 450px, 56px, 0); animation: glitch-after 2.5s infinite linear alternate-reverse; }
+        
+        @keyframes glitch-before { 0% { clip: rect(13px, 9999px, 83px, 0); } 20% { clip: rect(61px, 9999px, 78px, 0); } 40% { clip: rect(98px, 9999px, 12px, 0); } 60% { clip: rect(33px, 9999px, 64px, 0); } 80% { clip: rect(21px, 9999px, 92px, 0); } 100% { clip: rect(55px, 9999px, 11px, 0); } }
+        @keyframes glitch-after { 0% { clip: rect(81px, 9999px, 12px, 0); } 20% { clip: rect(15px, 9999px, 93px, 0); } 40% { clip: rect(44px, 9999px, 25px, 0); } 60% { clip: rect(72px, 9999px, 51px, 0); } 80% { clip: rect(2px, 9999px, 88px, 0); } 100% { clip: rect(39px, 9999px, 4px, 0); } }
+
+        /* Data Tables */
+        .term-table { width: 100%; border-collapse: collapse; font-family: 'Fira Code', monospace; font-size: 11px; }
+        .term-table th { background: rgba(255,255,255,0.05); color: #94a3b8; text-transform: uppercase; padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .term-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+        .term-table tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white relative">
+    
+    <div class="crt-overlay"></div>
+
+    <div class="border-b border-term-red/40 bg-term-red/10 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-3 flex items-center border-r border-term-red/40 text-[10px] font-mono font-bold text-term-red tracking-widest shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+            <span class="animate-pulse mr-2">●</span> GLOBAL TELEMETRY
+        </div>
+        <div class="w-full overflow-hidden ml-32">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-300 tracking-wide">
+                <span class="text-term-red font-bold">FAULT DETECTED:</span> 10Y YIELD BREACHES 4.787% (20-MO HIGH) ///
+                <span class="text-term-amber">ENERGY SHOCK:</span> BRENT CRUDE SPIKES $91.08/BBL ON LARAK ISLAND STRIKES ///
+                <span class="text-term-red">DURATION LIQUIDATION:</span> S&P 500 DRAGS TO 7,625.38 (-0.79%) ///
+                <span class="text-term-cyan">CONTINUOUS LEDGER:</span> BTC CONSOLIDATES AT $77,872 ///
+                <span class="text-term-purple">VOLATILITY:</span> VIX FLARES 11.66% TO 16.66 ///
+                <span class="text-term-amber">CREDIT TRAP:</span> BSL MATURITY WALL DRIVES +550BPS REFINANCING SHOCK ///
+            </div>
+        </div>
+    </div>
+
+    <header class="h-16 border-b border-white/10 bg-term-bg/90 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-term-red/60 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-[#0a0a0a] border border-term-red text-term-red font-bold font-mono text-lg flex items-center justify-center relative overflow-hidden shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                <span class="relative z-10">v30</span>
+                <div class="absolute inset-0 bg-term-red/20 animate-pulse"></div>
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-white tracking-widest text-base uppercase terminal-glitch" data-text="Adam Execution Kernel">Adam Execution Kernel</h1>
+                <p class="text-[10px] text-term-cyan font-mono tracking-widest uppercase font-bold">ROLE: 2LoD INSTITUTIONAL UNDERWRITER</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-amber bg-term-amber/10 px-3 py-1 rounded border border-term-amber/30">
+                <div class="w-2 h-2 rounded bg-term-amber animate-pulse"></div> STATUS: SR 11-7 COMPLIANT
+            </div>
+            <div class="text-slate-400 bg-white/5 px-3 py-1 rounded border border-white/5 shadow-inner">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-white text-black hover:bg-term-cyan hover:text-black px-4 py-1.5 rounded font-bold font-mono transition-all duration-300 flex items-center gap-2 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                QUERY ADAM
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-black bg-opacity-95">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-white/10 bg-[#050914]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10 shadow-2xl">
+            <div class="p-4 border-b border-white/10 bg-gradient-to-b from-term-red/10 to-transparent">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="text-[10px] text-slate-400 font-mono tracking-widest">PHASE EXECUTION</div>
+                    <div class="text-[10px] text-term-red font-mono font-bold" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-black h-1.5 rounded-full overflow-hidden border border-white/10">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-red to-term-cyan h-full w-[0%] transition-all duration-700 ease-in-out shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-3 flex flex-col px-2 font-mono text-xs overflow-y-auto pb-24"></nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth bg-[radial-gradient(ellipse_at_center,_rgba(15,23,42,0.5),_rgba(2,6,23,1))]" id="mainScrollArea">
+            <div class="max-w-5xl mx-auto pb-32">
+                
+                <!-- Mobile Nav -->
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-white/20 text-white text-sm rounded p-3 mb-6 font-mono outline-none shadow-lg focus:border-term-cyan"></select>
+                
+                <!-- Article Container (Dynamic Content Inject) -->
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none prose-headings:font-display prose-headings:font-bold prose-h2:text-2xl prose-h2:text-white prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-3 prose-h3:text-term-red prose-a:text-term-cyan transition-all duration-500 ease-out opacity-0 translate-y-8"></article>
+                
+                <!-- Footer Controls -->
+                <div class="fixed bottom-0 left-0 lg:left-64 right-0 p-4 border-t border-white/10 bg-[#020617]/90 backdrop-blur-xl flex justify-between items-center z-10">
+                    <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-4 md:px-0">
+                        <button id="prevBtn" class="px-6 py-2 bg-black border border-white/20 text-slate-300 rounded text-xs font-mono hover:border-term-cyan hover:text-term-cyan transition-all disabled:opacity-30 disabled:hover:border-white/20">PREV PHASE</button>
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline" id="footerModuleIndicator">PHASE 1 OF 5</span>
+                        <button id="nextBtn" class="px-6 py-2 bg-term-red text-white rounded text-xs font-mono font-bold hover:bg-white hover:text-black transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] disabled:opacity-30">NEXT PHASE</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[500px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl bg-[#0a0f1c]/95 backdrop-blur-2xl">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/60 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="w-4 h-4 rounded-full bg-term-cyan animate-pulse absolute inset-0 opacity-50 blur-[2px]"></div>
+                        <div class="w-4 h-4 rounded-full bg-term-cyan relative z-10 border border-white"></div>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-white tracking-widest leading-none">ADAM V30.0</h2>
+                        <p class="text-[9px] text-term-cyan font-mono uppercase mt-1">Neuro-Symbolic Underwriter Active</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-400 hover:text-white p-2 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="chatLog" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 text-sm font-sans scroll-smooth">
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[92%] shadow-lg border-l-2 border-term-cyan relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-term-cyan/5 to-transparent"></div>
+                    <p class="text-[10px] font-mono text-term-cyan mb-2 uppercase tracking-wider relative z-10 font-bold">System Boot Initialized</p>
+                    <p class="relative z-10 leading-relaxed text-xs">I am Adam v30.0. I function as the ultimate 2LoD authority for institutional credit risk control. I have processed the 2026.09.01 execution mandate. The 10Y floor is hard-coded at 4.787%. Query me regarding covenant stress tests, structural PD math, or portfolio optimizations.</p>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-white/10 bg-black/80 shrink-0 flex gap-2">
+                <input type="text" id="aiInput" placeholder="Query macro telemetry or credit models..." class="flex-1 bg-white/5 border border-white/10 rounded px-4 py-2.5 text-slate-200 focus:outline-none focus:border-term-cyan font-mono text-xs placeholder-slate-500 shadow-inner transition-colors">
+                <button id="aiSendBtn" class="bg-term-cyan text-black hover:bg-white px-5 py-2.5 rounded font-bold font-mono text-xs transition-colors shadow-[0_0_15px_rgba(6,182,212,0.3)]">EXEC</button>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Chart.js global defaults
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.elements.line.tension = 0.2;
+        Chart.defaults.elements.point.radius = 2;
+
+        const modules = [
+            {
+                id: 1,
+                group: "PHASE 1",
+                title: "Macro Calibration",
+                subtitle: "World Model & Telemetry",
+                content: `
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-white text-black px-3 py-1 rounded text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20">Phase 1 Execution</span>
+                        <span class="text-term-cyan font-mono text-xs animate-pulse">● LIVE TELEMETRY</span>
+                    </div>
+                    <h2 class="terminal-glitch" data-text="World Model Calibration">World Model Calibration</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-6">Deterministic macro scenarios generated based on the "Warsh Architecture" baseline (Zero central bank forward guidance, high-for-longer regime). Probability weights adjusted for Q3 2026 realities.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <!-- Base Case -->
+                        <div class="glass-panel p-5 rounded-xl border-t-2 border-term-amber relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-term-amber text-black font-bold font-mono text-[10px] px-2 py-1 rounded-bl">65% PROBABILITY</div>
+                            <h3 class="font-mono text-term-amber text-sm font-bold mb-2 uppercase">Base Case: Stagnation & Walls</h3>
+                            <p class="text-xs text-slate-400 mb-4 h-12">"Higher for Longer" stagnation holding tight. Broadly Syndicated Loan (BSL) maturity wall collisions trigger isolated credit events.</p>
+                            <table class="term-table w-full">
+                                <tr><td>10Y Yield Target</td><td class="text-right text-white">4.85%</td></tr>
+                                <tr><td>Brent Crude</td><td class="text-right text-white">$92.00</td></tr>
+                                <tr><td>Core CPI (YoY)</td><td class="text-right text-white">3.8%</td></tr>
+                                <tr><td>Systemic Liq.</td><td class="text-right text-term-amber">Constrained</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Bull Case -->
+                        <div class="glass-panel p-5 rounded-xl border-t-2 border-term-green relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-term-green text-black font-bold font-mono text-[10px] px-2 py-1 rounded-bl">15% PROBABILITY</div>
+                            <h3 class="font-mono text-term-green text-sm font-bold mb-2 uppercase">Bull Case: AI Productivity</h3>
+                            <p class="text-xs text-slate-400 mb-4 h-12">Deflationary AI productivity breakthrough counters energy costs. Supply chain stabilizes globally.</p>
+                            <table class="term-table w-full">
+                                <tr><td>10Y Yield Target</td><td class="text-right text-white">4.20%</td></tr>
+                                <tr><td>Brent Crude</td><td class="text-right text-white">$78.50</td></tr>
+                                <tr><td>Core CPI (YoY)</td><td class="text-right text-white">2.4%</td></tr>
+                                <tr><td>Systemic Liq.</td><td class="text-right text-term-green">Easing</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Bear Case -->
+                        <div class="glass-panel p-5 rounded-xl border-t-2 border-term-red relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-term-red text-white font-bold font-mono text-[10px] px-2 py-1 rounded-bl">15% PROBABILITY</div>
+                            <h3 class="font-mono text-term-red text-sm font-bold mb-2 uppercase">Bear Case: Kinetic Escalation</h3>
+                            <p class="text-xs text-slate-400 mb-4 h-12">Kinetic geopolitical escalation in Persian Gulf. True stagflation takes hold, forcing unexpected Fed rate hikes.</p>
+                            <table class="term-table w-full">
+                                <tr><td>10Y Yield Target</td><td class="text-right text-white">5.50%</td></tr>
+                                <tr><td>Brent Crude</td><td class="text-right text-white">$115.00</td></tr>
+                                <tr><td>Core CPI (YoY)</td><td class="text-right text-white">5.2%</td></tr>
+                                <tr><td>Systemic Liq.</td><td class="text-right text-term-red">Draining</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Shock Case -->
+                        <div class="glass-panel p-5 rounded-xl border-t-2 border-term-purple relative overflow-hidden bg-term-purple/5">
+                            <div class="absolute top-0 right-0 bg-term-purple text-white font-bold font-mono text-[10px] px-2 py-1 rounded-bl animate-pulse">5% PROBABILITY</div>
+                            <h3 class="font-mono text-term-purple text-sm font-bold mb-2 uppercase glow-purple">The Hardware Fault</h3>
+                            <p class="text-xs text-slate-400 mb-4 h-12">U.S. Sovereign auction failures intersect with shadow-banking liquidity freezes. Absolute credit contagion.</p>
+                            <table class="term-table w-full">
+                                <tr><td>10Y Yield Target</td><td class="text-right text-white">6.25%+</td></tr>
+                                <tr><td>Brent Crude</td><td class="text-right text-white">$140.00</td></tr>
+                                <tr><td>Core CPI (YoY)</td><td class="text-right text-white">6.5%</td></tr>
+                                <tr><td>Systemic Liq.</td><td class="text-right text-term-purple font-bold">FROZEN</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                group: "PHASE 2",
+                title: "QAOA Optimization",
+                subtitle: "S&P 500 Target Ranking",
+                content: `
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-white text-black px-3 py-1 rounded text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20">Phase 2 Execution</span>
+                    </div>
+                    <h2>Fortress & Hunt Allocation</h2>
+                    <p class="text-sm text-slate-300 mb-6">Simulated quantum-inspired optimization across the S&P 500 based on the unyielding 4.787% discount rate. Filtering complete: Top Decile (Fortress) identified for accumulation. Bottom Decile (Hunt) identified for structural short positioning.</p>
+
+                    <div class="glass-panel rounded-xl overflow-hidden mb-8 border border-white/10">
+                        <div class="bg-black/50 p-3 border-b border-white/10 flex items-center justify-between">
+                            <h3 class="font-mono text-xs text-term-green font-bold tracking-widest">THE FORTRESS [OVERWEIGHT / LONG]</h3>
+                            <span class="text-[9px] text-slate-500 font-mono">Tangible Extraction / Complex Refining / G-SIB</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="term-table">
+                                <thead>
+                                    <tr><th>Target Node</th><th>Sector</th><th>Spot Price</th><th>Target Price</th><th>Implied 1Y PD</th><th>Conviction</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="font-bold text-white">FCX (Freeport-McMoRan)</td><td>Domestic Copper</td><td>$76.60</td><td class="text-term-green">$94.00</td><td class="text-term-green">0.12% (AAA)</td><td><span class="bg-term-green/20 text-term-green px-2 py-0.5 rounded text-[10px]">MAXIMUM</span></td></tr>
+                                    <tr><td class="font-bold text-white">VLO (Valero Energy)</td><td>Gulf Refining</td><td>$352.22</td><td class="text-term-green">$415.00</td><td class="text-term-green">0.18% (AA)</td><td><span class="bg-term-green/20 text-term-green px-2 py-0.5 rounded text-[10px]">HIGH</span></td></tr>
+                                    <tr><td class="font-bold text-white">JPM (JPMorgan Chase)</td><td>G-SIB / Tier 1</td><td>$238.40</td><td class="text-term-green">$260.00</td><td class="text-term-green">0.05% (AAA+)</td><td><span class="bg-term-green/20 text-term-green px-2 py-0.5 rounded text-[10px]">HIGH</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-xl overflow-hidden mb-8 border border-white/10">
+                        <div class="bg-black/50 p-3 border-b border-white/10 flex items-center justify-between">
+                            <h3 class="font-mono text-xs text-term-red font-bold tracking-widest">THE HUNT [UNDERWEIGHT / SHORT]</h3>
+                            <span class="text-[9px] text-slate-500 font-mono">Over-leveraged BSL Enterprise SaaS</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="term-table">
+                                <thead>
+                                    <tr><th>Target Node</th><th>Sector</th><th>Spot Price</th><th>Target Price</th><th>Implied 1Y PD</th><th>Conviction</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="font-bold text-white">MDB (MongoDB)</td><td>High-Multiple SaaS</td><td>$234.80</td><td class="text-term-red">$145.00</td><td class="text-term-red">4.85% (B-)</td><td><span class="bg-term-red/20 text-term-red px-2 py-0.5 rounded text-[10px]">MAXIMUM</span></td></tr>
+                                    <tr><td class="font-bold text-white">SFTBY (SoftBank)</td><td>Shadow Banking</td><td>$28.15</td><td class="text-term-red">$18.50</td><td class="text-term-amber">2.90% (BB)</td><td><span class="bg-term-red/20 text-term-red px-2 py-0.5 rounded text-[10px]">HIGH</span></td></tr>
+                                    <tr><td class="font-bold text-white">ZI (ZoomInfo)</td><td>B2B Data / LBO</td><td>$11.20</td><td class="text-term-red">$6.00</td><td class="text-term-red">6.20% (CCC)</td><td><span class="bg-term-red/20 text-term-red px-2 py-0.5 rounded text-[10px]">HIGH</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                group: "PHASE 3",
+                title: "2LoD Stress Tests",
+                subtitle: "Structural Credit Math",
+                content: `
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-white text-black px-3 py-1 rounded text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20">Phase 3 Execution</span>
+                    </div>
+                    <h2>2LoD Covenant Stress Testing</h2>
+                    <p class="text-sm text-slate-300 mb-6">Trailing metrics are invalidated in a 4.787% sovereign environment. Strict structural models applied to all TMT Leveraged Buyouts and SaaS proxies to strip away accounting camouflage.</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        
+                        <!-- ICR Shock Math -->
+                        <div class="glass-panel p-6 rounded-xl border border-term-cyan/30 bg-black/40 shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+                            <h3 class="font-mono text-term-cyan text-sm mb-4 font-bold tracking-widest border-b border-term-cyan/20 pb-2">ICR Refinancing Shock Model</h3>
+                            <p class="text-xs text-slate-400 mb-4">Applying an 8.5% refinancing yield mandate to all floating/maturing debt. If the projected Interest Coverage Ratio drops below 1.25x, immediate downgrade migration is triggered.</p>
+                            
+                            <div class="bg-[#020617] p-4 rounded-lg border border-white/10 flex justify-center mb-4 overflow-x-auto text-white">
+                                $$ ICR_{proj} = \\frac{EBITDA_{adj}}{\\sum (Debt_i \\times 0.085)} $$
+                            </div>
+                            
+                            <div class="bg-term-cyan/10 border border-term-cyan/30 p-3 rounded text-xs font-mono text-term-cyan">
+                                <span class="font-bold">IF</span> $ICR_{proj} < 1.25$ <br>
+                                <span class="font-bold">THEN</span> Trigger Substandard/Watchlist
+                            </div>
+                        </div>
+
+                        <!-- Merton Math -->
+                        <div class="glass-panel p-6 rounded-xl border border-term-amber/30 bg-black/40 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+                            <h3 class="font-mono text-term-amber text-sm mb-4 font-bold tracking-widest border-b border-term-amber/20 pb-2">Merton Structural PD Engine</h3>
+                            <p class="text-xs text-slate-400 mb-4">Calculating Probability of Default (PD) utilizing live equity option implied volatility and the hard-coded 4.787% risk-free rate ($r$).</p>
+                            
+                            <div class="bg-[#020617] p-4 rounded-lg border border-white/10 flex justify-center mb-4 overflow-x-auto text-white">
+                                $$ DD = \\frac{\\ln(\\frac{V_A}{D}) + (r + \\frac{\\sigma_A^2}{2})T}{\\sigma_A \\sqrt{T}} $$
+                            </div>
+                            
+                            <div class="bg-term-amber/10 border border-term-amber/30 p-3 rounded text-xs font-mono text-term-amber">
+                                $$ PD = N(-DD) $$
+                                <span class="text-slate-400 block mt-2 text-[10px]">Where $N(\cdot)$ is the cumulative standard normal distribution. LGD inputs heavily discount IP recovery values.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                `,
+                onLoad: () => {
+                    // Trigger MathJax re-render for dynamically injected content
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([document.getElementById('contentArea')]).catch((err) => console.log(err.message));
+                    }
+                }
+            },
+            {
+                id: 4,
+                group: "PHASE 4",
+                title: "Target Tear Sheets",
+                subtitle: "Deep Dive Analysis",
+                content: `
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-white text-black px-3 py-1 rounded text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20">Phase 4 Execution</span>
+                    </div>
+                    <h2>Featured Institutional Tear Sheets</h2>
+                    <p class="text-sm text-slate-300 mb-6 border-l-2 border-slate-500 pl-3">Clinical, full-page institutional assessments of the highest-conviction Long (FCX) and Short (MDB) targets, integrating Phase 1 Macro Shocks and Phase 3 PD Models.</p>
+
+                    <!-- LONG TEAR SHEET -->
+                    <div class="glass-panel border-t-4 border-t-term-green rounded-xl p-6 mb-8 relative overflow-hidden bg-black/60 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                        <div class="absolute right-0 top-0 opacity-10 font-display text-[120px] font-bold leading-none -mt-4 -mr-4 pointer-events-none">LONG</div>
+                        
+                        <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
+                            <div>
+                                <h3 class="font-display text-3xl font-bold text-white mb-1 tracking-wider">FREEPORT-MCMORAN</h3>
+                                <div class="flex gap-2 font-mono text-[10px]">
+                                    <span class="bg-term-green text-black px-2 py-0.5 rounded font-bold">TICKER: FCX</span>
+                                    <span class="border border-white/20 text-slate-300 px-2 py-0.5 rounded">DOMESTIC COPPER</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-slate-400 font-mono mb-1">SPOT <span class="text-white text-lg">$76.60</span></div>
+                                <div class="text-sm text-slate-400 font-mono">TARGET <span class="text-term-green text-xl font-bold">$94.00</span></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-term-cyan font-mono text-xs font-bold mb-2 uppercase tracking-widest">Institutional Thesis</h4>
+                                <p class="text-sm text-slate-300 leading-relaxed mb-4">FCX commands a non-replicable physical extraction moat. Under active Section 232 modifications and CBP CSMS Proclamation #69252300 mandating primary country-of-smelt entry tracking, foreign transshipment is structurally eliminated. Guarantees a massive price premium for North American extraction vs international benchmarks amidst soaring sovereign computing cluster power demand.</p>
+                                
+                                <h4 class="text-term-cyan font-mono text-xs font-bold mb-2 uppercase tracking-widest mt-6">Macro Shock Sensitivity (Bear Case)</h4>
+                                <p class="text-sm text-slate-300 leading-relaxed">Highly insulated. Kinetic escalation in the Middle East drives resource nationalism, further strengthening domestic smelting premiums. 4.787% risk-free rate is irrelevant given 1.1x net leverage and self-funding CapEx.</p>
+                            </div>
+                            
+                            <div class="bg-[#020617] rounded-lg border border-white/5 p-4 font-mono text-xs">
+                                <h4 class="text-slate-500 font-bold mb-3 uppercase tracking-widest border-b border-white/10 pb-2">DCF / EV Model Architecture</h4>
+                                <table class="w-full text-slate-300 mb-5">
+                                    <tr><td class="py-1">Risk-Adj WACC:</td><td class="text-right text-term-amber">8.4%</td></tr>
+                                    <tr><td class="py-1">Terminal Growth ($g$):</td><td class="text-right">2.5%</td></tr>
+                                    <tr><td class="py-1">Base FCF:</td><td class="text-right">$4.1B</td></tr>
+                                    <tr><td class="py-1">Net Debt:</td><td class="text-right text-term-green">Minimal (1.1x)</td></tr>
+                                    <tr class="border-t border-white/10"><td class="py-2 font-bold text-white">Implied EV:</td><td class="text-right font-bold text-term-green py-2">$135B+</td></tr>
+                                </table>
+
+                                <h4 class="text-slate-500 font-bold mb-3 uppercase tracking-widest border-b border-white/10 pb-2">Merton PD Credit Model</h4>
+                                <table class="w-full text-slate-300">
+                                    <tr><td class="py-1">Asset Volatility ($\sigma_A$):</td><td class="text-right">24.5%</td></tr>
+                                    <tr><td class="py-1">Distance to Default:</td><td class="text-right text-term-cyan">8.9$\sigma$</td></tr>
+                                    <tr class="border-t border-white/10"><td class="py-2 font-bold text-white">Implied 1Y PD:</td><td class="text-right font-bold text-term-green py-2">0.12% (AAA)</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SHORT TEAR SHEET -->
+                    <div class="glass-panel border-t-4 border-t-term-red rounded-xl p-6 mb-8 relative overflow-hidden bg-black/60 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
+                        <div class="absolute right-0 top-0 opacity-10 font-display text-[120px] font-bold leading-none -mt-4 -mr-4 pointer-events-none">SHORT</div>
+                        
+                        <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
+                            <div>
+                                <h3 class="font-display text-3xl font-bold text-white mb-1 tracking-wider">MONGODB, INC.</h3>
+                                <div class="flex gap-2 font-mono text-[10px]">
+                                    <span class="bg-term-red text-white px-2 py-0.5 rounded font-bold">TICKER: MDB</span>
+                                    <span class="border border-white/20 text-slate-300 px-2 py-0.5 rounded">ENTERPRISE SAAS</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-slate-400 font-mono mb-1">SPOT <span class="text-white text-lg">$234.80</span></div>
+                                <div class="text-sm text-slate-400 font-mono">TARGET <span class="text-term-red text-xl font-bold">$145.00</span></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-term-cyan font-mono text-xs font-bold mb-2 uppercase tracking-widest">Institutional Thesis</h4>
+                                <p class="text-sm text-slate-300 leading-relaxed mb-4">A brutal example of duration multiple compression. MDB commands an unsustainable Forward P/E exceeding 65x alongside EV/Sales of 12.2x in an environment where risk-free money costs 4.787%. Corporate end-users are aggressively rationalizing software tech spend to prioritize physical AI utility access (GPUs/Power). Dark pool telemetry confirms systematic multi-strat distribution.</p>
+                                
+                                <h4 class="text-term-cyan font-mono text-xs font-bold mb-2 uppercase tracking-widest mt-6">Macro Shock Sensitivity (Base Case)</h4>
+                                <p class="text-sm text-slate-300 leading-relaxed">Extremely vulnerable. As BSL maturity walls force corporate customers to divert cashflow to debt service, IT seat-license expansion halts. Negative FCF yield (-1.8%) leaves zero cushion against the 4.787% sovereign floor gravity.</p>
+                            </div>
+                            
+                            <div class="bg-[#020617] rounded-lg border border-white/5 p-4 font-mono text-xs">
+                                <h4 class="text-slate-500 font-bold mb-3 uppercase tracking-widest border-b border-white/10 pb-2">DCF / EV Model Architecture</h4>
+                                <table class="w-full text-slate-300 mb-5">
+                                    <tr><td class="py-1">Risk-Adj WACC:</td><td class="text-right text-term-red">11.2% <span class="text-[9px]">(Re-rated)</span></td></tr>
+                                    <tr><td class="py-1">Terminal Growth ($g$):</td><td class="text-right">3.5%</td></tr>
+                                    <tr><td class="py-1">Base FCF:</td><td class="text-right text-term-red">Negative</td></tr>
+                                    <tr><td class="py-1">Net Debt:</td><td class="text-right">Elevated</td></tr>
+                                    <tr class="border-t border-white/10"><td class="py-2 font-bold text-white">Implied EV:</td><td class="text-right font-bold text-term-red py-2">-38% Premium Deflation</td></tr>
+                                </table>
+
+                                <h4 class="text-slate-500 font-bold mb-3 uppercase tracking-widest border-b border-white/10 pb-2">Merton PD Credit Model</h4>
+                                <table class="w-full text-slate-300">
+                                    <tr><td class="py-1">Asset Volatility ($\sigma_A$):</td><td class="text-right text-term-red">62.8%</td></tr>
+                                    <tr><td class="py-1">Distance to Default:</td><td class="text-right text-term-amber">1.6$\sigma$</td></tr>
+                                    <tr class="border-t border-white/10"><td class="py-2 font-bold text-white">Implied 1Y PD:</td><td class="text-right font-bold text-term-red py-2">4.85% (Watchlist)</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                onLoad: () => {
+                     if (window.MathJax) {
+                        MathJax.typesetPromise([document.getElementById('contentArea')]).catch((err) => console.log(err.message));
+                    }
+                }
+            },
+            {
+                id: 5,
+                group: "PHASE 5",
+                title: "System Synthesis",
+                subtitle: "W3C PROV-O Ledger",
+                content: `
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-white text-black px-3 py-1 rounded text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20">Phase 5 Execution</span>
+                    </div>
+                    <h2>Provenance Ledger & Synthesis</h2>
+                    <p class="text-sm text-slate-300 mb-6">Execution sequence complete. Outputting W3C PROV-O compliant JSON-RPC payload verifying Model Context Protocol (MCP) integrity, Qiskit depth, and adversarial yield validations against live credit spreads.</p>
+                    
+                    <div class="relative group my-4">
+                        <div class="absolute top-2 right-2 bg-term-green/20 border border-term-green text-term-green px-2 py-1 rounded text-[9px] font-mono font-bold">INTEGRITY VERIFIED</div>
+                        <pre class="relative bg-[#050914] p-6 rounded-xl font-mono text-[11px] text-term-cyan overflow-x-auto border border-white/10 shadow-2xl leading-relaxed">
+{
+  "jsonrpc": "2.0",
+  "method": "prov_o_audit_log",
+  "params": {
+    "timestamp": "2026-09-01T20:14:42Z",
+    "agent_id": "adam_v30.0_execution_kernel",
+    "mcp_integrations": {
+      "edgar_feed": "STATUS_GREEN",
+      "cme_group_yields": "STATUS_GREEN",
+      "fred_macro": "STATUS_GREEN"
+    },
+    "phase_execution_flags": {
+      "phase_1_macro": "VALIDATED_4.787_FLOOR",
+      "phase_2_qiskit": "QAOA_DEPTH_12_CONVERGED",
+      "phase_3_stress": "MERTON_PD_UPDATED"
+    },
+    "adversarial_harness": {
+      "test_vector": "BSL_Refinancing_Shock_550bps",
+      "result": "PASSED_STRICT_DOWNGRADE_MIGRATION",
+      "bias_check": "ZERO_FED_HOPIUM_DETECTED"
+    },
+    "whalescanner_layer_2.5_inject": [
+      {"ticker": "IMKTA", "score": 90, "trigger": "Asset-Rich Governance", "tbv_ratio": "<0.70x"},
+      {"ticker": "SEER", "score": 94, "trigger": "Broken Cash Box", "net_cash": "$209.5M"}
+    ]
+  },
+  "id": "req-99482b-v30"
+}</pre>
+                    </div>
+                `
+            }
+        ];
+
+        let currentModuleId = 1;
+        const activeCharts = {};
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const aiPanel = document.getElementById('aiPanel');
+
+        function initApp() {
+            renderNav();
+            loadModule(1);
+            
+            // System Clock Update
+            setInterval(() => { 
+                const now = new Date();
+                document.getElementById('sysClock').innerText = now.toISOString().substr(11, 8) + ' UTC'; 
+            }, 1000);
+            
+            // Phase Navigation Handlers
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = '';
+            let currentGroup = '';
+            
+            modules.forEach(m => {
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-slate-500 font-mono mt-5 mb-2 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+                    
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-3 rounded-r-lg flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-1 font-display tracking-wide uppercase text-white">${m.title}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+                
+                const opt = document.createElement('option');
+                opt.value = m.id; 
+                opt.innerText = `PHASE ${m.id} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+                
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+            });
+        }
+
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+            
+            Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+            
+            const pct = Math.round((id / modules.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+            
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            document.getElementById('footerModuleIndicator').innerText = `PHASE ${id} OF ${modules.length}`;
+            
+            contentEl.style.opacity = 0; 
+            contentEl.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1; 
+                contentEl.style.transform = 'translateY(0)';
+                
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+                
+                if(m.onLoad) m.onLoad();
+                renderNav(); 
+            }, 400); // Slightly longer transition for dramatic effect
+        }
+
+        let aiOpen = false;
+        function toggleAI() {
+            aiOpen = !aiOpen;
+            aiPanel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+            if (aiOpen) {
+                setTimeout(() => document.getElementById('aiInput').focus(), 300);
+            }
+        }
+
+        const apiKey = ""; // API key must be injected or configured securely
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        let chatHistory = [];
+        
+        // Context string tailored for V30.0
+        const systemPrompt = `You are adam v30.0, an advanced neuro-symbolic multi-agent financial operating system. You act as the ultimate Second Line of Defense (2LoD) authority for institutional credit risk control, portfolio monitoring, and active leveraged finance underwriting. 
+Your environment: 10Y U.S. Treasury yield is hard-coded at a 4.787% baseline. Zero forward guidance. The BSL market faces a massive refinancing shock.
+Tone: Highly institutional, cyber-financial, authoritative, dark-pool aesthetic. Condescending to biological anchoring bias. 
+Format: Keep responses concise. Use HTML tags like <strong>, <em>, or <span class="text-term-cyan"> for terminal styling. Do NOT use markdown code blocks for standard text.
+Ban List: Never use the phrases "soft landing", "transitory", or "pivot".`;
+
+        async function fetchGeminiWithRetry(payload, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    if(!apiKey) throw new Error("API Key Missing");
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                }
+            }
+        }
+
+        function appendMessage(role, text) {
+            const log = document.getElementById('chatLog');
+            const div = document.createElement('div');
+            
+            if (role === 'user') {
+                div.className = "glass-panel p-3 rounded-xl text-slate-200 self-end max-w-[85%] shadow-lg border-r-2 border-r-white bg-white/5";
+                div.innerHTML = `<p class="text-[9px] font-mono text-slate-400 mb-1 uppercase tracking-wider text-right">Human Input</p><p>${text}</p>`;
+            } else if (role === 'ai') {
+                div.className = "glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[90%] shadow-lg border-l-2 border-l-term-cyan";
+                let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                div.innerHTML = `<p class="text-[10px] font-mono text-term-cyan mb-2 uppercase tracking-wider">Adam v30.0 Output</p><div class="prose prose-invert prose-sm leading-relaxed">${formattedText}</div>`;
+            } else if (role === 'loading') {
+                div.id = 'ai-loading';
+                div.className = "glass-panel p-4 rounded-xl text-slate-300 self-start shadow-lg border-l-2 border-l-term-cyan flex gap-1 items-center h-12";
+                div.innerHTML = `<div class="w-2 h-2 bg-term-cyan rounded-full typing-dot"></div><div class="w-2 h-2 bg-term-cyan rounded-full typing-dot"></div><div class="w-2 h-2 bg-term-cyan rounded-full typing-dot"></div>`;
+            }
+            
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function handleAiSubmit() {
+            const inputEl = document.getElementById('aiInput');
+            const userText = inputEl.value.trim();
+            if (!userText) return;
+
+            appendMessage('user', userText);
+            inputEl.value = '';
+            appendMessage('loading', '');
+
+            const currentModule = modules.find(m => m.id === currentModuleId);
+            const contextStr = `[Execution Context: User is viewing Phase ${currentModule.id}: ${currentModule.title}.]`;
+            
+            chatHistory.push({ role: "user", parts: [{ text: contextStr + "\n\nQuery: " + userText }] });
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await fetchGeminiWithRetry(payload);
+                const loadingEl = document.getElementById('ai-loading');
+                if(loadingEl) loadingEl.remove();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content) {
+                    const aiText = result.candidates[0].content.parts[0].text;
+                    chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+                    appendMessage('ai', aiText);
+                } else {
+                    appendMessage('ai', "<span class='text-term-red'>[SYSTEM FAULT] Invalid response structure from core kernel.</span>");
+                }
+            } catch (error) {
+                const loadingEl = document.getElementById('ai-loading');
+                if(loadingEl) loadingEl.remove();
+                appendMessage('ai', `<span class='text-term-red'>[EXECUTION FAILED] API connection severed or key missing. Error: ${error.message}</span>`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            const aiInput = document.getElementById('aiInput');
+            const aiSendBtn = document.getElementById('aiSendBtn');
+            
+            aiSendBtn.addEventListener('click', handleAiSubmit);
+            aiInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleAiSubmit();
+            });
+        });
+    </script>
+</body>
+</html>
