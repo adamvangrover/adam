@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM v30 :: Agent Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 20px; background: #050b14; color: #ef4444; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .btn { background:none; border:1px solid #00f3ff; color:#00f3ff; padding:5px 10px; cursor:pointer; text-decoration: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; overflow-y: auto; padding-right: 10px; }
+        .agent-card { background: rgba(0,0,0,0.5); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; }
+        .agent-name { font-size: 1.2rem; color: #fff; margin: 0 0 10px 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .agent-prop { font-size: 0.85rem; margin: 5px 0; color: #ccc; }
+        .agent-prop span { color: #ef4444; }
+        agent-directive { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0; font-size: 1.2rem;">SYSTEM // AGENT REGISTRY</h1>
+        <a href="index.html" class="btn">[ RETURN ]</a>
+    </div>
+    <div class="grid" id="agentGrid">
+        <p style="color: #888;">Loading Agent Skills Registry...</p>
+    </div>
+    <agent-directive>{"type": "system_viewer", "context": "agents"}</agent-directive>
+    <script>
+        async function loadAgents() {
+            const grid = document.getElementById('agentGrid');
+            try {
+                // Attempt to load actual registry from docs
+                const response = await fetch('docs/agent_skills_registry.json');
+                if(!response.ok) throw new Error("Failed to load registry");
+                const data = await response.json();
+
+                grid.innerHTML = ''; // clear loading
+
+                // Handle potential structures of the JSON
+                let agents = [];
+                if(data.agents) agents = data.agents;
+                else if(Array.isArray(data)) agents = data;
+                else if(typeof data === 'object') {
+                    // if it's a map of id -> object
+                    for(const key in data) {
+                        agents.push({ id: key, ...data[key] });
+                    }
+                }
+
+                if(agents.length === 0) {
+                    grid.innerHTML = "<p>No agents found in registry format.</p>";
+                    return;
+                }
+
+                agents.forEach(agent => {
+                    const card = document.createElement('div');
+                    card.className = 'agent-card';
+
+                    // Safely stringify capabilities/tools if they exist
+                    const tools = agent.tools || agent.capabilities || [];
+                    const toolsStr = Array.isArray(tools) ? tools.join(', ') : 'None defined';
+
+                    card.innerHTML = `
+                        <h2 class="agent-name">${agent.name || agent.id || 'Unknown Agent'}</h2>
+                        <div class="agent-prop"><span>ROLE:</span> ${agent.role || agent.type || 'Standard'}</div>
+                        <div class="agent-prop"><span>STATUS:</span> ACTIVE</div>
+                        <div class="agent-prop"><span>DESCRIPTION:</span> ${agent.description || 'No description available.'}</div>
+                        <div class="agent-prop"><span>TOOLS:</span> ${toolsStr}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch(e) {
+                grid.innerHTML = "<p style='color:red;'>Error loading agents:<br>" + e.toString() + "<br><br>Generating Fallback Mock Registry...</p>";
+
+                // Fallback mock generation if file read fails
+                setTimeout(() => {
+                    const mocks = [
+                        { name: 'RiskOfficer', role: 'Evaluator', description: 'Assesses systemic and counterparty risk.' },
+                        { name: 'EvolutionaryArchitect', role: 'Meta-Agent', description: 'Monitors swarm health and updates codebase.' },
+                        { name: 'DataIngestor', role: 'Worker', description: 'Parses SEC EDGAR filings and live feeds.' }
+                    ];
+                    grid.innerHTML = '';
+                    mocks.forEach(agent => {
+                        const card = document.createElement('div');
+                        card.className = 'agent-card';
+                        card.innerHTML = `
+                            <h2 class="agent-name">${agent.name}</h2>
+                            <div class="agent-prop"><span>ROLE:</span> ${agent.role}</div>
+                            <div class="agent-prop"><span>STATUS:</span> ACTIVE [MOCK]</div>
+                            <div class="agent-prop"><span>DESCRIPTION:</span> ${agent.description}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }, 1000);
+            }
+        }
+        window.onload = loadAgents;
+    </script>
+</body>
+</html>
