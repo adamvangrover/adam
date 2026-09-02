@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Center | ADAM Governance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#090d16',
+                        emerald: '#10b981',
+                        crimson: '#ef4444',
+                        amber: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-obsidian text-slate-200 antialiased min-h-screen flex flex-col">
+
+    <header class="glass-header fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="text-xl font-bold font-mono tracking-tighter flex items-center gap-2 hover:text-pink-400 transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                </a>
+                <span class="text-slate-600">/</span>
+                <span class="text-pink-400 font-bold flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5"></i> Policy Center</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-24 pb-20">
+        <div class="max-w-7xl mx-auto px-4 space-y-8">
+
+            <div class="glass-panel p-6 rounded-xl">
+                <h2 class="text-2xl font-bold text-pink-400 border-b border-slate-800 pb-2 mb-6 flex items-center gap-2"><i data-lucide="book-open"></i> Global Limits & Baseline Thresholds</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <div class="text-sm text-slate-400 mb-1">Max Debt To Equity</div>
+                        <div class="text-xl font-mono font-bold text-emerald">3.0</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <div class="text-sm text-slate-400 mb-1">Min Profit Margin</div>
+                        <div class="text-xl font-mono font-bold text-emerald">0.0</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <div class="text-sm text-slate-400 mb-1">Min Current Ratio</div>
+                        <div class="text-xl font-mono font-bold text-emerald">1.0</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <div class="text-sm text-slate-400 mb-1">Min Interest Coverage</div>
+                        <div class="text-xl font-mono font-bold text-emerald">1.25</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-xl">
+                <h2 class="text-2xl font-bold text-pink-400 border-b border-slate-800 pb-2 mb-6 flex items-center gap-2"><i data-lucide="briefcase"></i> Sector Overrides (SNC)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 capitalize border-b border-slate-800 pb-2">General</h3>
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Max Debt To Equity</span>
+                                <span class="font-mono text-slate-300">3.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Profit Margin</span>
+                                <span class="font-mono text-slate-300">0.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Current Ratio</span>
+                                <span class="font-mono text-slate-300">1.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Interest Coverage</span>
+                                <span class="font-mono text-slate-300">1.25</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 capitalize border-b border-slate-800 pb-2">Energy</h3>
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Max Debt To Equity</span>
+                                <span class="font-mono text-amber font-bold">2.5 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Profit Margin</span>
+                                <span class="font-mono text-slate-300">0.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Current Ratio</span>
+                                <span class="font-mono text-amber font-bold">1.2 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Interest Coverage</span>
+                                <span class="font-mono text-slate-300">1.25</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 capitalize border-b border-slate-800 pb-2">Technology</h3>
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Max Debt To Equity</span>
+                                <span class="font-mono text-amber font-bold">4.0 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Profit Margin</span>
+                                <span class="font-mono text-amber font-bold">-0.1 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Current Ratio</span>
+                                <span class="font-mono text-slate-300">1.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Interest Coverage</span>
+                                <span class="font-mono text-slate-300">1.25</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 capitalize border-b border-slate-800 pb-2">Real Estate</h3>
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Max Debt To Equity</span>
+                                <span class="font-mono text-amber font-bold">5.0 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Profit Margin</span>
+                                <span class="font-mono text-slate-300">0.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Current Ratio</span>
+                                <span class="font-mono text-slate-300">1.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Interest Coverage</span>
+                                <span class="font-mono text-amber font-bold">1.1 *</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 capitalize border-b border-slate-800 pb-2">Financials</h3>
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Max Debt To Equity</span>
+                                <span class="font-mono text-amber font-bold">8.0 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Profit Margin</span>
+                                <span class="font-mono text-slate-300">0.0</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Current Ratio</span>
+                                <span class="font-mono text-amber font-bold">0.8 *</span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Min Interest Coverage</span>
+                                <span class="font-mono text-slate-300">1.25</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-xl">
+                <h2 class="text-2xl font-bold text-pink-400 border-b border-slate-800 pb-2 mb-6 flex items-center gap-2"><i data-lucide="gavel"></i> Governance Rules</h2>
+                <ul class="space-y-3 list-disc list-inside text-slate-300">
+                    <li>No unreviewed code merges to `main`.</li>
+                    <li>All agents must log decisions to `audit_trails`.</li>
+                    <li>HFT algorithms strictly limited to $1M daily volume in simulation.</li>
+                    <li>Model weights must be versioned with SHA-256 hashes.</li>
+
+                </ul>
+            </div>
+
+            <div class="glass-panel p-6 rounded-xl">
+                <h2 class="text-2xl font-bold text-pink-400 border-b border-slate-800 pb-2 mb-6 flex items-center gap-2"><i data-lucide="shield-check"></i> W3C PROV-O & PDIL Gatekeeper</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="font-bold text-slate-200 mb-2">Provenance Enforcement</h3>
+                        <p class="text-sm text-slate-400">All probabilistic layer outputs must retain a reference to their <code>source_data_object</code> to enforce W3C PROV-O compliance. Validated via <code>check_grounding</code> on Pydantic schemas.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="font-bold text-slate-200 mb-2">PDIL Gatekeeper Middleware</h3>
+                        <p class="text-sm text-slate-400">LLM inferences must be validated by the <code>JsonLogicGovernanceGatekeeper</code>. Inferences must contain a <code>provenance_trace</code> key satisfying the <code>ProvenanceHeader</code> schema; otherwise, a <code>GovernanceError</code> is raised.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="font-bold text-slate-200 mb-2">MRM Standards (SR 11-7)</h3>
+                        <p class="text-sm text-slate-400">All generative models and deterministic pipelines must adhere to Federal Reserve SR 11-7 guidelines, requiring strict model validation, ongoing monitoring, and comprehensive whitepaper documentation.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                        <h3 class="font-bold text-slate-200 mb-2">EU AI Act Compliance</h3>
+                        <p class="text-sm text-slate-400">High-risk AI systems must maintain transparent audit logs, deterministic fail-safes (Rust Execution Layer), and human oversight loops as mandated by the EU AI Act.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-existing Simulator UI Component -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+                <!-- Controls -->
+                <div class="glass-panel p-6 rounded-xl space-y-6">
+                    <h2 class="text-xl font-bold border-b border-slate-800 pb-2 flex items-center gap-2"><i data-lucide="settings" class="text-pink-400 w-5 h-5"></i> Governance Simulator</h2>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-slate-300">W3C PROV-O Enforcement</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-provo" class="sr-only peer" checked>
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500">Requires all agent outputs to contain a valid provenance_trace hash linked to the source_data_object.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-slate-300">Strict JSON-RPC Schema Match</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-schema" class="sr-only peer" checked>
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500">Rejects any response payload that contains keys not explicitly defined in the Pydantic schema.</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800">
+                        <button id="btn-simulate" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="play" class="w-4 h-4"></i> Run Compliance Simulation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Output Log -->
+                <div class="glass-panel p-6 rounded-xl flex flex-col">
+                    <h2 class="text-xl font-bold border-b border-slate-800 pb-2 mb-4 flex items-center gap-2"><i data-lucide="terminal" class="text-slate-400 w-5 h-5"></i> Audit Trail</h2>
+                    <div class="flex-grow bg-slate-900 border border-slate-700 rounded-lg p-4 font-mono text-xs overflow-y-auto space-y-2 h-64" id="audit-log">
+                        <div class="text-slate-500">System Ready. Awaiting simulation trigger...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('btn-simulate').addEventListener('click', async () => {
+            const log = document.getElementById('audit-log');
+            const provo = document.getElementById('toggle-provo').checked;
+            const schema = document.getElementById('toggle-schema').checked;
+
+            log.innerHTML = '';
+
+            const steps = [
+                { text: "> [SIM] Injecting Unstructured Mock Data...", delay: 300, type: 'info' },
+                { text: "> [SYS1] Agent processing complete. Yielding intermediate representation.", delay: 500, type: 'info' },
+                { text: "> [GATEKEEPER] Invoking Policy Checks...", delay: 400, type: 'info' },
+            ];
+
+            if (provo) {
+                steps.push({ text: "> [PASS] W3C PROV-O compliance verified. Trace hash exists.", delay: 300, type: 'success' });
+            } else {
+                steps.push({ text: "> [WARN] PROV-O Enforcement Disabled. Accepting unverified lineage.", delay: 300, type: 'warn' });
+            }
+
+            if (schema) {
+                steps.push({ text: "> [FAIL] Strict Schema Match failed. Unexpected key 'sentiment_score' found.", delay: 400, type: 'error' });
+                steps.push({ text: "> [SYS2] Halting pipeline execution.", delay: 200, type: 'error' });
+            } else {
+                steps.push({ text: "> [PASS] Schema Validation passed (Lenient).", delay: 400, type: 'success' });
+                steps.push({ text: "> [SYS2] Executing logic planner...", delay: 200, type: 'info' });
+            }
+
+            for (const step of steps) {
+                await new Promise(r => setTimeout(r, step.delay));
+                const div = document.createElement('div');
+                div.textContent = step.text;
+
+                if (step.type === 'success') div.className = 'text-emerald font-bold';
+                else if (step.type === 'error') div.className = 'text-crimson font-bold';
+                else if (step.type === 'warn') div.className = 'text-amber';
+                else div.className = 'text-slate-300';
+
+                log.appendChild(div);
+                log.scrollTop = log.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
