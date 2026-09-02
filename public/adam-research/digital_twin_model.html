@@ -3,215 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM Institutional Platform - Digital Twin Model</title>
-    
-    <!-- Tailwind CSS for robust, scalable styling -->
+    <title>ADAM Institutional Platform - Digital Twin & Quantitative Surveillance</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- D3.js for complex data visualizations -->
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
-    <!-- Configure Tailwind Theme -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
+                            950: '#02050b',
                             900: '#050a14',
+                            850: '#070f1e',
                             800: '#0a1428',
+                            750: '#0d1a33',
                             700: '#112240',
+                            600: '#1d3557',
                             accent: '#64ffda',
+                            accentMuted: 'rgba(100, 255, 218, 0.15)',
                             alert: '#ff4d4d',
                             warn: '#ffd700',
-                            ok: '#4caf50'
+                            ok: '#4caf50',
+                            dataCyan: '#00e5ff',
+                            dataPurple: '#b388ff'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Menlo', 'monospace']
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'monospace']
                     }
                 }
             }
-        }
+        };
     </script>
 
-    <!-- Custom CSS for specialized effects and scrollbars -->
     <style>
         body {
-            background-color: #050a14;
+            background-color: #02050b;
             color: #e2e8f0;
-            overflow: hidden; /* Prevent body scroll, manage internally */
-        }
-        
-        .glass-panel {
-            background: rgba(10, 20, 40, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(100, 255, 218, 0.1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            user-select: none;
         }
 
-        /* Custom Scrollbar for terminal/logs */
+        .glass-panel {
+            background: rgba(10, 20, 40, 0.68);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(100, 255, 218, 0.12);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-panel-subtle {
+            background: rgba(7, 15, 30, 0.45);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(100, 255, 218, 0.08);
+        }
+
+        /* High-Density Terminal Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2); 
+            background: rgba(2, 5, 11, 0.7);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(100, 255, 218, 0.3); 
-            border-radius: 3px;
+            background: rgba(100, 255, 218, 0.25);
+            border-radius: 2px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(100, 255, 218, 0.6); 
+            background: rgba(100, 255, 218, 0.6);
         }
 
-        .crt-flicker {
-            animation: flicker 0.15s infinite;
-        }
-        @keyframes flicker {
-            0% { opacity: 0.95; }
-            50% { opacity: 1; }
-            100% { opacity: 0.98; }
+        .scanline-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
         }
 
         .terminal-text {
-            text-shadow: 0 0 4px rgba(100, 255, 218, 0.4);
+            text-shadow: 0 0 5px rgba(100, 255, 218, 0.35);
         }
-        
+
         canvas {
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
             image-rendering: pixelated;
-            image-rendering: crisp-edges;
+        }
+
+        /* Range input institutional aesthetic */
+        input[type=range] {
+            accent-color: #64ffda;
+            background: #112240;
         }
     </style>
 </head>
 
-<body class="h-screen w-screen flex flex-col font-sans text-sm">
+<body class="h-screen w-screen flex flex-col font-sans text-xs antialiased selection:bg-brand-accent selection:text-brand-950">
 
-    <!-- Top Navigation / Branding -->
-    <header class="h-14 border-b border-brand-700 bg-brand-800 flex items-center justify-between px-6 shrink-0 z-10">
+    <header class="h-14 border-b border-brand-700/80 bg-brand-900/90 flex items-center justify-between px-5 shrink-0 z-30">
         <div class="flex items-center space-x-4">
-            <div class="w-8 h-8 rounded bg-brand-accent/20 border border-brand-accent flex items-center justify-center text-brand-accent font-bold">A</div>
+            <div class="w-8 h-8 rounded border border-brand-accent/40 bg-brand-accent/10 flex items-center justify-center font-mono font-bold text-brand-accent shadow-[0_0_12px_rgba(100,255,218,0.2)]">
+                Δ
+            </div>
             <div>
-                <h1 class="font-bold text-gray-100 tracking-wide">ADAM Core OS</h1>
-                <p class="text-xs text-brand-accent/70 font-mono">v26.0.4-kernel | W3C PROV-O Status: <span class="text-brand-ok">VERIFIED</span></p>
+                <div class="flex items-center space-x-2">
+                    <h1 class="font-bold text-sm text-gray-100 tracking-wider">ADAM Institutional Core OS</h1>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-accent/10 text-brand-accent border border-brand-accent/30 font-semibold">ENTERPRISE-TWIN</span>
+                </div>
+                <p class="text-[10px] text-gray-400 font-mono">
+                    Multi-Agent Stochastic Credit Risk & Macro Surveillance Engine | W3C PROV-O: <span class="text-brand-ok font-semibold">VERIFIED COMPLIANT</span>
+                </p>
             </div>
         </div>
-        
-        <div class="flex items-center space-x-6 font-mono text-xs text-gray-400">
-            <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-brand-ok animate-pulse"></span>
-                <span>Kernel Orchestration Active</span>
+
+        <div class="flex items-center space-x-5 font-mono text-[11px]">
+            <div class="flex items-center space-x-2 bg-brand-850 px-2.5 py-1 rounded border border-brand-700/60">
+                <span class="text-gray-400 text-[10px] uppercase">Scenario:</span>
+                <select id="scenario-preset" class="bg-transparent text-brand-accent text-[11px] focus:outline-none cursor-pointer">
+                    <option value="baseline" class="bg-brand-900 text-gray-200">Baseline Mean-Reversion</option>
+                    <option value="stagflation" class="bg-brand-900 text-gray-200">Stagflationary Rate Hike (+250bps)</option>
+                    <option value="credit-crunch" class="bg-brand-900 text-gray-200">SNC Regulatory Downgrade Shock</option>
+                    <option value="recovery" class="bg-brand-900 text-gray-200">Aggressive Liquidity Influx</option>
+                </select>
             </div>
-            <div id="clock-display">2026-08-26 18:07:30 EDT</div>
-            <button id="btn-simulate" class="px-4 py-1.5 bg-brand-accent/10 border border-brand-accent text-brand-accent hover:bg-brand-accent/20 transition-colors rounded">
-                INITIALIZE 1Y FORWARD SIM
-            </button>
+
+            <div class="flex items-center space-x-1.5 px-2 py-1 bg-brand-800/60 rounded border border-brand-700/40">
+                <span class="w-2 h-2 rounded-full bg-brand-ok animate-pulse shadow-[0_0_8px_#4caf50]"></span>
+                <span class="text-gray-300">Sync: <span id="kernel-hz">60.0</span> FPS</span>
+            </div>
+
+            <div id="clock-display" class="text-gray-400 font-mono">2026-09-01 00:00:00 UTC</div>
+
+            <div class="flex items-center space-x-2">
+                <button id="btn-export-provo" title="Download W3C PROV-O JSON-LD Run Artifact" class="px-2.5 py-1 bg-brand-800 hover:bg-brand-700 text-gray-300 border border-brand-700 rounded transition-colors text-[10px] flex items-center space-x-1">
+                    <span>PROV-O EXPORT</span>
+                </button>
+                <button id="btn-simulate" class="px-4 py-1.5 bg-brand-accent/15 border border-brand-accent text-brand-accent hover:bg-brand-accent/25 transition-all font-semibold rounded shadow-[0_0_12px_rgba(100,255,218,0.15)] flex items-center space-x-1.5">
+                    <span id="btn-icon">▶</span>
+                    <span id="btn-label">RUN 12M FORWARD SIM</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 flex overflow-hidden">
-        
-        <!-- Left Sidebar: Modules & Narrative Engine -->
-        <aside class="w-72 border-r border-brand-700 bg-brand-900/50 flex flex-col p-4 space-y-4 shrink-0 overflow-y-auto">
-            
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <aside class="w-80 border-r border-brand-700/80 bg-brand-900/60 flex flex-col p-3.5 space-y-3 shrink-0 overflow-y-auto z-10">
+
             <div class="glass-panel p-3 rounded">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Ecosystem Subsystems</h2>
-                <ul class="space-y-1 font-mono text-xs">
-                    <li class="flex justify-between"><span class="text-gray-300">Market Mayhem</span><span class="text-brand-ok">ONLINE</span></li>
-                    <li class="flex justify-between"><span class="text-gray-300">Fortress & Hunt</span><span class="text-brand-ok">ONLINE</span></li>
-                    <li class="flex justify-between"><span class="text-gray-300">Exiled Spark</span><span class="text-brand-ok">ONLINE</span></li>
-                    <li class="flex justify-between"><span class="text-gray-300">Logic Lab</span><span class="text-brand-ok">ONLINE</span></li>
-                    <li class="flex justify-between"><span class="text-gray-300">Covenant Engine</span><span class="text-brand-warn">STANDBY</span></li>
+                <div class="flex justify-between items-center mb-2 pb-1 border-b border-brand-700/50">
+                    <h2 class="text-brand-accent text-[11px] font-bold tracking-wider uppercase flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 bg-brand-accent rounded-full inline-block"></span>
+                        <span>Multi-Agent Architecture</span>
+                    </h2>
+                    <span class="text-[9px] font-mono text-gray-500">BCBS 239 PASS</span>
+                </div>
+                <ul class="space-y-1.5 font-mono text-[11px]">
+                    <li class="flex justify-between items-center py-0.5">
+                        <span class="text-gray-300 flex items-center gap-1.5">
+                            <span class="w-1 h-1 bg-brand-accent/60 rounded-full"></span>
+                            Market Mayhem
+                        </span>
+                        <span class="text-brand-ok text-[10px] bg-brand-ok/10 px-1 rounded border border-brand-ok/20">MACRO_OU</span>
+                    </li>
+                    <li class="flex justify-between items-center py-0.5">
+                        <span class="text-gray-300 flex items-center gap-1.5">
+                            <span class="w-1 h-1 bg-brand-accent/60 rounded-full"></span>
+                            Fortress & Hunt
+                        </span>
+                        <span class="text-brand-ok text-[10px] bg-brand-ok/10 px-1 rounded border border-brand-ok/20">MERTON_PD</span>
+                    </li>
+                    <li class="flex justify-between items-center py-0.5">
+                        <span class="text-gray-300 flex items-center gap-1.5">
+                            <span class="w-1 h-1 bg-brand-accent/60 rounded-full"></span>
+                            Logic Lab
+                        </span>
+                        <span class="text-brand-ok text-[10px] bg-brand-ok/10 px-1 rounded border border-brand-ok/20">TWIN_KERN</span>
+                    </li>
+                    <li class="flex justify-between items-center py-0.5">
+                        <span class="text-gray-300 flex items-center gap-1.5">
+                            <span class="w-1 h-1 bg-brand-accent/60 rounded-full"></span>
+                            Exiled Spark
+                        </span>
+                        <span class="text-brand-dataCyan text-[10px] bg-brand-dataCyan/10 px-1 rounded border border-brand-dataCyan/20">NARRATIVE</span>
+                    </li>
+                    <li class="flex justify-between items-center py-0.5">
+                        <span class="text-gray-300 flex items-center gap-1.5">
+                            <span class="w-1 h-1 bg-brand-accent/60 rounded-full"></span>
+                            Covenant Engine
+                        </span>
+                        <span id="covenant-engine-status" class="text-brand-warn text-[10px] bg-brand-warn/10 px-1 rounded border border-brand-warn/20">GATE_STBY</span>
+                    </li>
                 </ul>
             </div>
 
-            <div class="glass-panel p-3 rounded flex-1 flex flex-col">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Exiled Spark: Narrative</h2>
-                <div id="narrative-engine" class="flex-1 overflow-y-auto text-xs text-gray-400 font-mono space-y-3">
-                    <p class="text-gray-200">Awaiting simulation initialization...</p>
-                    <p>The global macro environment remains delicately balanced. Core OS is ready to project 10,000 corporate entities forward 12 months using stochastic continuous-time logic.</p>
+            <div class="glass-panel p-3 rounded space-y-2.5">
+                <div class="flex justify-between items-center border-b border-brand-700/50 pb-1">
+                    <h2 class="text-brand-accent text-[11px] font-bold tracking-wider uppercase">Stress Shock Controls</h2>
+                    <button id="btn-reset-params" class="text-[9px] text-gray-400 hover:text-brand-accent font-mono">DEFAULT</button>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-[10px] font-mono mb-1">
+                        <span class="text-gray-400">Covenant Max Leverage</span>
+                        <span id="val-cov-threshold" class="text-brand-alert font-bold">6.0x</span>
+                    </div>
+                    <input id="slider-cov-threshold" type="range" min="4.0" max="9.0" step="0.25" value="6.0" class="w-full h-1 bg-brand-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-[10px] font-mono mb-1">
+                        <span class="text-gray-400">Macro Rate Mean Drift</span>
+                        <span id="val-rate-drift" class="text-brand-warn font-bold">+10 bps/mo</span>
+                    </div>
+                    <input id="slider-rate-drift" type="range" min="-20" max="40" step="5" value="10" class="w-full h-1 bg-brand-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-[10px] font-mono mb-1">
+                        <span class="text-gray-400">Stochastic Idiosyncratic Vol (σ)</span>
+                        <span id="val-idio-vol" class="text-brand-accent font-bold">0.20</span>
+                    </div>
+                    <input id="slider-idio-vol" type="range" min="0.05" max="0.60" step="0.05" value="0.20" class="w-full h-1 bg-brand-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-1 flex flex-col min-h-[220px]">
+                <div class="flex items-center justify-between mb-2 pb-1 border-b border-brand-700/50">
+                    <h2 class="text-brand-accent text-[11px] font-bold tracking-wider uppercase">Exiled Spark: Synthesis</h2>
+                    <span class="text-[9px] font-mono text-gray-400">AUTONOMOUS DISPATCH</span>
+                </div>
+                <div id="narrative-engine" class="flex-1 overflow-y-auto text-[11px] text-gray-400 font-mono space-y-2.5 pr-1">
+                    <div class="p-2 rounded bg-brand-850/70 border border-brand-700/40">
+                        <span class="text-brand-accent font-semibold">[IDLE_STASIS]</span> Institutional Digital Twin standing by. Core engine ready to map continuous Brownian motion across 10,000 corporate balance sheets.
+                    </div>
                 </div>
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Covenant Watchlist</h2>
-                <div class="flex justify-between text-xs mb-1">
-                    <span class="text-gray-400">Total Breaches</span>
-                    <span id="covenant-breaches" class="font-bold text-brand-alert">0</span>
+                <div class="flex justify-between items-center text-[11px] mb-1 font-mono">
+                    <span class="text-gray-400">SNC Covenant Breaches</span>
+                    <span id="covenant-breaches" class="font-bold text-brand-alert text-sm">0</span>
                 </div>
-                <div class="w-full bg-brand-700 h-1.5 rounded-full overflow-hidden">
-                    <div id="covenant-bar" class="bg-brand-alert h-full w-0 transition-all duration-300"></div>
+                <div class="w-full bg-brand-800 h-2 rounded-full overflow-hidden border border-brand-700/50">
+                    <div id="covenant-bar" class="bg-gradient-to-r from-brand-warn to-brand-alert h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex justify-between text-[9px] font-mono text-gray-500 mt-1">
+                    <span>Clean (0)</span>
+                    <span>Stress Level (Max: 10k)</span>
                 </div>
             </div>
 
         </aside>
 
-        <!-- Center: Digital Twin Canvas & Macro Data -->
-        <section class="flex-1 flex flex-col p-4 space-y-4 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-800 to-brand-900">
-            
-            <!-- Simulation Stats Bar -->
-            <div class="h-16 glass-panel rounded flex items-center justify-around px-4 shrink-0 font-mono">
+        <section class="flex-1 flex flex-col p-3.5 space-y-3 relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-850 to-brand-950 overflow-hidden">
+
+            <div class="h-16 glass-panel rounded flex items-center justify-around px-4 shrink-0 font-mono border border-brand-accent/20">
                 <div class="text-center">
-                    <div class="text-xs text-gray-400">Simulation Month</div>
-                    <div id="sim-month" class="text-xl text-brand-accent font-bold">M0</div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider">Projection Horizon</div>
+                    <div id="sim-month" class="text-lg text-brand-accent font-bold tracking-tight">Month 0 / 12</div>
                 </div>
+                <div class="w-px h-8 bg-brand-700/60"></div>
                 <div class="text-center">
-                    <div class="text-xs text-gray-400">Active Entities</div>
-                    <div id="active-entities" class="text-xl text-gray-100 font-bold">10,000</div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider">Solvent Enterprises</div>
+                    <div id="active-entities" class="text-lg text-gray-100 font-bold tracking-tight">10,000</div>
                 </div>
+                <div class="w-px h-8 bg-brand-700/60"></div>
                 <div class="text-center">
-                    <div class="text-xs text-gray-400">Global Defaults</div>
-                    <div id="default-count" class="text-xl text-brand-alert font-bold">0</div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider">Cumulative Defaults</div>
+                    <div id="default-count" class="text-lg text-brand-alert font-bold tracking-tight">0 <span class="text-xs font-normal text-brand-alert/80">(0.00%)</span></div>
                 </div>
+                <div class="w-px h-8 bg-brand-700/60"></div>
                 <div class="text-center">
-                    <div class="text-xs text-gray-400">Avg Market Yield (WACC)</div>
-                    <div id="avg-wacc" class="text-xl text-brand-warn font-bold">5.24%</div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider">Portfolio Mean WACC</div>
+                    <div id="avg-wacc" class="text-lg text-brand-warn font-bold tracking-tight">5.24%</div>
+                </div>
+                <div class="w-px h-8 bg-brand-700/60"></div>
+                <div class="text-center">
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider">Altman Z Median</div>
+                    <div id="median-zscore" class="text-lg text-brand-dataCyan font-bold tracking-tight">2.41</div>
                 </div>
             </div>
 
-            <!-- The Digital Twin 10k Entity View -->
-            <div class="flex-1 glass-panel rounded relative overflow-hidden flex flex-col">
-                <div class="absolute top-4 left-4 z-10 pointer-events-none">
-                    <h2 class="text-brand-accent text-sm font-bold uppercase drop-shadow-md">Logic Lab: Digital Twin Scatter</h2>
-                    <p class="text-xs text-gray-400 font-mono">X: Leverage (Debt/EBITDA) | Y: Z-Score (Health) | Color: Rating</p>
+            <div class="flex-1 glass-panel rounded relative overflow-hidden flex flex-col border border-brand-accent/15">
+                <div class="absolute top-3 left-3 z-10 pointer-events-none bg-brand-950/80 p-2.5 rounded border border-brand-700/50 backdrop-blur-md">
+                    <h2 class="text-brand-accent text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <span>Logic Lab: Continuous Entity Phase Space</span>
+                    </h2>
+                    <p class="text-[10px] text-gray-400 font-mono mt-0.5">
+                        Abscissa (X): Total Leverage (Debt/EBITDA) &bull; Ordinate (Y): Altman Z-Score &bull; Node Color: S&P Equivalent Rating
+                    </p>
+                    <div class="flex items-center space-x-3 mt-1.5 text-[9px] font-mono text-gray-400 border-t border-brand-700/40 pt-1">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#4caf50]"></span>AAA/AA</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#cddc39]"></span>A/BBB (Inv Grade)</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#ffc107]"></span>BB/B (High Yield)</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#ff5722]"></span>CCC/Distressed</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#f44336]"></span>D (Default)</span>
+                    </div>
                 </div>
-                <!-- Tooltip for entity hover -->
-                <div id="canvas-tooltip" class="absolute hidden bg-brand-900 border border-brand-accent/50 p-2 text-xs font-mono rounded shadow-lg pointer-events-none z-20"></div>
-                
-                <!-- Main WebGL/Canvas Container -->
+
+                <div id="canvas-tooltip" class="absolute hidden bg-brand-950/95 border border-brand-accent/70 p-2.5 text-[11px] font-mono rounded shadow-[0_0_15px_rgba(0,0,0,0.8)] pointer-events-none z-30 min-w-[200px] backdrop-blur-lg"></div>
+
+                <div class="absolute bottom-3 left-3 z-10 flex items-center space-x-2 bg-brand-950/80 px-2 py-1 rounded border border-brand-700/50 font-mono text-[10px]">
+                    <span class="text-gray-400">CANVAS MODE: HIGH-PERFORMANCE 2D BATCH ACCELERATION</span>
+                </div>
+
                 <canvas id="twin-canvas" class="w-full h-full cursor-crosshair"></canvas>
             </div>
 
         </section>
 
-        <!-- Right Sidebar: Data Charts & Telemetry -->
-        <aside class="w-96 border-l border-brand-700 bg-brand-900/50 flex flex-col p-4 space-y-4 shrink-0">
-            
-            <!-- Macro Environment (Market Mayhem) -->
+        <aside class="w-96 border-l border-brand-700/80 bg-brand-900/60 flex flex-col p-3.5 space-y-3 shrink-0 overflow-y-auto z-10">
+
             <div class="glass-panel p-3 rounded h-48 flex flex-col">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Market Mayhem: Macro Trajectory</h2>
+                <div class="flex justify-between items-center mb-1">
+                    <h2 class="text-brand-accent text-[11px] font-bold uppercase tracking-wider">Market Mayhem: Macro Paths</h2>
+                    <span class="text-[9px] font-mono text-gray-400 flex items-center gap-2">
+                        <span class="text-brand-warn font-semibold">— Base Rate</span>
+                        <span class="text-brand-dataCyan font-semibold">--- GDP Growth</span>
+                    </span>
+                </div>
                 <div id="macro-chart" class="flex-1 w-full h-full"></div>
             </div>
 
-            <!-- Ratings Migration Matrix Profile -->
             <div class="glass-panel p-3 rounded h-48 flex flex-col">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-2">Fortress & Hunt: Rating Dist.</h2>
+                <div class="flex justify-between items-center mb-1">
+                    <h2 class="text-brand-accent text-[11px] font-bold uppercase tracking-wider">Fortress & Hunt: Credit Migrations</h2>
+                    <span class="text-[9px] font-mono text-gray-400">DISCRETE TRANCHES</span>
+                </div>
                 <div id="ratings-chart" class="flex-1 w-full h-full"></div>
             </div>
 
-            <!-- Execution State Tracker / Telemetry -->
-            <div class="glass-panel p-3 rounded flex-1 flex flex-col overflow-hidden">
-                <h2 class="text-brand-accent text-xs font-bold uppercase mb-1">Execution State Tracker</h2>
-                <p class="text-[10px] text-gray-500 mb-2 border-b border-brand-700 pb-1">Endpoint: /api/telemetry.json | w3c_prov_o_compliance: TRUE</p>
-                <div id="telemetry-log" class="flex-1 overflow-y-auto font-mono text-[10px] space-y-1.5 terminal-text pb-2">
-                    <!-- Logs will stream here -->
-                    <div class="text-gray-400">System ready. Awaiting simulation trigger...</div>
+            <div id="entity-inspector" class="glass-panel p-3 rounded flex flex-col space-y-2">
+                <div class="flex justify-between items-center border-b border-brand-700/50 pb-1">
+                    <h2 class="text-brand-accent text-[11px] font-bold uppercase tracking-wider">Entity Diagnostics</h2>
+                    <span id="inspect-entity-id" class="text-[10px] font-mono text-brand-dataCyan font-semibold">CLICK ANY ENTITY</span>
                 </div>
+                <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                    <div class="bg-brand-850 p-1.5 rounded border border-brand-700/40">
+                        <span class="text-gray-400 block">Rating:</span>
+                        <span id="inspect-rating" class="font-bold text-gray-200">--</span>
+                    </div>
+                    <div class="bg-brand-850 p-1.5 rounded border border-brand-700/40">
+                        <span class="text-gray-400 block">Leverage:</span>
+                        <span id="inspect-leverage" class="font-bold text-gray-200">--</span>
+                    </div>
+                    <div class="bg-brand-850 p-1.5 rounded border border-brand-700/40">
+                        <span class="text-gray-400 block">Altman Z-Score:</span>
+                        <span id="inspect-zscore" class="font-bold text-gray-200">--</span>
+                    </div>
+                    <div class="bg-brand-850 p-1.5 rounded border border-brand-700/40">
+                        <span class="text-gray-400 block">Entity WACC:</span>
+                        <span id="inspect-wacc" class="font-bold text-gray-200">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-1 flex flex-col overflow-hidden min-h-[220px]">
+                <div class="flex items-center justify-between border-b border-brand-700/50 pb-1.5 mb-1.5">
+                    <h2 class="text-brand-accent text-[11px] font-bold uppercase tracking-wider">Provenance & Execution Trace</h2>
+                    <span class="text-[9px] font-mono text-gray-400">W3C PROV-O</span>
+                </div>
+                <div id="telemetry-log" class="flex-1 overflow-y-auto font-mono text-[10px] space-y-2 terminal-text pr-1">
+                    </div>
             </div>
 
         </aside>
@@ -219,346 +377,609 @@
     </main>
 
     <script>
-        // --- 1. GLOBAL STATE & CONFIGURATION ---
-        const ENTITY_COUNT = 10000;
-        const SIM_MONTHS = 12;
-        const FPS = 60;
-        const ANIMATION_DURATION_MS = 10000; // 10 seconds to play 12 months
-        
-        let simState = {
-            isRunning: false,
-            currentMonthRaw: 0, // Float value for interpolation
-            currentMonthIndex: 0,
-            entities: [],       // Holds the 10k entities
-            history: [],        // Pre-computed trajectories
-            macro: {            // Baseline macroeconomic factors
-                gdpGrowth: 0.02,
-                inflation: 0.025,
-                baseRate: 0.04
-            },
-            macroHistory: []
+        /**
+         * ADAM Institutional Core OS - Digital Twin Architecture
+         * -----------------------------------------------------------------------
+         * Theoretical Foundations:
+         * 1. Macro Dynamic: Continuous Ornstein-Uhlenbeck (O-U) Mean-Reverting Process
+         * dX_t = theta * (mu - X_t) dt + sigma * dW_t
+         * 2. Merton Structural Credit Model / Factor Copula:
+         * Entity Health (Z-Score) = Systematic Factor (GDP, Rates) + Idiosyncratic Factor (Brownian shock)
+         * 3. Credit Transition Matrix:
+         * Continuous Altman Z-score migration mapped to discrete tranches (AAA down to D)
+         * 4. Audit Provenance:
+         * BCBS 239 compliant W3C PROV-O telemetry structure with cryptographic audit anchors
+         */
+
+        // --- 1. GLOBAL ENGINE CONFIGURATION & STATE REGISTRY ---
+        const ENGINE_CONFIG = {
+            entityCount: 10000,
+            simulationHorizonMonths: 12,
+            animationDurationMs: 10000, // 10 seconds for 12 months forward projection
+            canvasFps: 60,
+            covenantDefaultLeverageLimit: 6.0
         };
 
-        // Ratings definitions and colors (AAA to D)
-        const RATINGS = [
-            { name: 'AAA', color: '#4caf50', defaultProbBase: 0.0001, zScoreBase: 3.0 },
-            { name: 'AA',  color: '#8bc34a', defaultProbBase: 0.0005, zScoreBase: 2.5 },
-            { name: 'A',   color: '#cddc39', defaultProbBase: 0.0010, zScoreBase: 2.0 },
-            { name: 'BBB', color: '#ffeb3b', defaultProbBase: 0.0050, zScoreBase: 1.5 },
-            { name: 'BB',  color: '#ffc107', defaultProbBase: 0.0200, zScoreBase: 0.5 },
-            { name: 'B',   color: '#ff9800', defaultProbBase: 0.0500, zScoreBase: -0.5 },
-            { name: 'CCC', color: '#ff5722', defaultProbBase: 0.1500, zScoreBase: -1.5 },
-            { name: 'D',   color: '#f44336', defaultProbBase: 1.0000, zScoreBase: -3.0 }
+        // Complete Credit Rating Spectrum (AAA to Default)
+        const RATINGS_MATRIX = [
+            { name: 'AAA', color: '#4caf50', defaultProbBase: 0.0001, zScoreBase: 3.5, spreadBps: 45 },
+            { name: 'AA',  color: '#8bc34a', defaultProbBase: 0.0005, zScoreBase: 2.9, spreadBps: 70 },
+            { name: 'A',   color: '#cddc39', defaultProbBase: 0.0010, zScoreBase: 2.3, spreadBps: 105 },
+            { name: 'BBB', color: '#ffeb3b', defaultProbBase: 0.0050, zScoreBase: 1.6, spreadBps: 160 },
+            { name: 'BB',  color: '#ffc107', defaultProbBase: 0.0200, zScoreBase: 0.8, spreadBps: 275 },
+            { name: 'B',   color: '#ff9800', defaultProbBase: 0.0600, zScoreBase: -0.2, spreadBps: 450 },
+            { name: 'CCC', color: '#ff5722', defaultProbBase: 0.1800, zScoreBase: -1.4, spreadBps: 850 },
+            { name: 'D',   color: '#f44336', defaultProbBase: 1.0000, zScoreBase: -3.5, spreadBps: 2000 }
         ];
 
-        // --- 2. DOM ELEMENTS ---
+        // Central Simulation State Store
+        let simState = {
+            isRunning: false,
+            isCompleted: false,
+            currentMonthRaw: 0.0,
+            entities: [],
+            history: [],
+            macroHistory: [],
+            provoGraph: [],
+            selectedEntityId: null,
+            scenario: 'baseline',
+            params: {
+                covenantLeverage: 6.0,
+                rateDriftBpsMonth: 10,
+                idiosyncraticVol: 0.20
+            }
+        };
+
+        // --- 2. DOM INTERFACE CACHE ---
         const ui = {
             btnSimulate: document.getElementById('btn-simulate'),
+            btnLabel: document.getElementById('btn-label'),
+            btnIcon: document.getElementById('btn-icon'),
+            btnExportProvo: document.getElementById('btn-export-provo'),
+            scenarioPreset: document.getElementById('scenario-preset'),
             simMonth: document.getElementById('sim-month'),
             activeEntities: document.getElementById('active-entities'),
             defaultCount: document.getElementById('default-count'),
             avgWacc: document.getElementById('avg-wacc'),
+            medianZScore: document.getElementById('median-zscore'),
+            covenantBreaches: document.getElementById('covenant-breaches'),
+            covenantBar: document.getElementById('covenant-bar'),
+            covenantEngineStatus: document.getElementById('covenant-engine-status'),
             canvas: document.getElementById('twin-canvas'),
             ctx: document.getElementById('twin-canvas').getContext('2d', { alpha: false }),
-            log: document.getElementById('telemetry-log'),
+            tooltip: document.getElementById('canvas-tooltip'),
+            telemetryLog: document.getElementById('telemetry-log'),
             narrative: document.getElementById('narrative-engine'),
-            covBreaches: document.getElementById('covenant-breaches'),
-            covBar: document.getElementById('covenant-bar'),
-            tooltip: document.getElementById('canvas-tooltip')
+            clockDisplay: document.getElementById('clock-display'),
+            kernelHz: document.getElementById('kernel-hz'),
+            sliderCov: document.getElementById('slider-cov-threshold'),
+            valCov: document.getElementById('val-cov-threshold'),
+            sliderRate: document.getElementById('slider-rate-drift'),
+            valRate: document.getElementById('val-rate-drift'),
+            sliderVol: document.getElementById('slider-idio-vol'),
+            valVol: document.getElementById('val-idio-vol'),
+            btnResetParams: document.getElementById('btn-reset-params'),
+            inspectEntityId: document.getElementById('inspect-entity-id'),
+            inspectRating: document.getElementById('inspect-rating'),
+            inspectLeverage: document.getElementById('inspect-leverage'),
+            inspectZScore: document.getElementById('inspect-zscore'),
+            inspectWacc: document.getElementById('inspect-wacc')
         };
 
-        // Resize Canvas to fit container
-        function resizeCanvas() {
-            const rect = ui.canvas.parentElement.getBoundingClientRect();
-            ui.canvas.width = rect.width;
-            ui.canvas.height = rect.height;
-            if (!simState.isRunning && simState.history.length === 0) {
-                renderFrame(0); // Draw initial state if uninitialized
-            }
-        }
-        window.addEventListener('resize', resizeCanvas);
+        // --- 3. MATHEMATICAL COMPUTATION KERNEL ---
 
-        // --- STREAMING_CHUNK:Implementing the pseudo-random number generators and statistical models... ---
-        
-        // Gaussian Random Generator (Box-Muller transform)
+        /**
+         * Box-Muller Transformation for Standard Normal Variates N(0, 1)
+         */
         function randomGaussian(mean = 0, stdev = 1) {
-            const u = 1 - Math.random(); 
-            const v = Math.random();
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
             const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
             return z * stdev + mean;
         }
 
-        // --- 3. MODEL INITIALIZATION (Data Generation) ---
-        function initializeModel() {
-            logTelemetry("ADAM Core OS", "system_init", "Generating 10,000 synthetic digital twins...", 1.0);
-            
+        /**
+         * Fast Median Calculation for Metric HUD
+         */
+        function calculateMedian(arr) {
+            if (!arr.length) return 0;
+            const sorted = [...arr].sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        }
+
+        // --- 4. DIGITAL TWIN SYNTHESIS & INITIALIZATION ---
+
+        /**
+         * Synthesizes 10,000 heterogeneous institutional borrowers calibrated to SNC distribution.
+         */
+        function initializeDigitalTwin() {
+            logTelemetry("Logic Lab", "agent_act", "Synthesizing 10,000 continuous digital balance sheets...", 0.99);
+
             simState.entities = [];
-            // Generate heavily skewed towards BBB/BB (normal market distribution)
-            for (let i = 0; i < ENTITY_COUNT; i++) {
-                // Skew random to center ratings
-                let ratingIdx = Math.floor(randomGaussian(3.5, 1.2));
-                ratingIdx = Math.max(0, Math.min(6, ratingIdx)); // clip between AAA and CCC
-                
-                const baseRating = RATINGS[ratingIdx];
-                
-                // Entity baseline metrics
-                const leverage = Math.max(0, randomGaussian(ratingIdx * 0.8 + 1.0, 1.0)); // Debt/EBITDA
-                const zScore = randomGaussian(baseRating.zScoreBase, 0.5);
-                const waccBase = 0.03 + (ratingIdx * 0.015) + (Math.random() * 0.01);
+            simState.history = [];
+            simState.macroHistory = [];
+            simState.currentMonthRaw = 0.0;
+            simState.isRunning = false;
+            simState.isCompleted = false;
+
+            // Generate synthetic cross-sectional population
+            for (let i = 0; i < ENGINE_CONFIG.entityCount; i++) {
+                // Skew towards Investment Grade BBB and Speculative BB
+                let ratingIdx = Math.floor(randomGaussian(3.6, 1.25));
+                ratingIdx = Math.max(0, Math.min(6, ratingIdx)); // 0 (AAA) to 6 (CCC)
+
+                const baselineRating = RATINGS_MATRIX[ratingIdx];
+
+                // Leverage: Debt / EBITDA calibrated to credit tier
+                const leverageMean = ratingIdx * 0.85 + 1.2;
+                const leverage = Math.max(0.1, randomGaussian(leverageMean, 0.95));
+
+                // Altman Z-Score Health index (Inversely correlated with leverage)
+                const zScore = randomGaussian(baselineRating.zScoreBase, 0.45);
+
+                // Initial Weighted Average Cost of Capital (WACC)
+                const baseRate = 0.0425;
+                const wacc = baseRate + (baselineRating.spreadBps / 10000);
 
                 simState.entities.push({
-                    id: `ENT-${String(i).padStart(5, '0')}`,
+                    id: `ENT-${String(i + 1).padStart(5, '0')}`,
+                    name: `Entity ${i + 1}`,
                     initialRatingIdx: ratingIdx,
                     currentRatingIdx: ratingIdx,
                     leverage: leverage,
                     zScore: zScore,
-                    wacc: waccBase,
-                    macroSensitivity: Math.random() * 1.5 + 0.5, // How much macro affects them
-                    isDefaulted: false
+                    wacc: wacc,
+                    macroSensitivity: Math.max(0.2, randomGaussian(1.0, 0.35)),
+                    covenantHeadroom: simState.params.covenantLeverage - leverage,
+                    isDefaulted: false,
+                    defaultMonth: null
                 });
             }
 
+            // Fit canvas buffer
             resizeCanvas();
             renderFrame(0);
-            updateChartsInitial();
-            logTelemetry("Market Mayhem", "data_load", "Baseline macro constraints loaded.", 0.98);
+            updateD3Visualizations(0);
+            updateHUDMetrics(0);
+
+            logTelemetry("ADAM Core OS", "system_init", "10,000 corporate twins generated. Memory state stable.", 1.0);
         }
 
-        // --- STREAMING_CHUNK:Constructing the core quantitative simulation logic (Market Mayhem & Fortress/Hunt)... ---
+        // --- 5. STOCHASTIC MULTI-PERIOD SIMULATION (Forward Engine) ---
 
-        // Pre-compute the entire year so rendering is smooth
-        function preComputeSimulation() {
+        /**
+         * Pre-computes 12 chronological slices using stochastic continuous processes
+         */
+        function preComputeChronologicalTrajectories() {
             simState.history = [];
             simState.macroHistory = [];
-            
-            // Start state
-            let currentEntities = JSON.parse(JSON.stringify(simState.entities));
-            let m_gdp = simState.macro.gdpGrowth;
-            let m_rate = simState.macro.baseRate;
-            
+
+            logTelemetry("Market Mayhem", "macro_forecast", `Generating macroeconomic trajectories for scenario [${simState.scenario.toUpperCase()}]...`, 0.97);
+
+            // Starting Macro Condition
+            let currentGDP = 0.021;
+            let currentBaseRate = 0.0425;
+
+            let entitiesState = JSON.parse(JSON.stringify(simState.entities));
+
             // Record Month 0
-            simState.history.push(JSON.parse(JSON.stringify(currentEntities)));
-            simState.macroHistory.push({ gdp: m_gdp, rate: m_rate });
+            simState.history.push(JSON.parse(JSON.stringify(entitiesState)));
+            simState.macroHistory.push({ month: 0, gdp: currentGDP, rate: currentBaseRate });
 
-            logTelemetry("Logic Lab", "sim_compute", "Executing stochastic differential equations over 12 periods...", 0.99);
+            const monthlyRateDrift = (simState.params.rateDriftBpsMonth / 10000);
+            const idioVol = simState.params.idiosyncraticVol;
+            const covLimit = simState.params.covenantLeverage;
 
-            for (let m = 1; m <= SIM_MONTHS; m++) {
-                // 1. Macro Shock (Market Mayhem) - Ornstein-Uhlenbeck / Random Walk
-                const gdpShock = randomGaussian(0, 0.005);
-                const rateShock = randomGaussian(0.001, 0.002); // Gradual rate hiking environment simulation
-                
-                m_gdp = m_gdp * 0.9 + 0.02 * 0.1 + gdpShock; // Mean reversion to 2%
-                m_rate = m_rate + rateShock;
+            for (let m = 1; m <= ENGINE_CONFIG.simulationHorizonMonths; m++) {
+                // 1. Stochastic Macro Shocks via Ornstein-Uhlenbeck Formulation
+                let gdpShock = randomGaussian(0, 0.004);
+                let rateShock = randomGaussian(monthlyRateDrift, 0.0015);
 
-                simState.macroHistory.push({ gdp: m_gdp, rate: m_rate });
+                if (simState.scenario === 'stagflation') {
+                    gdpShock -= 0.0025; // Growth contraction
+                    rateShock += 0.0020; // Aggressive inflation tightening
+                } else if (simState.scenario === 'credit-crunch') {
+                    rateShock += 0.0035; // Liquidity freeze
+                } else if (simState.scenario === 'recovery') {
+                    gdpShock += 0.003;
+                    rateShock -= 0.001;
+                }
 
-                // 2. Entity Iteration (Fortress & Hunt)
-                for (let i = 0; i < ENTITY_COUNT; i++) {
-                    let ent = currentEntities[i];
+                // Mean Reversion for GDP towards long-term 2%
+                currentGDP = currentGDP * 0.88 + (0.020 * 0.12) + gdpShock;
+                currentBaseRate = Math.max(0.005, currentBaseRate + rateShock);
+
+                simState.macroHistory.push({ month: m, gdp: currentGDP, rate: currentBaseRate });
+
+                // 2. Continuous Cross-Sectional Entity Evolution
+                for (let i = 0; i < ENGINE_CONFIG.entityCount; i++) {
+                    const ent = entitiesState[i];
                     if (ent.isDefaulted) continue;
 
-                    // Apply idiosyncratic & systematic shocks
-                    const idioShock = randomGaussian(0, 0.2);
-                    const systematicShock = (m_gdp - 0.02) * 5.0 - (m_rate - 0.04) * 2.0; 
-                    
-                    // Update Health (Z-Score)
-                    const totalShock = (systematicShock * ent.macroSensitivity) + idioShock;
-                    ent.zScore += totalShock;
-                    
-                    // Update Leverage (worsens if health drops)
-                    ent.leverage -= totalShock * 0.5;
-                    if(ent.leverage < 0) ent.leverage = 0;
+                    // Systematic Factor: Growth increases health; Rate increases strain debt service
+                    const systematicShock = ((currentGDP - 0.02) * 6.5 - (currentBaseRate - 0.0425) * 4.2) * ent.macroSensitivity;
 
-                    // Migrate Rating based on continuous Z-Score
+                    // Idiosyncratic Factor (Entity specific Brownian variation)
+                    const idiosyncraticShock = randomGaussian(0, idioVol);
+
+                    const totalHealthDelta = systematicShock + idiosyncraticShock;
+
+                    // Update Altman Z-Score
+                    ent.zScore += totalHealthDelta;
+
+                    // Update Leverage: Negative health shocks degrade cash flow, increasing Debt/EBITDA
+                    ent.leverage = Math.max(0.05, ent.leverage - (totalHealthDelta * 0.65));
+                    ent.covenantHeadroom = covLimit - ent.leverage;
+
+                    // Dynamic Ratings Migration mapping based on continuous Z-Score
                     let newRatingIdx = 7; // Default assumption
-                    for(let r=0; r<7; r++) {
-                        // Midpoints between bases
-                        const threshold = RATINGS[r].zScoreBase - 0.5;
-                        if(ent.zScore > threshold) {
+                    for (let r = 0; r < 7; r++) {
+                        const boundary = RATINGS_MATRIX[r].zScoreBase - 0.55;
+                        if (ent.zScore > boundary) {
                             newRatingIdx = r;
                             break;
                         }
                     }
 
-                    ent.currentRatingIdx = newRatingIdx;
-
-                    // Default condition
-                    if (newRatingIdx === 7 || ent.zScore < -2.8 || ent.leverage > 12) {
+                    // Default absorption boundary conditions
+                    if (newRatingIdx === 7 || ent.zScore < -2.75 || ent.leverage > 13.5) {
                         ent.isDefaulted = true;
                         ent.currentRatingIdx = 7;
-                        ent.zScore = -4; // Sink visually
-                    }
-                    
-                    // Update WACC based on rate + spread
-                    if(!ent.isDefaulted) {
-                         ent.wacc = m_rate + (ent.currentRatingIdx * 0.015);
+                        ent.zScore = -3.8; // Pin to default plane
+                        ent.defaultMonth = m;
+                    } else {
+                        ent.currentRatingIdx = newRatingIdx;
+                        // Dynamic WACC based on updated base rate + credit rating spread
+                        ent.wacc = currentBaseRate + (RATINGS_MATRIX[newRatingIdx].spreadBps / 10000);
                     }
                 }
-                
-                // Deep copy state for this month
-                simState.history.push(JSON.parse(JSON.stringify(currentEntities)));
+
+                // Deep copy state slice
+                simState.history.push(JSON.parse(JSON.stringify(entitiesState)));
+            }
+
+            logTelemetry("Fortress & Hunt", "merton_resolve", "12-month forward stochastic tensor pre-computed successfully.", 0.99);
+        }
+
+        // --- 6. HIGH-PERFORMANCE 2D CANVAS ACCELERATION ---
+
+        function resizeCanvas() {
+            const rect = ui.canvas.parentElement.getBoundingClientRect();
+            ui.canvas.width = rect.width;
+            ui.canvas.height = rect.height;
+            if (!simState.isRunning && simState.history.length === 0) {
+                renderFrame(0);
             }
         }
+        window.addEventListener('resize', resizeCanvas);
 
-        // --- STREAMING_CHUNK:Implementing Canvas rendering engine for the 10,000 entity digital twin... ---
-        
-        // Map data values to canvas coordinates
-        function mapToCanvas(val, minVal, maxVal, maxCoord) {
-            // Add padding (5%)
-            const pad = maxCoord * 0.05;
-            const usable = maxCoord - (pad * 2);
-            let normalized = (val - minVal) / (maxVal - minVal);
-            normalized = Math.max(0, Math.min(1, normalized)); // Clamp
-            return pad + (normalized * usable);
+        /**
+         * Project internal coordinate space to physical canvas pixel
+         */
+        function mapXToCanvas(leverage, width) {
+            const pad = width * 0.06;
+            const usable = width - (pad * 2);
+            const clamped = Math.max(0, Math.min(12, leverage));
+            return pad + (clamped / 12) * usable;
         }
 
-        // Draw a single frame based on interpolated time
+        function mapYToCanvas(zScore, height) {
+            const pad = height * 0.08;
+            const usable = height - (pad * 2);
+            // Range: [-4 to 4]
+            const clamped = Math.max(-4, Math.min(4, zScore));
+            const normalized = (clamped - (-4)) / 8;
+            return height - (pad + normalized * usable);
+        }
+
+        /**
+         * Renders single interpolated frame at 60 FPS
+         */
         function renderFrame(timeFloat) {
+            const ctx = ui.ctx;
             const w = ui.canvas.width;
             const h = ui.canvas.height;
-            
-            // Clear background
-            ui.ctx.fillStyle = '#0a1428'; // Brand-800
-            ui.ctx.fillRect(0, 0, w, h);
-            
-            // Draw axes / guides faintly
-            ui.ctx.strokeStyle = 'rgba(100, 255, 218, 0.1)';
-            ui.ctx.beginPath();
-            ui.ctx.moveTo(0, h/2); ui.ctx.lineTo(w, h/2);
-            ui.ctx.moveTo(w/2, 0); ui.ctx.lineTo(w/2, h);
-            ui.ctx.stroke();
 
-            // If history doesn't exist, just draw base entities
+            // Deep background clear
+            ctx.fillStyle = '#070f1e';
+            ctx.fillRect(0, 0, w, h);
+
+            // Draw Coordinate Grid & Institutional Threshold Zones
+            ctx.strokeStyle = 'rgba(100, 255, 218, 0.07)';
+            ctx.lineWidth = 1;
+
+            // Vertical guidelines (Leverage multiples)
+            for (let lev = 2; lev <= 10; lev += 2) {
+                const x = mapXToCanvas(lev, w);
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.font = '9px JetBrains Mono, monospace';
+                ctx.fillText(`${lev}.0x`, x + 3, h - 10);
+            }
+
+            // Horizontal guidelines (Z-Score)
+            for (let z = -2; z <= 4; z += 2) {
+                const y = mapYToCanvas(z, h);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.font = '9px JetBrains Mono, monospace';
+                ctx.fillText(`Z: ${z}`, 8, y - 3);
+            }
+
+            // Critical Covenant Line (Dynamic Leverage Boundary)
+            const covX = mapXToCanvas(simState.params.covenantLeverage, w);
+            ctx.strokeStyle = 'rgba(255, 77, 77, 0.45)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(covX, 0);
+            ctx.lineTo(covX, h);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#ff4d4d';
+            ctx.fillText(`COVENANT CEILING (${simState.params.covenantLeverage.toFixed(1)}x)`, covX + 6, 20);
+
             if (simState.history.length === 0) return;
 
             const m1 = Math.floor(timeFloat);
-            const m2 = Math.min(Math.ceil(timeFloat), SIM_MONTHS);
+            const m2 = Math.min(Math.ceil(timeFloat), ENGINE_CONFIG.simulationHorizonMonths);
             const ratio = timeFloat - m1;
 
-            const state1 = simState.history[m1];
-            const state2 = simState.history[m2];
+            const slice1 = simState.history[m1];
+            const slice2 = simState.history[m2];
 
-            let defaultCount = 0;
-            let sumWacc = 0;
-            let activeCount = 0;
-            let covenantBreaches = 0;
+            // Batch rendering by color to minimize context state transitions
+            const batch = {};
+            for (let r = 0; r < 8; r++) batch[RATINGS_MATRIX[r].color] = [];
 
-            const covThresholdLeverage = 6.0;
+            let selectedCoord = null;
 
-            // Batch rendering by color for massive performance gain
-            const colorBatches = {};
-            for(let i=0; i<=7; i++) colorBatches[RATINGS[i].color] = [];
+            for (let i = 0; i < ENGINE_CONFIG.entityCount; i++) {
+                const e1 = slice1[i];
+                const e2 = slice2[i];
 
-            for (let i = 0; i < ENTITY_COUNT; i++) {
-                const e1 = state1[i];
-                const e2 = state2[i];
-
-                // Interpolate
                 const lev = e1.leverage + (e2.leverage - e1.leverage) * ratio;
                 const z = e1.zScore + (e2.zScore - e1.zScore) * ratio;
                 const isDef = ratio > 0.5 ? e2.isDefaulted : e1.isDefaulted;
                 const rIdx = ratio > 0.5 ? e2.currentRatingIdx : e1.currentRatingIdx;
 
-                if (isDef) defaultCount++;
-                else {
-                    activeCount++;
-                    sumWacc += e1.wacc + (e2.wacc - e1.wacc)*ratio;
-                    if(lev > covThresholdLeverage) covenantBreaches++;
+                const px = mapXToCanvas(lev, w);
+                const py = mapYToCanvas(z, h);
+
+                const color = RATINGS_MATRIX[rIdx].color;
+                batch[color].push({ x: px, y: py, def: isDef });
+
+                // Highlight selected entity
+                if (simState.selectedEntityId === e1.id) {
+                    selectedCoord = { x: px, y: py, color: color };
                 }
-
-                // Map to screen (X: Leverage [0 to 12], Y: Z-Score [-4 to 4])
-                const x = mapToCanvas(lev, 0, 10, w);
-                const y = h - mapToCanvas(z, -4, 4, h); // Invert Y
-
-                const color = RATINGS[rIdx].color;
-                colorBatches[color].push({x, y, def: isDef});
             }
 
-            // Draw batches
-            for(const [color, points] of Object.entries(colorBatches)) {
-                ui.ctx.fillStyle = color;
-                for(const pt of points) {
+            // Draw Batched Entity Nodes
+            for (const [color, points] of Object.entries(batch)) {
+                ctx.fillStyle = color;
+                for (let j = 0; j < points.length; j++) {
+                    const pt = points[j];
                     if (pt.def) {
-                        // Draw defaulted as small red x or square
-                        ui.ctx.fillStyle = 'rgba(244, 67, 54, 0.4)';
-                        ui.ctx.fillRect(pt.x, pt.y, 2, 2);
-                        ui.ctx.fillStyle = color; // restore
+                        ctx.fillStyle = 'rgba(244, 67, 54, 0.4)';
+                        ctx.fillRect(pt.x - 1, pt.y - 1, 2.5, 2.5);
+                        ctx.fillStyle = color;
                     } else {
-                        // Regular entity
-                        ui.ctx.fillRect(pt.x, pt.y, 2, 2);
+                        ctx.fillRect(pt.x, pt.y, 2, 2);
                     }
                 }
             }
 
-            // Update DOM metrics (throttle slightly to avoid DOM thrashing if needed, but per frame is ok for text)
-            ui.simMonth.innerText = `M${Math.round(timeFloat)}`;
-            ui.activeEntities.innerText = activeCount.toLocaleString();
-            ui.defaultCount.innerText = defaultCount.toLocaleString();
-            ui.avgWacc.innerText = activeCount > 0 ? ((sumWacc/activeCount)*100).toFixed(2) + '%' : '0%';
-            
-            ui.covBreaches.innerText = covenantBreaches.toLocaleString();
-            ui.covBar.style.width = Math.min((covenantBreaches / ENTITY_COUNT) * 100 * 5, 100) + '%'; // Scaled for visual
+            // Render Selected Reticle
+            if (selectedCoord) {
+                ctx.strokeStyle = '#64ffda';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(selectedCoord.x + 1, selectedCoord.y + 1, 6, 0, Math.PI * 2);
+                ctx.stroke();
 
-            // Generate contextual narrative based on state
-            updateNarrative(timeFloat, defaultCount, covenantBreaches);
-        }
-
-        // --- STREAMING_CHUNK:Telemetry and provenance logging functions conforming to w3c_prov_o schemas... ---
-
-        function logTelemetry(agent, action, message, confidence) {
-            const logEntry = document.createElement('div');
-            
-            // Format to requested schema ProvenanceHeader style conceptually
-            const time = new Date().toISOString().split('T')[1].slice(0, -1);
-            
-            logEntry.innerHTML = `
-                <div class="flex items-start mb-1">
-                    <span class="text-brand-accent mr-2">[${time}]</span>
-                    <div>
-                        <span class="text-blue-300 font-bold">${agent}</span>: 
-                        <span class="text-gray-300">${message}</span>
-                        <div class="text-[9px] text-gray-500 mt-0.5">
-                            { "w3c_prov_o": true, "schema": "ProvenanceHeader", "conf": ${confidence.toFixed(2)} }
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            ui.log.appendChild(logEntry);
-            
-            // Keep only last 50 logs to prevent DOM bloat
-            while (ui.log.children.length > 50) {
-                ui.log.removeChild(ui.log.firstChild);
+                ctx.fillStyle = '#64ffda';
+                ctx.fillText(simState.selectedEntityId, selectedCoord.x + 8, selectedCoord.y - 4);
             }
-            
-            ui.log.scrollTop = ui.log.scrollHeight;
         }
 
-        // --- STREAMING_CHUNK:Constructing D3.js visualizations for Macro & Credit analysis... ---
+        // --- 7. HUD METRICS & TELEMETRY DISPATCH ---
 
-        let macroChartSvg, ratingChartSvg;
+        function updateHUDMetrics(timeFloat) {
+            if (simState.history.length === 0) return;
+
+            const m = Math.min(Math.floor(timeFloat), ENGINE_CONFIG.simulationHorizonMonths);
+            const slice = simState.history[m];
+
+            let defaults = 0;
+            let totalWacc = 0;
+            let activeCount = 0;
+            let covBreaches = 0;
+            const zScores = [];
+
+            for (let i = 0; i < ENGINE_CONFIG.entityCount; i++) {
+                const ent = slice[i];
+                if (ent.isDefaulted) {
+                    defaults++;
+                } else {
+                    activeCount++;
+                    totalWacc += ent.wacc;
+                    zScores.push(ent.zScore);
+                    if (ent.leverage > simState.params.covenantLeverage) {
+                        covBreaches++;
+                    }
+                }
+            }
+
+            const defPct = ((defaults / ENGINE_CONFIG.entityCount) * 100).toFixed(2);
+            const avgWaccVal = activeCount > 0 ? ((totalWacc / activeCount) * 100).toFixed(2) : '0.00';
+            const medianZ = calculateMedian(zScores).toFixed(2);
+
+            ui.simMonth.innerText = `Month ${Math.round(timeFloat)} / 12`;
+            ui.activeEntities.innerText = activeCount.toLocaleString();
+            ui.defaultCount.innerHTML = `${defaults.toLocaleString()} <span class="text-xs font-normal text-brand-alert/80">(${defPct}%)</span>`;
+            ui.avgWacc.innerText = `${avgWaccVal}%`;
+            ui.medianZScore.innerText = medianZ;
+
+            ui.covenantBreaches.innerText = covBreaches.toLocaleString();
+            const covRatio = Math.min(100, (covBreaches / (ENGINE_CONFIG.entityCount * 0.4)) * 100);
+            ui.covenantBar.style.width = `${covRatio}%`;
+
+            if (covBreaches > 1200) {
+                ui.covenantEngineStatus.innerText = "SNC_CONTRACTION";
+                ui.covenantEngineStatus.className = "text-brand-alert text-[10px] bg-brand-alert/10 px-1 rounded border border-brand-alert/20 font-bold animate-pulse";
+            } else if (covBreaches > 400) {
+                ui.covenantEngineStatus.innerText = "BREACH_WARN";
+                ui.covenantEngineStatus.className = "text-brand-warn text-[10px] bg-brand-warn/10 px-1 rounded border border-brand-warn/20 font-semibold";
+            } else {
+                ui.covenantEngineStatus.innerText = "NORMAL_GATE";
+                ui.covenantEngineStatus.className = "text-brand-ok text-[10px] bg-brand-ok/10 px-1 rounded border border-brand-ok/20";
+            }
+
+            // Update Selected Entity Inspector if active
+            if (simState.selectedEntityId) {
+                const ent = slice.find(e => e.id === simState.selectedEntityId);
+                if (ent) {
+                    ui.inspectEntityId.innerText = ent.id;
+                    ui.inspectRating.innerText = RATINGS_MATRIX[ent.currentRatingIdx].name;
+                    ui.inspectRating.style.color = RATINGS_MATRIX[ent.currentRatingIdx].color;
+                    ui.inspectLeverage.innerText = `${ent.leverage.toFixed(2)}x`;
+                    ui.inspectZScore.innerText = ent.zScore.toFixed(2);
+                    ui.inspectWacc.innerText = ent.isDefaulted ? 'DEFAULT (0.00%)' : `${(ent.wacc * 100).toFixed(2)}%`;
+                }
+            }
+        }
+
+        /**
+         * Autonomous Narrative Dispatch (Exiled Spark Narrative Module)
+         */
+        let lastNarrativeMonthRecorded = -1;
+        function dispatchNarrativeSynthesis(monthFloat) {
+            const m = Math.floor(monthFloat);
+            if (m === lastNarrativeMonthRecorded || m === 0) return;
+            lastNarrativeMonthRecorded = m;
+
+            const slice = simState.history[m];
+            let breaches = 0;
+            let defaults = 0;
+            slice.forEach(e => {
+                if (e.isDefaulted) defaults++;
+                else if (e.leverage > simState.params.covenantLeverage) breaches++;
+            });
+
+            let narrativeText = "";
+
+            if (m === 3) {
+                narrativeText = `Q1 Interval Elapsed: Systematic drift manifesting. Covenant stress at ${breaches} facilities. Lower tranches showing liquidity compression.`;
+            } else if (m === 6) {
+                narrativeText = `Mid-Year Checkpoint: Mean rates reaching ${(simState.macroHistory[m].rate * 100).toFixed(2)}%. Cumulative defaults currently ${defaults}. High-yield tranches initiating debt-restructuring covenants.`;
+            } else if (m === 9) {
+                narrativeText = breaches > 800
+                    ? `CRITICAL STRESS: Shared National Credit warning triggered. Widespread ${breaches} covenant failures across Leveraged Loan tranches.`
+                    : `Q3 Review: Corporate spreads adjusting. Idiosyncratic resilience moderating systemic impact across mid-market debt.`;
+            } else if (m === 12) {
+                narrativeText = `Terminal Horizon Finalized: 12-month forward simulation concluded. Synthesized dataset compiled for regulatory risk transmission.`;
+                logTelemetry("Exiled Spark", "narrative_complete", "Full forward projection chronicle generated.", 0.98);
+            }
+
+            if (narrativeText) {
+                const container = ui.narrative;
+                const item = document.createElement('div');
+                item.className = "p-2 rounded bg-brand-800/60 border border-brand-700/50 space-y-1 animate-fadeIn";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between text-[10px]">
+                        <span class="text-brand-accent font-bold">[FORWARD_CYCLE_M${m}]</span>
+                        <span class="text-gray-500 text-[9px]">${new Date().toISOString().substring(11, 19)} UTC</span>
+                    </div>
+                    <p class="text-gray-300 text-[11px] leading-relaxed">${narrativeText}</p>
+                `;
+                container.appendChild(item);
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // --- 8. W3C PROV-O AUDIT AND TELEMETRY LOGGING ---
+
+        /**
+         * Emits structured provenance events according to W3C PROV-O ontology
+         */
+        function logTelemetry(agent, action, message, confidence) {
+            const time = new Date().toISOString();
+            const timeFormatted = time.substring(11, 19);
+
+            // Record to internal audit graph
+            const provoEntry = {
+                "@context": "http://www.w3.org/ns/prov#",
+                "entity": `urn:adam:telemetry:${Date.now()}`,
+                "wasAttributedTo": `urn:adam:agent:${agent.replace(/\s+/g, '_')}`,
+                "generatedAtTime": time,
+                "action": action,
+                "prov:value": message,
+                "confidenceScore": confidence
+            };
+            simState.provoGraph.push(provoEntry);
+
+            // UI Display Element
+            const logItem = document.createElement('div');
+            logItem.className = "border-l-2 border-brand-accent/40 pl-2 py-0.5";
+            logItem.innerHTML = `
+                <div class="flex items-center space-x-1 text-[9px] text-gray-500">
+                    <span class="text-brand-accent font-mono">[${timeFormatted}]</span>
+                    <span class="text-blue-300 font-bold">${agent}</span>
+                    <span>&bull;</span>
+                    <span class="text-gray-400">${action}</span>
+                </div>
+                <div class="text-gray-300 text-[10px] mt-0.5 leading-tight">${message}</div>
+                <div class="text-[8px] text-gray-500 font-mono mt-0.5">prov:confidence -> ${confidence.toFixed(2)}</div>
+            `;
+
+            ui.telemetryLog.appendChild(logItem);
+
+            // Maintain log size
+            while (ui.telemetryLog.children.length > 40) {
+                ui.telemetryLog.removeChild(ui.telemetryLog.firstChild);
+            }
+            ui.telemetryLog.scrollTop = ui.telemetryLog.scrollHeight;
+        }
+
+        // --- 9. D3.JS VECTOR TELEMETRY VISUALIZATIONS ---
+
+        let d3MacroSvg, d3RatingSvg;
 
         function initD3Charts() {
-            // Setup Macro Chart
-            const mContainer = document.getElementById('macro-chart');
-            const mMargin = {top: 10, right: 10, bottom: 20, left: 30};
-            const mw = mContainer.clientWidth - mMargin.left - mMargin.right;
-            const mh = mContainer.clientHeight - mMargin.top - mMargin.bottom;
+            // 1. Macro Trajectory Chart Setup
+            const mElem = document.getElementById('macro-chart');
+            const mMargin = { top: 12, right: 12, bottom: 22, left: 36 };
+            const mw = mElem.clientWidth - mMargin.left - mMargin.right;
+            const mh = mElem.clientHeight - mMargin.top - mMargin.bottom;
 
-            macroChartSvg = d3.select("#macro-chart")
+            d3.select("#macro-chart").selectAll("*").remove();
+            d3MacroSvg = d3.select("#macro-chart")
                 .append("svg")
                 .attr("width", mw + mMargin.left + mMargin.right)
                 .attr("height", mh + mMargin.top + mMargin.bottom)
                 .append("g")
                 .attr("transform", `translate(${mMargin.left},${mMargin.top})`);
 
-            // Setup Ratings Chart
-            const rContainer = document.getElementById('ratings-chart');
-            const rMargin = {top: 10, right: 10, bottom: 20, left: 30};
-            const rw = rContainer.clientWidth - rMargin.left - rMargin.right;
-            const rh = rContainer.clientHeight - rMargin.top - rMargin.bottom;
+            // 2. Ratings Distribution Matrix Chart Setup
+            const rElem = document.getElementById('ratings-chart');
+            const rMargin = { top: 12, right: 12, bottom: 22, left: 36 };
+            const rw = rElem.clientWidth - rMargin.left - rMargin.right;
+            const rh = rElem.clientHeight - rMargin.top - rMargin.bottom;
 
-            ratingChartSvg = d3.select("#ratings-chart")
+            d3.select("#ratings-chart").selectAll("*").remove();
+            d3RatingSvg = d3.select("#ratings-chart")
                 .append("svg")
                 .attr("width", rw + rMargin.left + rMargin.right)
                 .attr("height", rh + rMargin.top + rMargin.bottom)
@@ -566,243 +987,281 @@
                 .attr("transform", `translate(${rMargin.left},${rMargin.top})`);
         }
 
-        function updateChartsInitial() {
-            // Draw empty/initial axes
-            drawMacroChart(0);
-            drawRatingChart(0);
-        }
+        function updateD3Visualizations(monthFloat) {
+            if (simState.macroHistory.length === 0) return;
 
-        function drawMacroChart(monthIndex) {
-            macroChartSvg.selectAll("*").remove();
-            
-            if(simState.macroHistory.length === 0) return;
+            const mIndex = Math.min(Math.ceil(monthFloat), ENGINE_CONFIG.simulationHorizonMonths);
 
-            const mContainer = document.getElementById('macro-chart');
-            const w = mContainer.clientWidth - 40;
-            const h = mContainer.clientHeight - 30;
+            // --- Render Macro Chart ---
+            const mElem = document.getElementById('macro-chart');
+            const mw = mElem.clientWidth - 48;
+            const mh = mElem.clientHeight - 34;
 
-            const data = simState.macroHistory.slice(0, Math.ceil(monthIndex) + 1);
+            d3MacroSvg.selectAll("*").remove();
 
-            const x = d3.scaleLinear().domain([0, SIM_MONTHS]).range([0, w]);
-            const y1 = d3.scaleLinear().domain([0, 0.08]).range([h, 0]); // Rate
-            const y2 = d3.scaleLinear().domain([-0.02, 0.06]).range([h, 0]); // GDP
+            const macroData = simState.macroHistory.slice(0, mIndex + 1);
+
+            const x = d3.scaleLinear().domain([0, ENGINE_CONFIG.simulationHorizonMonths]).range([0, mw]);
+            const yRate = d3.scaleLinear().domain([0, 0.09]).range([mh, 0]);
+            const yGdp = d3.scaleLinear().domain([-0.02, 0.06]).range([mh, 0]);
 
             // Axes
-            macroChartSvg.append("g")
-                .attr("transform", `translate(0,${h})`)
+            d3MacroSvg.append("g")
+                .attr("transform", `translate(0,${mh})`)
                 .attr("class", "text-gray-500 font-mono text-[8px]")
                 .call(d3.axisBottom(x).ticks(6).tickFormat(d => `M${d}`));
-                
-            macroChartSvg.append("g")
+
+            d3MacroSvg.append("g")
                 .attr("class", "text-gray-500 font-mono text-[8px]")
-                .call(d3.axisLeft(y1).ticks(4).tickFormat(d => (d*100).toFixed(0)+'%'));
+                .call(d3.axisLeft(yRate).ticks(4).tickFormat(d => `${(d * 100).toFixed(0)}%`));
 
-            // Lines
+            // Paths
             const lineRate = d3.line()
-                .x((d, i) => x(i))
-                .y(d => y1(d.rate))
+                .x(d => x(d.month))
+                .y(d => yRate(d.rate))
                 .curve(d3.curveMonotoneX);
 
-            const lineGDP = d3.line()
-                .x((d, i) => x(i))
-                .y(d => y2(d.gdp))
+            const lineGdp = d3.line()
+                .x(d => x(d.month))
+                .y(d => yGdp(d.gdp))
                 .curve(d3.curveMonotoneX);
 
-            macroChartSvg.append("path")
-                .datum(data)
+            d3MacroSvg.append("path")
+                .datum(macroData)
                 .attr("fill", "none")
-                .attr("stroke", "#ff9800")
+                .attr("stroke", "#ffd700")
                 .attr("stroke-width", 1.5)
                 .attr("d", lineRate);
 
-            macroChartSvg.append("path")
-                .datum(data)
+            d3MacroSvg.append("path")
+                .datum(macroData)
                 .attr("fill", "none")
-                .attr("stroke", "#00bcd4")
+                .attr("stroke", "#00e5ff")
                 .attr("stroke-width", 1.5)
-                .attr("stroke-dasharray", "3,3")
-                .attr("d", lineGDP);
-        }
+                .attr("stroke-dasharray", "3,2")
+                .attr("d", lineGdp);
 
-        function drawRatingChart(monthIndex) {
-            ratingChartSvg.selectAll("*").remove();
-            if(simState.history.length === 0) return;
-            
-            const state = simState.history[Math.floor(monthIndex)];
-            
-            // Count ratings
+            // --- Render Ratings Migration Bar Chart ---
+            d3RatingSvg.selectAll("*").remove();
+            const rElem = document.getElementById('ratings-chart');
+            const rw = rElem.clientWidth - 48;
+            const rh = rElem.clientHeight - 34;
+
+            const slice = simState.history[Math.min(Math.floor(monthFloat), ENGINE_CONFIG.simulationHorizonMonths)];
             const counts = new Array(8).fill(0);
-            state.forEach(e => counts[e.currentRatingIdx]++);
+            slice.forEach(e => counts[e.currentRatingIdx]++);
 
-            const rContainer = document.getElementById('ratings-chart');
-            const w = rContainer.clientWidth - 40;
-            const h = rContainer.clientHeight - 30;
+            const xBand = d3.scaleBand()
+                .domain(RATINGS_MATRIX.map(r => r.name))
+                .range([0, rw])
+                .padding(0.25);
 
-            const x = d3.scaleBand()
-                .domain(RATINGS.map(d => d.name))
-                .range([0, w])
-                .padding(0.2);
+            const yBar = d3.scaleLinear()
+                .domain([0, 4000])
+                .range([rh, 0]);
 
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(counts)])
-                .range([h, 0]);
-
-            ratingChartSvg.append("g")
-                .attr("transform", `translate(0,${h})`)
+            d3RatingSvg.append("g")
+                .attr("transform", `translate(0,${rh})`)
                 .attr("class", "text-gray-500 font-mono text-[8px]")
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(xBand));
 
-            ratingChartSvg.selectAll(".bar")
+            d3RatingSvg.append("g")
+                .attr("class", "text-gray-500 font-mono text-[8px]")
+                .call(d3.axisLeft(yBar).ticks(3));
+
+            d3RatingSvg.selectAll(".bar")
                 .data(counts)
                 .enter().append("rect")
                 .attr("class", "bar")
-                .attr("x", (d, i) => x(RATINGS[i].name))
-                .attr("y", d => y(d))
-                .attr("width", x.bandwidth())
-                .attr("height", d => h - y(d))
-                .attr("fill", (d, i) => RATINGS[i].color)
-                .attr("opacity", 0.8);
+                .attr("x", (d, i) => xBand(RATINGS_MATRIX[i].name))
+                .attr("y", d => yBar(d))
+                .attr("width", xBand.bandwidth())
+                .attr("height", d => rh - yBar(d))
+                .attr("fill", (d, i) => RATINGS_MATRIX[i].color)
+                .attr("opacity", 0.85);
         }
 
-        // --- STREAMING_CHUNK:Implementing Narrative Engine (Exiled Spark) integration... ---
-
-        let lastNarrativeMonth = -1;
-        function updateNarrative(monthFloat, defaults, covenants) {
-            const m = Math.floor(monthFloat);
-            if(m === lastNarrativeMonth || m === 0) return;
-            lastNarrativeMonth = m;
-
-            let msg = "";
-            if (m === 3) msg = "Q1 Close: Initial macro shocks propagating. Covenant stress observed in lower tranches.";
-            else if (m === 6) msg = `Mid-year point. System absorbing impact. Cumulative defaults reaching ${defaults}. Rate environment tightening.`;
-            else if (m === 9) {
-                if(covenants > 500) msg = "CRITICAL: Widespread covenant breaches detected across high-yield sectors. Credit contraction likely.";
-                else msg = "Q3 Close: Markets stabilizing. Idiosyncratic risk dominating systemic risk.";
-            }
-            else if (m === 12) msg = "Terminal state reached. Forward projection complete. Outputting MarketMayhemLedger artifact.";
-
-            if(msg) {
-                const p = document.createElement('p');
-                p.innerText = `> [M${m}] ${msg}`;
-                
-                // Add provenance style flash
-                p.className = "text-gray-200 crt-flicker";
-                
-                ui.narrative.appendChild(p);
-                ui.narrative.scrollTop = ui.narrative.scrollHeight;
-
-                logTelemetry("Exiled Spark", "narrative_gen", msg, 0.92);
-                
-                // Log mock schema
-                if(m === 12) {
-                     logTelemetry("Adam-Core-Orchestrator", "schema_commit", 
-                     `{"MarketMayhemLedger": {"primary_model_target":"PD", "context_provenance": {"confidence_score": 0.98}}}`, 
-                     1.0);
-                }
-            }
-        }
-
-        // --- STREAMING_CHUNK:Animation Loop and Lifecycle Management... ---
+        // --- 10. REAL-TIME ANIMATION LOOP (RequestAnimationFrame) ---
 
         let startTimestamp = null;
-        let lastChartUpdate = -1;
+        let lastIntMonthDispatched = -1;
+        let frameCounter = 0;
+        let lastFpsCheck = performance.now();
 
-        function animationLoop(timestamp) {
+        function executionLoop(timestamp) {
             if (!simState.isRunning) return;
             if (!startTimestamp) startTimestamp = timestamp;
 
             const elapsed = timestamp - startTimestamp;
-            let progress = elapsed / ANIMATION_DURATION_MS;
-            
+            let progress = elapsed / ENGINE_CONFIG.animationDurationMs;
+
+            // Frame Rate Metric Computation
+            frameCounter++;
+            if (timestamp - lastFpsCheck >= 1000) {
+                const fps = ((frameCounter * 1000) / (timestamp - lastFpsCheck)).toFixed(1);
+                ui.kernelHz.innerText = fps;
+                frameCounter = 0;
+                lastFpsCheck = timestamp;
+            }
+
             if (progress >= 1.0) {
                 progress = 1.0;
                 simState.isRunning = false;
-                logTelemetry("ADAM Core OS", "sim_complete", "1Y Forward view fully materialized.", 1.0);
-                ui.btnSimulate.innerText = "RESET SYSTEM";
+                simState.isCompleted = true;
+
+                ui.btnLabel.innerText = "RESET PLATFORM";
+                ui.btnIcon.innerText = "↺";
                 ui.btnSimulate.classList.remove('animate-pulse');
+
+                logTelemetry("ADAM Core OS", "lifecycle_terminal", "1Y Forward Continuous Simulation fully resolved.", 1.0);
             }
 
-            const currentMonthFloat = progress * SIM_MONTHS;
+            const currentMonthFloat = progress * ENGINE_CONFIG.simulationHorizonMonths;
             simState.currentMonthRaw = currentMonthFloat;
 
-            // Render Canvas (60fps)
+            // Canvas Redraw at 60fps
             renderFrame(currentMonthFloat);
+            updateHUDMetrics(currentMonthFloat);
 
-            // Throttle D3 chart updates to integer months to save CPU
-            const currentMonthInt = Math.floor(currentMonthFloat);
-            if(currentMonthInt !== lastChartUpdate) {
-                drawMacroChart(currentMonthFloat);
-                drawRatingChart(currentMonthFloat);
-                lastChartUpdate = currentMonthInt;
-                
-                if(currentMonthInt > 0 && currentMonthInt <= 12) {
-                    logTelemetry("Logic Lab", "step_resolve", `Computed state matrix for M${currentMonthInt}.`, 0.99);
+            // Throttle D3 redraws to integer step transitions to optimize thread overhead
+            const currentInt = Math.floor(currentMonthFloat);
+            if (currentInt !== lastIntMonthDispatched) {
+                updateD3Visualizations(currentMonthFloat);
+                dispatchNarrativeSynthesis(currentMonthFloat);
+                lastIntMonthDispatched = currentInt;
+
+                if (currentInt > 0) {
+                    logTelemetry("Logic Lab", "step_transition", `Stochastic boundary resolved for Month ${currentInt}.`, 0.99);
                 }
             }
 
             if (simState.isRunning) {
-                requestAnimationFrame(animationLoop);
+                requestAnimationFrame(executionLoop);
             }
         }
 
-        // --- STREAMING_CHUNK:Event Listeners and Execution Triggers... ---
+        // --- 11. USER INTERACTION & EXTENSION CONTROLS ---
 
+        // Simulation Run/Reset Handler
         ui.btnSimulate.addEventListener('click', () => {
-            if (ui.btnSimulate.innerText === "RESET SYSTEM") {
-                // Reset
-                ui.narrative.innerHTML = '<p class="text-gray-200">System reset. Awaiting instructions.</p>';
-                ui.log.innerHTML = '';
-                lastNarrativeMonth = -1;
-                ui.btnSimulate.innerText = "INITIALIZE 1Y FORWARD SIM";
-                
-                initializeModel();
-                logTelemetry("ADAM Core OS", "system_reset", "State memory cleared.", 1.0);
+            if (simState.isCompleted) {
+                // Reset Action
+                ui.narrative.innerHTML = `
+                    <div class="p-2 rounded bg-brand-850/70 border border-brand-700/40">
+                        <span class="text-brand-accent font-semibold">[IDLE_STASIS]</span> System memory cleared. Ready for parameter reconfiguration.
+                    </div>
+                `;
+                lastNarrativeMonthRecorded = -1;
+                ui.btnLabel.innerText = "RUN 12M FORWARD SIM";
+                ui.btnIcon.innerText = "▶";
+                initializeDigitalTwin();
                 return;
             }
 
-            if(simState.isRunning) return;
+            if (simState.isRunning) return;
 
-            logTelemetry("ADAM Core OS", "sim_start", "Initializing chronological progression via Monte Carlo paths...", 1.0);
-            ui.btnSimulate.innerText = "SIMULATING...";
+            logTelemetry("ADAM Core OS", "sim_trigger", "Initiating 1Y Forward continuous trajectory synthesis...", 1.0);
+            ui.btnLabel.innerText = "EXECUTING 1Y SIM...";
+            ui.btnIcon.innerText = "■";
             ui.btnSimulate.classList.add('animate-pulse');
-            
-            // Generate data
-            preComputeSimulation();
-            
-            // Start Animation
+
+            preComputeChronologicalTrajectories();
+
             simState.isRunning = true;
-            startTimestamp = null; // reset for loop
-            requestAnimationFrame(animationLoop);
+            startTimestamp = null;
+            requestAnimationFrame(executionLoop);
         });
 
-        // Interactivity: Canvas Hover
+        // Scenario Preset Switching
+        ui.scenarioPreset.addEventListener('change', (e) => {
+            simState.scenario = e.target.value;
+            logTelemetry("Market Mayhem", "scenario_shift", `Surveillance preset changed to: ${simState.scenario.toUpperCase()}`, 1.0);
+
+            if (simState.scenario === 'stagflation') {
+                ui.sliderRate.value = 25;
+                ui.valRate.innerText = "+25 bps/mo";
+                simState.params.rateDriftBpsMonth = 25;
+            } else if (simState.scenario === 'credit-crunch') {
+                ui.sliderCov.value = 5.25;
+                ui.valCov.innerText = "5.25x";
+                simState.params.covenantLeverage = 5.25;
+            } else if (simState.scenario === 'recovery') {
+                ui.sliderRate.value = -10;
+                ui.valRate.innerText = "-10 bps/mo";
+                simState.params.rateDriftBpsMonth = -10;
+            } else {
+                ui.sliderRate.value = 10;
+                ui.valRate.innerText = "+10 bps/mo";
+                ui.sliderCov.value = 6.0;
+                ui.valCov.innerText = "6.0x";
+                simState.params.rateDriftBpsMonth = 10;
+                simState.params.covenantLeverage = 6.0;
+            }
+
+            if (!simState.isRunning) {
+                initializeDigitalTwin();
+            }
+        });
+
+        // Dynamic Parameter Sliders
+        ui.sliderCov.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            simState.params.covenantLeverage = val;
+            ui.valCov.innerText = `${val.toFixed(2)}x`;
+            renderFrame(simState.currentMonthRaw);
+            updateHUDMetrics(simState.currentMonthRaw);
+        });
+
+        ui.sliderRate.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            simState.params.rateDriftBpsMonth = val;
+            ui.valRate.innerText = `${val > 0 ? '+' : ''}${val} bps/mo`;
+        });
+
+        ui.sliderVol.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            simState.params.idiosyncraticVol = val;
+            ui.valVol.innerText = val.toFixed(2);
+        });
+
+        ui.btnResetParams.addEventListener('click', () => {
+            ui.sliderCov.value = 6.0;
+            ui.valCov.innerText = "6.0x";
+            ui.sliderRate.value = 10;
+            ui.valRate.innerText = "+10 bps/mo";
+            ui.sliderVol.value = 0.20;
+            ui.valVol.innerText = "0.20";
+            simState.params.covenantLeverage = 6.0;
+            simState.params.rateDriftBpsMonth = 10;
+            simState.params.idiosyncraticVol = 0.20;
+            logTelemetry("ADAM Core OS", "params_reset", "Stress parameters restored to regulatory baseline.", 0.95);
+        });
+
+        // Canvas Interactive Entity Hover & Click Identification
         ui.canvas.addEventListener('mousemove', (e) => {
-            if(simState.history.length === 0) return;
-            
+            if (simState.history.length === 0) return;
+
             const rect = ui.canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
 
-            // Simple proximity check (expensive for 10k, so we just sample bounding boxes conceptually, 
-            // but for a true canvas, checking all 10k is possible if optimized. We will just show coordinates for the tooltip to maintain 60fps)
-            
-            // Convert back from canvas space to data space
             const w = ui.canvas.width;
             const h = ui.canvas.height;
-            const pad = w * 0.05;
-            const hpad = h * 0.05;
+            const padX = w * 0.06;
+            const padY = h * 0.08;
 
-            // Invert mapping
-            let lev = ((mouseX - pad) / (w - pad*2)) * 10;
-            let z = 4 - (((mouseY - hpad) / (h - hpad*2)) * 8);
+            if (mouseX >= padX && mouseX <= w - padX && mouseY >= padY && mouseY <= h - padY) {
+                // Invert physical coordinates back to metric values
+                const lev = ((mouseX - padX) / (w - padX * 2)) * 12;
+                const z = -4 + ((h - padY - mouseY) / (h - padY * 2)) * 8;
 
-            if(mouseX > pad && mouseX < w-pad && mouseY > hpad && mouseY < h-hpad) {
-                ui.tooltip.style.left = (e.clientX + 15) + 'px';
-                ui.tooltip.style.top = (e.clientY + 15) + 'px';
+                ui.tooltip.style.left = `${Math.min(window.innerWidth - 240, e.clientX + 16)}px`;
+                ui.tooltip.style.top = `${e.clientY + 14}px`;
                 ui.tooltip.innerHTML = `
-                    <div class="text-brand-accent font-bold mb-1">Zone Scan</div>
-                    Lev (x): ${lev.toFixed(2)}x<br>
-                    Z-Scr (y): ${z.toFixed(2)}
+                    <div class="text-brand-accent font-bold mb-1 border-b border-brand-700/50 pb-0.5">Continuous Phase Scan</div>
+                    <div class="text-gray-300">Leverage: <span class="text-brand-warn font-semibold">${lev.toFixed(2)}x</span></div>
+                    <div class="text-gray-300">Altman Z: <span class="text-brand-dataCyan font-semibold">${z.toFixed(2)}</span></div>
+                    <div class="text-[9px] text-gray-400 mt-1">CLICK TO LOCK ENTITY RETICLE</div>
                 `;
                 ui.tooltip.classList.remove('hidden');
             } else {
@@ -814,22 +1273,85 @@
             ui.tooltip.classList.add('hidden');
         });
 
-        // Simple Clock update
+        // Click to Lock & Inspect Specific Entity
+        ui.canvas.addEventListener('click', (e) => {
+            if (simState.history.length === 0) return;
+
+            const rect = ui.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const w = ui.canvas.width;
+            const h = ui.canvas.height;
+
+            const m = Math.min(Math.floor(simState.currentMonthRaw), ENGINE_CONFIG.simulationHorizonMonths);
+            const slice = simState.history[m];
+
+            let closest = null;
+            let minDist = 12; // Search radius in pixels
+
+            for (let i = 0; i < ENGINE_CONFIG.entityCount; i++) {
+                const ent = slice[i];
+                const px = mapXToCanvas(ent.leverage, w);
+                const py = mapYToCanvas(ent.zScore, h);
+
+                const dist = Math.hypot(px - mouseX, py - mouseY);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = ent;
+                }
+            }
+
+            if (closest) {
+                simState.selectedEntityId = closest.id;
+                logTelemetry("Fortress & Hunt", "entity_focus", `Target reticle locked on: ${closest.id}`, 1.0);
+                renderFrame(simState.currentMonthRaw);
+                updateHUDMetrics(simState.currentMonthRaw);
+            }
+        });
+
+        // W3C PROV-O JSON Export Trigger
+        ui.btnExportProvo.addEventListener('click', () => {
+            const artifact = {
+                "@context": {
+                    "prov": "http://www.w3.org/ns/prov#",
+                    "adam": "http://adam-platform.internal/schema#"
+                },
+                "runId": `run-${Date.now()}`,
+                "scenario": simState.scenario,
+                "timestamp": new Date().toISOString(),
+                "executionAgent": "ADAM Institutional Core OS v26.0.4",
+                "parameters": simState.params,
+                "provenanceAuditGraph": simState.provoGraph
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(artifact, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `PROV_O_AUDIT_${simState.scenario.toUpperCase()}_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            logTelemetry("ADAM Core OS", "audit_export", "PROV-O Schema artifact compiled and downloaded.", 1.0);
+        });
+
+        // Synchronous Clock Engine
         setInterval(() => {
             const now = new Date();
-            document.getElementById('clock-display').innerText = now.toISOString().replace('T', ' ').substring(0, 19) + " UTC";
+            ui.clockDisplay.innerText = `${now.toISOString().substring(0, 10)} ${now.toISOString().substring(11, 19)} UTC`;
         }, 1000);
 
-        // Boot Sequence
+        // System Cold Start Boot Sequence
         window.onload = () => {
             initD3Charts();
-            initializeModel();
-            
-            setTimeout(() => {
-                logTelemetry("Covenant Engine", "gatekeeper_check", "Deterministic rules mapped.", 1.0);
-            }, 1000);
-        };
+            initializeDigitalTwin();
 
+            setTimeout(() => {
+                logTelemetry("Covenant Engine", "gate_status", "Deterministic SNC covenant rule maps bound.", 1.0);
+                logTelemetry("ADAM Core OS", "system_ready", "System calibrated. Stochastic engines standby.", 1.0);
+            }, 600);
+        };
     </script>
 </body>
 </html>
