@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional AI Ecosystem World Model & Structural Credit Simulator (Q3 2026)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js for High-Fidelity Quantitative Graphics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons via Unpkg -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- KaTeX for Institutional Financial Mathematics -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+            },
+            terminal: {
+              bg: '#090d16',
+              card: '#0f172a',
+              cardHover: '#1e293b',
+              border: '#334155',
+              accent: '#38bdf8',
+              gold: '#fbbf24',
+              crimson: '#f43f5e',
+              emerald: '#10b981'
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Menlo', 'Courier New', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090d16;
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .financial-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Custom range slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      height: 6px;
+      border-radius: 4px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      border: 2px solid #0f172a;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      transition: all 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #7dd3fc;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Executive Status Bar -->
+  <header class="border-b border-terminal-border glass-panel sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse"></div>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold tracking-wider uppercase text-white flex items-center gap-2">
+            <span>ADAM v31.0</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800">WARSH ARCHITECTURE</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">2ND LINE RISK CONTROL</span>
+          </h1>
+          <p class="text-[11px] text-slate-400">AI Cap-Stack World Model & Structural Default Engine | Mark-to-Market: Q3 2026</p>
+        </div>
+      </div>
+
+      <!-- Live Global Macro Sovereign Yield Anchors Ticker -->
+      <div class="flex items-center gap-2 sm:gap-6 text-xs financial-num overflow-x-auto pb-1 sm:pb-0">
+        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+          <span class="text-slate-400">US 10Y ($R_f$):</span>
+          <span id="ticker-rf" class="font-bold text-sky-400">4.792%</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+          <span class="text-slate-400">UK 10Y:</span>
+          <span class="font-bold text-amber-400">5.260%</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+          <span class="text-slate-400">JP 10Y:</span>
+          <span class="font-bold text-purple-400">3.000%</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+          <span class="text-slate-400">Brent:</span>
+          <span id="ticker-brent" class="font-bold text-rose-400">$88.00/bbl</span>
+        </div>
+        <button id="btn-export-audit" class="hidden sm:flex items-center gap-1 text-xs bg-sky-600 hover:bg-sky-500 text-white font-medium px-2.5 py-1 rounded transition">
+          <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+          <span>W3C Ledger</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dynamic Cockpit -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Global Macro & Warsh Sovereign Stress Console -->
+    <section class="glass-panel rounded-xl p-5 shadow-2xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-sky-400"></i>
+            <h2 class="text-lg font-bold text-white tracking-wide">Macro Sovereign Floor & Ecosystem Stress Console</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Dynamically propagate discount rates, energy input costs, capex velocity, and regulatory frictions across the 6-layer stack.</p>
+        </div>
+
+        <!-- Stress Scenario Quick-Presets -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Presets:</span>
+          <button onclick="applyPreset('warshBaseline')" class="preset-btn px-2.5 py-1 text-xs font-medium rounded border border-sky-500/40 bg-sky-950/40 text-sky-300 hover:bg-sky-900/50 transition">
+            Q3 '26 Warsh Base
+          </button>
+          <button onclick="applyPreset('stagflationShock')" class="preset-btn px-2.5 py-1 text-xs font-medium rounded border border-rose-500/40 bg-rose-950/40 text-rose-300 hover:bg-rose-900/50 transition">
+            Stagflation Crisis ($R_f$ 5.8%)
+          </button>
+          <button onclick="applyPreset('capexCliffFreeze')" class="preset-btn px-2.5 py-1 text-xs font-medium rounded border border-amber-500/40 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 transition">
+            Hyperscale Capex Retrenchment
+          </button>
+          <button onclick="applyPreset('techGoldilocks')" class="preset-btn px-2.5 py-1 text-xs font-medium rounded border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50 transition">
+            Dovish Soft-Landing
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Model Sliders Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+        
+        <!-- Slider 1: US 10-Year Sovereign Floor -->
+        <div class="bg-slate-900/90 rounded-lg p-3.5 border border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+              <span>US 10Y Floor ($R_f$)</span>
+              <span class="text-[10px] text-sky-400 font-mono" id="val-rf">4.792%</span>
+            </label>
+            <span class="text-[10px] text-slate-500">Benchmark Floor</span>
+          </div>
+          <input type="range" id="input-rf" min="3.50" max="6.50" step="0.02" value="4.792" class="w-full">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>3.50%</span>
+            <span class="text-sky-400">Warsh 4.792%</span>
+            <span>6.50%</span>
+          </div>
+        </div>
+
+        <!-- Slider 2: Equity Risk Premium -->
+        <div class="bg-slate-900/90 rounded-lg p-3.5 border border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+              <span>Equity Risk Premium</span>
+              <span class="text-[10px] text-sky-400 font-mono" id="val-erp">5.25%</span>
+            </label>
+            <span class="text-[10px] text-slate-500">Macro Volatility</span>
+          </div>
+          <input type="range" id="input-erp" min="4.00" max="7.00" step="0.05" value="5.25" class="w-full">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>4.00%</span>
+            <span class="text-sky-400">5.25%</span>
+            <span>7.00%</span>
+          </div>
+        </div>
+
+        <!-- Slider 3: 2026 Hyperscale Capex Multiplier -->
+        <div class="bg-slate-900/90 rounded-lg p-3.5 border border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+              <span>Hyperscale Capex Rate</span>
+              <span class="text-[10px] text-emerald-400 font-mono" id="val-capex">$790B (+64%)</span>
+            </label>
+            <span class="text-[10px] text-slate-500">2026 Commitment</span>
+          </div>
+          <input type="range" id="input-capex" min="450" max="1100" step="10" value="790" class="w-full">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>$450B (-43%)</span>
+            <span class="text-emerald-400">Base $790B</span>
+            <span>$1,100B</span>
+          </div>
+        </div>
+
+        <!-- Slider 4: SR 26-2 Governance Drag / Seat Churn -->
+        <div class="bg-slate-900/90 rounded-lg p-3.5 border border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+              <span>SR 26-2 Adoption Drag</span>
+              <span class="text-[10px] text-amber-400 font-mono" id="val-sr26">42.5% Active</span>
+            </label>
+            <span class="text-[10px] text-slate-500">Copilot / Agentic MRM</span>
+          </div>
+          <input type="range" id="input-sr26" min="20.0" max="85.0" step="2.5" value="42.5" class="w-full">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>20% (High Friction)</span>
+            <span class="text-amber-400">42.5%</span>
+            <span>85% (Frictionless)</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Secondary Lever Strip -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-800/80 text-xs">
+        <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded border border-slate-800">
+          <span class="text-slate-400">Brent Energy Baseline:</span>
+          <div class="flex items-center gap-2">
+            <input type="range" id="input-brent" min="60" max="130" step="1" value="88" class="w-24">
+            <span id="val-brent-slider" class="font-mono text-rose-400 w-16 text-right">$88/bbl</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded border border-slate-800">
+          <span class="text-slate-400">TSMC Geopolitical Spread:</span>
+          <div class="flex items-center gap-2">
+            <input type="range" id="input-tsm-spread" min="50" max="500" step="25" value="200" class="w-24">
+            <span id="val-tsm-spread" class="font-mono text-amber-400 w-16 text-right">+200 bps</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded border border-slate-800">
+          <span class="text-slate-400">GPU Hardware Life (Depreciation):</span>
+          <select id="select-depreciation" class="bg-slate-900 text-slate-200 rounded px-2 py-1 border border-slate-700 font-mono text-xs focus:outline-none focus:border-sky-500">
+            <option value="5">Standard (5 Years)</option>
+            <option value="4">Architectural Turnover (4 Years)</option>
+            <option value="3" selected>Aggressive Cycle (3 Years)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center space-x-2 border-b border-slate-800 pb-1 overflow-x-auto text-sm font-medium">
+      <button onclick="switchTab('tab-credit-engine')" id="tab-btn-credit" class="tab-btn active px-4 py-2 rounded-t-lg bg-slate-800 text-sky-400 border-t border-l border-r border-slate-700 flex items-center gap-2">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+        <span>Merton Default & Credit Matrix</span>
+      </button>
+      <button onclick="switchTab('tab-crossover')" id="tab-btn-crossover" class="tab-btn px-4 py-2 rounded-t-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 flex items-center gap-2">
+        <i data-lucide="trending-down" class="w-4 h-4"></i>
+        <span>Hyperscale Capex Cliff (Crossover)</span>
+      </button>
+      <button onclick="switchTab('tab-valuation-engine')" id="tab-btn-valuation" class="tab-btn px-4 py-2 rounded-t-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 flex items-center gap-2">
+        <i data-lucide="calculator" class="w-4 h-4"></i>
+        <span>Cap Stack Valuation & Tear Sheets</span>
+      </button>
+      <button onclick="switchTab('tab-taxonomy-flow')" id="tab-btn-taxonomy" class="tab-btn px-4 py-2 rounded-t-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 flex items-center gap-2">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+        <span>Ecosystem Chokepoints & Packaging</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: Merton Structural Credit & Forward PD Matrix -->
+    <div id="tab-credit-engine" class="tab-content space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: The Full Capital Stack Credit Matrix Table -->
+        <div class="lg:col-span-2 glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>Merton Structural Credit Risk & Default Transmission Matrix</span>
+                <span class="text-xs px-2 py-0.5 rounded bg-sky-900/50 text-sky-400 border border-sky-700">1-Year Horizon</span>
+              </h3>
+              <p class="text-xs text-slate-400">Equity modeled as a European Call option $E = V\mathcal{N}(d_1) - De^{-rT}\mathcal{N}(d_2)$ on total enterprise assets.</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400">Merton Barrier: $D = \text{ST Debt} + 0.5 \times \text{LT Debt}$</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Credit Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900/80 text-slate-300 font-semibold uppercase tracking-wider border-b border-slate-700">
+                <tr>
+                  <th class="py-3 px-3">Entity / Ticker</th>
+                  <th class="py-3 px-2">Layer</th>
+                  <th class="py-3 px-2 text-right">Implied $V$</th>
+                  <th class="py-3 px-2 text-right">Barrier $D$</th>
+                  <th class="py-3 px-2 text-right">Asset Vol ($\sigma_V$)</th>
+                  <th class="py-3 px-2 text-right">Distance to Default ($DD$)</th>
+                  <th class="py-3 px-2 text-right">1Y Implied $PD$</th>
+                  <th class="py-3 px-2 text-center">Rating</th>
+                </tr>
+              </thead>
+              <tbody id="merton-table-body" class="divide-y divide-slate-800 financial-num">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mathematical Methodology Box -->
+          <div class="bg-slate-950/70 p-3.5 rounded-lg border border-slate-800/80 text-xs space-y-1.5">
+            <div class="font-semibold text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="code" class="w-3.5 h-3.5 text-sky-400"></i>
+              <span>Structural Credit Derivation ($DD$ Engine)</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-400">
+              <div id="katex-merton-formula" class="overflow-x-auto py-1"></div>
+              <div class="text-[11px] leading-relaxed">
+                <span class="text-sky-400 font-semibold">Second Line Risk Control:</span> Under the 4.792% sovereign floor, debt refinancing costs increase by 180–240 bps. While mega-cap solvency remains intact, Broadcom (AVGO) carries elevated post-merger integration debt, driving a higher 1Y $PD$ sensitivity if hyperscaler capex contracts.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Merton Interactive Distance-to-Default Visualizer -->
+        <div class="glass-panel rounded-xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+              <span>Asset Value vs. Default Barrier ($D$)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Asset distribution $\ln(V_T) \sim \mathcal{N}(\dots)$ vs. insolvency barrier.</p>
+          </div>
+
+          <!-- Chart Canvas -->
+          <div class="relative w-full h-56">
+            <canvas id="chart-merton-curve"></canvas>
+          </div>
+
+          <!-- Active Selection Summary -->
+          <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800 text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Focused Entity:</span>
+              <select id="select-merton-entity" onchange="updateMertonDistributionChart()" class="bg-slate-800 text-sky-400 font-bold px-2 py-0.5 rounded border border-slate-700">
+                <option value="NVDA">NVDA (Layer 1 Silicon)</option>
+                <option value="TSM">TSM (Layer 1 Foundry)</option>
+                <option value="MSFT">MSFT (Layer 3 Utility)</option>
+                <option value="ASML">ASML (Layer 0 Lithography)</option>
+                <option value="AVGO" selected>AVGO (Layer 2 Networking)</option>
+              </select>
+            </div>
+            <div class="flex justify-between pt-1">
+              <span class="text-slate-400">Probability of Default ($PD$):</span>
+              <span id="stat-merton-pd" class="font-mono font-bold text-rose-400">0.65% (65 bps)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Default Buffer Margin:</span>
+              <span id="stat-merton-buffer" class="font-mono text-slate-200">$485 Billion (+124%)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: Hyperscale Capex Cliff & Cash Flow Crossover -->
+    <div id="tab-crossover" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left 2 Cols: Cash Flow Crossover Multi-Year Chart -->
+        <div class="lg:col-span-2 glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>The Hyperscaler Cash-Flow Crossover Point (2023 - 2028E)</span>
+                <span class="text-xs px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Aggregate Big 5</span>
+              </h3>
+              <p class="text-xs text-slate-400">Trajectory of Aggregate Operating Cash Flow vs. Infrastructure Capex (MSFT, AMZN, GOOGL, META, ORCL).</p>
+            </div>
+            <div class="text-right">
+              <span id="badge-crossover-status" class="text-xs px-2.5 py-1 rounded-full font-bold bg-rose-900/60 text-rose-300 border border-rose-700">
+                ACTIVE DEFICIT IN Q3 2026
+              </span>
+            </div>
+          </div>
+
+          <!-- Capex vs OCF Chart -->
+          <div class="relative w-full h-80">
+            <canvas id="chart-crossover-trajectory"></canvas>
+          </div>
+
+          <!-- Sensitivity Metrics Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+            <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[11px]">2026E Aggregate Capex</div>
+              <div id="metric-agg-capex" class="text-sm sm:text-base font-bold text-rose-400 financial-num mt-0.5">$790 Billion</div>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[11px]">2026E Operating Cash Flow</div>
+              <div id="metric-agg-ocf" class="text-sm sm:text-base font-bold text-emerald-400 financial-num mt-0.5">$720 Billion</div>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[11px]">Aggregate Free Cash Flow</div>
+              <div id="metric-agg-fcf" class="text-sm sm:text-base font-bold text-rose-500 financial-num mt-0.5">-$70.0 Billion</div>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[11px]">Incremental Debt Ratio</div>
+              <div id="metric-agg-debt-ratio" class="text-sm sm:text-base font-bold text-amber-400 financial-num mt-0.5">34.2% of Capex</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Hyperscaler Crossover Breakdown by Entity -->
+        <div class="glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="clock-alert" class="w-4 h-4 text-amber-400"></i>
+              <span>Crossover Windows by Entity</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Date when quarterly Capex strictly eclipses organic cash generation.</p>
+          </div>
+
+          <div class="space-y-3" id="crossover-entity-list">
+            <!-- Populated via JavaScript -->
+          </div>
+
+          <!-- Structured Financing Note -->
+          <div class="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-[11px] leading-relaxed text-slate-400 space-y-1">
+            <span class="font-bold text-sky-400 uppercase tracking-wider block">Balance Sheet Transmission Channel:</span>
+            To preserve stated FCF, hyperscalers have moved over $140B into off-balance-sheet SPVs, project debt, and residual value guarantees on GPU compute clusters. If GPU economic lifetimes shorten to 3 years, accelerated write-downs will hit GAAP net income across 2027.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: Cap Stack Valuation & Tear Sheets -->
+    <div id="tab-valuation-engine" class="tab-content hidden space-y-6">
+      
+      <!-- Top Row: Titan Selection Carousel -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="titan-selector-grid">
+        <!-- Generated by JS -->
+      </div>
+
+      <!-- Main Detailed Tear Sheet Panel -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 1 Col: Entity Underwriting Diagnostics -->
+        <div class="glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <span id="ts-ticker" class="text-2xl font-black text-white font-mono">NVDA</span>
+              <span id="ts-name" class="text-xs text-slate-400 block">NVIDIA Corporation</span>
+            </div>
+            <div class="text-right">
+              <span id="ts-layer-badge" class="text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-400 border border-sky-800 font-bold">
+                Layer 1: Silicon
+              </span>
+              <span id="ts-rating" class="text-xs font-mono font-bold text-emerald-400 block mt-1">AAA Implied</span>
+            </div>
+          </div>
+
+          <!-- Fundamental Drivers Grid -->
+          <div class="space-y-2 text-xs financial-num">
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Current Spot Price (Q3 '26):</span>
+              <span id="ts-spot" class="font-bold text-slate-200">$158.20</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Sensitized Target Price:</span>
+              <span id="ts-target" class="font-bold text-emerald-400 text-sm">$185.00</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Modeled Upside / Downside:</span>
+              <span id="ts-spread-pct" class="font-bold text-emerald-400">+16.9%</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Risk-Adjusted WACC:</span>
+              <span id="ts-wacc" class="font-bold text-sky-400">9.80%</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Terminal Growth Rate ($g$):</span>
+              <span id="ts-terminal-g" class="font-bold text-slate-300">4.00%</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Base NTM Free Cash Flow:</span>
+              <span id="ts-fcf" class="font-bold text-slate-200">$68.0 Billion</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-850">
+              <span class="text-slate-400">Implied Target Enterprise Value:</span>
+              <span id="ts-ev" class="font-bold text-slate-100">$4.20 Trillion</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-400">Merton Distance-to-Default:</span>
+              <span id="ts-merton-dd" class="font-bold text-emerald-400">12.2σ (0.00% 1Y PD)</span>
+            </div>
+          </div>
+
+          <!-- Second Line Underwriting Thesis Commentary -->
+          <div class="bg-slate-950/70 p-3.5 rounded-lg border border-slate-800 text-xs text-slate-300 leading-relaxed">
+            <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider block mb-1">Underwriting Verdict:</span>
+            <p id="ts-commentary">
+              Dominates datacenter compute via CUDA, but gross margins face compression from 75% to 71% due to TSMC wafer surcharges and packaging complexity on Rubin dual-die configurations.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right 2 Cols: Interactive Valuation Matrix (WACC vs Terminal Growth) -->
+        <div class="lg:col-span-2 glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>Enterprise Valuation Sensitivity Matrix</span>
+                <span class="text-xs px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800">Dynamic Discounting</span>
+              </h3>
+              <p class="text-xs text-slate-400">Sensitized Enterprise Value ($ Trillions / Billions) under shifting WACC vs. Long-Run Growth ($g$).</p>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">
+              Formula: $EV = \frac{\text{FCF} \times (1+g)}{\text{WACC} - g}$
+            </div>
+          </div>
+
+          <!-- Sensitivity Heatmap Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-center text-xs border border-slate-800 rounded-lg overflow-hidden">
+              <thead class="bg-slate-900 text-slate-300 font-mono font-semibold">
+                <tr id="matrix-header-row">
+                  <!-- Dynamic headers for WACC -->
+                </tr>
+              </thead>
+              <tbody id="matrix-body" class="divide-y divide-slate-800 font-mono">
+                <!-- Dynamic rows for terminal g -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Cash Flow Reconciliation Bridge Notice -->
+          <div class="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-xs text-slate-400 flex items-start gap-2.5">
+            <i data-lucide="info" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
+            <div>
+              <span class="text-slate-200 font-medium">Capex Accounting Reconciliation:</span>
+              Reported Free Cash Flow is adjusted to incorporate capitalized software R&D, cloud datacenter lease commitments, and customer advance chip payments. Valuation applies a strict floor penalty when WACC expands above 10.0%.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 4: Ecosystem Taxonomy & Physical Bottlenecks -->
+    <div id="tab-taxonomy-flow" class="tab-content hidden space-y-6">
+      
+      <!-- Interactive Packaging & Physical Scaling Visualizer -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Rubin Ultra Packaging Redesign Breakdown -->
+        <div class="glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="cpu" class="w-4 h-4 text-amber-400"></i>
+                <span>Advanced Packaging Yield Bottleneck (Rubin Ultra)</span>
+              </h3>
+              <p class="text-xs text-slate-400">Thermodynamic & CTE Warpage Mechanics: Quad-Die vs. Dual-Die Redesign.</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono font-bold">
+              CoWoS-L Yield Limit
+            </span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-rose-950/30 p-3 rounded-lg border border-rose-900/60">
+                <div class="text-rose-400 font-bold mb-1 flex items-center gap-1">
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                  <span>Quad-Die (Canceled)</span>
+                </div>
+                <ul class="text-slate-300 space-y-1 text-[11px] list-disc list-inside">
+                  <li>Footprint: ~7.5x reticle limit</li>
+                  <li>16x HBM4E stacks</li>
+                  <li>Severe reflow warpage (CTE mismatch: Si 2.6 vs Organic 15.0)</li>
+                  <li>Microbump shear during 240°C reflow</li>
+                </ul>
+              </div>
+
+              <div class="bg-emerald-950/30 p-3 rounded-lg border border-emerald-900/60">
+                <div class="text-emerald-400 font-bold mb-1 flex items-center gap-1">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                  <span>Dual-Die (Revised Base)</span>
+                </div>
+                <ul class="text-slate-300 space-y-1 text-[11px] list-disc list-inside">
+                  <li>Footprint: ~3.5x to 4.0x reticle limit</li>
+                  <li>8x HBM4 stacks (High Yield)</li>
+                  <li>System scaling shifted to 2+2 board topology</li>
+                  <li>Surges demand for Layer 2 Networking (AVGO)</li>
+                </ul>
+              </div>
+            </div>
+
+            <p class="text-slate-400 text-xs leading-relaxed">
+              <strong class="text-slate-200">Packaging Transition Horizon:</strong> TSMC's glass-substrate CoPoS (Chip-on-Panel-on-Substrate) platform eliminates organic bow, but volume delivery is deferred to 2028+. In the interim, cluster compute density cannot double at the socket level—forcing scale-out fabrics to absorb the latency penalty.
+            </p>
+          </div>
+        </div>
+
+        <!-- Networking Standard Shift: InfiniBand vs UEC 1.0 -->
+        <div class="glass-panel rounded-xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="network" class="w-4 h-4 text-sky-400"></i>
+                <span>Layer 2 Networking Fabric Transition</span>
+              </h3>
+              <p class="text-xs text-slate-400">Ultra Ethernet Consortium (UEC 1.0) vs. Proprietary InfiniBand.</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-300 border border-sky-800 font-mono font-bold">
+              102.4 Tbps Switch Era
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+              <span class="text-slate-400 font-semibold block mb-1">Legacy InfiniBand</span>
+              <ul class="space-y-1 text-[11px] text-slate-400 list-disc list-inside">
+                <li>Proprietary hardware lock-in</li>
+                <li>Credit-based link flow control</li>
+                <li>Head-of-line buffer bloat</li>
+                <li>Elevated unit pricing premium</li>
+              </ul>
+            </div>
+            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+              <span class="text-sky-400 font-semibold block mb-1">UEC 1.0 Specification</span>
+              <ul class="space-y-1 text-[11px] text-slate-300 list-disc list-inside">
+                <li>Open-standard Ethernet fabric</li>
+                <li>Packet spraying across all ECMP paths</li>
+                <li>Sub-RTT Congestion Notification (CNP)</li>
+                <li>AVGO Tomahawk 6 & Thor Ultra NICs</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 text-xs text-slate-400">
+            <span class="font-bold text-slate-200">Economic Rent Transmission:</span> With socket-level compute constrained, hyperscalers spend an incremental 14% to 18% of cluster capex on Ethernet switching infrastructure and optical transceivers.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Complete 6-Layer Stack Hierarchy Matrix -->
+      <div class="glass-panel rounded-xl p-5 shadow-xl space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+            <span>Institutional Stack Taxonomy & Economic Rent Extraction Profile</span>
+          </h3>
+          <p class="text-xs text-slate-400">Structural ranking of pricing power, moat defensibility, and return on invested capital across the AI Stack.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 text-slate-300 font-semibold uppercase tracking-wider border-b border-slate-700">
+              <tr>
+                <th class="py-3 px-3">Stack Layer</th>
+                <th class="py-3 px-3">Archetype</th>
+                <th class="py-3 px-3">Dominant Entities</th>
+                <th class="py-3 px-3">Pricing Leverage</th>
+                <th class="py-3 px-3">2026–2027 Economic Rent Accrual Mechanics</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300 leading-relaxed">
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-sky-400">Layer 0</td>
+                <td class="py-3 px-3 font-medium text-white">Lithography & Primitives</td>
+                <td class="py-3 px-3 font-mono">ASML, AMAT, LRCX</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-semibold">Absolute / Monopoly</span></td>
+                <td class="py-3 px-3 text-slate-400">Sole global supplier of High-NA EUV lithography (€380M/tool). Multi-year order backlogs (€38.8B) insulate equipment revenues from downstream software monetization hiccups.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-sky-400">Layer 1</td>
+                <td class="py-3 px-3 font-medium text-white">Silicon Forges & Accelerators</td>
+                <td class="py-3 px-3 font-mono">TSMC, NVDA, AMD</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-semibold">Apex / Chokepoint</span></td>
+                <td class="py-3 px-3 text-slate-400">TSMC secures 5–10% node price hikes for 2027 runs. NVDA dominates training, but gross margins face pressure from packaging complexity and rising HBM memory costs.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-sky-400">Layer 2</td>
+                <td class="py-3 px-3 font-medium text-white">Networking & Interconnects</td>
+                <td class="py-3 px-3 font-mono">AVGO, MRVL, SK Hynix, MU</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800 font-semibold">High / Expanding</span></td>
+                <td class="py-3 px-3 text-slate-400">Scale-out cluster networking is the core bottleneck. Tomahawk 6 (102.4T) and custom ASICs (Google TPU, Meta MTIA) capture expanding margin share as hyperscalers diversify away from mono-GPU reliance.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-amber-400">Layer 3</td>
+                <td class="py-3 px-3 font-medium text-white">Hyperscale Compute Utilities</td>
+                <td class="py-3 px-3 font-mono">MSFT, AMZN, GOOGL, ORCL</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-semibold">Moderate (Squeeze)</span></td>
+                <td class="py-3 px-3 text-slate-400">Capital expenditures ($775B–$800B) collide with operating cash flow, turning aggregate FCF negative and requiring increased reliance on balance sheet debt and structured SPVs.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-rose-400">Layer 4</td>
+                <td class="py-3 px-3 font-medium text-white">Foundation Model Weights</td>
+                <td class="py-3 px-3 font-mono">OpenAI, Anthropic, Meta</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 font-semibold">Negative / Subsidized</span></td>
+                <td class="py-3 px-3 text-slate-400">Capital-intensive training runs and commodity token pricing. Heavy dependence on equity infusions and compute subsidies provided by Layer 3 hyperscalers.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/50">
+                <td class="py-3 px-3 font-bold text-rose-400">Layer 5</td>
+                <td class="py-3 px-3 font-medium text-white">Application SaaS Proxies</td>
+                <td class="py-3 px-3 font-mono">CRM, NOW, PLTR</td>
+                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 font-semibold">Low / Vulnerable</span></td>
+                <td class="py-3 px-3 text-slate-400">Enterprise buyers demand measurable ROI. Copilot seat activation stalls at 30%–55% as compliance teams enforce SR 26-2 model validation controls on automated workflows.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- W3C PROV-O Ledger Modal (Standalone dialog) -->
+    <div id="modal-prov" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="glass-panel w-full max-w-2xl rounded-xl p-5 shadow-2xl border border-slate-700 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-sky-400"></i>
+            <h3 class="text-base font-bold text-white">W3C PROV-O Institutional Audit Record</h3>
+          </div>
+          <button onclick="closeModal('modal-prov')" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto max-h-96">
+          <pre id="prov-json-content"></pre>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-xs text-slate-500">Hash: SHA256-ADAM-WARSH-31.009</span>
+          <button onclick="copyAuditRecord()" id="btn-copy-audit" class="px-3 py-1.5 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="btn-copy-audit-text">Copy JSON Record</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="border-t border-terminal-border py-4 px-6 text-center text-xs text-slate-500 glass-panel">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Adam v31.0 Warsh Model Architecture</span>
+        <span class="text-slate-600">|</span>
+        <span>Federal Reserve SR 26-2 (AI Model Risk) Compliant</span>
+      </div>
+      <div>
+        Underwriting Mandates: Basel III ERBA • BCBS 239 Risk Aggregation • Sovereign Floor Mark-to-Market
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================================
+       INSTITUTIONAL QUANTITATIVE CORE: ADAM v31.0 WARSH ARCHITECTURE
+       ========================================================================= */
+
+    // Macro State
+    const state = {
+      rf: 4.792,         // US 10-Year Sovereign Floor (%)
+      erp: 5.25,         // Equity Risk Premium (%)
+      capexRate: 790,    // Big 5 2026 Capex ($ Billions)
+      sr26Adoption: 42.5,// Enterprise active seat retention (%)
+      brent: 88,         // Crude benchmark ($/bbl)
+      tsmSpread: 200,    // Geopolitical basis points
+      depreciationYears: 3, // GPU asset life
+      selectedTitan: 'NVDA', // Active tear sheet
+      selectedMerton: 'AVGO',// Active Merton curve focus
+    };
+
+    // Preset Scenarios
+    const presets = {
+      warshBaseline: {
+        rf: 4.792, erp: 5.25, capexRate: 790, sr26Adoption: 42.5, brent: 88, tsmSpread: 200, depreciationYears: 3
+      },
+      stagflationShock: {
+        rf: 5.800, erp: 6.25, capexRate: 710, sr26Adoption: 30.0, brent: 115, tsmSpread: 350, depreciationYears: 3
+      },
+      capexCliffFreeze: {
+        rf: 4.950, erp: 5.75, capexRate: 520, sr26Adoption: 35.0, brent: 82, tsmSpread: 200, depreciationYears: 4
+      },
+      techGoldilocks: {
+        rf: 3.750, erp: 4.25, capexRate: 950, sr26Adoption: 68.0, brent: 68, tsmSpread: 100, depreciationYears: 5
+      }
+    };
+
+    // Titan Fundamental Underwriting Database (Q3 2026 Mark-to-Market)
+    const titanData = {
+      NVDA: {
+        name: "NVIDIA Corporation",
+        layer: "Layer 1: Silicon Apex",
+        spot: 158.20,
+        sharesOut: 24.5, // Billion shares
+        baseWacc: 9.80,
+        beta: 1.65,
+        baseG: 4.00,
+        baseFcf: 68.0,   // $B
+        debtShort: 4.5,  // $B
+        debtLong: 10.5,  // $B
+        cash: 38.0,      // $B
+        assetVol: 0.284, // 28.4%
+        assetDrift: 0.12,
+        rating: "AAA",
+        commentary: "Dominates high-performance logic with Blackwell and Vera Rubin. However, gross margins face compression toward 71%-72% from TSMC sub-3nm price hikes and CoWoS-L packaging complexities, shifting Rubin Ultra from quad-die to dual-die."
+      },
+      TSM: {
+        name: "Taiwan Semiconductor Mfg.",
+        layer: "Layer 1: Advanced Foundry",
+        spot: 210.50,
+        sharesOut: 5.18, // ADR units
+        baseWacc: 11.20, // includes 200 bps geopolitical spread
+        beta: 1.25,
+        baseG: 3.50,
+        baseFcf: 38.0,   // $B (deducted for $60B+ Capex)
+        debtShort: 12.0,
+        debtLong: 28.0,
+        cash: 52.0,
+        assetVol: 0.221,
+        assetDrift: 0.10,
+        rating: "AA+",
+        commentary: "Pure-play monopoly over leading-edge sub-3nm nodes and CoWoS packaging. Enforcing 5%-10% price hikes for 2027 deliveries. Ramping N2 (2nm) to 100k wpm by late 2026. Cap constrained by sovereign Taiwan utility and water quotas."
+      },
+      MSFT: {
+        name: "Microsoft Corporation",
+        layer: "Layer 3: Compute Utility",
+        spot: 475.00,
+        sharesOut: 7.43,
+        baseWacc: 8.50,
+        beta: 0.95,
+        baseG: 2.50,
+        baseFcf: 75.0,   // $B
+        debtShort: 15.0,
+        debtLong: 65.0,
+        cash: 85.0,
+        assetVol: 0.155,
+        assetDrift: 0.08,
+        rating: "AAA",
+        commentary: "Hyperscale compute utility facing heavy Capex acceleration ($41B/quarter). Enterprise Copilot active seat activation has stabilized at 30%-55% under SR 26-2 model validation requirements. Recommend underweight / source of funds."
+      },
+      ASML: {
+        name: "ASML Holding N.V.",
+        layer: "Layer 0: Lithography Moat",
+        spot: 1150.00,
+        sharesOut: 0.395,
+        baseWacc: 9.00,
+        beta: 1.15,
+        baseG: 4.00,
+        baseFcf: 11.0,   // $B
+        debtShort: 2.2,
+        debtLong: 4.8,
+        cash: 8.5,
+        assetVol: 0.263,
+        assetDrift: 0.11,
+        rating: "AA",
+        commentary: "Absolute commercial monopoly on EUV and High-NA (€380M/unit). Order book of €38.8B insulates cash generation from downstream enterprise application deployment friction through 2028-2030."
+      },
+      AVGO: {
+        name: "Broadcom Inc.",
+        layer: "Layer 2: Networking & ASIC",
+        spot: 1820.00,
+        sharesOut: 0.465,
+        baseWacc: 9.50,
+        beta: 1.30,
+        baseG: 2.50,
+        baseFcf: 22.0,   // $B
+        debtShort: 14.5,
+        debtLong: 62.0,  // Post-VMware acquisition debt
+        cash: 12.0,
+        assetVol: 0.235, // Recalibrated for VMware enterprise cash flow stability
+        assetDrift: 0.09,
+        rating: "BBB+",
+        commentary: "Apex beneficiary of Ethernet cluster migration (Tomahawk 6, 102.4T) and custom AI accelerators (Google TPU v6/v7, Meta MTIA). Carries higher post-merger integration debt, leaving Merton distance-to-default tighter under high sovereign refi floors."
+      }
+    };
+
+    // Standard Normal Cumulative Distribution Function Approximation
+    function normalCDF(x) {
+      const a1 =  0.254829592;
+      const a2 = -0.284496736;
+      const a3 =  1.421413741;
+      const a4 = -1.453152027;
+      const a5 =  1.061405429;
+      const p  =  0.3275911;
+
+      const sign = x < 0 ? -1 : 1;
+      const absX = Math.abs(x) / Math.sqrt(2.0);
+
+      const t = 1.0 / (1.0 + p * absX);
+      const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
+
+      return 0.5 * (1.0 + sign * y);
+    }
+
+    // Normal Probability Density Function
+    function normalPDF(x) {
+      return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x);
+    }
+
+    // Dynamic CAPM & WACC Engine
+    function calculateEntityWacc(ticker) {
+      const data = titanData[ticker];
+      let baseCostOfEquity = (state.rf / 100) + data.beta * (state.erp / 100);
+      
+      // TSM Geopolitical adder
+      if (ticker === 'TSM') {
+        baseCostOfEquity += (state.tsmSpread / 10000);
+      }
+      
+      // Debt sensitivity under Warsh floor
+      const costOfDebt = (state.rf / 100) + (ticker === 'AVGO' ? 0.019 : 0.0075);
+      const taxRate = 0.18;
+      const afterTaxDebt = costOfDebt * (1 - taxRate);
+
+      const totalDebt = data.debtShort + data.debtLong;
+      const marketEquity = data.spot * data.sharesOut;
+      const enterpriseVal = marketEquity + totalDebt - data.cash;
+
+      const weightEquity = marketEquity / (marketEquity + totalDebt);
+      const weightDebt = totalDebt / (marketEquity + totalDebt);
+
+      const wacc = (weightEquity * baseCostOfEquity) + (weightDebt * afterTaxDebt);
+      return Math.max(wacc, 0.065); // Hard floor
+    }
+
+    // Sensitized Free Cash Flow Calculation
+    function calculateSensitizedFCF(ticker) {
+      const data = titanData[ticker];
+      let fcf = data.baseFcf;
+
+      // Capex elasticity multipliers
+      const capexRatio = state.capexRate / 790; // 1.0 at baseline
+      const energyDrag = (state.brent - 88) * 0.003; // margin drag from high fuel/power
+
+      if (ticker === 'NVDA') {
+        // NVDA benefits from capex, but loses margins if TSMC hikes node prices
+        fcf = fcf * Math.pow(capexRatio, 0.85) * (1 - energyDrag);
+      } else if (ticker === 'TSM') {
+        // TSMC gets direct wafer volume from capex
+        fcf = fcf * Math.pow(capexRatio, 0.70) * (1 - energyDrag * 0.8);
+      } else if (ticker === 'MSFT') {
+        // Hyperscaler FCF contracts if capex surges!
+        const capexExcess = (state.capexRate - 790) * 0.25; // 25% share of incremental capex
+        fcf = Math.max(fcf - capexExcess, 15.0);
+        // Enterprise seat drag
+        const seatFactor = state.sr26Adoption / 42.5;
+        fcf = fcf * Math.pow(seatFactor, 0.2);
+      } else if (ticker === 'ASML') {
+        fcf = fcf * Math.pow(capexRatio, 0.55);
+      } else if (ticker === 'AVGO') {
+        fcf = fcf * Math.pow(capexRatio, 0.65) * (1 - energyDrag * 0.5);
+      }
+
+      return fcf;
+    }
+
+    // Target Price & Valuation Output
+    function calculateValuation(ticker) {
+      const data = titanData[ticker];
+      const wacc = calculateEntityWacc(ticker);
+      const fcf = calculateSensitizedFCF(ticker);
+      const g = data.baseG / 100;
+
+      // Gordon Growth Terminal Capitalization: EV = FCF * (1+g) / (WACC - g)
+      const denominator = Math.max(wacc - g, 0.012);
+      const impliedEV = (fcf * (1 + g)) / denominator;
+
+      const totalDebt = data.debtShort + data.debtLong;
+      const impliedEquityValue = impliedEV - totalDebt + data.cash;
+      const targetPrice = impliedEquityValue / data.sharesOut;
+
+      return {
+        wacc: wacc * 100,
+        fcf: fcf,
+        ev: impliedEV,
+        targetPrice: targetPrice,
+        upside: ((targetPrice - data.spot) / data.spot) * 100
+      };
+    }
+
+    // Merton Structural Credit Engine
+    function calculateMerton(ticker) {
+      const data = titanData[ticker];
+      const val = calculateValuation(ticker);
+
+      // Default Barrier D = Short Debt + 0.5 * Long Debt
+      const D = data.debtShort + (0.5 * data.debtLong);
+      // Asset Value V = Sensitized Enterprise Value + Cash
+      const V = val.ev + data.cash;
+      const T = 1.0; // 1-year default horizon
+      const sigmaV = data.assetVol;
+      const mu = data.assetDrift + (state.rf / 1000); // Asset drift rate
+
+      // Distance to Default: DD = [ln(V/D) + (mu - 0.5*sigmaV^2)*T] / (sigmaV * sqrt(T))
+      const numerator = Math.log(V / D) + ((mu - 0.5 * Math.pow(sigmaV, 2)) * T);
+      const denominator = sigmaV * Math.sqrt(T);
+      const DD = numerator / denominator;
+
+      // 1-Year Implied Probability of Default
+      const PD = normalCDF(-DD);
+
+      // Implied Credit Rating based on Merton DD
+      let impliedRating = "AAA";
+      if (DD < 3.0) impliedRating = "B / CCC";
+      else if (DD < 4.0) impliedRating = "BB / BB+";
+      else if (DD < 5.0) impliedRating = "BBB";
+      else if (DD < 6.0) impliedRating = "BBB+";
+      else if (DD < 8.0) impliedRating = "A / A+";
+      else if (DD < 10.0) impliedRating = "AA";
+      else impliedRating = "AAA";
+
+      return {
+        V: V,
+        D: D,
+        DD: DD,
+        PD: PD,
+        PD_bps: (PD * 10000).toFixed(2),
+        rating: impliedRating,
+        buffer: V - D,
+        bufferPct: ((V - D) / D) * 100
+      };
+    }
+
+    let chartMertonInstance = null;
+    let chartCrossoverInstance = null;
+
+    // Initialize Chart.js Graphics
+    function initCharts() {
+      // 1. Merton Asset Distribution Chart
+      const ctxMerton = document.getElementById('chart-merton-curve').getContext('2d');
+      chartMertonInstance = new Chart(ctxMerton, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Asset Probability Density f(V)',
+              data: [],
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.15)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => `Asset Valuation: $${items[0].label}B`,
+                label: (item) => `Density: ${item.formattedValue}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: '#1e293b' },
+              ticks: { color: '#64748b', maxTicksLimit: 6, font: { family: 'JetBrains Mono', size: 10 } }
+            },
+            y: {
+              display: false
+            }
+          }
+        }
+      });
+
+      // 2. Hyperscaler Crossover Multi-Year Chart
+      const ctxCrossover = document.getElementById('chart-crossover-trajectory').getContext('2d');
+      chartCrossoverInstance = new Chart(ctxCrossover, {
+        type: 'line',
+        data: {
+          labels: ['2023', '2024', '2025', '2026E (Warsh)', '2027E', '2028E'],
+          datasets: [
+            {
+              label: 'Big 5 Operating Cash Flow ($B)',
+              data: [380, 470, 580, 720, 885, 1080],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.05)',
+              borderWidth: 2.5,
+              tension: 0.3,
+              fill: false
+            },
+            {
+              label: 'Big 5 Infrastructure Capex ($B)',
+              data: [150, 240, 480, 790, 1050, 1320],
+              borderColor: '#f43f5e',
+              backgroundColor: 'rgba(244, 63, 94, 0.1)',
+              borderWidth: 2.5,
+              tension: 0.3,
+              borderDash: [4, 4],
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, boxWidth: 14 }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: '#1e293b' },
+              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } }
+            },
+            y: {
+              grid: { color: '#1e293b' },
+              ticks: {
+                color: '#94a3b8',
+                font: { family: 'JetBrains Mono', size: 11 },
+                callback: (val) => `$${val}B`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Master Update Function
+    function updateWorldModel() {
+      // 1. Update Ticker Labels
+      document.getElementById('ticker-rf').textContent = `${parseFloat(state.rf).toFixed(3)}%`;
+      document.getElementById('ticker-brent').textContent = `$${parseFloat(state.brent).toFixed(2)}/bbl`;
+      document.getElementById('val-rf').textContent = `${parseFloat(state.rf).toFixed(3)}%`;
+      document.getElementById('val-erp').textContent = `${parseFloat(state.erp).toFixed(2)}%`;
+      document.getElementById('val-capex').textContent = `$${state.capexRate}B (${state.capexRate >= 790 ? '+' : ''}${Math.round(((state.capexRate - 480) / 480) * 100)}% YoY)`;
+      document.getElementById('val-sr26').textContent = `${parseFloat(state.sr26Adoption).toFixed(1)}% Active`;
+      document.getElementById('val-brent-slider').textContent = `$${state.brent}/bbl`;
+      document.getElementById('val-tsm-spread').textContent = `+${state.tsmSpread} bps`;
+
+      // 2. Refresh Merton Table
+      const mertonTbody = document.getElementById('merton-table-body');
+      mertonTbody.innerHTML = '';
+
+      const tickers = ['NVDA', 'TSM', 'MSFT', 'ASML', 'AVGO'];
+      tickers.forEach(tk => {
+        const m = calculateMerton(tk);
+        const data = titanData[tk];
+
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-850/60 transition cursor-pointer ${state.selectedMerton === tk ? 'bg-sky-950/30' : ''}`;
+        tr.onclick = () => {
+          state.selectedMerton = tk;
+          document.getElementById('select-merton-entity').value = tk;
+          updateMertonDistributionChart();
+        };
+
+        const ratingColor = m.rating.startsWith('AAA') ? 'text-emerald-400 bg-emerald-950/60 border-emerald-800' :
+                            m.rating.startsWith('AA') ? 'text-teal-300 bg-teal-950/60 border-teal-800' :
+                            m.rating.startsWith('A') ? 'text-sky-300 bg-sky-950/60 border-sky-800' :
+                            'text-amber-400 bg-amber-950/60 border-amber-800';
+
+        const pdFormatted = m.PD < 0.0001 ? '<0.01%' : `${(m.PD * 100).toFixed(2)}%`;
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 font-bold text-white flex items-center gap-1.5">
+            <span>${tk}</span>
+            <span class="text-[10px] text-slate-500 font-normal">(${data.name.split(' ')[0]})</span>
+          </td>
+          <td class="py-3 px-2 text-slate-400 text-[11px]">${data.layer.split(':')[0]}</td>
+          <td class="py-3 px-2 text-right text-slate-200">$${(m.V).toFixed(1)}B</td>
+          <td class="py-3 px-2 text-right text-slate-400">$${(m.D).toFixed(1)}B</td>
+          <td class="py-3 px-2 text-right text-slate-300">${(data.assetVol * 100).toFixed(1)}%</td>
+          <td class="py-3 px-2 text-right font-bold ${m.DD > 8 ? 'text-emerald-400' : m.DD > 5 ? 'text-sky-400' : 'text-amber-400'}">${m.DD.toFixed(1)}σ</td>
+          <td class="py-3 px-2 text-right font-semibold ${m.PD > 0.002 ? 'text-rose-400' : 'text-slate-300'}">${pdFormatted}</td>
+          <td class="py-3 px-2 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${ratingColor}">${m.rating}</span>
+          </td>
+        `;
+        mertonTbody.appendChild(tr);
+      });
+
+      // 3. Update Merton Focus Curve
+      updateMertonDistributionChart();
+
+      // 4. Update Hyperscale Capex Crossover Chart & Diagnostics
+      updateCrossoverModule();
+
+      // 5. Update Titan Tear Sheet & Sensitivity Matrix
+      updateTitanTearSheet();
+
+      // 6. Update Provenance Ledger Content
+      updateProvenanceJSON();
+    }
+
+    function updateMertonDistributionChart() {
+      const tk = document.getElementById('select-merton-entity').value || state.selectedMerton;
+      state.selectedMerton = tk;
+      const m = calculateMerton(tk);
+      const data = titanData[tk];
+
+      document.getElementById('stat-merton-pd').textContent = `${m.PD < 0.0001 ? '<0.001%' : (m.PD * 100).toFixed(2) + '%'} (${m.PD_bps} bps)`;
+      document.getElementById('stat-merton-buffer').textContent = `$${m.buffer.toFixed(1)}B (+${m.bufferPct.toFixed(0)}%)`;
+
+      // Generate distribution data points around V
+      const meanV = m.V;
+      const stdV = m.V * data.assetVol;
+      const points = 50;
+      const minV = Math.max(m.D * 0.5, meanV - 3 * stdV);
+      const maxV = meanV + 3 * stdV;
+      const step = (maxV - minV) / points;
+
+      const labels = [];
+      const densityData = [];
+
+      for (let x = minV; x <= maxV; x += step) {
+        labels.push(Math.round(x));
+        const z = (x - meanV) / stdV;
+        densityData.push(normalPDF(z) / stdV);
+      }
+
+      chartMertonInstance.data.labels = labels;
+      chartMertonInstance.data.datasets[0].data = densityData;
+      chartMertonInstance.update('none');
+    }
+
+    function updateCrossoverModule() {
+      // 2026 Capex scales with slider
+      const capex2026 = state.capexRate;
+      const ocf2026 = 720 * Math.pow(state.sr26Adoption / 42.5, 0.15); // OCF has slight elasticity with enterprise seat uptake
+      const fcf2026 = ocf2026 - capex2026;
+
+      document.getElementById('metric-agg-capex').textContent = `$${capex2026} Billion`;
+      document.getElementById('metric-agg-ocf').textContent = `$${Math.round(ocf2026)} Billion`;
+      
+      const fcfEl = document.getElementById('metric-agg-fcf');
+      fcfEl.textContent = `${fcf2026 >= 0 ? '+' : ''}$${fcf2026.toFixed(1)} Billion`;
+      fcfEl.className = `text-sm sm:text-base font-bold financial-num mt-0.5 ${fcf2026 < 0 ? 'text-rose-500' : 'text-emerald-400'}`;
+
+      const debtRatio = ((capex2026 - ocf2026) > 0 ? (28 + ((capex2026 - ocf2026) / 20)) : 18).toFixed(1);
+      document.getElementById('metric-agg-debt-ratio').textContent = `${debtRatio}% of Capex`;
+
+      const badge = document.getElementById('badge-crossover-status');
+      if (fcf2026 < 0) {
+        badge.textContent = 'ACTIVE CASH-FLOW DEFICIT IN 2026';
+        badge.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-rose-950 text-rose-300 border border-rose-700';
+      } else {
+        badge.textContent = 'SURPLUS BUFFER PRESERVED';
+        badge.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-700';
+      }
+
+      // Update Chart points
+      chartCrossoverInstance.data.datasets[0].data = [380, 470, 580, Math.round(ocf2026), Math.round(ocf2026 * 1.22), Math.round(ocf2026 * 1.48)];
+      chartCrossoverInstance.data.datasets[1].data = [150, 240, 480, capex2026, Math.round(capex2026 * 1.33), Math.round(capex2026 * 1.67)];
+      chartCrossoverInstance.update('none');
+
+      // Update Breakdown by entity list
+      const entityList = document.getElementById('crossover-entity-list');
+      const entities = [
+        { ticker: 'ORCL', name: 'Oracle Corp', date: 'Crossed (FY25)', status: 'Active Deficit', color: 'rose' },
+        { ticker: 'AMZN', name: 'Amazon.com', date: capex2026 > 750 ? 'Active Deficit (Q2 \'26)' : 'Late 2026', status: 'High Capex Drag', color: 'rose' },
+        { ticker: 'GOOGL', name: 'Alphabet Inc', date: capex2026 > 850 ? 'Q4 2026E' : 'Q1 2027E', status: 'Ad Buffer Defensible', color: 'amber' },
+        { ticker: 'META', name: 'Meta Platforms', date: capex2026 > 900 ? 'Mid 2027E' : 'Q3 2027E', status: 'Strong OCF Anchor', color: 'sky' },
+        { ticker: 'MSFT', name: 'Microsoft Corp', date: capex2026 > 820 ? 'Q1 2027E' : 'Q3 2028E', status: 'Enterprise Annuity', color: 'emerald' }
+      ];
+
+      entityList.innerHTML = entities.map(e => `
+        <div class="flex items-center justify-between p-2.5 bg-slate-900/90 rounded border border-slate-800 text-xs">
+          <div>
+            <div class="font-bold text-white flex items-center gap-1.5 font-mono">
+              <span>${e.ticker}</span>
+              <span class="text-[10px] text-slate-400 font-normal">(${e.name})</span>
+            </div>
+            <div class="text-[11px] text-slate-400">Projected Crossover: <span class="text-slate-200 font-medium">${e.date}</span></div>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-${e.color}-950 text-${e.color}-400 border border-${e.color}-800">
+            ${e.status}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function renderTitanSelector() {
+      const grid = document.getElementById('titan-selector-grid');
+      grid.innerHTML = '';
+      const tickers = ['NVDA', 'TSM', 'MSFT', 'ASML', 'AVGO'];
+
+      tickers.forEach(tk => {
+        const d = titanData[tk];
+        const val = calculateValuation(tk);
+        const isSelected = state.selectedTitan === tk;
+
+        const btn = document.createElement('button');
+        btn.className = `p-3 rounded-xl border text-left transition ${
+          isSelected 
+            ? 'bg-sky-950/60 border-sky-500 shadow-lg shadow-sky-950/50' 
+            : 'glass-panel border-slate-800 hover:border-slate-700'
+        }`;
+        btn.onclick = () => {
+          state.selectedTitan = tk;
+          renderTitanSelector();
+          updateTitanTearSheet();
+        };
+
+        btn.innerHTML = `
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-black font-mono text-sm ${isSelected ? 'text-sky-400' : 'text-white'}">${tk}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded ${val.upside >= 0 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'} font-mono font-bold">
+              ${val.upside >= 0 ? '+' : ''}${val.upside.toFixed(0)}%
+            </span>
+          </div>
+          <div class="text-[11px] text-slate-400 truncate">${d.name}</div>
+          <div class="text-xs font-mono font-bold text-slate-200 mt-1">$${val.targetPrice.toFixed(0)} <span class="text-[10px] text-slate-500 font-normal">tgt</span></div>
+        `;
+        grid.appendChild(btn);
+      });
+    }
+
+    function updateTitanTearSheet() {
+      const tk = state.selectedTitan;
+      const d = titanData[tk];
+      const val = calculateValuation(tk);
+      const m = calculateMerton(tk);
+
+      document.getElementById('ts-ticker').textContent = tk;
+      document.getElementById('ts-name').textContent = d.name;
+      document.getElementById('ts-layer-badge').textContent = d.layer;
+      document.getElementById('ts-rating').textContent = `${m.rating} Implied Credit`;
+      document.getElementById('ts-spot').textContent = `$${d.spot.toFixed(2)}`;
+      document.getElementById('ts-target').textContent = `$${val.targetPrice.toFixed(2)}`;
+
+      const spreadEl = document.getElementById('ts-spread-pct');
+      spreadEl.textContent = `${val.upside >= 0 ? '+' : ''}${val.upside.toFixed(1)}%`;
+      spreadEl.className = `font-bold ${val.upside >= 0 ? 'text-emerald-400' : 'text-rose-400'} text-sm`;
+
+      document.getElementById('ts-wacc').textContent = `${val.wacc.toFixed(2)}%`;
+      document.getElementById('ts-terminal-g').textContent = `${d.baseG.toFixed(2)}%`;
+      document.getElementById('ts-fcf').textContent = `$${val.fcf.toFixed(1)} Billion`;
+      
+      const evFormatted = val.ev >= 1000 ? `$${(val.ev / 1000).toFixed(2)} Trillion` : `$${val.ev.toFixed(0)} Billion`;
+      document.getElementById('ts-ev').textContent = evFormatted;
+      document.getElementById('ts-merton-dd').textContent = `${m.DD.toFixed(1)}σ (${m.PD < 0.0001 ? '<0.01%' : (m.PD * 100).toFixed(2) + '%'} 1Y PD)`;
+      document.getElementById('ts-commentary').textContent = d.commentary;
+
+      // Populate Sensitivity Heatmap Table (WACC vs Terminal g)
+      renderSensitivityMatrix(tk, val.wacc, d.baseG, val.fcf);
+    }
+
+    function renderSensitivityMatrix(ticker, currentWacc, currentG, currentFcf) {
+      const headerRow = document.getElementById('matrix-header-row');
+      const matrixBody = document.getElementById('matrix-body');
+
+      // Define columns: 4 WACC offsets around current WACC
+      const waccSteps = [-1.0, -0.5, 0.0, 0.5, 1.0];
+      const gSteps = [-1.0, -0.5, 0.0, 0.5, 1.0];
+
+      headerRow.innerHTML = `<th class="py-2.5 px-2 text-slate-400 text-left bg-slate-950 font-normal">Terminal $g$ \\ WACC</th>`;
+      waccSteps.forEach(offset => {
+        const w = currentWacc + offset;
+        headerRow.innerHTML += `<th class="py-2.5 px-2 ${offset === 0 ? 'text-sky-400 bg-sky-950/40 font-bold border-b border-sky-500' : 'text-slate-300'}">${w.toFixed(1)}%</th>`;
+      });
+
+      matrixBody.innerHTML = '';
+      gSteps.forEach(gOffset => {
+        const g = currentG + gOffset;
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-850/50';
+
+        let rowHtml = `<td class="py-2 px-2 text-left text-slate-400 font-semibold bg-slate-950/70">${g.toFixed(1)}%</td>`;
+
+        waccSteps.forEach(wOffset => {
+          const w = currentWacc + wOffset;
+          const denom = Math.max((w - g) / 100, 0.012);
+          const ev = (currentFcf * (1 + (g / 100))) / denom;
+          const isBase = (gOffset === 0 && wOffset === 0);
+
+          const displayEv = ev >= 1000 ? `$${(ev / 1000).toFixed(2)}T` : `$${Math.round(ev)}B`;
+          const cellColor = isBase 
+            ? 'bg-sky-950/80 text-sky-300 font-bold border border-sky-500' 
+            : (w - g) < 4.5 ? 'text-emerald-400' : 'text-slate-300';
+
+          rowHtml += `<td class="py-2 px-2 ${cellColor}">${displayEv}</td>`;
+        });
+
+        tr.innerHTML = rowHtml;
+        matrixBody.appendChild(tr);
+      });
+    }
+
+    function updateProvenanceJSON() {
+      const auditPayload = {
+        "@context": "http://www.w3.org/ns/prov",
+        "Activity": "AI_CapStack_Forward_Default_And_Valuation_Model",
+        "Agent": "Adam_v31.0_Warsh_Kernel",
+        "Timestamp": new Date().toISOString(),
+        "SovereignFloorAnchors": {
+          "US_10Y_Treasury_Rf": `${parseFloat(state.rf).toFixed(3)}%`,
+          "UK_10Y_Gilt": "5.260%",
+          "Japan_10Y_JGB": "3.000%",
+          "Brent_Crude": `$${state.brent}.00/bbl`,
+          "TSM_Geopolitical_Spread": `+${state.tsmSpread} bps`
+        },
+        "UnderwritingParameters": {
+          "EquityRiskPremium": `${parseFloat(state.erp).toFixed(2)}%`,
+          "Hyperscaler_2026_Capex": `$${state.capexRate} Billion`,
+          "SR26_2_Active_Adoption_Rate": `${parseFloat(state.sr26Adoption).toFixed(1)}%`,
+          "GPU_Depreciation_Cycle": `${state.depreciationYears} Years`
+        },
+        "StructuralCreditOutputs": {
+          "NVDA": { "DD": calculateMerton('NVDA').DD.toFixed(2), "PD_1Y": calculateMerton('NVDA').PD_bps + " bps", "Rating": calculateMerton('NVDA').rating },
+          "TSM": { "DD": calculateMerton('TSM').DD.toFixed(2), "PD_1Y": calculateMerton('TSM').PD_bps + " bps", "Rating": calculateMerton('TSM').rating },
+          "MSFT": { "DD": calculateMerton('MSFT').DD.toFixed(2), "PD_1Y": calculateMerton('MSFT').PD_bps + " bps", "Rating": calculateMerton('MSFT').rating },
+          "ASML": { "DD": calculateMerton('ASML').DD.toFixed(2), "PD_1Y": calculateMerton('ASML').PD_bps + " bps", "Rating": calculateMerton('ASML').rating },
+          "AVGO": { "DD": calculateMerton('AVGO').DD.toFixed(2), "PD_1Y": calculateMerton('AVGO').PD_bps + " bps", "Rating": calculateMerton('AVGO').rating }
+        },
+        "RegulatoryGovernanceCompliance": {
+          "Fed_SR_26_2_MRM": "ENFORCED",
+          "Basel_III_ERBA": "CONFORMING",
+          "BCBS_239_RiskDataAggregation": "ACTIVE_TELEMETRY"
+        }
+      };
+
+      document.getElementById('prov-json-content').textContent = JSON.stringify(auditPayload, null, 2);
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('bg-slate-800', 'text-sky-400', 'border-t', 'border-l', 'border-r', 'border-slate-700');
+        b.classList.add('text-slate-400');
+      });
+
+      const activeBtnMap = {
+        'tab-credit-engine': 'tab-btn-credit',
+        'tab-crossover': 'tab-btn-crossover',
+        'tab-valuation-engine': 'tab-btn-valuation',
+        'tab-taxonomy-flow': 'tab-btn-taxonomy'
+      };
+      const activeBtn = document.getElementById(activeBtnMap[tabId]);
+      activeBtn.classList.add('bg-slate-800', 'text-sky-400', 'border-t', 'border-l', 'border-r', 'border-slate-700');
+      activeBtn.classList.remove('text-slate-400');
+
+      if (tabId === 'tab-crossover' && chartCrossoverInstance) {
+        chartCrossoverInstance.resize();
+      }
+      if (tabId === 'tab-credit-engine' && chartMertonInstance) {
+        chartMertonInstance.resize();
+      }
+    }
+
+    // Preset Applicator
+    function applyPreset(presetKey) {
+      const p = presets[presetKey];
+      state.rf = p.rf;
+      state.erp = p.erp;
+      state.capexRate = p.capexRate;
+      state.sr26Adoption = p.sr26Adoption;
+      state.brent = p.brent;
+      state.tsmSpread = p.tsmSpread;
+      state.depreciationYears = p.depreciationYears;
+
+      document.getElementById('input-rf').value = state.rf;
+      document.getElementById('input-erp').value = state.erp;
+      document.getElementById('input-capex').value = state.capexRate;
+      document.getElementById('input-sr26').value = state.sr26Adoption;
+      document.getElementById('input-brent').value = state.brent;
+      document.getElementById('input-tsm-spread').value = state.tsmSpread;
+      document.getElementById('select-depreciation').value = state.depreciationYears;
+
+      updateWorldModel();
+    }
+
+    // Modal Handlers
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    function copyAuditRecord() {
+      const text = document.getElementById('prov-json-content').textContent;
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      const btnText = document.getElementById('btn-copy-audit-text');
+      btnText.textContent = 'Copied to Clipboard!';
+      setTimeout(() => { btnText.textContent = 'Copy JSON Record'; }, 2000);
+    }
+
+    window.onload = function() {
+      // Initialize KaTeX formulas
+      const katexFormula = "\\text{Distance to Default } (DD) = \\frac{\\ln(V/D) + \\left(\\mu - \\frac{\\sigma_V^2}{2}\\right)T}{\\sigma_V \\sqrt{T}}";
+      katex.render(katexFormula, document.getElementById('katex-merton-formula'), { throwOnError: false });
+
+      // Initialize Charts
+      initCharts();
+
+      // Render Titan Buttons
+      renderTitanSelector();
+
+      // Hook up interactive sliders
+      document.getElementById('input-rf').addEventListener('input', (e) => {
+        state.rf = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('input-erp').addEventListener('input', (e) => {
+        state.erp = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('input-capex').addEventListener('input', (e) => {
+        state.capexRate = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('input-sr26').addEventListener('input', (e) => {
+        state.sr26Adoption = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('input-brent').addEventListener('input', (e) => {
+        state.brent = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('input-tsm-spread').addEventListener('input', (e) => {
+        state.tsmSpread = parseFloat(e.target.value);
+        updateWorldModel();
+      });
+      document.getElementById('select-depreciation').addEventListener('change', (e) => {
+        state.depreciationYears = parseInt(e.target.value);
+        updateWorldModel();
+      });
+
+      document.getElementById('btn-export-audit').addEventListener('click', () => {
+        openModal('modal-prov');
+      });
+
+      // Initial state render
+      updateWorldModel();
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
