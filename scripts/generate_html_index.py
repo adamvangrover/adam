@@ -182,6 +182,10 @@ def generate_index():
             <a href="showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">SHOWCASE</a>
             <a href="docs/index.html" class="cyber-btn">DOCS</a>
             <a href="README.md" class="cyber-btn" style="border-color: #a855f7; color: #a855f7;">README</a>
+            <a href="system_graph_viewer.html" class="cyber-btn" style="border-color: #ff00ff; color: #ff00ff;">GRAPH</a>
+            <a href="json_data_viewer.html" class="cyber-btn" style="border-color: #ff00ff; color: #ff00ff;">JSON</a>
+            <a href="prompt_library_viewer.html" class="cyber-btn" style="border-color: #ff00ff; color: #ff00ff;">PROMPTS</a>
+            <a href="agent_viewer.html" class="cyber-btn" style="border-color: #ff00ff; color: #ff00ff;">AGENTS</a>
         </nav>
     </header>
 

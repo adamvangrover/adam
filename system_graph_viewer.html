@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM v30 :: System Graph Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/force-graph"></script>
+    <style>
+        body { margin: 0; background: #050b14; color: #e0e0e0; font-family: 'Inter', sans-serif; overflow: hidden; }
+        #graph-container { width: 100vw; height: 100vh; }
+        .overlay { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(5,11,20,0.8); padding: 15px; border: 1px solid #00f3ff; border-radius: 8px; backdrop-filter: blur(10px); font-family: 'JetBrains Mono', monospace; }
+        h1 { margin: 0 0 10px 0; color: #00f3ff; font-size: 1.2rem; }
+        p { margin: 0; color: #888; font-size: 0.8rem; }
+        agent-directive { display: none; }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <h1>SYSTEM TOPOLOGY</h1>
+        <p>Interactive Architecture Graph</p>
+        <button onclick="window.location.href='index.html'" style="margin-top:10px; background:none; border:1px solid #00f3ff; color:#00f3ff; padding:5px 10px; cursor:pointer;">[ RETURN TO OS ]</button>
+    </div>
+    <div id="graph-container"></div>
+    <agent-directive>{"type": "visualization", "context": "knowledge_graph"}</agent-directive>
+    <script>
+        const mockData = {
+            nodes: [
+                { id: 'AdamOS', group: 1, val: 20 },
+                { id: 'KnowledgeKernel', group: 2, val: 10 },
+                { id: 'ExecutionKernel', group: 2, val: 10 },
+                { id: 'PolicyKernel', group: 2, val: 10 },
+                { id: 'GovernanceKernel', group: 2, val: 10 },
+                { id: 'SimulationKernel', group: 2, val: 10 },
+                { id: 'IntegrationKernel', group: 2, val: 10 },
+                { id: 'AgentSwarm', group: 3, val: 15 },
+                { id: 'RiskOfficer', group: 4, val: 5 },
+                { id: 'EvolutionaryArchitect', group: 4, val: 5 },
+                { id: 'WhaleScanner', group: 4, val: 5 },
+                { id: 'PDIL', group: 5, val: 8 },
+                { id: 'HarnessTelemetry', group: 6, val: 12 },
+                { id: 'MemoryBus', group: 7, val: 8 }
+            ],
+            links: [
+                { source: 'AdamOS', target: 'KnowledgeKernel' },
+                { source: 'AdamOS', target: 'ExecutionKernel' },
+                { source: 'AdamOS', target: 'PolicyKernel' },
+                { source: 'AdamOS', target: 'GovernanceKernel' },
+                { source: 'AdamOS', target: 'SimulationKernel' },
+                { source: 'AdamOS', target: 'IntegrationKernel' },
+                { source: 'AdamOS', target: 'AgentSwarm' },
+                { source: 'AdamOS', target: 'PDIL' },
+                { source: 'AdamOS', target: 'HarnessTelemetry' },
+                { source: 'AgentSwarm', target: 'RiskOfficer' },
+                { source: 'AgentSwarm', target: 'EvolutionaryArchitect' },
+                { source: 'AgentSwarm', target: 'WhaleScanner' },
+                { source: 'AgentSwarm', target: 'ExecutionKernel' },
+                { source: 'AgentSwarm', target: 'MemoryBus' },
+                { source: 'PDIL', target: 'ExecutionKernel' }
+            ]
+        };
+        const Graph = ForceGraph()(document.getElementById('graph-container'))
+            .graphData(mockData)
+            .nodeId('id')
+            .nodeAutoColorBy('group')
+            .nodeVal('val')
+            .linkDirectionalParticles(2)
+            .linkDirectionalParticleSpeed(d => 0.005)
+            .nodeLabel('id')
+            .backgroundColor('#050b14');
+    </script>
+</body>
+</html>
