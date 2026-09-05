@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="adam-os">
+<head>
+    <meta charset="UTF-8">
+    <title>Adam OS | Prompt & Persona Library</title>
+
+    <meta name="adam-node-type" content="prompt_library">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <meta name="adam-sibling-nodes" content="/data">
+
+    <link rel="stylesheet" href="../styles/global.css">
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0c;
+            color: #00ff41;
+            padding: 40px;
+            margin: 0;
+        }
+        .terminal-window {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid #333;
+            background: #050505;
+            padding: 20px;
+        }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .persona-block { border-left: 2px solid #00ff41; padding-left: 15px; margin-bottom: 20px; background: #111; padding: 15px; }
+        .status-active { color: #00ff41; font-weight: bold; }
+        .status-idle { color: #888; }
+        a { color: #00ff41; text-decoration: none; }
+        a:hover { background: #00ff41; color: #000; }
+    </style>
+</head>
+<body data-mcp-sync="verified">
+
+    <div class="terminal-window">
+        <div class="header">
+            <span>> ADAM_OS // PROMPT_LIBRARY</span>
+            <span>SYS_DATE: 2026-09-04</span>
+        </div>
+
+        <div><a href="/root/index.html">[cd ../root]</a></div>
+        <br>
+        <p>> Initializing manifest traversal from /data/prompt_manifest.json...</p>
+
+        <div id="library-output">
+            <!-- Hydrated by JS -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/data/prompt_manifest.json')
+                .then(res => res.json())
+                .then(data => {
+                    const output = document.getElementById('library-output');
+                    data.active_personas.forEach(persona => {
+                        const statusClass = persona.status === 'ACTIVE' ? 'status-active' : 'status-idle';
+                        const block = document.createElement('div');
+                        block.className = 'persona-block';
+                        block.innerHTML = `
+                            <div><strong>ID:</strong> ${persona.id}</div>
+                            <div><strong>ROLE:</strong> ${persona.role}</div>
+                            <div><strong>PATH:</strong> <a href="${persona.directive_path}">${persona.directive_path}</a></div>
+                            <div><strong>STATUS:</strong> <span class="${statusClass}">[${persona.status}]</span></div>
+                        `;
+                        output.appendChild(block);
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('library-output').innerText = '> ERR: MANIFEST FETCH FAILED.';
+                });
+        });
+    </script>
+</body>
+</html>
