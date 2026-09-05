@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Institutional | Portfolio Tracking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+    <style>.text-accent-blue { color: var(--accent-blue); }</style>
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
+    <div id="global-header"></div>
+    <div class="relative w-full py-20 border-b border-blue-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #3b82f6 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-accent-blue">Adam Institutional</h1>
+            <p class="text-xl text-slate-300 font-light mb-6">Broad multi-asset portfolio tracking and institutional credit risk.</p>
+        </div>
+    </div>
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div class="glass-panel p-6 border-blue-900/50">
+            <h3 class="text-2xl font-bold mb-4 font-mono text-blue-400">Multi-Asset Portfolio</h3>
+            <div class="relative h-64 w-full bg-slate-900/50 rounded flex items-center justify-center border border-slate-800">
+                <canvas id="inst-chart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-6 border-blue-900/50">
+            <h3 class="text-2xl font-bold mb-4 font-mono text-blue-400">Credit Risk Perimeter</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-900/80 rounded border border-slate-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-200">Global Tech ETF (QQQ)</span>
+                        <span class="text-xs px-2 py-1 bg-green-900/30 text-green-400 rounded">Low Risk</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-green-400 h-1.5 rounded-full" style="width: 15%"></div></div>
+                </div>
+                <div class="p-4 bg-slate-900/80 rounded border border-slate-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-200">High Yield Corp Bonds</span>
+                        <span class="text-xs px-2 py-1 bg-amber-900/30 text-amber-400 rounded">Elevated</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-amber-400 h-1.5 rounded-full" style="width: 65%"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('inst-chart');
+        if(ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Equities', 'Fixed Income', 'Alternatives', 'Cash'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: ['#3b82f6', '#10b981', '#a855f7', '#64748b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+            });
+        }
+    });
+</script>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>

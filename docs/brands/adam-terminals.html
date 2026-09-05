@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Terminals | Widget Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+    <style>.text-accent-pink { color: var(--accent-pink); }</style>
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
+    <div id="global-header"></div>
+    <div class="relative w-full py-20 border-b border-pink-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #ec4899 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-accent-pink">Adam Terminals</h1>
+            <p class="text-xl text-slate-300 font-light mb-6">Interactive, widget-based interactive HTML screens simulating real-time datastreams.</p>
+        </div>
+    </div>
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="glass-panel p-6 border-pink-900/50 mb-16">
+            <h3 class="text-xl font-bold mb-4 font-mono text-accent-pink">Live Datastreams</h3>
+            <div class="flex gap-4 border-b border-slate-800 pb-2 mb-4">
+                <button class="tab-btn text-accent-pink border-b-2 border-accent-pink">Rates</button>
+                <button class="tab-btn text-slate-500">FX</button>
+                <button class="tab-btn text-slate-500">Equities</button>
+            </div>
+            <div id="stream-content" class="h-32 bg-slate-900 rounded p-4 text-xs font-mono text-slate-400">Rates Data: <br>[Waiting for connection]</div>
+        </div>
+
+    <div class="glass-panel p-6 border-pink-900/50 mt-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold font-mono text-pink-400">Datastream Terminal</h3>
+            <div class="flex gap-2">
+                <div class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></div>
+                <span class="text-xs text-slate-500 font-mono">LIVE</span>
+            </div>
+        </div>
+        <div class="flex gap-4 border-b border-slate-800 pb-2 mb-4">
+            <button class="tab-btn text-pink-400 border-b-2 border-pink-400 pb-1 text-sm font-bold transition-colors" data-target="rates">Rates</button>
+            <button class="tab-btn text-slate-500 hover:text-slate-300 pb-1 text-sm font-bold transition-colors" data-target="fx">FX</button>
+            <button class="tab-btn text-slate-500 hover:text-slate-300 pb-1 text-sm font-bold transition-colors" data-target="equities">Equities</button>
+        </div>
+        <div id="terminal-screen" class="h-64 bg-[#050b14] rounded p-4 text-sm font-mono text-emerald-400 overflow-y-auto border border-slate-800 shadow-inner">
+            <div class="opacity-50 mb-2">Connecting to secure stream...</div>
+            <div id="stream-content"></div>
+        </div>
+    </div>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const screen = document.getElementById('stream-content');
+        let streamInterval;
+
+        function startStream(type) {
+            clearInterval(streamInterval);
+            screen.innerHTML = `<div class="text-slate-500 mb-2">>> Subscribed to [${type.toUpperCase()}] feed...</div>`;
+
+            streamInterval = setInterval(() => {
+                const val = (Math.random() * 100).toFixed(4);
+                const line = document.createElement('div');
+                line.className = 'mb-1 ' + (Math.random() > 0.5 ? 'text-emerald-400' : 'text-pink-400');
+                line.textContent = `[${new Date().toISOString().split('T')[1].slice(0,-1)}] RECV DATA_PKT: ${type.toUpperCase()}_IDX = ${val}`;
+                screen.appendChild(line);
+
+                if(screen.children.length > 15) {
+                    screen.removeChild(screen.children[1]); // keep the subscription message
+                }
+            }, 800);
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('text-pink-400', 'border-b-2', 'border-pink-400');
+                    b.classList.add('text-slate-500');
+                });
+                e.target.classList.remove('text-slate-500');
+                e.target.classList.add('text-pink-400', 'border-b-2', 'border-pink-400');
+                startStream(e.target.dataset.target);
+            });
+        });
+
+        // Start default
+        startStream('rates');
+    });
+</script>
+
+    <script src="../js/app.js"></script>
+
+
+</body>
+</html>

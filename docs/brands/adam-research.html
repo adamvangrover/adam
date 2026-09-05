@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Research | Historic Archives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/theme.css">
+    <style>.text-accent-violet { color: var(--accent-violet); }</style>
+</head>
+<body class="bg-[#090d16] text-slate-200 antialiased min-h-screen flex flex-col">
+    <div id="global-header"></div>
+    <div class="relative w-full py-20 border-b border-violet-900/50 bg-black overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at center, #8b5cf6 0%, transparent 70%);"></div>
+        <div class="relative z-10 text-center p-8 max-w-3xl mx-4">
+            <h1 class="text-4xl md:text-5xl font-bold font-mono tracking-tight mb-4 text-accent-violet">Adam Research</h1>
+            <p class="text-xl text-slate-300 font-light mb-6">Historic market performance, training data archives, and model testing.</p>
+        </div>
+    </div>
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="glass-panel p-6 border-violet-900/50 mb-16">
+
+<div class="glass-panel p-6 border-slate-700/50 mt-12 mb-8">
+    <h3 class="text-xl font-bold mb-4 font-mono text-slate-300">Filter Archives</h3>
+    <input type="text" id="archive-search" placeholder="Search archives..." class="w-full bg-slate-900 border border-slate-700 rounded px-4 py-2 text-slate-200 focus:outline-none focus:border-violet-500">
+</div>
+<script>
+document.getElementById('archive-search')?.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+});
+</script>
+
+<h3 class="text-xl font-bold mb-4 font-mono text-accent-violet">Market Data Archives</h3>
+            <table class="w-full text-left text-sm text-slate-400">
+                <thead class="text-xs text-slate-200 uppercase bg-slate-800">
+                    <tr><th class="px-4 py-2">Date</th><th class="px-4 py-2">Archive Link</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b border-slate-700"><td class="px-4 py-2">adam_daily</td><td class="px-4 py-2"><a href="../../showcase/data/adam_daily/portfolio_analysis.html" class="text-violet-400 hover:text-white">View Archive 1</a></td></tr>
+<tr class="border-b border-slate-700"><td class="px-4 py-2">adam_daily</td><td class="px-4 py-2"><a href="../../showcase/data/adam_daily/macro_tail_risks.html" class="text-violet-400 hover:text-white">View Archive 2</a></td></tr>
+<tr class="border-b border-slate-700"><td class="px-4 py-2">adam_daily</td><td class="px-4 py-2"><a href="../../showcase/data/adam_daily/rates_outlook.html" class="text-violet-400 hover:text-white">View Archive 3</a></td></tr>
+<tr class="border-b border-slate-700"><td class="px-4 py-2">adam_daily</td><td class="px-4 py-2"><a href="../../showcase/data/adam_daily/industry_watchlists.html" class="text-violet-400 hover:text-white">View Archive 4</a></td></tr>
+<tr class="border-b border-slate-700"><td class="px-4 py-2">adam_daily</td><td class="px-4 py-2"><a href="../../showcase/data/adam_daily/index.html" class="text-violet-400 hover:text-white">View Archive 5</a></td></tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    <div class="glass-panel p-6 border-violet-900/50 mt-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold font-mono text-violet-400">Historic Archives</h3>
+            <input type="text" id="archive-search" placeholder="Search dates..." class="bg-slate-900/80 border border-slate-700 rounded px-4 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-violet-500 w-64">
+        </div>
+        <div class="overflow-x-auto rounded border border-slate-800">
+            <table class="w-full text-left text-sm text-slate-400">
+                <thead class="text-xs text-slate-400 uppercase bg-slate-900/80 border-b border-slate-800">
+                    <tr><th class="px-4 py-3 font-medium">Date / Run</th><th class="px-4 py-3 font-medium">Static Artifact</th></tr>
+                </thead>
+                <tbody id="archive-body">
+                    <tr class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"><td class="px-4 py-3 font-mono text-slate-300">adam_daily</td><td class="px-4 py-3"><a href="../../showcase/data/adam_daily/portfolio_analysis.html" class="text-violet-400 hover:text-violet-300 transition-colors">View Snapshot 1</a></td></tr>
+<tr class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"><td class="px-4 py-3 font-mono text-slate-300">adam_daily</td><td class="px-4 py-3"><a href="../../showcase/data/adam_daily/macro_tail_risks.html" class="text-violet-400 hover:text-violet-300 transition-colors">View Snapshot 2</a></td></tr>
+<tr class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"><td class="px-4 py-3 font-mono text-slate-300">adam_daily</td><td class="px-4 py-3"><a href="../../showcase/data/adam_daily/rates_outlook.html" class="text-violet-400 hover:text-violet-300 transition-colors">View Snapshot 3</a></td></tr>
+<tr class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"><td class="px-4 py-3 font-mono text-slate-300">adam_daily</td><td class="px-4 py-3"><a href="../../showcase/data/adam_daily/industry_watchlists.html" class="text-violet-400 hover:text-violet-300 transition-colors">View Snapshot 4</a></td></tr>
+<tr class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"><td class="px-4 py-3 font-mono text-slate-300">adam_daily</td><td class="px-4 py-3"><a href="../../showcase/data/adam_daily/index.html" class="text-violet-400 hover:text-violet-300 transition-colors">View Snapshot 5</a></td></tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<script>
+    document.getElementById('archive-search')?.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('#archive-body tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(term) ? '' : 'none';
+        });
+    });
+</script>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>
