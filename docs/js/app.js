@@ -104,6 +104,10 @@ function generateGlobalHeader() {
                     <a href="${prefix}brands/adam-core.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">CORE</a>
                     <a href="${prefix}brands/market-mayhem.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">MAYHEM</a>
                     <a href="${prefix}brands/fortress-hunt.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">FORTRESS</a>
+                    <a href="${prefix}brands/adam-institutional.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">INSTITUTIONAL</a>
+                    <a href="${prefix}brands/adam-research.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">RESEARCH</a>
+                    <a href="${prefix}brands/adam-governance.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">GOVERNANCE</a>
+                    <a href="${prefix}brands/adam-terminals.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">TERMINALS</a>
                     <a href="${prefix}archive/index.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">ARCHIVE</a>
                     <a href="${prefix}demo/agent-sandbox.html" class="text-xs font-mono text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition-colors">SANDBOX</a>
                     <a href="${prefix}../index_all.html" class="text-xs font-mono text-purple-400 hover:text-purple-300 px-2 py-1 rounded hover:bg-slate-800 transition-colors">REPO EXPLORER</a>

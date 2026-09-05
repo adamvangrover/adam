@@ -89,7 +89,46 @@
             </div>
         </div>
 
-    </main>
+
+
+    <div class="glass-panel p-6 border-rose-900/50 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+            <h3 class="text-2xl font-bold mb-4 font-mono text-rose-400">Daily Hub</h3>
+            <ul class="list-disc pl-5 space-y-2 text-slate-400 text-sm">
+                <li><a href="../../newsletters/market_mayhem_20260829.html" class="hover:text-white transition-colors">Market Mayhem: 20260829</a></li>
+
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-2xl font-bold mb-4 font-mono text-rose-400">Yield Volatility</h3>
+            <div class="relative h-48 w-full bg-slate-900/50 rounded flex items-center justify-center border border-slate-800">
+                <canvas id="mayhem-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('mayhem-chart');
+        if(ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: '10Y Treasury Volatility',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#f43f5e',
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    });
+</script>
+
 
     <!-- Scripts -->
     <script src="../js/app.js"></script>
