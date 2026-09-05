@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | Global Systemic Risk Dashboard</title>
+    <meta name="adam-node-type" content="dashboard">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-obsidian: #090d16;
+            --surface-glass: rgba(15, 23, 42, 0.75);
+            --border: rgba(6, 182, 212, 0.3);
+            --blue: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+        }
+        body {
+            background-color: var(--bg-obsidian);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        a { color: var(--blue); text-decoration: none; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .panel {
+            background: var(--surface-glass);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+        }
+        h2 { color: var(--blue); font-size: 1.2em; border-bottom: 1px dashed var(--border); padding-bottom: 5px; margin-top: 0; }
+        .metric { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;}
+        .status-ok { color: var(--green); }
+        .status-warn { color: var(--orange); }
+        .status-crit { color: var(--red); }
+    </style>
+</head>
+<body>
+    <header>
+        <div>ADAM_OS // SYSTEMIC RISK AGGREGATOR <a href="/root/index.html">[ROOT]</a></div>
+        <div>STATUS: <span class="status-ok">ALL MODELS SYNCED</span></div>
+    </header>
+
+    <div class="grid-container">
+        <div class="panel">
+            <h2>GSIB ENTERPRISE TWIN</h2>
+            <div class="metric"><span>Active Entities (Graph):</span> <span>10,000</span></div>
+            <div class="metric"><span>Compute Engine:</span> <span>Deep BSDE</span></div>
+            <div class="metric"><span>Chinese Wall Breaches:</span> <span class="status-ok">0</span></div>
+            <div class="metric"><span>Basel IV Output Floor:</span> <span>72.5%</span></div>
+            <div style="margin-top: 15px; text-align: right;"><a href="knowledge_graph.html">>> View W3C Graph</a></div>
+        </div>
+
+        <div class="panel">
+            <h2>S&P 500 REGIME MODEL</h2>
+            <div class="metric"><span>Entities:</span> <span>500</span></div>
+            <div class="metric"><span>Current Macro Regime:</span> <span class="status-warn">Stagflation</span></div>
+            <div class="metric"><span>High Sens Tech PD:</span> <span class="status-crit">> 8.0%</span></div>
+            <div class="metric"><span>Rules Engine:</span> <span>jsonLogic</span></div>
+            <div style="margin-top: 15px; text-align: right;"><a href="sp500_world_model.html">>> View S&P 500 Simulation</a></div>
+        </div>
+
+        <div class="panel">
+            <h2>SOVEREIGN DEBT TWIN</h2>
+            <div class="metric"><span>Tracked Nations:</span> <span>G20</span></div>
+            <div class="metric"><span>Regime Override:</span> <span>Quantitative Tightening</span></div>
+            <div class="metric"><span>US 10Y Yield:</span> <span>4.15%</span></div>
+            <div class="metric"><span>Contagion Model:</span> <span>VAR (Dense)</span></div>
+            <div style="margin-top: 15px; text-align: right;"><a href="../data/sovereign_twin_state.json">>> View Data State</a></div>
+        </div>
+
+        <div class="panel">
+            <h2>SHADOW BANKING & LOGISTICS</h2>
+            <div class="metric"><span>Private Credit AUM:</span> <span>$1.7T</span></div>
+            <div class="metric"><span>Covenant Lite Share:</span> <span class="status-warn">85.0%</span></div>
+            <div class="metric"><span>Logistics Chokepoints:</span> <span class="status-crit">4 ACTIVE</span></div>
+            <div class="metric"><span>Semiconductor Lead Time:</span> <span class="status-crit">24 Weeks</span></div>
+            <div style="margin-top: 15px; text-align: right;"><a href="supply_chain_graph.html">>> View Supply Chain Graph</a></div>
+        </div>
+    </div>
+</body>
+</html>

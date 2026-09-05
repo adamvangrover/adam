@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam OS | Global Supply Chain Digital Twin</title>
+    <meta name="adam-node-type" content="logistics_visualization">
+    <meta name="adam-parent-node" content="/root/index.html">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-obsidian: #090d16;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-crimson: #ef4444;
+            --surface-glass: rgba(15, 23, 42, 0.75);
+            --border: rgba(6, 182, 212, 0.3);
+        }
+        body {
+            background-color: var(--bg-obsidian);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            background: #010409;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            z-index: 10;
+        }
+        header a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+        .workspace {
+            display: flex;
+            width: 100%;
+            margin-top: 55px; /* Offset for header */
+            height: calc(100vh - 55px);
+        }
+        .simulation-view {
+            flex-grow: 1;
+            position: relative;
+            background: #000;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            width: 350px;
+            background: var(--surface-glass);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(12px);
+        }
+        h3 {
+            color: var(--accent-cyan);
+            margin-top: 0;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 5px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body data-system-state="ONLINE">
+
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: Render 1,000 global logistics nodes connecting primary manufacturing hubs to consumer markets. Use HTML5 Canvas to trace cascading failures from geopolitical chokepoints.
+    </agent-directive>
+
+    <header>
+        <div>ADAM_OS // SUPPLY CHAIN LOGISTICS TWIN <a href="/root/index.html">[ROOT]</a></div>
+        <div>ENGINE: Physics-based Routing | <span style="color:var(--accent-emerald)">ACTIVE</span></div>
+    </header>
+
+    <div class="workspace">
+        <div class="simulation-view">
+            <canvas id="logisticsCanvas"></canvas>
+            <div style="position: absolute; bottom: 20px; left: 20px; color: #555; background: #000; padding: 5px;">
+                Rendering: 1,000 Global Routes | Chokepoints: 4
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>LOGISTICS ANALYTICS</h3>
+            <p style="font-size: 0.9em; color: #94a3b8; margin-bottom: 20px;">
+                Monitoring systemic dependencies in manufacturing, semiconductors, and energy corridors.
+            </p>
+
+            <div style="margin-bottom: 15px;">
+                <strong>Global Freight Index:</strong> <span style="color:var(--accent-cyan)">145.2</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Port Congestion:</strong> <span style="color:var(--accent-amber)">ELEVATED</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Semiconductor Lead Time:</strong> <span style="color:var(--accent-crimson)">24 Weeks</span>
+            </div>
+
+            <h3 style="margin-top: 30px;">ACTIVE CHOKEPOINTS</h3>
+            <ul style="font-size: 0.85em; color: #cbd5e1; list-style-type: none; padding: 0;">
+                <li style="margin-bottom: 5px; border-left: 2px solid var(--accent-crimson); padding-left: 5px;">Panama Canal (Drought)</li>
+                <li style="margin-bottom: 5px; border-left: 2px solid var(--accent-crimson); padding-left: 5px;">Red Sea (Geopolitical)</li>
+                <li style="margin-bottom: 5px; border-left: 2px solid var(--accent-amber); padding-left: 5px;">Strait of Hormuz (Tension)</li>
+                <li style="margin-bottom: 5px; border-left: 2px solid var(--accent-amber); padding-left: 5px;">Taiwan Strait (Transit Delay)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('logisticsCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = canvas.parentElement.clientWidth;
+        let height = canvas.height = canvas.parentElement.clientHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = canvas.parentElement.clientWidth;
+            height = canvas.height = canvas.parentElement.clientHeight;
+            drawRoutes();
+        });
+
+        // Generate synthetic supply chain nodes
+        const nodes = [];
+        for (let i = 0; i < 50; i++) {
+            nodes.push({ x: Math.random() * width, y: Math.random() * height });
+        }
+
+        function drawRoutes() {
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.strokeStyle = "rgba(6, 182, 212, 0.1)";
+            ctx.lineWidth = 1;
+
+            // Draw connections
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (Math.random() > 0.95) { // Sparse connections
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+
+                        // bezier curve to simulate ship routes
+                        let cpX = (nodes[i].x + nodes[j].x) / 2 + (Math.random() - 0.5) * 100;
+                        let cpY = (nodes[i].y + nodes[j].y) / 2 + (Math.random() - 0.5) * 100;
+
+                        ctx.quadraticCurveTo(cpX, cpY, nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+
+                        // Simulate moving ship
+                        let t = (Date.now() % 5000) / 5000;
+                        let shipX = (1-t)*(1-t)*nodes[i].x + 2*(1-t)*t*cpX + t*t*nodes[j].x;
+                        let shipY = (1-t)*(1-t)*nodes[i].y + 2*(1-t)*t*cpY + t*t*nodes[j].y;
+
+                        ctx.fillStyle = "#10b981";
+                        ctx.beginPath();
+                        ctx.arc(shipX, shipY, 2, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // Draw hubs
+            ctx.fillStyle = "#f59e0b";
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 4, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawRoutes);
+        }
+
+        drawRoutes();
+    </script>
+</body>
+</html>
