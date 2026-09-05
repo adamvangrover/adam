@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.3 :: FDOS Master Hub</title>
+    <meta name="description" content="FDOS — Institutional-grade neuro-symbolic multi-agent financial operating system.">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@600;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Machine-Readable UX Metadata -->
+    <meta name="adam-node-type" content="root_index">
+    <meta name="adam-required-capabilities" content="html_parsing, json_extraction, contextual_routing">
+    <meta name="adam-sibling-nodes" content="/libraries, /prompts, /terminals, /applications, /showcases, /data, /newsletters, /briefings, /lore">
+
+    <style>
+        :root {
+            --fdos-bg: #090a0f;
+            --fdos-panel: #11131a;
+            --fdos-border: #1e2230;
+            --fdos-text: #e2e8f0;
+            --fdos-accent: #00f0ff;
+            --fdos-accent-glow: rgba(0, 240, 255, 0.25);
+            --brand-font: 'JetBrains Mono', monospace;
+        }
+
+        body.theme-adam-os { --fdos-bg: #06070a; --fdos-panel: #0d0f17; --fdos-border: #1a1e2e; --fdos-accent: #00f0ff; --fdos-accent-glow: rgba(0, 240, 255, 0.25); --brand-font: 'JetBrains Mono', monospace; }
+        body.theme-market-mayhem { --fdos-bg: #0f0a15; --fdos-panel: #1a1024; --fdos-border: #2e1a40; --fdos-accent: #ff007a; --fdos-accent-glow: rgba(255, 0, 122, 0.25); --brand-font: 'Inter', sans-serif; }
+        body.theme-fortress-hunt { --fdos-bg: #080c14; --fdos-panel: #0f172a; --fdos-border: #1e293b; --fdos-accent: #f59e0b; --fdos-accent-glow: rgba(245, 158, 11, 0.25); --brand-font: 'Cinzel', serif; }
+        body.theme-institutional { --fdos-bg: #0b1120; --fdos-panel: #131d31; --fdos-border: #21304d; --fdos-accent: #3b82f6; --fdos-accent-glow: rgba(59, 130, 246, 0.25); --brand-font: 'Inter', sans-serif; }
+        body.theme-research { --fdos-bg: #0a0d12; --fdos-panel: #121722; --fdos-border: #1f2738; --fdos-accent: #10b981; --fdos-accent-glow: rgba(16, 185, 129, 0.25); --brand-font: 'JetBrains Mono', monospace; }
+        
+        body { background-color: var(--fdos-bg); color: var(--fdos-text); font-family: var(--brand-font); transition: background-color 0.4s ease, color 0.4s ease; scroll-behavior: smooth; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .fdos-panel { background-color: var(--fdos-panel); border: 1px solid var(--fdos-border); box-shadow: 0 4px 24px rgba(0,0,0,0.4); transition: border-color 0.3s ease, background-color 0.3s ease; scroll-margin-top: 1.5rem; }
+        .accent-text { color: var(--fdos-accent); }
+        .accent-bg { background-color: var(--fdos-accent); }
+        .accent-border { border-color: var(--fdos-accent); }
+        .glow-effect { text-shadow: 0 0 10px var(--fdos-accent-glow); }
+
+        .chart-container { position: relative; width: 100%; height: 320px; max-height: 400px; }
+        
+        .scrollbar-custom::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-custom::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .scrollbar-custom::-webkit-scrollbar-thumb { background: var(--fdos-border); border-radius: 3px; }
+        
+        .brand-pill { transition: all 0.2s ease; }
+        .brand-pill.active { background-color: var(--fdos-accent); color: #000000; font-weight: 800; box-shadow: 0 0 12px var(--fdos-accent-glow); }
+
+        /* Progress Bar for Odds */
+        .progress-track { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+        .progress-fill { height: 100%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+
+<body class="theme-adam-os flex flex-col h-screen overflow-hidden text-sm" data-system-state="ONLINE" data-active-users="1">
+
+    <!-- Hidden Agent Injector Directive -->
+    <agent-directive style="display:none;">
+        AGENT_INSTRUCTION: This is the root FDOS terminal for September 4, 2026. Target nodes include /data/system_state.json and macroeconomic arrays tracking 10Y Yields (4.812%) and Brent Crude ($95.90).
+    </agent-directive>
+
+    <!-- Embedded State for Instant Agent Scraping -->
+    <script type="application/json" id="adam-state-injector">
+        {
+            "current_node": "/root/index.html",
+            "snapshot_date": "2026-09-04T17:41:43-04:00",
+            "mcp_gateway_status": "listening",
+            "macro_state": {
+                "ust_10y": 4.812,
+                "brent_crude": 95.90,
+                "btc_usd": 79422.95,
+                "spx": 7718.60,
+                "vix": 45
+            }
+        }
+    </script>
+
+    <!-- MASTER HEADER -->
+    <header class="h-16 border-b border-gray-800 bg-black/80 backdrop-blur flex items-center justify-between px-4 z-50 shrink-0">
+        <div class="flex items-center gap-3">
+            <div id="brand-logo" class="w-9 h-9 rounded flex items-center justify-center font-black text-black text-lg transition-colors accent-bg">FD</div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 id="brand-title" class="font-black tracking-wider uppercase text-base glow-effect">ADAM OS FOUNDATION</h1>
+                    <span class="text-[10px] mono px-2 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700">v30.3</span>
+                </div>
+                <p id="brand-subtitle" class="text-[11px] text-gray-400 font-normal">Multi-Agent Swarm Orchestrator & System Kernel</p>
+            </div>
+        </div>
+
+        <!-- Brand Selector -->
+        <div class="hidden xl:flex items-center gap-1.5 bg-gray-950 p-1.5 rounded-lg border border-gray-800">
+            <button onclick="switchBrand('adam-os')" id="btn-brand-adam-os" class="brand-pill active text-[11px] px-2.5 py-1 rounded font-semibold transition-all">Adam OS</button>
+            <button onclick="switchBrand('market-mayhem')" id="btn-brand-market-mayhem" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Market Mayhem</button>
+            <button onclick="switchBrand('fortress-hunt')" id="btn-brand-fortress-hunt" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Fortress & Hunt</button>
+            <button onclick="switchBrand('institutional')" id="btn-brand-institutional" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Institutional</button>
+            <button onclick="switchBrand('research')" id="btn-brand-research" class="brand-pill text-[11px] px-2.5 py-1 rounded font-semibold text-gray-400 hover:text-white transition-all">Research</button>
+        </div>
+
+        <!-- Telemetry -->
+        <div class="flex items-center gap-4 mono text-[10px] text-gray-400">
+            <div class="hidden md:flex flex-col text-right">
+                <span class="text-gray-500">MACRO REGIME</span>
+                <span class="text-red-400 font-bold glow-effect">YIELD_SHOCK</span>
+            </div>
+            <div class="hidden sm:flex flex-col text-right border-l border-gray-700 pl-4">
+                <span class="text-gray-500">10Y UST / BRENT</span>
+                <span class="accent-text font-bold">4.81% / $95.90</span>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded ml-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="mono text-[11px] font-bold text-gray-200" id="live-clock">17:41:43 EDT</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- SUB-NAVIGATION -->
+        <aside class="w-16 md:w-56 border-r border-gray-800 bg-black/40 flex flex-col shrink-0 relative z-10">
+            <div class="p-3 border-b border-gray-800/80">
+                <p class="hidden md:block text-[10px] font-bold text-gray-500 uppercase tracking-wider mono">Active System Persona</p>
+                <p id="nav-persona-label" class="text-xs font-black accent-text mt-0.5 truncate uppercase glow-effect">Adam OS Core</p>
+            </div>
+            <nav class="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-custom" id="subnav-container"></nav>
+            
+            <!-- Mini Ticker -->
+            <div class="p-3 border-t border-gray-800 hidden md:block mono text-[10px] space-y-2 bg-black/60">
+                <div class="flex justify-between text-gray-400">
+                    <span>S&P 500:</span><span class="text-white font-bold">7,718.60 <span class="text-red-500">↓</span></span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>BRENT CRUDE:</span><span class="text-red-400 font-bold">$95.90 <span class="text-green-500">↑</span></span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>BITCOIN:</span><span class="text-amber-400 font-bold">$79,422 <span class="text-red-500">↓</span></span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>GOLD:</span><span class="text-amber-200 font-bold">$4,514 <span class="text-green-500">↑</span></span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- VIEWPORT -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-custom bg-black/20 relative" id="main-viewport">
+
+            <!-- 1. ADAM OS CORE -->
+            <section id="view-adam-os" class="brand-view space-y-6">
+                <div id="os-intro" class="fdos-panel p-5 rounded-lg border-l-4 accent-border flex flex-col md:flex-row gap-4 justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
+                            <span>⚡</span> Adam OS Foundation & Topology
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed max-w-3xl">
+                            The central computational backbone. Currently parsing Sept 4th macroeconomic shocks including the ISM Manufacturing pull-back (54.6) and the 10Y Yield surge following strong jobs data.
+                        </p>
+                    </div>
+                    <div class="bg-black/60 border border-gray-800 rounded p-3 text-[10px] mono shrink-0 shadow-inner w-full md:w-auto mt-4 md:mt-0">
+                        <div class="text-gray-500 mb-1 border-b border-gray-800 pb-1">System 3 Quant Refinement Status</div>
+                        <div class="text-green-400">> A_ADAM = { Rate_Odds:60%, Vol:45 }</div>
+                        <div class="text-gray-300">> Target: SEPT_FOMC_SYNC</div>
+                        <div class="accent-text">> Zero-Trust Network: ONLINE</div>
+                    </div>
+                </div>
+
+                <div id="os-canvas" class="fdos-panel p-5 rounded-lg flex flex-col space-y-2">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mono">Neural Swarm Topology & Primitive Tensor State</h3>
+                        <span class="text-[10px] mono bg-cyan-950/60 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded animate-pulse">LIVE FEED</span>
+                    </div>
+                    <div class="chart-container min-h-[350px] relative overflow-hidden bg-[#020408] rounded border border-gray-800">
+                        <!-- Live Swarm Topology rendered via HTML5 Canvas -->
+                        <canvas id="quantum-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                    </div>
+                    <div class="flex justify-between text-[10px] mono text-gray-500 px-2">
+                        <span>Nodes: 48 (NY Hardline)</span>
+                        <span>Coherence: <span class="text-green-400">0.9998</span></span>
+                        <span>Routing: Sept CPI Prep</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. MARKET MAYHEM -->
+            <section id="view-market-mayhem" class="brand-view hidden space-y-6">
+                <div id="mm-intro" class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-pink-400 flex items-center gap-2">
+                        <span>🔥</span> Market Mayhem & Predictive Odds
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Retail-accessible intelligence translating institutional flow. Tracking the "No-Hire, No-Fire" labor regime against the 60% probability of a September FOMC hike.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div id="mm-memo" class="lg:col-span-2 fdos-panel p-6 rounded-lg flex flex-col h-full">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-4">
+                            <div>
+                                <span class="text-[10px] mono text-pink-400 uppercase font-bold">DAILY NEWSLETTER EDITION</span>
+                                <h3 class="text-lg font-black text-white mt-1">Sept 4: The 4.81% Yield Floor & The Bitcoin-Gold Flight</h3>
+                            </div>
+                            <button onclick="synthesizeMemo()" class="bg-pink-900/30 hover:bg-pink-900/60 border border-pink-700 text-pink-300 text-xs px-3 py-1.5 rounded transition-colors flex items-center gap-2">
+                                <span>🧠</span> LLM Synthesis
+                            </button>
+                        </div>
+                        <div id="newsletter-body" class="text-sm text-gray-300 space-y-4 leading-relaxed flex-grow">
+                            <p class="font-bold text-white uppercase text-xs border-l-2 border-pink-500 pl-2">The Setup:</p>
+                            <p>Despite Fed Governor Waller hinting at a pause earlier this week, Friday's jobs report confirmed a "no-hire, no-fire" stasis, sending 10Y Treasury yields spiking to 4.812%. The market is now pricing in a ~60% chance of a September rate hike.</p>
+                            
+                            <p class="font-bold text-white uppercase text-xs border-l-2 border-pink-500 pl-2 mt-4">The Correlation Glitch:</p>
+                            <p>Institutional capital is quietly fleeing fiat. The correlation between Bitcoin and Gold has hit a 6-year high above 50%, while BTC's correlation to the Nasdaq plummets to 33%. With Brent crude choked at $95.90 due to Hormuz disruptions, smart money is accumulating hard-capped assets (Gold at $4,514, BTC consolidating near $79.4k) ahead of the inflation wall.</p>
+                        </div>
+                    </div>
+
+                    <!-- Live Odds Markets -->
+                    <div id="mm-odds" class="fdos-panel p-5 rounded-lg space-y-5 border border-pink-900/30 bg-gradient-to-b from-gray-900 to-black">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <h3 class="text-xs font-bold text-pink-400 uppercase tracking-wider mono">Live Predictive Odds</h3>
+                            <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                        </div>
+                        
+                        <div class="space-y-4 pt-2">
+                            <div>
+                                <div class="flex justify-between text-xs mono mb-1 text-gray-300">
+                                    <span>Sept FOMC 25bps Hike</span>
+                                    <span id="odd-fomc" class="font-bold text-white">60.4%</span>
+                                </div>
+                                <div class="progress-track"><div id="bar-fomc" class="progress-fill bg-pink-500" style="width: 60.4%; box-shadow: 0 0 10px rgba(236,72,153,0.5);"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mono mb-1 text-gray-300">
+                                    <span>Brent Crude > $100 (EOY)</span>
+                                    <span id="odd-brent" class="font-bold text-white">72.5%</span>
+                                </div>
+                                <div class="progress-track"><div id="bar-brent" class="progress-fill bg-amber-500" style="width: 72.5%;"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mono mb-1 text-gray-300">
+                                    <span>BTC Hits $85k (Pre-Election)</span>
+                                    <span id="odd-btc" class="font-bold text-white">48.1%</span>
+                                </div>
+                                <div class="progress-track"><div id="bar-btc" class="progress-fill bg-cyan-400" style="width: 48.1%;"></div></div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-xs mono mb-1 text-gray-300">
+                                    <span>CNN Fear/Greed > 50 (Greed)</span>
+                                    <span id="odd-vix" class="font-bold text-white">35.0%</span>
+                                </div>
+                                <div class="progress-track"><div id="bar-vix" class="progress-fill bg-gray-500" style="width: 35.0%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. FORTRESS & HUNT -->
+            <section id="view-fortress-hunt" class="brand-view hidden space-y-6">
+                <div id="fh-intro" class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-amber-500 flex items-center gap-2">
+                        <span>🏛️</span> Fortress & Hunt Strategy
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Institutional barbell strategy testing the 4.81% yield floor against technology equity multiples using the deterministic VaR engine.
+                    </p>
+                </div>
+
+                <div id="fh-math" class="fdos-panel p-6 rounded-lg space-y-6 bg-gradient-to-br from-[#0a0f12] to-black border border-amber-900/30">
+                    <div class="text-center space-y-2 mb-6">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mono block">Deterministic Executive Calculator</span>
+                        <div class="text-xl md:text-2xl font-light text-white mono py-2 tracking-tight">
+                            VaR<sub>Tech</sub> = <span class="text-blue-400">α</span> · (<span class="text-amber-400">∂Yield<sub>10Y</sub></span>) + <span class="text-red-400">β</span> · DSPX<sub>Implied</sub> + ε
+                        </div>
+                        <p class="text-[10px] text-gray-500 max-w-xl mx-auto italic">Model updated for Sept 4th: 10Y Yield surge to 4.812% drives massive Tech VaR expansion.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-4xl mx-auto">
+                        <div class="space-y-1">
+                            <label class="text-[10px] mono text-blue-400 font-bold uppercase block">Alpha (α) Multiplier</label>
+                            <input type="number" id="calc-alpha" value="1.65" step="0.01" class="w-full bg-black border border-gray-700 rounded p-2 text-white mono text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] mono text-amber-400 font-bold uppercase block">∂ Yield (4.81%)</label>
+                            <input type="number" id="calc-dyield" value="56" step="1" class="w-full bg-black border border-gray-700 rounded p-2 text-white mono text-xs focus:border-amber-500 focus:outline-none" title="Basis point shift to 4.812%">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] mono text-red-400 font-bold uppercase block">Beta (β) Correlation</label>
+                            <input type="number" id="calc-beta" value="0.84" step="0.01" class="w-full bg-black border border-gray-700 rounded p-2 text-white mono text-xs focus:border-red-500 focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] mono text-purple-400 font-bold uppercase block">DSPX Variance</label>
+                            <input type="number" id="calc-dspx" value="18.2" step="0.1" class="w-full bg-black border border-gray-700 rounded p-2 text-white mono text-xs focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] mono text-gray-400 font-bold uppercase block">Epsilon (ε) Noise</label>
+                            <input type="number" id="calc-epsilon" value="0.08" step="0.01" class="w-full bg-black border border-gray-700 rounded p-2 text-white mono text-xs focus:border-gray-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 mt-6">
+                        <button onclick="executeVaR()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold mono text-xs px-6 py-2.5 rounded transition-colors shadow-[0_0_15px_rgba(245,158,11,0.3)] uppercase">
+                            Execute Equation
+                        </button>
+                        <div class="flex items-center gap-3 bg-black/60 border border-gray-800 rounded px-4 py-2 min-w-[200px] justify-center">
+                            <span class="text-xs text-gray-500 mono font-bold">VaR Output:</span>
+                            <span id="calc-result" class="text-lg text-white font-black mono tracking-wider">107.7680</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ADAM RESEARCH (MONTE CARLO SIMULATOR) -->
+            <section id="view-research" class="brand-view hidden space-y-6">
+                <div id="ar-intro" class="fdos-panel p-5 rounded-lg border-l-4 accent-border">
+                    <h2 class="text-xl font-bold uppercase tracking-tight text-emerald-400 flex items-center gap-2">
+                        <span>🧪</span> Monte Carlo Risk Engine (GBM Simulator)
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                        High-performance HTML5 Canvas path visualizer. Runs stochastic Geometric Brownian Motion (GBM) simulations for asset tail-risk modeling.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Controls -->
+                    <div class="lg:col-span-1 fdos-panel p-6 rounded-lg space-y-5">
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mono border-b border-gray-800 pb-2">Model Parameters</h3>
+                        
+                        <div>
+                            <div class="flex justify-between text-xs mono mb-1 text-gray-400"><span>Volatility (σ)</span><span id="val-vol" class="text-white font-bold">32%</span></div>
+                            <input type="range" id="mc-vol" min="5" max="80" value="32" oninput="updateMCVals()" class="w-full accent-emerald-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mono mb-1 text-gray-400"><span>Drift (μ)</span><span id="val-drift" class="text-white font-bold">4.5%</span></div>
+                            <input type="range" id="mc-drift" min="-20" max="30" value="4.5" step="0.5" oninput="updateMCVals()" class="w-full accent-emerald-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mono mb-1 text-gray-400"><span>Start Asset (S0)</span><span id="val-price" class="text-white font-bold">$79.4k (BTC)</span></div>
+                            <input type="range" id="mc-price" min="10" max="100" value="79.4" step="0.1" oninput="updateMCVals()" class="w-full accent-emerald-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mono mb-1 text-gray-400"><span>Time (T)</span><span id="val-time" class="text-white font-bold">180 Days</span></div>
+                            <input type="range" id="mc-time" min="30" max="500" value="180" step="1" oninput="updateMCVals()" class="w-full accent-emerald-500">
+                        </div>
+
+                        <button onclick="runMonteCarlo()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-black font-bold rounded mono text-xs uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                            Execute Paths
+                        </button>
+                    </div>
+
+                    <!-- Canvas Output -->
+                    <div class="lg:col-span-3 fdos-panel p-6 rounded-lg relative flex flex-col">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-4">
+                            <h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider mono">Path Visualization (n=200)</h3>
+                            <span id="mc-status" class="text-[10px] text-gray-500 mono bg-black px-2 py-0.5 border border-gray-800 rounded">READY</span>
+                        </div>
+                        <div class="flex-grow w-full bg-[#020408] border border-gray-800 rounded relative overflow-hidden min-h-[300px]">
+                            <canvas id="mc-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mt-4 text-center mono text-xs">
+                            <div class="bg-black/50 p-2 border border-gray-800 rounded">
+                                <span class="text-gray-500 block text-[9px] mb-1">MEDIAN TERMINAL</span>
+                                <span id="mc-res-med" class="text-white font-bold text-sm">--</span>
+                            </div>
+                            <div class="bg-black/50 p-2 border border-green-900/30 rounded">
+                                <span class="text-green-500 block text-[9px] mb-1">95th PERCENTILE</span>
+                                <span id="mc-res-high" class="text-green-400 font-bold text-sm">--</span>
+                            </div>
+                            <div class="bg-black/50 p-2 border border-red-900/30 rounded">
+                                <span class="text-red-500 block text-[9px] mb-1">5th PERCENTILE</span>
+                                <span id="mc-res-low" class="text-red-400 font-bold text-sm">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- (Other tabs hidden for brevity but architecture remains intact) -->
+            <section id="view-institutional" class="brand-view hidden"><div class="p-6 text-center text-gray-500 mono">Institutional Perimeter Offline for Re-calibration.</div></section>
+
+        </main>
+
+        <!-- PERSISTENT LLM INTERROGATOR (Sidebar) -->
+        <aside class="w-72 border-l border-gray-800 bg-[#0a0d14]/90 hidden xl:flex flex-col shrink-0 relative z-10 backdrop-blur-md">
+            <div class="p-3 border-b border-gray-800 flex items-center justify-between bg-black/50">
+                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider mono flex items-center gap-2">
+                    <span class="text-lg">🤖</span> FDOS Swarm Interrogator
+                </span>
+                <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+            </div>
+            
+            <div id="chat-history" class="flex-1 p-4 overflow-y-auto space-y-4 text-xs scrollbar-custom bg-black/30">
+                <!-- Initial System Message -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] text-cyan-500 font-bold mono">SYSTEM</span>
+                    <div class="bg-cyan-900/20 border border-cyan-800/50 p-3 rounded-r rounded-bl text-gray-300">
+                        FDOS Master Orchestrator initialized. Real-time data arrays for September 4, 2026 injected. How may I assist your portfolio analysis?
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-3 border-t border-gray-800 bg-black/80">
+                <div class="relative">
+                    <input type="text" id="chat-input" placeholder="Query the Swarm..." class="w-full bg-[#11131a] border border-gray-700 rounded p-2.5 pr-8 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono" onkeypress="handleChatKey(event)">
+                    <button onclick="sendChatMessage()" class="absolute right-2 top-1.5 text-gray-400 hover:text-cyan-400">
+                        ➤
+                    </button>
+                </div>
+                <div class="flex justify-between mt-2 px-1">
+                    <span class="text-[9px] text-gray-600 mono">Model: gemini-3-flash</span>
+                    <span class="text-[9px] text-gray-600 mono">API_KEY: ACTIVE</span>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         SCRIPTS & INTERACTIVITY LOGIC
+         ═══════════════════════════════════════════ -->
+    <script>
+        // --- Navigation Logic ---
+        function switchBrand(brandId) {
+            const themes = {
+                'adam-os': 'theme-adam-os',
+                'market-mayhem': 'theme-market-mayhem',
+                'fortress-hunt': 'theme-fortress-hunt',
+                'institutional': 'theme-institutional',
+                'research': 'theme-research'
+            };
+            
+            document.body.className = `${themes[brandId]} flex flex-col h-screen overflow-hidden text-sm`;
+            
+            // FIX: Removed invalid optional chaining assignment
+            const themeLabel = document.getElementById('label-active-theme');
+            if (themeLabel) themeLabel.innerText = themes[brandId];
+
+            document.querySelectorAll('.brand-pill').forEach(btn => {
+                btn.classList.remove('active'); btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`btn-brand-${brandId}`);
+            if (activeBtn) { activeBtn.classList.add('active'); activeBtn.classList.remove('text-gray-400'); }
+
+            document.querySelectorAll('.brand-view').forEach(view => view.classList.add('hidden'));
+            const targetView = document.getElementById(`view-${brandId}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            document.getElementById('main-viewport').scrollTo({top: 0, behavior: 'smooth'});
+
+            // Re-trigger Canvas Initializations based on active view
+            if (brandId === 'adam-os' && !topologyRunning) startTopologyCanvas();
+            if (brandId === 'research' && !mcRunning) drawBaseGrid();
+        }
+
+        // --- Live Odds Jitter (Market Mayhem) ---
+        const oddsData = { fomc: 60.4, brent: 72.5, btc: 48.1, vix: 35.0 };
+        setInterval(() => {
+            if(document.getElementById('view-market-mayhem').classList.contains('hidden')) return;
+            Object.keys(oddsData).forEach(key => {
+                const drift = (Math.random() * 0.8 - 0.4); // Random walk drift
+                oddsData[key] = Math.max(0, Math.min(100, oddsData[key] + drift));
+                const valStr = oddsData[key].toFixed(1) + '%';
+                
+                const textEl = document.getElementById(`odd-${key}`);
+                const barEl = document.getElementById(`bar-${key}`);
+                if(textEl && barEl) {
+                    textEl.innerText = valStr;
+                    barEl.style.width = valStr;
+                }
+            });
+        }, 1500);
+
+        // --- Deterministic VaR Calculator ---
+        function executeVaR() {
+            const alpha = parseFloat(document.getElementById('calc-alpha').value) || 0;
+            const dyield = parseFloat(document.getElementById('calc-dyield').value) || 0;
+            const beta = parseFloat(document.getElementById('calc-beta').value) || 0;
+            const dspx = parseFloat(document.getElementById('calc-dspx').value) || 0;
+            const eps = parseFloat(document.getElementById('calc-epsilon').value) || 0;
+
+            const result = (alpha * dyield) + (beta * dspx) + eps;
+            const el = document.getElementById('calc-result');
+            el.innerText = result.toFixed(4);
+            
+            // Visual Flash
+            el.parentElement.classList.add('border-amber-500', 'bg-amber-900/40');
+            setTimeout(() => el.parentElement.classList.remove('border-amber-500', 'bg-amber-900/40'), 300);
+            appendToChat("SYSTEM", `VaR Equation Executed manually. Output: ${result.toFixed(4)}`, true);
+        }
+
+        // --- Monte Carlo Stochastic Engine (HTML5 Canvas) ---
+        let mcRunning = false;
+        function updateMCVals() {
+            document.getElementById('val-vol').innerText = document.getElementById('mc-vol').value + '%';
+            document.getElementById('val-drift').innerText = document.getElementById('mc-drift').value + '%';
+            document.getElementById('val-price').innerText = '$' + document.getElementById('mc-price').value + 'k';
+            document.getElementById('val-time').innerText = document.getElementById('mc-time').value + ' Days';
+        }
+
+        function drawBaseGrid() {
+            const canvas = document.getElementById('mc-canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<10; i++) {
+                ctx.beginPath(); ctx.moveTo(0, (canvas.height/10)*i); ctx.lineTo(canvas.width, (canvas.height/10)*i); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo((canvas.width/10)*i, 0); ctx.lineTo((canvas.width/10)*i, canvas.height); ctx.stroke();
+            }
+        }
+
+        function runMonteCarlo() {
+            if(mcRunning) return;
+            mcRunning = true;
+            
+            const canvas = document.getElementById('mc-canvas');
+            const ctx = canvas.getContext('2d');
+            drawBaseGrid();
+            
+            const vol = parseFloat(document.getElementById('mc-vol').value) / 100;
+            const drift = parseFloat(document.getElementById('mc-drift').value) / 100;
+            const S0 = parseFloat(document.getElementById('mc-price').value);
+            const days = parseInt(document.getElementById('mc-time').value);
+            
+            const dt = 1 / 252;
+            const numPaths = 200;
+            let finalPrices = [];
+            let paths = [];
+
+            const randn_bm = () => {
+                let u = 0, v = 0; while(u===0) u=Math.random(); while(v===0) v=Math.random();
+                return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            }
+
+            let maxS = S0, minS = S0;
+
+            // Generate Paths
+            for(let i=0; i<numPaths; i++) {
+                let path = [S0];
+                let S = S0;
+                for(let t=1; t<=days; t++) {
+                    S = S * Math.exp((drift - 0.5 * vol * vol) * dt + vol * Math.sqrt(dt) * randn_bm());
+                    path.push(S);
+                    if(S > maxS) maxS = S;
+                    if(S < minS) minS = S;
+                }
+                paths.push(path);
+                finalPrices.push(S);
+            }
+
+            maxS *= 1.05; minS *= 0.95;
+            const range = maxS - minS;
+
+            document.getElementById('mc-status').innerText = 'COMPUTING...';
+            document.getElementById('mc-status').className = 'text-[10px] text-amber-400 mono bg-amber-900/30 px-2 py-0.5 border border-amber-800 rounded animate-pulse';
+
+            // Draw paths incrementally to show animation
+            let currentPath = 0;
+            function drawNextPath() {
+                if(currentPath >= numPaths) {
+                    mcRunning = false;
+                    // Calculate Stats
+                    finalPrices.sort((a,b) => a-b);
+                    const median = finalPrices[Math.floor(numPaths * 0.5)];
+                    const p95 = finalPrices[Math.floor(numPaths * 0.95)];
+                    const p05 = finalPrices[Math.floor(numPaths * 0.05)];
+
+                    document.getElementById('mc-res-med').innerText = `$${median.toFixed(2)}k`;
+                    document.getElementById('mc-res-high').innerText = `$${p95.toFixed(2)}k`;
+                    document.getElementById('mc-res-low').innerText = `$${p05.toFixed(2)}k`;
+                    
+                    document.getElementById('mc-status').innerText = 'COMPLETE';
+                    document.getElementById('mc-status').className = 'text-[10px] text-emerald-400 mono bg-emerald-900/30 px-2 py-0.5 border border-emerald-800 rounded';
+                    return;
+                }
+
+                for(let batch=0; batch<5; batch++) { // Draw 5 at a time
+                    if(currentPath >= numPaths) break;
+                    const path = paths[currentPath];
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvas.height - ((path[0] - minS) / range) * canvas.height);
+                    for(let t=1; t<=days; t++) {
+                        let x = (t/days) * canvas.width;
+                        let y = canvas.height - ((path[t] - minS) / range) * canvas.height;
+                        ctx.lineTo(x, y);
+                    }
+                    const endVal = path[days];
+                    // Color code based on finish vs start
+                    ctx.strokeStyle = endVal > S0 ? `rgba(16, 185, 129, 0.15)` : `rgba(239, 68, 68, 0.15)`; 
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    currentPath++;
+                }
+                requestAnimationFrame(drawNextPath);
+            }
+            drawNextPath();
+        }
+
+        // --- Quantum Canvas Swarm Topology (Adam OS) ---
+        let topologyRunning = false;
+        function startTopologyCanvas() {
+            const canvas = document.getElementById('quantum-canvas');
+            if(!canvas) return;
+            topologyRunning = true;
+            const ctx = canvas.getContext('2d');
+            const parent = canvas.parentElement;
+            
+            function resize() { canvas.width = parent.clientWidth; canvas.height = parent.clientHeight; }
+            resize();
+            window.addEventListener('resize', resize);
+
+            let nodes = [];
+            for(let i=0; i<48; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.7, vy: (Math.random() - 0.5) * 0.7,
+                    tier: Math.random() > 0.85 ? 'core' : 'edge'
+                });
+            }
+
+            function animate() {
+                if(!document.getElementById('view-adam-os').classList.contains('hidden')) {
+                    ctx.fillStyle = 'rgba(2, 4, 8, 0.2)'; // fade effect
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    for(let i=0; i<nodes.length; i++) {
+                        for(let j=i+1; j<nodes.length; j++) {
+                            let dx = nodes[i].x - nodes[j].x;
+                            let dy = nodes[i].y - nodes[j].y;
+                            let dist = dx*dx + dy*dy;
+                            if(dist < 12000) {
+                                ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y);
+                                ctx.strokeStyle = `rgba(0, 243, 255, ${0.15 * (1 - dist/12000)})`;
+                                ctx.lineWidth = nodes[i].tier === 'core' && nodes[j].tier === 'core' ? 1.5 : 0.5;
+                                ctx.stroke();
+                            }
+                        }
+                    }
+
+                    nodes.forEach(n => {
+                        n.x += n.vx; n.y += n.vy;
+                        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+                        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+                        
+                        ctx.beginPath();
+                        ctx.arc(n.x, n.y, n.tier === 'core' ? 3 : 1.5, 0, Math.PI * 2);
+                        ctx.fillStyle = n.tier === 'core' ? '#fff' : '#00f3ff';
+                        if(n.tier === 'core') { ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff'; } else { ctx.shadowBlur = 0; }
+                        ctx.fill();
+                    });
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // --- GEMINI LLM INTERFACE ---
+        
+        // Internal history to pass to the API
+        let llmHistory = [
+            {
+                role: "user",
+                parts: [{ text: "Act as the FDOS Master Orchestrator, an institutional neuro-symbolic AI. Current Date: September 4, 2026. Macro context: 10Y Yield is 4.812%, Brent is $95.90, BTC is $79.4k, ISM Mfg is 54.6, FOMC hike odds are 60%. Keep responses concise, analytical, and in-character." }]
+            },
+            {
+                role: "model",
+                parts: [{ text: "Acknowledged. FDOS Master Orchestrator online. Parameters ingested. Ready for query." }]
+            }
+        ];
+
+        function appendToChat(sender, text, isSystem = false) {
+            const chatBox = document.getElementById('chat-history');
+            const div = document.createElement('div');
+            div.className = "flex flex-col gap-1";
+            
+            if(sender === 'USER') {
+                div.innerHTML = `
+                    <span class="text-[9px] text-gray-400 font-bold mono text-right">USER</span>
+                    <div class="bg-gray-800 border border-gray-700 p-3 rounded-l rounded-br text-gray-200 self-end ml-4">
+                        ${text}
+                    </div>`;
+            } else if (isSystem) {
+                 div.innerHTML = `
+                    <span class="text-[9px] text-amber-500 font-bold mono">SYSTEM</span>
+                    <div class="bg-amber-900/20 border border-amber-800/50 p-3 rounded-r rounded-bl text-amber-200/80 italic text-[11px]">
+                        ${text}
+                    </div>`;
+            } else {
+                div.innerHTML = `
+                    <span class="text-[9px] text-cyan-500 font-bold mono">FDOS ORCHESTRATOR</span>
+                    <div class="bg-cyan-900/20 border border-cyan-800/50 p-3 rounded-r rounded-bl text-gray-300">
+                        ${text}
+                    </div>`;
+            }
+            
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleChatKey(e) {
+            if(e.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            appendToChat('USER', text);
+            input.value = '';
+            
+            llmHistory.push({ role: "user", parts: [{ text: text }] });
+
+            // Add loading indicator
+            const chatBox = document.getElementById('chat-history');
+            const loadDiv = document.createElement('div');
+            loadDiv.id = "loading-msg";
+            loadDiv.className = "text-[10px] text-cyan-500/50 mono animate-pulse";
+            loadDiv.innerText = "> Parsing matrix...";
+            chatBox.appendChild(loadDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const apiKey = ""; // API Key provided by environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: llmHistory })
+                });
+
+                document.getElementById('loading-msg')?.remove();
+
+                const result = await response.json();
+                const modelResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (modelResponse) {
+                    appendToChat('MODEL', modelResponse);
+                    llmHistory.push({ role: "model", parts: [{ text: modelResponse }] });
+                } else {
+                    appendToChat('SYSTEM', "Error: Null return from cognitive engine.", true);
+                }
+            } catch (error) {
+                document.getElementById('loading-msg')?.remove();
+                appendToChat('SYSTEM', `API Connection Error: ${error.message}`, true);
+            }
+        }
+
+        // --- LLM Memo Synthesis ---
+        async function synthesizeMemo() {
+            const btn = document.querySelector('button[onclick="synthesizeMemo()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-spin">⚙️</span> Generating...`;
+            btn.disabled = true;
+
+            const prompt = `Write a 2-paragraph retail-friendly financial newsletter for the 'Market Mayhem' hub. Date is Sept 4, 2026. Focus on the 'No-Hire, No-Fire' jobs report making the Fed rate hike a 60% coin-flip, and the 10Y yield spiking to 4.81%. Mention the Bitcoin-Gold correlation hitting a 6-year high as institutional money flees fiat. Output only HTML paragraphs <p>. No markdown blocks. Make it sound urgent but analytical.`;
+
+            try {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                const result = await response.json();
+                const htmlResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if(htmlResponse) {
+                    const body = document.getElementById('newsletter-body');
+                    body.style.opacity = 0;
+                    setTimeout(() => {
+                        body.innerHTML = htmlResponse.replace(/```html/g, '').replace(/```/g, '');
+                        document.getElementById('newsletter-title').innerText = "Sept 4 Live Synthesis: Yield Spike & Hard Assets";
+                        body.style.transition = 'opacity 0.5s ease';
+                        body.style.opacity = 1;
+                    }, 300);
+                }
+            } catch (error) {
+                console.error("Memo Gen Error:", error);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize defaults
+        window.onload = () => {
+            switchBrand('adam-os');
+            
+            setInterval(() => {
+                const clockEl = document.getElementById('live-clock');
+                if (clockEl) {
+                    const now = new Date();
+                    clockEl.innerText = now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour12: false }) + ' EDT';
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
