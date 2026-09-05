@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARKET MAYHEM // ADAM V31.0 TERMINAL // 2026.09.02</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        display: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        term: {
+                            bg: '#030712', surface: '#0f172a', card: '#1e293b', border: '#334155',
+                            cyan: '#06b6d4', blue: '#3b82f6', red: '#ef4444', amber: '#f59e0b', green: '#10b981',
+                            neon: '#38bdf8', purple: '#8b5cf6', pink: '#ec4899', gold: '#fbbf24'
+                        }
+                    },
+                    backgroundImage: {
+                        'scanline': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))'
+                    },
+                    animation: {
+                        'ticker': 'ticker 40s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        ticker: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(-100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        body { font-size: 14px; }
+
+        /* Cyberpunk text glow effects */
+        .glow-red { text-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+        .glow-amber { text-shadow: 0 0 12px rgba(245, 158, 11, 0.8); }
+        .glow-cyan { text-shadow: 0 0 12px rgba(6, 182, 212, 0.8); }
+
+        /* CRT Screen Overlay */
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--scanline); background-size: 100% 4px;
+            z-index: 9999; pointer-events: none; opacity: 0.15;
+        }
+
+        /* Navigation Styles */
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-active {
+            border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1);
+            color: #fff; box-shadow: inset 20px 0 20px -20px rgba(239, 68, 68, 0.3);
+        }
+        .nav-item:hover:not(.nav-active) { background: #1e293b; color: #fff; }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .chart-container { animation: pulse-chart 4s infinite; }
+        @keyframes pulse-chart { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
+        /* Data Table Styling */
+        .term-table th { @apply p-3 text-term-cyan font-mono text-xs uppercase tracking-wider border-b border-white/10; }
+        .term-table td { @apply p-3 text-sm text-slate-300 border-b border-white/5; }
+        .term-table tr:last-child td { border-bottom: none; }
+        .term-table tr:hover td { @apply bg-white/5 transition-colors; }
+    </style>
+</head>
+<body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
+    <div class="crt-overlay"></div>
+
+    <div class="border-bottom border-term-red/30 bg-term-red/5 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
+        <div class="absolute left-0 top-0 h-full bg-term-bg z-10 px-2 flex items-center border-r border-term-red/30 text-[10px] font-mono font-bold text-term-red">
+            <span class="animate-pulse mr-2">●</span> LIVE FEED
+        </div>
+        <div class="w-full overflow-hidden ml-24">
+            <div class="animate-ticker whitespace-nowrap text-[10px] font-mono text-slate-400">
+                <span class="text-term-amber">ALERT:</span> S&P 500 AT 7,625.38 (-0.79%) ///
+                <span class="text-term-red">ENERGY:</span> BRENT BREAKOUT AT $91.08/BBL ///
+                <span class="text-term-cyan">ACTIVIST:</span> SUMMER ROAD SEIZES IMKTA GOVERNANCE LEVERAGE ///
+                <span class="text-term-amber">YIELDS:</span> 10Y TREASURY AT 4.787% (20-MONTH HIGH) ///
+                <span class="text-term-red">CREDIT TRAP:</span> VIX FLARES TO 16.66 ON DURATION LIQUIDATION ///
+                <span class="text-term-cyan">CRYPTO:</span> BTC CONSOLIDATES AT $77,872
+            </div>
+        </div>
+    </div>
+
+    <header class="h-16 border-b border-white/10 bg-term-bg/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 z-20 shadow-2xl relative">
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-term-red/50 to-transparent"></div>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded bg-gradient-to-br from-term-red to-term-amber text-white font-bold font-display text-lg flex items-center justify-center border border-term-red/50 shadow-[0_0_15px_rgba(239,68,68,0.4)]">MM</div>
+            <div>
+                <h1 class="font-display font-bold text-slate-100 tracking-widest text-base uppercase">Market Mayhem</h1>
+                <p class="text-[10px] text-term-red font-mono tracking-widest uppercase glow-red">NODE: Adam v26.0 // 2026.09.02</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 md:gap-6 font-mono text-xs">
+            <div class="hidden md:flex items-center gap-2 text-term-red bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                <div class="w-2 h-2 rounded-full bg-term-red animate-pulse-fast"></div> SYSTEM: CRITICAL
+            </div>
+            <div class="text-slate-400 bg-white/5 px-2 md:px-3 py-1 rounded border border-white/5">
+                <span id="sysClock">00:00:00 UTC</span>
+            </div>
+            <button onclick="toggleAI()" class="bg-term-red text-term-bg hover:bg-white px-3 md:px-4 py-1.5 rounded font-bold transition-all duration-300 whitespace-nowrap">
+                TERMINAL UI
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-white/5 bg-term-surface/80 backdrop-blur flex flex-col shrink-0 overflow-y-auto hidden lg:flex z-10">
+            <div class="p-4 border-b border-white/5 bg-black/20">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="text-[10px] text-slate-500 font-mono tracking-widest">INGESTION PROGRESS</div>
+                    <div class="text-[10px] text-term-cyan font-mono" id="progressText">0%</div>
+                </div>
+                <div class="w-full bg-term-bg h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-term-cyan to-term-blue h-full w-[0%] transition-all duration-500"></div>
+                </div>
+            </div>
+            <nav id="moduleNav" class="flex-1 py-2 flex flex-col px-3 font-mono text-xs overflow-y-auto pb-20"></nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-term-surface via-term-bg to-term-bg p-4 md:p-8 relative scroll-smooth" id="mainScrollArea">
+            <div class="max-w-4xl mx-auto pb-24">
+                <!-- Mobile Navigation Dropdown -->
+                <select id="mobileNav" onchange="loadModule(parseInt(this.value))" class="lg:hidden w-full bg-term-surface border border-term-border text-slate-200 text-sm rounded p-3 mb-6 font-mono outline-none"></select>
+
+                <!-- Dynamic Content Container -->
+                <article id="contentArea" class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-headings:font-display prose-headings:font-bold prose-h1:text-3xl prose-h1:border-b prose-h1:border-white/10 prose-h1:pb-4 prose-h2:text-xl prose-h2:text-term-cyan transition-all duration-500 ease-in-out opacity-0 translate-y-4"></article>
+
+                <!-- Footer Controls -->
+                <div class="fixed bottom-0 left-0 lg:left-64 right-0 p-4 border-t border-white/10 bg-term-bg/90 backdrop-blur-md flex justify-between items-center z-10">
+                    <div class="max-w-4xl mx-auto w-full flex justify-between items-center px-4 md:px-0">
+                        <button id="prevBtn" class="px-5 py-2 glass-panel text-slate-300 rounded text-xs font-mono hover:text-white transition-all disabled:opacity-30">PREV MODULE</button>
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline" id="footerModuleIndicator">MODULE 1 OF X</span>
+                        <button id="nextBtn" class="px-5 py-2 bg-term-cyan text-term-bg rounded text-xs font-mono font-bold hover:bg-white transition-all disabled:opacity-30">NEXT MODULE</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside id="aiPanel" class="absolute right-0 top-0 h-full w-full md:w-[480px] glass-panel border-l border-white/10 transform translate-x-full transition-transform duration-300 ease-in-out z-40 flex flex-col shadow-2xl bg-term-surface/95 backdrop-blur-xl">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/40">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-term-red animate-pulse-fast"></div>
+                    <div>
+                        <h2 class="font-display text-base font-bold text-white tracking-widest">ADAM V26.0</h2>
+                        <p class="text-[9px] text-slate-400 font-mono uppercase glow-red">System Diagnostics Live</p>
+                    </div>
+                </div>
+                <button onclick="toggleAI()" class="text-slate-400 hover:text-white p-2 text-xl font-bold">&times;</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-sm font-sans pb-4">
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[95%] shadow-lg border-l-2 border-l-term-cyan">
+                    <p class="text-[10px] font-mono text-term-cyan mb-2 uppercase tracking-wider">System Initialization Status</p>
+                    <p class="mb-2"><strong>ENCRYPTION:</strong> ACTIVE</p>
+                    <p><strong>RLHF FINE-TUNING:</strong> Active (Weighting "10Y Sovereign Yield Surge to 4.787% 20-Month High & $91.08 Brent Breakout" vs. "S&P 500 7,625 Duration Drag & $77.8k BTC Continuous Re-Balance")</p>
+                </div>
+                <div class="glass-panel p-4 rounded-xl text-slate-300 self-start max-w-[95%] shadow-lg border-l-2 border-l-term-red">
+                    <p class="text-[10px] font-mono text-term-red mb-2 uppercase tracking-wider">Critical Alert</p>
+                    <p>The macro simulation is glitching. Node operators are scrambling as the "Bear-Flattening Virus" corrupts long-held yield assumptions, forcing liquid reserves to re-render across digital and safe-haven assets before systemic entropy takes hold.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Setup Chart.js defaults to match the terminal theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.elements.line.tension = 0.3;
+
+        /* Content payload organized into discrete modules */
+        const modules = [
+            {
+                id: 1,
+                group: "EXECUTIVE BRIEF",
+                title: "Sovereign Floor",
+                subtitle: "The Death of the Rate-Immune Narrative",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-red text-white text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">MACRO ALERT</span>
+                        <span class="text-xs font-mono text-term-amber">Q3 2026</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">The Adam v31.0 Sovereign Floor & The Death of the Rate-Immune Narrative</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">The foundational underwriting premise that sustained generative artificial intelligence (AI) equity multiples between 2023 and 2025—namely, that hyperscaler capital expenditures are completely price-inelastic and insulated from discount-rate regimes—has collapsed.</p>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">Under the <strong>Adam v31.0 Warsh Architecture</strong>, institutional underwriting mandates a rigorous mark-to-market of capital structures against a persistent "Higher for Longer" sovereign floor. The benchmark 10-year US Treasury yield serves as the sovereign anchor at <strong class="text-term-red">4.792%</strong> (having intraday-breached 4.81% in early September 2026).</p>
+                    <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2 mb-6">
+                        <li><strong>Persistent Core Inflation & Fiscal Deficits:</strong> Treasury supply absorption frictions compounded by ongoing fiscal expansion.</li>
+                        <li><strong>Geopolitical & Energy Shocks:</strong> Renewed military exchanges in the Middle East and Brent crude holding near <strong>$88/barrel</strong>.</li>
+                        <li><strong>Global Sovereign Spreads:</strong> UK 10-year gilts clearing <strong>5.26%</strong> (a post-2008 high) and Japanese 10-year JGBs reaching <strong>3.00%</strong> (the highest level since 1996).</li>
+                    </ul>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-4">Global Sovereign Yield Anchors (Q3 2026)</h3>
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th>Benchmark</th>
+                                    <th>Yield / Spot</th>
+                                    <th>Context / Historical Benchmark</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td class="font-bold text-white">US 10-Year Treasury</td><td class="text-term-red">4.792%</td><td>Model Sovereign Risk-Free Floor ($R_f$)</td></tr>
+                                <tr><td class="font-bold text-white">US 5-Year Treasury</td><td class="text-term-amber">4.550%</td><td>Multi-year corporate borrowing refi rate</td></tr>
+                                <tr><td class="font-bold text-white">UK 10-Year Gilt</td><td class="text-term-red">5.260%</td><td>Highest borrowing cost post-2008</td></tr>
+                                <tr><td class="font-bold text-white">Japan 10-Year JGB</td><td class="text-term-amber">3.000%</td><td>Highest cost of domestic debt since 1996</td></tr>
+                                <tr><td class="font-bold text-white">Brent Crude Prompt Month</td><td class="text-term-purple">$88.00/bbl</td><td>Elevated baseline input cost for energy</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                group: "MACRO ARCHITECTURE",
+                title: "Capital Asset Pricing",
+                subtitle: "Yield Curve Mechanics",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-blue text-white text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">CAPM ARCHITECTURE</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">The Yield Curve & Capital Asset Pricing Architecture</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">The benchmark US 10-Year Treasury rate of 4.792% flows directly into the Capital Asset Pricing Model (CAPM). With $\text{ERP} = 5.00\% - 5.50\%$, WACC expands rapidly. Because terminal valuations historically accounted for 65% to 75% of high-growth technology enterprise values, an expansion of the Weighted Average Cost of Capital ($\Delta \text{WACC} \approx +150\text{ to }220\text{ bps}$) generates a mathematical contraction of 20% to 35% in terminal capitalized enterprise values.</p>
+
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-amber overflow-x-auto border border-white/10 shadow-inner">
+       CAPITAL ALLOCATION & SENSITIVITY PROFILE UNDER ELEVATED SOVEREIGN YIELDS
+
+          Terminal Growth (g)  │   WACC: 8.5%   WACC: 9.5%   WACC: 10.5%   WACC: 11.5%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 2.0%          │     15.4x        13.3x        11.8x        10.5x
+                 2.5%          │     16.7x        14.3x        12.5x        11.1x
+                 3.0%          │     18.2x        15.4x        13.3x        11.8x
+                 3.5%          │     20.0x        16.7x        14.3x        12.5x
+                 4.0%          │     22.2x        18.2x        15.4x        13.3x
+         ─────────────────────────────────────────────────────────────────────────────
+         Note: Terminal Exit Multiples [1 / (WACC - g)] illustrate rapid multiple
+         compression as sovereign floor holds WACC above 9.5% across the stack.
+                        </pre>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                group: "MACRO ARCHITECTURE",
+                title: "Credit Risk & Governance",
+                subtitle: "Distance-to-Default & SR 26-2",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-purple text-white text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">STRUCTURAL RISK</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Structural Credit Risk: Merton Distance-to-Default Engine</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">To evaluate balance sheet resilience and transmission channels from equity volatility to credit default, underwriting utilizes the <strong>Merton Structural Credit Risk Model</strong>, which evaluates a firm’s equity as a European call option on its underlying asset value ($V$) with a strike price equal to the face value of debt ($D$).</p>
+
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                                MERTON STRUCTURAL CREDIT FORMULATION
+
+       Asset Value (V) ───────────────────────────────────────────────┐
+             │                                                        │
+             │   Equity Value: E = V·N(d₁) - D·e^(-rT)·N(d₂)          ▼
+             │                                              Default Horizon (T)
+             ▼                                                        ▲
+      Default Barrier (D) ────────────────────────────────────────────┘
+                         [Insolvency occurs if V(T) < D at maturity]
+                        </pre>
+                    </div>
+
+                    <div class="glass-panel p-4 border-l-4 border-term-amber my-4 bg-term-amber/5">
+                        <p class="text-sm text-slate-300"><strong>Second Line of Defense Underwriting Conclusion:</strong> While absolute distances to default across Tier-1 equipment makers and foundries remain strong (>8.5σ), the core credit risk is <strong>asset value drawdown</strong> ($\Delta V < 0$).</p>
+                    </div>
+
+                    <h2 class="mt-8 mb-4">Regulatory Governance: SR 26-2 Framework</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">On April 17, 2026, the Federal Reserve Board, FDIC, and OCC jointly issued SR 26-2, superseding legacy SR 11-7.</p>
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr><th>Regulatory Dimension</th><th>Legacy SR 11-7</th><th>SR 26-2 Directive (Active)</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td>Scope & Application</td><td>Econometric, PD/LGD models</td><td>Agentic AI, LLMs, Neural Proxies</td></tr>
+                                <tr><td>Model Drift Controls</td><td>Annual / Semi-annual reviews</td><td>Continuous real-time telemetry</td></tr>
+                                <tr><td>Explainability Mandate</td><td>Conceptual soundness</td><td>Deterministic output bounds & audits</td></tr>
+                                <tr><td>Governance Sanctions</td><td>Qualitative MRM findings</td><td>Direct operational tier-weight caps</td></tr>
+                                <tr><td>Effective Challenge</td><td>Internal model validation</td><td>Independent adversarial red-teaming</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                group: "ECOSYSTEM TAXONOMY",
+                title: "Value Accrual Matrix",
+                subtitle: "The Artificial Intelligence Value Pyramid",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-cyan text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">ECOSYSTEM HIERARCHY</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Ecosystem Taxonomy & Value Accrual Matrix</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">Economic rent extraction in the AI ecosystem follows a top-down hierarchy. Valuations must pass the "Fortress Filter": survivability requires monopolistic physical chokepoints, sovereign-grade pricing power, and immediate, non-dilutive Free Cash Flow generation.</p>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-4">Value Accrual Layer Analysis</h3>
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th>Layer</th>
+                                    <th>Archetype</th>
+                                    <th>Dominant Entities</th>
+                                    <th>Pricing Power</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td class="font-bold text-term-cyan">Layer 0</td><td>Lithography & Tools</td><td>ASML, AMAT, LRCX</td><td class="text-term-green">Absolute / Monopolistic</td></tr>
+                                <tr><td class="font-bold text-term-cyan">Layer 1</td><td>Foundry & Silicon</td><td>TSMC, NVDA, AMD, INTC</td><td class="text-term-green">Apex / Chokepoint</td></tr>
+                                <tr><td class="font-bold text-term-cyan">Layer 2</td><td>Networking & Memory</td><td>AVGO, MRVL, MU, SK Hynix</td><td class="text-term-amber">High / Expanding</td></tr>
+                                <tr><td class="font-bold text-term-cyan">Layer 3</td><td>Hyperscale Infrastructure</td><td>MSFT, AMZN, GOOGL, ORCL</td><td class="text-term-red">Moderate (Margin Squeeze)</td></tr>
+                                <tr><td class="font-bold text-term-cyan">Layer 4</td><td>Foundation Models</td><td>OpenAI, Anthropic</td><td class="text-term-red">Negative / Subsidized</td></tr>
+                                <tr><td class="font-bold text-term-cyan">Layer 5</td><td>Application SaaS</td><td>CRM, NOW, PLTR</td><td class="text-term-red">Low / Vulnerable</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-amber overflow-x-auto border border-white/10 shadow-inner">
+  ┌────────────────────────────────────────────────────────────────────────────────────────┐
+  │                            VALUE ACCRUAL FLOW SCHEMATIC                                │
+  │                                                                                        │
+  │     [Layer 5: SaaS Users]  ──► Enterprise seat adoption slows to 30-55% (SR 26-2)      │
+  │               │                                                                        │
+  │               ▼                                                                        │
+  │     [Layer 3: Hyperscalers] ─► $775B-$800B Capex eclipses Operating Cash Flow (Q3 '26) │
+  │               │                                                                        │
+  │         ┌─────┴──────────────────────────────┐                                         │
+  │         ▼                                    ▼                                         │
+  │   [Layer 2: Networking]                [Layer 1: Silicon]                              │
+  │   AVGO captures back-end               NVDA Blackwell/Rubin                            │
+  │   fabric spend (Tomahawk 6)            faces 71-72% GM compression                     │
+  │         │                                    │                                         │
+  │         └──────────────────┬─────────────────┘                                         │
+  │                            ▼                                                           │
+  │                  [Layer 1: Foundry] ──► TSMC 67.7% Gross Margin; enforces 5-10% hikes  │
+  │                            │                                                           │
+  │                            ▼                                                           │
+  │                 [Layer 0: Lithography] ► ASML €38.8B backlog; complete EUV monopoly   │
+  └────────────────────────────────────────────────────────────────────────────────────────┘
+                        </pre>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                group: "DETAILED ANALYSIS",
+                title: "Layer 3, 4 & 1",
+                subtitle: "Hyperscalers & Silicon",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-green text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">LAYER 3 & 1</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Layer 3 & 4: The Hyperscaler Capex Cliff & Cash Flow Deficit</h2>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">A major structural development in 2026 is the convergence of hyperscale capital expenditures with operating cash flows. In Q1 2026, earnings reports confirmed that the Big 5 hyperscalers planned an aggregate $775 billion to $800 billion in capital spending for calendar year 2026—a ~64% YoY increase over 2025.</p>
+
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+            AGGREGATE HYPERSCALER CASH REINVESTMENT IMBALANCE (2023 - 2027E)
+
+     $ Billions
+      $1,400 ┬                                                      [Projected Capex: $1.3T]
+      $1,200 ┼                                                                 ▲
+      $1,000 ┼                                                  ┌──────────────┘
+        $800 ┼                                    $775B-$800B   │
+        $600 ┼                      $480B              ▲        │
+        $400 ┼        $280B           ▲         ───────┼────────┼─── Projected OCF
+        $200 ┼          ▲             │                │        │    (Compounding ~23% YoY)
+          $0 ┴──────────┴─────────────┴────────────────┴────────┴──────────────────────►
+                      2023          2024             2025     2026E (Crossover)  2027E
+                        </pre>
+                    </div>
+
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr><th>Entity</th><th>Ticker</th><th>Crossover Window</th><th>Current Balance Sheet State</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td>Oracle Corporation</td><td>ORCL</td><td>Pre-2026 (Crossed)</td><td>Elevated leverage; reliant on private credit</td></tr>
+                                <tr><td>Amazon.com, Inc.</td><td>AMZN</td><td>Mid-2026 (Active)</td><td>AWS cash flow diverted to datacenter buildouts</td></tr>
+                                <tr><td>Alphabet Inc.</td><td>GOOGL</td><td>Q1 2027E</td><td>Search ad margins provide a temporary cash buffer</td></tr>
+                                <tr><td>Meta Platforms, Inc.</td><td>META</td><td>Q3 2027E</td><td>Strong FCF; open-source strategy caps monetization</td></tr>
+                                <tr><td>Microsoft Corp.</td><td>MSFT</td><td>Q3 2028E</td><td>Commercial enterprise backlog supports near-term cash</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="mt-8 mb-4">Layer 1: Silicon Architecture & Advanced Packaging Bottlenecks</h2>
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr><th>Architecture</th><th>Rubin Ultra (Canceled Design)</th><th>Dual-Die Rubin (Revised Base)</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td>Die Topology</td><td>Quad-Die (4x N3P Compute)</td><td>Dual-Die (2x N3P Compute)</td></tr>
+                                <tr><td>Memory Capacity</td><td>16x HBM4E Stacks</td><td>8x HBM4 Stacks</td></tr>
+                                <tr><td>Substrate Footprint</td><td>~7.5x to 8.0x Reticle Limit</td><td>~3.5x to 4.0x Reticle Limit</td></tr>
+                                <tr><td>Packaging Technology</td><td>TSMC CoWoS-L (Organic Substrate)</td><td>TSMC CoWoS-L (Qualified Matrix)</td></tr>
+                                <tr><td>Primary Yield Issue</td><td>Reflow Warpage / Microbump Shear</td><td>Within normal yield parameters</td></tr>
+                                <tr><td>Remediation Path</td><td>Deferred to CoPoS (Panel: 2028+)</td><td>Transition to 2+2 Board Topology</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                group: "DETAILED ANALYSIS",
+                title: "Layer 0 & 2",
+                subtitle: "Equipment & Networking",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-green text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">LAYER 0 & 2</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Layer 0 & 1 Supply Chain: Equipment and Foundry Chokepoints</h2>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+    TSMC REVENUE BREAKDOWN & CAPITAL EXPENDITURE SURGE (Q2 2026)
+
+    Gross Margin: 67.7%                      Operating Margin: 60.3%
+    ┌───────────────────────────┐            ┌───────────────────────────┐
+    │█████████████████████░░░░░░│            │███████████████████░░░░░░░│
+    └───────────────────────────┘            └───────────────────────────┘
+
+    2026 Capex Budget: $60B - $64B (All-Time Record in Semiconductor Industry)
+    Arizona Fab Campus Commitment: $100B Total Investment (Sub-2nm Target Ramps)
+                        </pre>
+                    </div>
+
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr><th>Metric Segment</th><th>Reported Value (€ / $)</th><th>Operational Context</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td>Total Net Sales</td><td>€9.33 Billion ($10.84B)</td><td>Exceeded guidance midpoints</td></tr>
+                                <tr><td>EUV System Net Sales</td><td>€3.80 Billion</td><td>Includes early High-NA shipments</td></tr>
+                                <tr><td>Installed Base Management</td><td>€2.76 Billion</td><td>High-margin recurring service stream</td></tr>
+                                <tr><td>Gross Profit Margin</td><td>54.0%</td><td>Benefiting from tool productivity kits</td></tr>
+                                <tr><td>Quarterly Net Income</td><td>€2.90 Billion</td><td>31.3% net margin on sales</td></tr>
+                                <tr><td>Consolidated Order Backlog</td><td>€38.80 Billion</td><td>Visibility extending through 2028-2030</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="mt-8 mb-4">Layer 2: Networking Infrastructure & The Ethernet Standard</h2>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-amber overflow-x-auto border border-white/10 shadow-inner">
+       UEC SPECIFICATION 1.0: ARCHITECTURAL TRANSPORT IMPROVEMENTS
+
+       Legacy TCP/IP Fabric              Ultra Ethernet Consortium (UEC 1.0)
+       ┌───────────────────────────┐     ┌─────────────────────────────────────────┐
+       │ In-order stream delivery  │     │ Packet spray over all equal-cost paths │
+       │ Coarse congestion backoff │ ──► │ Sub-RTT Congestion Notification (CNP)   │
+       │ High tail packet latency  │     │ Selective retransmission of lost packets│
+       │ Buffer drop buffer bloat  │     │ End-to-end hardware-level flow credits  │
+       └───────────────────────────┘     └─────────────────────────────────────────┘
+                        </pre>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                group: "TARGET TEAR SHEETS",
+                title: "Titans (NVDA, TSM)",
+                subtitle: "Layer 1 - Silicon & Foundry",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-green text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">LAYER 1 ANALYSIS</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Phase 4: Target Tear Sheets (The Titans)</h2>
+
+                    <div class="overflow-x-auto mb-8 border border-white/10 rounded-lg">
+                        <table class="w-full text-xs text-left whitespace-nowrap term-table">
+                            <thead class="bg-white/5">
+                                <tr><th>Ticker</th><th>Role in AI Ecosystem</th><th>Spot Price</th><th>Target Price</th><th>Implied Rating</th><th>WACC</th><th>Merton DD (σ)</th><th>1Y PD</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr><td>NVDA</td><td>Silicon Apex (Layer 1)</td><td>$158.20</td><td>$185.00</td><td>AAA</td><td>9.80%</td><td>12.2σ</td><td>0.00%</td></tr>
+                                <tr><td>TSM</td><td>Foundry Chokepoint (L1)</td><td>$210.50</td><td>$260.00</td><td>AA+</td><td>11.20%</td><td>9.8σ</td><td>0.01%</td></tr>
+                                <tr><td>MSFT</td><td>Compute Utility (L3/L4)</td><td>$475.00</td><td>$440.00</td><td>AAA</td><td>8.50%</td><td>11.0σ</td><td>0.00%</td></tr>
+                                <tr><td>ASML</td><td>Lithography Prim. (L0)</td><td>$1,150.00</td><td>$1,400.00</td><td>AA</td><td>9.00%</td><td>8.9σ</td><td>0.02%</td></tr>
+                                <tr><td>AVGO</td><td>Nervous System (L2)</td><td>$1,820.00</td><td>$2,100.00</td><td>BBB+</td><td>9.50%</td><td>4.2σ</td><td>0.65%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-2">TARGET 1: NVDA (NVIDIA) - THE SILICON APEX</h3>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                   NVDA ENTERPRISE VALUE SENSITIVITY MATRIX ($ TRILLIONS)
+
+          Terminal Growth (g)  │   WACC: 8.8%   WACC: 9.3%   WACC: 9.8%   WACC: 10.3%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 3.0%          │     $4.46        $4.02        $3.65        $3.34
+                 3.5%          │     $4.88        $4.36        $3.93        $3.58
+                 4.0% (Base)   │     $5.40        $4.77        $4.20 (Base) $3.86
+                 4.5%          │     $6.07        $5.27        $4.65        $4.20
+         ─────────────────────────────────────────────────────────────────────────────
+                        </pre>
+                    </div>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-2 mt-8">TARGET 2: TSM (TAIWAN SEMICONDUCTOR) - FOUNDRY CHOKEPOINT</h3>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                   TSM ENTERPRISE VALUE SENSITIVITY MATRIX ($ TRILLIONS)
+
+          Terminal Growth (g)  │   WACC: 10.2%  WACC: 10.7%  WACC: 11.2%  WACC: 11.7%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 2.5%          │     $1.50        $1.39        $1.29        $1.21
+                 3.0%          │     $1.60        $1.47        $1.36        $1.27
+                 3.5% (Base)   │     $1.72        $1.57        $1.35 (Base) $1.34
+                 4.0%          │     $1.86        $1.69        $1.54        $1.42
+         ─────────────────────────────────────────────────────────────────────────────
+                        </pre>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                group: "TARGET TEAR SHEETS",
+                title: "Titans (MSFT, ASML, AVGO)",
+                subtitle: "Layers 3, 0, 2",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-green text-black text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">MULTILAYER ANALYSIS</span>
+                    </div>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-2">TARGET 3: MSFT (MICROSOFT) - COMPUTE UTILITY</h3>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                   MSFT ENTERPRISE VALUE SENSITIVITY MATRIX ($ TRILLIONS)
+
+          Terminal Growth (g)  │   WACC: 7.5%   WACC: 8.0%   WACC: 8.5%   WACC: 9.0%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 2.0%          │     $3.41        $3.12        $2.88        $2.68
+                 2.5% (Base)   │     $3.75        $3.41        $3.10 (Base) $2.88
+                 3.0%          │     $4.17        $3.75        $3.41        $3.12
+                 3.5%          │     $4.69        $4.17        $3.75        $3.41
+         ─────────────────────────────────────────────────────────────────────────────
+                        </pre>
+                    </div>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-2 mt-8">TARGET 4: ASML (ASML HOLDING) - THE PRIMITIVE</h3>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                   ASML ENTERPRISE VALUE SENSITIVITY MATRIX ($ BILLIONS)
+
+          Terminal Growth (g)  │   WACC: 8.0%   WACC: 8.5%   WACC: 9.0%   WACC: 9.5%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 3.0%          │      $550         $500         $458         $423
+                 3.5%          │      $611         $550         $500         $458
+                 4.0% (Base)   │      $688         $611         $550 (Base)  $500
+                 4.5%          │      $786         $688         $611         $550
+         ─────────────────────────────────────────────────────────────────────────────
+                        </pre>
+                    </div>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-2 mt-8">TARGET 5: AVGO (BROADCOM) - THE NERVOUS SYSTEM</h3>
+                    <div class="relative group my-4">
+                        <pre class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-cyan overflow-x-auto border border-white/10 shadow-inner">
+                   AVGO ENTERPRISE VALUE SENSITIVITY MATRIX ($ BILLIONS)
+
+          Terminal Growth (g)  │   WACC: 8.5%   WACC: 9.0%   WACC: 9.5%   WACC: 10.0%
+         ──────────────────────┼──────────────────────────────────────────────────────
+                 1.5%          │      $943         $880         $825         $776
+                 2.0%          │    $1,015         $943         $880         $825
+                 2.5% (Base)   │    $1,100       $1,015         $950 (Base)  $880
+                 3.0%          │    $1,200       $1,100       $1,015         $943
+         ─────────────────────────────────────────────────────────────────────────────
+                        </pre>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                group: "PROVENANCE",
+                title: "LiveTelemetry",
+                subtitle: "Market Mayhem Ledger",
+                content: `
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="bg-term-border text-slate-300 text-[10px] font-mono px-2 py-1 rounded font-bold tracking-widest">MODULE 9: PROVENANCE LEDGER & METRICS</span>
+                    </div>
+
+                    <h2 class="mt-4 mb-4">Institutional Portfolio Recommendation & Underwriting Directives</h2>
+                    <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2 mb-6">
+                        <li><strong>Rotate Capital from Layer 3 into Layers 0, 1, and 2:</strong> Reallocate exposure away from capital-intensive cloud infrastructure operators approaching cash-flow crossover points.</li>
+                        <li><strong>Enforce Strict WACC Thresholds:</strong> Discontinue the use of sub-8.0% discount rates; discount all cash flows against an $R_f$ floor of at least 4.792%.</li>
+                        <li><strong>Monitor Hardware Physical Scaling Transitions:</strong> Track development milestones for CoPoS panel packaging and optical interconnects.</li>
+                        <li><strong>Incorporate Model Risk Controls (SR 26-2):</strong> Model lower conversion rates and longer adoption cycles for enterprise agentic software to reflect compliance validation overhead.</li>
+                    </ul>
+
+                    <h3 class="font-display font-bold text-lg text-white mb-4">W3C PROV-O Audit Log & System Execution Record</h3>
+                    <div class="relative group my-4">
+                        <pre id="jsonLedger" class="relative bg-[#0a0f1c] p-5 rounded-lg font-mono text-[11px] leading-tight text-term-amber overflow-x-auto border border-white/10 shadow-inner">
+{
+  "jsonrpc": "2.0",
+  "method": "adam_v31.verify_ai_ecosystem_execution",
+  "params": {
+    "provenance_ledger": {
+      "@context": "http://www.w3.org/ns/prov",
+      "Activity": "AI_Infrastructure_Deep_Dive_and_Valuation",
+      "Agent": "adam_v31.0_kernel",
+      "GeneratedEntity": "Ecosystem_Titan_Models_v1",
+      "Timestamp": "2026-09-02T19:37:09-04:00",
+      "Constraints_Enforced": [
+        "Sovereign_Floor: 4.792%",
+        "Hyperscale_Capex_Deductions: APPLIED",
+        "Geopolitical_Risk_Premium_TSM: 200bps",
+        "SR_26_2_Governance_Friction: MODELED",
+        "Merton_Structural_Credit_Engine: ACTIVE"
+      ]
+    },
+    "mcp_integrations": {
+      "status": "GREEN",
+      "adversarial_harness": "PASSED - NO HOPIUM DETECTED"
+    },
+    "stress_test_validation": {
+      "regime": "HIGHER_FOR_LONGER_WARSH_ARCHITECTURE",
+      "sovereign_benchmark_10y": "4.792%",
+      "corporate_benchmark_5y": "4.550%",
+      "uk_gilt_10y": "5.260%",
+      "jgb_10y": "3.000%",
+      "brent_crude": "$88.00/bbl",
+      "underwriting_verdict": "CHOKEPOINTS_SECURED_CAPEX_OVEREXTENDED"
+    }
+  },
+  "id": "ai-infra-audit-v31-009"
+}
+                        </pre>
+                    </div>
+                `
+            }
+        ];
+
+        let currentModuleId = 1;
+        const activeCharts = {};
+        const navEl = document.getElementById('moduleNav');
+        const mobileNavEl = document.getElementById('mobileNav');
+        const contentEl = document.getElementById('contentArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const aiPanel = document.getElementById('aiPanel');
+
+        function initApp() {
+            renderNav();
+            loadModule(1);
+
+            // Update clock
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('sysClock').innerText = now.toISOString().substr(11, 8) + ' UTC';
+            }, 1000);
+
+            // Button handlers
+            document.getElementById('prevBtn').onclick = () => { if(currentModuleId > 1) loadModule(currentModuleId - 1); };
+            document.getElementById('nextBtn').onclick = () => { if(currentModuleId < modules.length) loadModule(currentModuleId + 1); };
+        }
+
+        function renderNav() {
+            navEl.innerHTML = ''; mobileNavEl.innerHTML = '';
+            let currentGroup = '';
+
+            modules.forEach(m => {
+                // Group Headers
+                if (m.group && m.group !== currentGroup) {
+                    currentGroup = m.group;
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'text-[10px] text-term-red/70 font-mono mt-4 mb-1 px-4 uppercase tracking-widest font-bold';
+                    groupHeader.innerText = currentGroup;
+                    navEl.appendChild(groupHeader);
+
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = currentGroup;
+                    mobileNavEl.appendChild(optGroup);
+                }
+
+                // Desktop Button
+                const btn = document.createElement('button');
+                btn.className = `nav-item text-left px-4 py-2.5 rounded-r-lg flex flex-col mb-0.5 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
+                btn.onclick = () => loadModule(m.id);
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                navEl.appendChild(btn);
+
+                // Mobile Select Option
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
+                if(m.id === currentModuleId) opt.selected = true;
+
+                const lastOptGroup = mobileNavEl.querySelector('optgroup:last-of-type');
+                if (lastOptGroup) lastOptGroup.appendChild(opt);
+                else mobileNavEl.appendChild(opt);
+            });
+        }
+
+        function initChart(id, chartObj) {
+            if(activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = chartObj;
+        }
+
+        function loadModule(id) {
+            currentModuleId = id;
+            const m = modules.find(x => x.id === id);
+
+            // Clean up old charts
+            Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
+
+            // Update UI State
+            const pct = Math.round((id / modules.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+
+            document.getElementById('prevBtn').disabled = id === 1;
+            document.getElementById('nextBtn').disabled = id === modules.length;
+            document.getElementById('footerModuleIndicator').innerText = `MODULE ${id} OF ${modules.length}`;
+
+            // Animate transition
+            contentEl.style.opacity = 0;
+            contentEl.style.transform = 'translateY(15px)';
+
+            setTimeout(() => {
+                contentEl.innerHTML = m.content;
+                contentEl.style.opacity = 1;
+                contentEl.style.transform = 'translateY(0)';
+
+                // Scroll to top of main area
+                document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
+
+                if(m.onLoad) m.onLoad();
+                renderNav();
+            }, 300);
+        }
+
+        let aiOpen = false;
+        function toggleAI() {
+            aiOpen = !aiOpen;
+            aiPanel.style.transform = aiOpen ? 'translateX(0)' : 'translateX(100%)';
+        }
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
