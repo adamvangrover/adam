@@ -50,7 +50,16 @@
                 const data = await response.json();
                 container.innerText = JSON.stringify(data, null, 4);
             } catch(e) {
-                container.innerText = "Error loading " + file + ":\n\n" + e.toString();
+                container.innerText = "Error loading " + file + ":\n\n" + e.toString() + "\n\n--- FALLBACK MOCK DATA ---\n" + JSON.stringify({
+                    "system": "ADAM v30 Fallback",
+                    "status": "Degraded Environment",
+                    "file_requested": file,
+                    "mock_payload": {
+                        "nodes": 500,
+                        "edges": 1200,
+                        "health": "sub-optimal"
+                    }
+                }, null, 4);
             }
         }
         // Load default
