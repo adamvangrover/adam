@@ -8,33 +8,40 @@ class ScenarioBuilder:
         # Default probabilities to ensure they sum to 100
         self.default_probs = {"Base": 60, "Bull": 20, "Bear": 20}
 
-    def generate_scenarios(self, regime: str) -> List[Dict[str, str]]:
-        """
-        Generates scenario templates based on the detected macro regime.
-        """
-        scenarios = []
-
-        if regime.lower() == "restrictive":
-            scenarios = [
+        # Additive modular registry for regimes
+        self.regime_registry = {
+            "restrictive": [
                 {"name": "Base Case", "probability": 60, "description": "Rates stay elevated, growth slows moderately, resulting in a mild earnings recession and a shallow equity correction."},
                 {"name": "Bull Case", "probability": 15, "description": "Inflation falls faster than expected, allowing the Fed to signal cuts, sparking a massive duration rally and equity melt-up."},
                 {"name": "Bear Case", "probability": 25, "description": "High rates cause a credit event or banking stress, forcing emergency liquidity injections while inflation remains sticky."}
-            ]
-        elif regime.lower() == "early cycle (recovery)":
-            scenarios = [
+            ],
+            "early cycle (recovery)": [
                 {"name": "Base Case", "probability": 65, "description": "The Fed cuts rates 3-4 times. Growth remains positive but sluggish. Equities grind higher on multiple expansion."},
                 {"name": "Bull Case", "probability": 20, "description": "Productivity gains boost earnings significantly, while inflation stays dead. The broad market rallies strongly."},
                 {"name": "Bear Case", "probability": 15, "description": "The easing of financial conditions sparks a second wave of inflation, forcing central banks to reverse course."}
             ]
-        else:
-            # Generic fallback
-            scenarios = [
-                {"name": "Base Case", "probability": 60, "description": "Current trends continue with moderate volatility."},
-                {"name": "Bull Case", "probability": 20, "description": "Upside surprise in growth and positive earnings revisions."},
-                {"name": "Bear Case", "probability": 20, "description": "Unexpected shock to growth or liquidity causes a rapid sell-off."}
-            ]
+        }
 
-        return scenarios
+    def add_regime(self, regime_name: str, scenarios: List[Dict[str, str]]):
+        """
+        Dynamically adds or updates a macro regime.
+        """
+        self.regime_registry[regime_name.lower()] = scenarios
+
+    def generate_scenarios(self, regime: str) -> List[Dict[str, str]]:
+        """
+        Generates scenario templates based on the detected macro regime.
+        """
+        regime_lower = regime.lower()
+        if regime_lower in self.regime_registry:
+            return self.regime_registry[regime_lower]
+
+        # Generic fallback
+        return [
+            {"name": "Base Case", "probability": 60, "description": "Current trends continue with moderate volatility."},
+            {"name": "Bull Case", "probability": 20, "description": "Upside surprise in growth and positive earnings revisions."},
+            {"name": "Bear Case", "probability": 20, "description": "Unexpected shock to growth or liquidity causes a rapid sell-off."}
+        ]
 
     def format_markdown(self, scenarios: List[Dict[str, str]]) -> str:
         """
