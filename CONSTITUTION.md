@@ -1,5 +1,40 @@
 ```markdown
-```
+```gemini-code-1789316078693
+
+# ADAM OS v30.1: CONSTITUTION & REPOSITORY GOVERNANCE
+
+> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
+
+This document serves as the constitutional baseline and system specification for the **Adam** repository (`adamvangrover/adam`). It governs all agent behavior, architectural boundaries, data governance, and evaluation criteria across the v30.1 paradigm. 
+
+---
+
+## 1. Core Principles & Architectural Mandates
+
+### Article I: Environmental Bifurcation (Core vs. Lab)
+The repository enforces strict isolation between production stability and experimental velocity.
+*   **Path A: The Core (`core/agents/`, `core/credit_sentinel/`)**
+    *   *Philosophy:* Deterministic execution, zero hallucination, and Tier 1 G-SIB reliability standards.
+    *   *Rules:* Strict Pydantic type safety, mandatory `try/except` wrappers around external calls, and W3C PROV-O compliant telemetry logging for every decision.
+*   **Path B: The Lab (`experimental/`, `research/`, `tinker_lab/`)**
+    *   *Philosophy:* Expansive iteration, optimized token throughput, and bleeding-edge swarm mechanics.
+    *   *Rules:* Code here is strictly siloed and **must never** be imported into Path A.
+
+### Article II: The Hybrid Cognitive Engine
+Adam v30.1 abandons synchronous blocking loops in favor of a decoupled cognitive model:
+*   **System 1 (The Neural Swarm):** Asynchronous Python Pub/Sub (`AsyncAgentBase`) operating on local pheromones. Handles low-latency market telemetry, perception, and deal premium volatility skews without blocking UI threads.
+*   **System 2 (The Neuro-Symbolic Graph):** Stateful Directed Acyclic Graphs (DAGs) powered by Temporal workflows and Qdrant JIT vector memory. Handles complex credit underwriting, debt covenant modeling, and synthesized risk ratings.
+
+### Article III: Stateless Governance & Zero Magic Numbers
+*   All credit risk thresholds, covenant evaluation logic, and compliance triggers must be evaluated via stateless `jsonLogic` engines (`adam_os/contexts/governance/engine.py`). 
+*   Business rules must never be hardcoded as procedural branching within Python modules.
+
+---
+
+## 2. Autonomous Confidence Tiers & Evaluation Rubric
+
+All agent operations are governed by three rigorous conviction thresholds:
+
 # ADAM OS v30.1: CONSTITUTION & REPOSITORY GOVERNANCE
 
 > **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
