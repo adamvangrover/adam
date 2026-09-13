@@ -109,13 +109,13 @@ def calculate_pd(
     term2 = math.sqrt(rho) * norm.ppf(0.999)
     term3 = math.sqrt(1 - rho)
     PD_basel_stressed = norm.cdf((term1 + term2) / max(term3, 1e-6))
-    
+
     directive = "Standard monitoring."
     if state == "CONTESTED":
         directive = "Monitor closely due to SR 11-7 model divergence flag and elevated challenger PD. "
         if flags_sum > 0:
             directive += "Debt restructuring flag applied."
-            
+
     output = {
         "entity_identification": {
             "name": name,
