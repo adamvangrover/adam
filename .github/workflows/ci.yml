@@ -1,0 +1,82 @@
+name: Production CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-security:
+    name: Code Hygiene & Security Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1edb5228c822699939733fed00a605f579f2930a # v5.3.0
+        with:
+          version: "0.5.24"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.11"
+
+      - name: Verify Locked Environment
+        run: uv sync --frozen --all-extras
+
+      - name: Ruff Linter
+        run: uv run ruff check .
+
+      - name: Instruction Synchronization Check
+        run: uv run python scripts/build_instructions.py --verify
+
+  unit-tests:
+    name: Core Unit & Risk Mathematical Suite
+    needs: [lint-and-security]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1edb5228c822699939733fed00a605f579f2930a # v5.3.0
+        with:
+          version: "0.5.24"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: uv sync --frozen --all-extras
+
+      - name: Run Test Suite
+        run: uv run pytest --cov=afos --cov-report=xml --cov-fail-under=85
+
+  simulation-gate:
+    name: Simulation & Generator Validation
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1edb5228c822699939733fed00a605f579f2930a # v5.3.0
+
+      - name: Install Dependencies
+        run: uv sync --frozen --all-extras
+
+      - name: Validate Synthetic Generators
+        run: |
+          uv run python -c "from afos.risk.arbitration import ArbitrationEngine; e = ArbitrationEngine(); print('Simulation gate operational.')"

@@ -1,0 +1,39 @@
+version: "30.1.0"
+governance_policy:
+  thresholds:
+    autonomous_execution:
+      min_confidence: 0.85
+      review_required: false
+      description: "Autonomous execution permitted for low/medium-impact actions."
+    human_in_the_loop:
+      min_confidence: 0.50
+      max_confidence: 0.8499
+      review_required: true
+      description: "Execution paused. Mandatory HITL approval required."
+    rejection:
+      max_confidence: 0.4999
+      review_required: false
+      description: "Hard execution abort. System halts and records failure event."
+
+roles:
+  underwriting_agent:
+    id: "AFOS-UWR-01"
+    authority: "Obligor Credit Evaluation"
+    constraints:
+      - "MUST compute dual obligor-level PD (Model Alpha and Model Beta) to support neutrality arbitration."
+      - "MUST NOT calculate bespoke facility-level PD; facility PD is derived strictly from structural rating maps and LGD adjustments."
+    allowed_tools:
+      - "financial_statement_parser"
+      - "model_alpha_client"
+      - "model_beta_client"
+      - "arbitration_calculator"
+
+  compliance_agent:
+    id: "AFOS-CMP-01"
+    authority: "Regulatory Capital & Audit Verification"
+    constraints:
+      - "MUST evaluate bidirectional divergence against threshold theta."
+      - "MUST verify downside risk spread prior to capital buffer allocation."
+    allowed_tools:
+      - "divergence_validator"
+      - "audit_logger"
