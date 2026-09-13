@@ -1,4 +1,5 @@
 ```markdown
+```
 # ADAM OS v30.1: CONSTITUTION & REPOSITORY GOVERNANCE
 
 > **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
