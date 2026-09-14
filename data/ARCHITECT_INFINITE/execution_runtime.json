@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "run_id": "sim_7f9b2a1e-843c-4d22-91a5-334978f14299",
+    "timestamp_utc": "2026-09-13T18:21:12Z",
+    "protocol": "ARCHITECT_INFINITE",
+    "operator_review_required": false,
+    "system_divergence_ceiling": 0.05,
+    "status": "COMPLETED"
+  },
+  "execution_nodes": [
+    {
+      "industry": "Hyperscale Technology & Software",
+      "entities": ["MSFT", "AAPL", "GOOGL", "META", "AMZN", "ORCL"],
+      "primary_node_audit": {
+        "entity": "MSFT",
+        "inputs": {"ebitda_ttm": 138500000000, "total_debt": 75000000000, "interest_exp": 3100000000},
+        "metrics": {"fccr": 44.67, "net_leverage": -0.12, "headroom_pct": 89.4},
+        "pd_alpha": 0.00012,
+        "pd_beta": 0.00014,
+        "divergence": 0.00002,
+        "validation_flag": "PASS",
+        "prov_hash": "sha256:8b3a5c2d9e1f88764a4bc373110294e09f8742abdf445a"
+      }
+    },
+    {
+      "industry": "Semiconductors & Compute Hardware",
+      "entities": ["NVDA", "AVGO", "INTC"],
+      "primary_node_audit": {
+        "entity": "INTC",
+        "inputs": {"ebitda_ttm": -3200000000, "total_debt": 53000000000, "interest_exp": 1850000000},
+        "metrics": {"fccr": -1.73, "leverage_ratio": -16.56, "headroom_pct": -42.1},
+        "pd_alpha": 0.0385,
+        "pd_beta": 0.0412,
+        "divergence": 0.0027,
+        "validation_flag": "CIRCUIT_BREAKER_WATCH",
+        "prov_hash": "sha256:3c19e48a77d29bf8a1104e6c98f244199bd8a0026e7a"
+      }
+    },
+    {
+      "industry": "Traditional Banking & SIFIs",
+      "entities": ["JPM", "MS", "BCS"],
+      "primary_node_audit": {
+        "entity": "JPM",
+        "inputs": {"cet1_ratio": 0.153, "total_assets": 4150000000000, "tier1_leverage": 0.071},
+        "metrics": {"regulatory_surplus_bps": 340, "lcr_ratio": 1.48},
+        "pd_alpha": 0.00085,
+        "pd_beta": 0.00091,
+        "divergence": 0.00006,
+        "validation_flag": "PASS",
+        "prov_hash": "sha256:7f01a9c4458b61e204c3e1204d887a023bcf4189e1a0"
+      }
+    },
+    {
+      "industry": "Shadow Banking & Private Credit",
+      "entities": ["BX", "APO", "CG"],
+      "primary_node_audit": {
+        "entity": "APO",
+        "inputs": {"aum_credit": 510000000000, "dry_powder": 68000000000, "fee_related_earnings": 1950000000},
+        "metrics": {"fre_margin": 0.56, "deleveraging_velocity_mo": 14.2},
+        "pd_alpha": 0.0021,
+        "pd_beta": 0.0024,
+        "divergence": 0.0003,
+        "validation_flag": "PASS",
+        "prov_hash": "sha256:12e9b817c093a65241bde88019a84ef3381a0397cc22"
+      }
+    },
+    {
+      "industry": "Capital Equipment & Asset Leasing",
+      "entities": ["WLFC"],
+      "primary_node_audit": {
+        "entity": "WLFC",
+        "inputs": {"ebitda_ttm": 410000000, "total_debt": 2700000000, "interest_exp": 168000000},
+        "metrics": {"fccr": 2.44, "leverage_ratio": 6.58, "covenant_limit": 7.00, "headroom_pct": 6.0},
+        "pd_alpha": 0.0145,
+        "pd_beta": 0.0162,
+        "divergence": 0.0017,
+        "validation_flag": "MONITOR_HEADROOM_TIGHT",
+        "prov_hash": "sha256:99a843f01cba283188de51287cba00108924bce37aa1"
+      }
+    },
+    {
+      "industry": "Defense Tech & Neo-Primes",
+      "entities": ["PLTR", "Anduril", "SpaceX", "Shield_AI"],
+      "primary_node_audit": {
+        "entity": "Anduril",
+        "inputs": {"arr": 1150000000, "total_debt": 600000000, "backlog_probabilistic": 4800000000},
+        "metrics": {"synthetic_fccr": 4.10, "backlog_adjusted_leverage": 0.12},
+        "pd_alpha": 0.0112,
+        "pd_beta": 0.0128,
+        "divergence": 0.0016,
+        "validation_flag": "PASS",
+        "prov_hash": "sha256:6b82c174092b71efc558000210e7498cda6e11894b90"
+      }
+    },
+    {
+      "industry": "Sovereign DeFi & Stablecoin Systems",
+      "entities": ["WLFI", "BitGo", "BlackRock_BUIDL"],
+      "primary_node_audit": {
+        "entity": "WLFI",
+        "inputs": {"usd1_circulation": 4600000000, "reserve_treasuries": 4640000000, "fdv_token": 5700000000},
+        "metrics": {"reserve_ratio": 1.0087, "collateral_delta_bps": 87},
+        "pd_alpha": 0.0210,
+        "pd_beta": 0.0245,
+        "divergence": 0.0035,
+        "validation_flag": "COUNTERPARTY_CONCENTRATION_WARN",
+        "prov_hash": "sha256:d89a7732efbc809110e5fca99281a70014efb90038cb"
+      }
+    }
+  ],
+  "operator_review": {
+    "status": "APPROVED",
+    "divergence_max": 0.0035,
+    "circuit_breakers_tripped": 0,
+    "lineage_integrity_verified": true,
+    "supervisor_token": "PROV_OK_20260913_AUTOMATED"
+  }
+}
