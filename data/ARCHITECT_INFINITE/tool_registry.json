@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "schema_version": "30.1.0",
+    "protocol": "ARCHITECT_INFINITE",
+    "description": "Deterministic tool registry for Path A core execution. All tools return W3C PROV-O compliant metadata."
+  },
+  "tools": [
+    {
+      "name": "financial_statement_parser",
+      "description": "Deterministically extracts specific line items directly from indexed SEC EDGAR filings.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "entity_ticker": {"type": "string", "description": "Stock ticker or CIK."},
+          "filing_type": {"type": "string", "enum": ["10-K", "10-Q", "8-K"]},
+          "line_item": {"type": "string", "description": "Standardized XBRL financial metric."}
+        },
+        "required": ["entity_ticker", "filing_type", "line_item"]
+      }
+    },
+    {
+      "name": "covenant_headroom_calculator",
+      "description": "Executes stateless jsonLogic to calculate coverage and leverage headroom against credit agreement parameters.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ebitda": {"type": "number"},
+          "total_debt": {"type": "number"},
+          "interest_expense": {"type": "number"},
+          "covenant_ruleset_id": {"type": "string", "description": "Qdrant UUID pointing to credit agreement jsonLogic."}
+        },
+        "required": ["ebitda", "total_debt", "interest_expense", "covenant_ruleset_id"]
+      }
+    },
+    {
+      "name": "divergence_validator",
+      "description": "Evaluates bidirectional PD divergence between dual probabilistic models against system threshold theta.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "model_alpha_pd": {"type": "number"},
+          "model_beta_pd": {"type": "number"},
+          "threshold_theta": {"type": "number", "default": 0.05}
+        },
+        "required": ["model_alpha_pd", "model_beta_pd", "threshold_theta"]
+      }
+    },
+    {
+      "name": "prov_o_audit_logger",
+      "description": "Commits cryptographic hash and reasoning lineage to Temporal state before final node execution.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent_id": {"type": "string"},
+          "action_taken": {"type": "string"},
+          "confidence_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+          "source_citations": {"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["agent_id", "action_taken", "confidence_score", "source_citations"]
+      }
+    }
+  ]
+}
