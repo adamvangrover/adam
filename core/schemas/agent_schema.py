@@ -20,6 +20,7 @@ class AgentOutput(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
     provenance_trace: ProvenanceHeader = Field(..., description="Immutable provenance trace linking the agent output to source and logic version.")
+    observed_drift: bool = Field(default=False, description="Flag indicating if behavior or calculation drift was observed.")
 
 class FundamentalReport(BaseModel):
     """
