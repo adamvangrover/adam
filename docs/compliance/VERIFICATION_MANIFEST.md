@@ -1,4 +1,4 @@
-# AFOS v30.1 Verification & Compliance Manifest (operator reviewed 202609131158 v0.1 test eval schema)
+# AFOS v30.1 Verification & Compliance Manifest
 
 ## 1. Audit Attestation History
 - **Prior Score:** 42/100 (Assessed under fragmented locks, instruction drift, and undefined arbitration math)
