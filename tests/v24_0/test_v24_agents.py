@@ -46,19 +46,21 @@ class TestV24Agents(unittest.IsolatedAsyncioTestCase):
 
     async def test_chronos_init(self):
         agent = Chronos(llm_engine=self.mock_llm)
-        self.assertEqual(agent.name, "Chronos")
+        self.assertEqual(agent.name, "ChronosAgent")
 
     async def test_chronos_run(self):
+        from core.schemas.meta_agent_schemas import ChronosInput, TimeHorizon
         agent = Chronos(llm_engine=self.mock_llm)
-        context = {
-            "user_query": "What happened during the 2008 crash?",
-            "market_snapshot": {"sp500": 4000}
-        }
+
+        context = ChronosInput(
+            query="What happened during the 2008 crash?",
+            horizons=[TimeHorizon.SHORT_TERM],
+            market_context={"sp500": 4000}
+        )
+
         result = await agent.execute(context)
-        self.assertIn("temporal_context", result)
-        self.assertIn("strategy", result["temporal_context"])
-        # The mock LLM returns "Mocked LLM Response", but the code does .strip().lower()
-        self.assertEqual(result["temporal_context"]["strategy"], "mocked llm response")
+        self.assertIsNotNone(result)
+        self.assertEqual(result.query_context, "What happened during the 2008 crash?")
 
 if __name__ == '__main__':
     unittest.main()

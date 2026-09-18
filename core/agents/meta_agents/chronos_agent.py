@@ -47,9 +47,10 @@ class ChronosAgent(AgentBase):
 
     def __init__(self, 
                  llm_engine: BaseLLMEngine,
-                 config: Dict[str, Any], 
+                 config: Optional[Dict[str, Any]] = None,
                  tools: List[BaseTool] = [],
                  **kwargs):
+        config = config or {}
         super().__init__(config=config, **kwargs)
         self.llm_engine = llm_engine
         self.tools = tools
@@ -74,7 +75,8 @@ class ChronosAgent(AgentBase):
         memories = self._retrieve_memories(input_data.query, input_data.horizons, reference_date)
 
         # 3. Find Historical Analogs (Using v24's LLM logic, mapped to main's Schema)
-        analogs = await self._find_historical_analogs(input_data.query, input_data.market_context)
+        market_context = getattr(input_data, "market_context", None)
+        analogs = await self._find_historical_analogs(input_data.query, market_context)
 
         # 4. Synthesize Narrative
         synthesis = await self._synthesize_temporal_context(memories, analogs, strategy)
