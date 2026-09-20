@@ -1,6 +1,7 @@
-import json
 import argparse
+import json
 from datetime import datetime
+
 
 def version_data(file_path, version_type, change_description):
     """

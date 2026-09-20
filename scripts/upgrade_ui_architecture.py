@@ -1,8 +1,7 @@
+import datetime
+import json
 import os
 import shutil
-import json
-import datetime
-import re
 from pathlib import Path
 
 # ==========================================
@@ -378,17 +377,17 @@ def scan_agents():
     agents = []
     if not AGENTS_DIR.exists():
         return agents
-    
+
     for file in AGENTS_DIR.rglob("*.py"):
-        if file.name == "__init__.py": 
+        if file.name == "__init__.py":
             continue
-        
+
         # Determine version tag based on filename or content (naive)
         tag = "v22"
         if "19" in file.name: tag = "legacy"
         if "20" in file.name: tag = "legacy"
         if "21" in file.name: tag = "legacy"
-        
+
         rel_path = file.relative_to(REPO_ROOT)
         agents.append({
             "name": file.stem,
@@ -396,7 +395,7 @@ def scan_agents():
             "tag": tag,
             "type": "Python"
         })
-    
+
     # Sort: v22 first
     return sorted(agents, key=lambda x: x['tag'] == 'legacy')
 
@@ -405,11 +404,11 @@ def scan_prompts():
     prompts = []
     if not PROMPTS_DIR.exists():
         return prompts
-        
+
     for file in PROMPTS_DIR.rglob("*"):
         if file.suffix not in ['.json', '.yaml', '.md'] or file.name.startswith('.'):
             continue
-            
+
         rel_path = file.relative_to(REPO_ROOT)
         prompts.append({
             "name": file.name,
@@ -431,31 +430,31 @@ def archive_html_artifacts():
         print(f"Created archive directory: {ARCHIVE_DIR}")
 
     moved_files = []
-    
+
     # Walk the repo
     for root, dirs, files in os.walk(REPO_ROOT):
         # Skip protected directories
         if any(excluded in root for excluded in EXCLUDE_FILES[1:]): # Skip excluding index.html here, logic below
             continue
-            
+
         for file in files:
             if file.endswith(".html"):
                 file_path = Path(root) / file
-                
+
                 # Don't move the master index we are about to create, or things inside the archive
                 if file_path == MASTER_INDEX_PATH:
                     continue
                 if ARCHIVE_DIR in file_path.parents:
                     continue
-                
+
                 # Calculate relative path to maintain structure or flat rename
                 rel_path = file_path.relative_to(REPO_ROOT)
-                
+
                 # Strategy: Flatten but prepend path to avoid collisions
                 # e.g. core_libraries_newsletters_MM06292025.html
                 safe_name = str(rel_path).replace("/", "_").replace("\\", "_")
                 dest_path = ARCHIVE_DIR / safe_name
-                
+
                 print(f"Archiving artifact: {rel_path} -> {dest_path.name}")
                 shutil.copy2(file_path, dest_path)
                 moved_files.append({"original": str(rel_path), "archived": safe_name})
@@ -463,7 +462,7 @@ def archive_html_artifacts():
     # Create Manifest
     with open(ARCHIVE_DIR / "manifest.json", "w") as f:
         json.dump(moved_files, f, indent=2)
-    
+
     # Create an index for the archive folder itself
     create_archive_index(moved_files)
 
@@ -473,7 +472,7 @@ def create_archive_index(files):
     for item in files:
         html += f"<li><a href='{item['archived']}'>{item['original']}</a></li>"
     html += "</ul></body></html>"
-    
+
     with open(ARCHIVE_DIR / "index.html", "w") as f:
         f.write(html)
 
@@ -483,15 +482,15 @@ def create_archive_index(files):
 
 def main():
     print("Initializing ADAM v22.0 UI Architecture Upgrade...")
-    
+
     # 1. Run Archival Process
     archive_html_artifacts()
-    
+
     # 2. Gather Data
     agents = scan_agents()
     prompts = scan_prompts()
     cortex_count = scan_cortex()
-    
+
     # 3. Generate HTML Rows
     agent_rows = ""
     for a in agents:
@@ -524,11 +523,11 @@ def main():
         agent_rows=agent_rows,
         prompt_rows=prompt_rows
     )
-    
+
     # 5. Write Master Index
     with open(MASTER_INDEX_PATH, "w", encoding="utf-8") as f:
         f.write(final_html)
-        
+
     print(f"SUCCESS: Master Dashboard generated at {MASTER_INDEX_PATH}")
     print(f"SUCCESS: Artifacts archived in {ARCHIVE_DIR}")
     print("Deployment Ready. Commit changes and push to GitHub to see the live dashboard.")

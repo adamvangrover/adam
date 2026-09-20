@@ -1,35 +1,34 @@
-import sys
-import os
 import json
 import logging
-from typing import Dict, Any, List, Optional
-import glob
+import os
+import sys
+from typing import Any
 
 # Ensure we can import from core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # --- Dependency Handling & Mocking ---
 try:
-    from mcp.server.fastmcp import FastMCP, Context, Image
+    from mcp.server.fastmcp import Context, FastMCP, Image
 except ImportError:
     # Fallback for environments without MCP installed (Mock implementation)
     logging.warning("MCP library not found. Using Mock FastMCP.")
     class FastMCP:
-        def __init__(self, name, dependencies=None): 
+        def __init__(self, name, dependencies=None):
             self.name = name
             self.tools = []
             self.resources = []
-        def resource(self, path): 
+        def resource(self, path):
             def decorator(f):
                 self.resources.append({"path": path, "func": f})
                 return f
             return decorator
-        def tool(self, name=None): 
+        def tool(self, name=None):
             def decorator(f):
                 self.tools.append({"name": name or f.__name__, "func": f})
                 return f
             return decorator
-        def run(self): 
+        def run(self):
             print(f"Starting Project Adam MCP Server: {self.name}")
             while True:
                 try:
@@ -90,8 +89,8 @@ except ImportError:
 
 # 5. Security & Governance
 try:
-    from core.security.governance import GovernanceEnforcer, GovernanceError, ApprovalRequired
     from core.security.eaci_middleware import EACIMiddleware
+    from core.security.governance import ApprovalRequired, GovernanceEnforcer, GovernanceError
     GOVERNANCE_AVAILABLE = True
     # Initialize middleware (mocking permission manager for now)
     eaci = EACIMiddleware(permission_manager=None)
@@ -135,7 +134,7 @@ def get_documentation(filename: str) -> str:
     filename = os.path.basename(filename)
     docs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../docs"))
     target_path = os.path.join(docs_path, filename)
-    
+
     # Try extensions
     if not os.path.exists(target_path):
         if os.path.exists(target_path + ".md"):
@@ -144,9 +143,9 @@ def get_documentation(filename: str) -> str:
             target_path += ".txt"
         else:
             return f"Error: Document '{filename}' not found in docs/."
-            
+
     try:
-        with open(target_path, "r") as f:
+        with open(target_path) as f:
             return f.read()
     except Exception as e:
         return f"Error reading file: {e}"
@@ -187,7 +186,7 @@ def generate_market_scenarios(regime: str = "stress", n_samples: int = 5) -> str
 # 2. CREDIT & SNC
 
 @mcp.tool()
-def analyze_snc_credit(financials: Dict[str, float], capital_structure: List[Dict[str, Any]], enterprise_value: float) -> str:
+def analyze_snc_credit(financials: dict[str, float], capital_structure: list[dict[str, Any]], enterprise_value: float) -> str:
     """
     Performs a Shared National Credit (SNC) rating analysis.
     
