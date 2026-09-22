@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adam-kernel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: adam-kernel
+  template:
+    metadata:
+      labels:
+        app: adam-kernel
+    spec:
+      containers:
+      - name: adam-kernel
+        image: adam-kernel:latest
+        ports:
+        - containerPort: 8000
