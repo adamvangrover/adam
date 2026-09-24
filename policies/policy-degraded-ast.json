@@ -1,0 +1,32 @@
+{
+  "$schema": "https://adam.internal/schemas/v2/policy-degraded-ast.json",
+  "policy_id": "POL-DEGRADED-CREDIT-V1",
+  "evaluator_type": "DeterministicRuleTree",
+  "trigger_condition": {
+    "or": [
+      { "field": "epistemic_state", "operator": "IN", "values": ["UNKNOWN", "CONFLICTED", "OUT_OF_DISTRIBUTION"] },
+      { "field": "w1_wasserstein_divergence", "operator": "GREATER_THAN", "value": 42.5 }
+    ]
+  },
+  "action_ast": {
+    "node_type": "SequentialDecisionList",
+    "rules": [
+      {
+        "rule_id": "FREEZE_EXPANSION",
+        "description": "Block all credit limit increases immediately",
+        "condition": { "field": "proposed_limit_bps", "operator": "GREATER_THAN", "target": "original_limit_bps" },
+        "deterministic_action": { "type": "REJECT", "override_code": "DEGRADED_MODE_FREEZE" }
+      },
+      {
+        "rule_id": "VOLATILITY_HAIRCUT",
+        "description": "Apply systematic 20% limit reduction if market volatility tier is extreme",
+        "condition": { "field": "c0_macro_vix_spread", "operator": "GREATER_THAN", "value": 3000 },
+        "deterministic_action": {
+          "type": "SYNTHETIC_HYPOTHESIS_DISPATCH",
+          "action_class": "SYSTEMATIC_DERISK",
+          "parameters": { "reduction_factor_bps": 2000 }
+        }
+      }
+    ]
+  }
+}
