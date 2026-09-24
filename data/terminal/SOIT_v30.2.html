@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADAM-v30.2 // Sovereign Obligor Intelligence Terminal</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for high-fidelity quantitative visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            terminal: {
+              950: '#07090e',
+              900: '#0b0f19',
+              850: '#0f1422',
+              800: '#141b2d',
+              700: '#1e293b',
+              600: '#334155',
+              accent: '#38bdf8',
+              alert: '#f43f5e',
+              warning: '#fbbf24',
+              nominal: '#10b981',
+              neon: '#06b6d4'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #07090e;
+      color: #cbd5e1;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+    .glass-panel {
+      background: rgba(15, 20, 34, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel-subtle {
+      background: rgba(11, 15, 25, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .neon-border {
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.12);
+    }
+    .radar-pulse {
+      animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    input[type=range] {
+      accent-color: #38bdf8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-terminal-accent selection:text-black">
+
+  <!-- Top Global Header -->
+  <header class="border-b border-terminal-700 bg-terminal-900/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3">
+    <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Telemetry Ident -->
+      <div class="flex items-center space-x-3">
+        <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-terminal-800 border border-terminal-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 radar-pulse"></span>
+          <span class="absolute text-[9px] font-mono font-bold text-slate-300">30</span>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-bold tracking-wider text-slate-100 font-mono">ADAM-v30.2</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-terminal-800 border border-slate-700 font-mono text-cyan-400">SOVEREIGN ANALYST</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-rose-950/80 border border-rose-800/80 font-mono text-rose-300 font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> MKT MYHM DIALECT
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono">S&P 500 Corporate Universe // Bottom-Up Obligor Matrix // Q1 2026 Macro Anchor</p>
+        </div>
+      </div>
+
+      <!-- Quick Telemetry Tickers -->
+      <div class="hidden xl:flex items-center space-x-6 text-xs font-mono bg-terminal-950/80 px-4 py-1.5 rounded-lg border border-terminal-700">
+        <div>
+          <span class="text-slate-500">AGG DEBT:</span>
+          <span class="text-slate-200 font-semibold ml-1">$7.24 T</span>
+        </div>
+        <div class="border-l border-terminal-700 pl-4">
+          <span class="text-slate-500">MEDIAN ICR:</span>
+          <span class="text-emerald-400 font-semibold ml-1" id="ticker-med-icr">9.91x</span>
+        </div>
+        <div class="border-l border-terminal-700 pl-4">
+          <span class="text-slate-500">CORE 490 ICR:</span>
+          <span class="text-amber-400 font-semibold ml-1" id="ticker-core-icr">8.54x</span>
+        </div>
+        <div class="border-l border-terminal-700 pl-4">
+          <span class="text-slate-500">MERTON DD:</span>
+          <span class="text-cyan-400 font-semibold ml-1" id="ticker-merton-dd">16.20σ</span>
+        </div>
+        <div class="border-l border-terminal-700 pl-4">
+          <span class="text-slate-500">PVT CREDIT LBO:</span>
+          <span class="text-rose-400 font-semibold ml-1">$3.00 T</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs & Actions -->
+      <div class="flex items-center space-x-2">
+        <nav class="flex space-x-1 bg-terminal-950 p-1 rounded-lg border border-terminal-700 text-xs font-mono">
+          <button onclick="switchTab('cockpit')" id="tab-btn-cockpit" class="tab-btn px-3 py-1.5 rounded-md text-white bg-terminal-700 transition">
+            1. Cockpit & Heatmap
+          </button>
+          <button onclick="switchTab('obligors')" id="tab-btn-obligors" class="tab-btn px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+            2. Obligor Table & PTs
+          </button>
+          <button onclick="switchTab('vectors')" id="tab-btn-vectors" class="tab-btn px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+            3. Transmission Vectors
+          </button>
+          <button onclick="switchTab('dossier')" id="tab-btn-dossier" class="tab-btn px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition">
+            4. Appendices & Dossier
+          </button>
+        </nav>
+
+        <button onclick="resetToBaseline()" class="px-2.5 py-1.5 text-xs font-mono text-slate-300 hover:text-white bg-terminal-800 hover:bg-terminal-700 rounded-lg border border-terminal-700 transition flex items-center gap-1.5" title="Reset All Sliders to Baseline">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span class="hidden sm:inline">Reset</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Notification Banner -->
+  <div id="toast-banner" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-terminal-800 border border-terminal-accent text-slate-100 px-4 py-3 rounded-lg shadow-xl font-mono text-xs flex items-center gap-3">
+    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+    <span id="toast-message">Telemetry Synchronized.</span>
+  </div>
+
+  <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-8 space-y-6">
+
+    <!-- Global Scenario Calibration Bar (Interactive Controls) -->
+    <section class="glass-panel p-4 lg:p-6 rounded-2xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-terminal-700/60 mb-5">
+        <div>
+          <div class="flex items-center space-x-2">
+            <h2 class="text-base font-semibold text-slate-100 flex items-center gap-2">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+              Autonomous Macro Stress & Outlook Calibration
+            </h2>
+            <span class="text-[11px] font-mono text-slate-400">12-Month Dynamic Horizon</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Stress-test systemic obligors across SaaS seat erosion, hyperscaler depreciation acceleration, power bottlenecks, and refinancing walls.</p>
+        </div>
+
+        <!-- Presets -->
+        <div class="flex items-center flex-wrap gap-2">
+          <span class="text-xs font-mono text-slate-400 mr-1">Preset Scenarios:</span>
+          <button onclick="applyScenario('baseline')" class="preset-btn px-2.5 py-1 text-xs font-mono rounded bg-terminal-800 hover:bg-terminal-700 text-cyan-300 border border-cyan-800/60 transition">
+            Q1 Baseline
+          </button>
+          <button onclick="applyScenario('stagflation')" class="preset-btn px-2.5 py-1 text-xs font-mono rounded bg-terminal-800 hover:bg-terminal-700 text-amber-300 border border-amber-800/60 transition">
+            Power Mirage Shock
+          </button>
+          <button onclick="applyScenario('deathspiral')" class="preset-btn px-2.5 py-1 text-xs font-mono rounded bg-terminal-800 hover:bg-terminal-700 text-rose-300 border border-rose-800/60 transition">
+            Reflexive Spiral
+          </button>
+          <button onclick="applyScenario('productivity')" class="preset-btn px-2.5 py-1 text-xs font-mono rounded bg-terminal-800 hover:bg-terminal-700 text-emerald-300 border border-emerald-800/60 transition">
+            Tech Soft Landing
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Parameter Sliders Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-5">
+        
+        <!-- Slider 1: Deflationary Gravity (Seat Contraction) -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="Enterprise Seat Contraction & ARR compression">
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Seat Flatlining
+            </span>
+            <span class="font-mono text-indigo-300 font-bold" id="val-seat-churn">-10%</span>
+          </div>
+          <input type="range" id="slider-seat-churn" min="-30" max="0" step="1" value="-10" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>Severe (-30%)</span>
+            <span>0%</span>
+          </div>
+        </div>
+
+        <!-- Slider 2: Century Duration Mirage (CapEx / Write-down) -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="Accelerated silicon depreciation & CapEx bloat">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> CapEx Bloat / Amort
+            </span>
+            <span class="font-mono text-cyan-300 font-bold" id="val-capex-writeoff">+15%</span>
+          </div>
+          <input type="range" id="slider-capex-writeoff" min="0" max="40" step="1" value="15" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>0%</span>
+            <span>Stress (+40%)</span>
+          </div>
+        </div>
+
+        <!-- Slider 3: The Power Mirage (Grid Latency & Costs) -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="Interconnection delay and PPA escalation">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span> Power Mirage Latency
+            </span>
+            <span class="font-mono text-amber-300 font-bold" id="val-power-latency">+12m</span>
+          </div>
+          <input type="range" id="slider-power-latency" min="0" max="36" step="3" value="12" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>0m (Nominal)</span>
+            <span>+36 Months</span>
+          </div>
+        </div>
+
+        <!-- Slider 4: Benchmark Rate (r_f) -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="US 10-Year Treasury Yield Baseline">
+              <span class="w-2 h-2 rounded-full bg-sky-400"></span> Risk-Free Rate (r_f)
+            </span>
+            <span class="font-mono text-sky-300 font-bold" id="val-rf-rate">4.25%</span>
+          </div>
+          <input type="range" id="slider-rf-rate" min="3.0" max="6.0" step="0.25" value="4.25" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>3.00%</span>
+            <span>6.00%</span>
+          </div>
+        </div>
+
+        <!-- Slider 5: Credit Spread Shock (ΔOAS) -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="Unsecured Corporate Bond Spread Widening">
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span> Spread Shock (ΔOAS)
+            </span>
+            <span class="font-mono text-rose-300 font-bold" id="val-spread-shock">+0 bps</span>
+          </div>
+          <input type="range" id="slider-spread-shock" min="0" max="250" step="10" value="0" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>0 bps</span>
+            <span>+250 bps</span>
+          </div>
+        </div>
+
+        <!-- Slider 6: Maturity Rollover Cliff Bump -->
+        <div class="space-y-1.5 bg-terminal-900/60 p-3 rounded-xl border border-terminal-800">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-medium flex items-center gap-1.5" title="Coupon re-pricing delta on maturing tranches">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Refi Rollover Hike
+            </span>
+            <span class="font-mono text-emerald-300 font-bold" id="val-refi-bump">+120 bps</span>
+          </div>
+          <input type="range" id="slider-refi-bump" min="0" max="300" step="15" value="120" class="w-full h-1.5 bg-terminal-700 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono text-slate-500">
+            <span>0 bps</span>
+            <span>+300 bps</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 1: EXECUTIVE COCKPIT & SCENARIO HEATMAPS -->
+    <div id="tab-content-cockpit" class="space-y-6">
+
+      <!-- Real-Time Aggregate Solvency Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Metric 1: Aggregate Merton Distance-to-Default -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-cyan-500 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Structural Solvency</p>
+              <h3 class="text-2xl font-bold font-mono text-white mt-1" id="kpi-merton-dd">16.20σ</h3>
+              <p class="text-xs text-slate-400 mt-1">Merton Distance-to-Default (1-Yr)</p>
+            </div>
+            <span class="p-2 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </span>
+          </div>
+          <div class="mt-4 pt-3 border-t border-terminal-800 flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-500">Default Probability:</span>
+            <span class="text-emerald-400 font-semibold" id="kpi-pd-stat">&lt; 0.001% (Surface)</span>
+          </div>
+        </div>
+
+        <!-- Metric 2: Consolidated Interest Coverage -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-emerald-500 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Consolidated Coverage</p>
+              <h3 class="text-2xl font-bold font-mono text-white mt-1" id="kpi-aggregate-icr">9.91x</h3>
+              <p class="text-xs text-slate-400 mt-1">Total EBITDA / Interest Expense</p>
+            </div>
+            <span class="p-2 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            </span>
+          </div>
+          <div class="mt-4 pt-3 border-t border-terminal-800 flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-500">Core 490 ICR Delta:</span>
+            <span class="text-amber-400 font-semibold" id="kpi-core-icr-delta">8.54x (Compressed)</span>
+          </div>
+        </div>
+
+        <!-- Metric 3: Implied S&P 500 Index 1-Yr Target -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-sky-500 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Target Enterprise Value</p>
+              <h3 class="text-2xl font-bold font-mono text-white mt-1" id="kpi-spx-target">5,820 pts</h3>
+              <p class="text-xs text-slate-400 mt-1">Blended Model 1-Yr Price Target</p>
+            </div>
+            <span class="p-2 rounded-lg bg-sky-950/60 border border-sky-800/60 text-sky-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+            </span>
+          </div>
+          <div class="mt-4 pt-3 border-t border-terminal-800 flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-500">Projected Market Cap:</span>
+            <span class="text-sky-300 font-semibold" id="kpi-marketcap-val">$46.85 T</span>
+          </div>
+        </div>
+
+        <!-- Metric 4: Systemic Vulnerability Status -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-rose-500 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[11px] font-mono uppercase tracking-wider text-slate-400">ADAM Transmission Flag</p>
+              <h3 class="text-2xl font-bold font-mono text-rose-400 mt-1 flex items-center gap-2" id="kpi-risk-status">
+                ALERT
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Sovereign Obligor Divergence</p>
+            </div>
+            <span class="p-2 rounded-lg bg-rose-950/60 border border-rose-800/60 text-rose-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </span>
+          </div>
+          <div class="mt-4 pt-3 border-t border-terminal-800 flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-500">Refi Friction Index:</span>
+            <span class="text-rose-400 font-semibold" id="kpi-friction-index">Elevated (68/100)</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Middle Charts Row: 1-Year Forward Projection & Multi-Scenario Heatmap -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: 1-Year Forward Trajectory & Spread Dynamics (7 Cols) -->
+        <div class="lg:col-span-7 glass-panel p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                1-Year Forward Obligor Valuation Trajectory & OAS Spreads
+              </h3>
+              <p class="text-xs text-slate-400">Monthly projected index enterprise value vs. corporate credit spread widening under active assumptions</p>
+            </div>
+            <div class="flex items-center space-x-2 font-mono text-xs">
+              <span class="flex items-center gap-1 text-cyan-400"><span class="w-2.5 h-0.5 bg-cyan-400"></span> SPX Level</span>
+              <span class="flex items-center gap-1 text-rose-400 ml-2"><span class="w-2.5 h-0.5 bg-rose-400"></span> OAS Spread</span>
+            </div>
+          </div>
+
+          <div class="relative w-full h-[320px]">
+            <canvas id="trajectoryChart"></canvas>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-terminal-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
+            <span>Terminal Estimate: <strong class="text-slate-200" id="chart-terminal-spx">5,640 pts</strong></span>
+            <span>Spread Expansion: <strong class="text-rose-400" id="chart-terminal-oas">+55 bps</strong></span>
+            <span>Useful Asset Life Implied: <strong class="text-amber-300">3.4 Years</strong></span>
+          </div>
+        </div>
+
+        <!-- Right: Dynamic Sensitivity Heatmap Matrix (5 Cols) -->
+        <div class="lg:col-span-5 glass-panel p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                Systemic Stress Heatmap: Rate Hike vs. Seat Contraction
+              </h3>
+              <p class="text-xs text-slate-400">Impact on Median BBB Interest Coverage Ratio (ICR)</p>
+            </div>
+          </div>
+
+          <!-- Heatmap Matrix Grid -->
+          <div class="space-y-2 my-auto">
+            <div class="text-[11px] font-mono text-slate-400 text-center pb-1">
+              &larr; Risk-Free Rate Shift ($\Delta r_f$) &rarr;
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-center text-xs font-mono border-collapse">
+                <thead>
+                  <tr class="text-slate-400 text-[11px]">
+                    <th class="p-1.5 text-left text-slate-500">Seat Churn</th>
+                    <th class="p-1.5 bg-terminal-900/60 rounded-t border-b border-terminal-700">r_f -50bps</th>
+                    <th class="p-1.5 bg-terminal-900/60 rounded-t border-b border-terminal-700">Baseline (4.25%)</th>
+                    <th class="p-1.5 bg-terminal-900/60 rounded-t border-b border-terminal-700">r_f +75bps</th>
+                    <th class="p-1.5 bg-terminal-900/60 rounded-t border-b border-terminal-700">r_f +150bps</th>
+                  </tr>
+                </thead>
+                <tbody id="heatmap-body">
+                  <!-- Generated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Heatmap legend -->
+            <div class="flex items-center justify-between pt-3 text-[10px] font-mono text-slate-400 border-t border-terminal-800">
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-emerald-900/80 border border-emerald-600"></span> ICR &gt; 8.0x
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-amber-900/80 border border-amber-600"></span> ICR 4.0 - 8.0x
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-rose-950/90 border border-rose-600"></span> ICR &lt; 4.0x
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded bg-red-600 border border-red-400 animate-pulse"></span> &lt; 2.5x (Refi Default)
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-3 p-2.5 rounded-lg bg-terminal-900/80 border border-terminal-800 text-[11px] text-slate-400">
+            <span class="text-amber-400 font-mono font-semibold">ADAM Diagnostic:</span> When seat flatlining breaches -15% alongside a 75bps rate expansion, lower-quartile Core 490 ICR drops to <strong class="text-rose-400">2.42x</strong>, triggering widespread rating agency downgrades.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sector Concentration & Tier Breakdown Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Tier 1 -->
+        <div class="glass-panel-subtle p-4 rounded-xl border border-terminal-700/60 hover:border-terminal-600 transition">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-mono text-cyan-400 font-semibold">TIER 1: HYPERSCALERS</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono">4 Obligors</span>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-200 mt-1">"Heavy-Metal Railroads"</h4>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">MSFT, AMZN, GOOGL, META. Combined CapEx tracking &gt; $200B/yr against 3-year silicon obsolescence.</p>
+          <div class="mt-3 pt-2 border-t border-terminal-800 flex justify-between text-xs font-mono">
+            <span class="text-slate-500">Tier Net Debt:</span>
+            <span class="text-emerald-400 font-medium">-$18.8 B</span>
+          </div>
+          <div class="flex justify-between text-xs font-mono mt-1">
+            <span class="text-slate-500">Blended OAS:</span>
+            <span class="text-slate-300">38.5 bps</span>
+          </div>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="glass-panel-subtle p-4 rounded-xl border border-terminal-700/60 hover:border-terminal-600 transition">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-mono text-indigo-400 font-semibold">TIER 2: ENTERPRISE SAAS</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-mono">3 Obligors</span>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-200 mt-1">"Deflationary Gravity"</h4>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">CRM, ADBE, ORCL. Facing enterprise seat rationalization, per-seat ARR compression, and $3T private credit LBO drag.</p>
+          <div class="mt-3 pt-2 border-t border-terminal-800 flex justify-between text-xs font-mono">
+            <span class="text-slate-500">Tier Gross Debt:</span>
+            <span class="text-rose-400 font-medium">$108.8 B</span>
+          </div>
+          <div class="flex justify-between text-xs font-mono mt-1">
+            <span class="text-slate-500">Oracle Gross Lev:</span>
+            <span class="text-amber-400">3.66x EBITDA</span>
+          </div>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="glass-panel-subtle p-4 rounded-xl border border-terminal-700/60 hover:border-terminal-600 transition">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-mono text-amber-400 font-semibold">TIER 3: GRID & ENERGY</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-mono">2 Obligors</span>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-200 mt-1">"The Power Mirage"</h4>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">CEG, NEE. Baseload nuclear and regulated grid builders facing 48-month transmission interconnection delays.</p>
+          <div class="mt-3 pt-2 border-t border-terminal-800 flex justify-between text-xs font-mono">
+            <span class="text-slate-500">Total Debt:</span>
+            <span class="text-amber-400 font-medium">$88.3 B</span>
+          </div>
+          <div class="flex justify-between text-xs font-mono mt-1">
+            <span class="text-slate-500">Grid Queue Avg:</span>
+            <span class="text-rose-400">5.5 Years</span>
+          </div>
+        </div>
+
+        <!-- Tier 4 -->
+        <div class="glass-panel-subtle p-4 rounded-xl border border-terminal-700/60 hover:border-terminal-600 transition">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-mono text-rose-400 font-semibold">TIER 4: CORE 490</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 font-mono">~490 Obligors</span>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-200 mt-1">"Refi Maturity Cliff"</h4>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Diversified non-financial core. 24% of debt maturing 2026–2028 re-pricing from 3% coupons to 6%+ yield regime.</p>
+          <div class="mt-3 pt-2 border-t border-terminal-800 flex justify-between text-xs font-mono">
+            <span class="text-slate-500">Aggregate Debt:</span>
+            <span class="text-rose-400 font-medium">$6.61 T</span>
+          </div>
+          <div class="flex justify-between text-xs font-mono mt-1">
+            <span class="text-slate-500">Tier ICR Baseline:</span>
+            <span class="text-amber-400">8.54x</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: GRANULAR OBLIGOR TELEMETRY & PRICE TARGETS -->
+    <div id="tab-content-obligors" class="space-y-6 hidden">
+      
+      <div class="glass-panel p-5 rounded-2xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-terminal-700 mb-4">
+          <div>
+            <h3 class="text-base font-semibold text-slate-100 flex items-center gap-2">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              Bottom-Up Obligor Balance Sheet & 1-Year Price Target Telemetry
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Click any obligor row for granular Merton default boundary diagnostics, duration mismatch profile, and stress decomposition.</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <input type="text" id="obligor-search" placeholder="Search ticker, name, or LEI..." oninput="filterObligors()" class="bg-terminal-900 border border-terminal-700 text-xs font-mono text-slate-200 px-3 py-1.5 rounded-lg w-64 focus:outline-none focus:border-cyan-500">
+            </div>
+            <select id="tier-filter" onchange="filterObligors()" class="bg-terminal-900 border border-terminal-700 text-xs font-mono text-slate-200 px-3 py-1.5 rounded-lg focus:outline-none focus:border-cyan-500">
+              <option value="ALL">All Systemic Tiers</option>
+              <option value="T1">Tier 1: Hyperscalers</option>
+              <option value="T2">Tier 2: Enterprise SaaS</option>
+              <option value="T3">Tier 3: Grid / Energy</option>
+              <option value="T4">Tier 4: Core 490 Composite</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Obligor Interactive Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono border-collapse">
+            <thead>
+              <tr class="text-slate-400 border-b border-terminal-700 bg-terminal-900/70">
+                <th class="p-3">Ticker / Obligor</th>
+                <th class="p-3">Sector / LEI</th>
+                <th class="p-3 text-right">Current Price</th>
+                <th class="p-3 text-right">1-Yr Target</th>
+                <th class="p-3 text-right">Implied Δ</th>
+                <th class="p-3 text-right">Total Debt ($M)</th>
+                <th class="p-3 text-right">Cash ($M)</th>
+                <th class="p-3 text-right">Adj EBITDA ($M)</th>
+                <th class="p-3 text-right">Model ICR</th>
+                <th class="p-3 text-right">OAS Spread</th>
+                <th class="p-3 text-right">Merton DD</th>
+                <th class="p-3 text-center">Systemic Status</th>
+              </tr>
+            </thead>
+            <tbody id="obligors-table-body" class="divide-y divide-terminal-800">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Granular Entity Inspection Card (Interactive Drawer) -->
+      <div id="entity-drawer" class="glass-panel p-6 rounded-2xl border-2 border-cyan-500/40 hidden">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-terminal-700 pb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl bg-terminal-800 border border-terminal-600 flex items-center justify-center font-mono font-bold text-lg text-cyan-400" id="drawer-ticker">
+              MSFT
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span id="drawer-name">Microsoft Corporation</span>
+                <span id="drawer-badge" class="text-xs px-2 py-0.5 rounded font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">NOMINAL</span>
+              </h3>
+              <p class="text-xs font-mono text-slate-400 mt-0.5" id="drawer-lei">LEI: INR2ETJR104677DF8053 | Sector: Information Technology</p>
+            </div>
+          </div>
+
+          <button onclick="closeDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-terminal-800 border border-terminal-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <!-- Drawer Content Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
+          
+          <div class="bg-terminal-900/70 p-4 rounded-xl border border-terminal-800 space-y-3">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-cyan-400">Balance Sheet Telemetry</h4>
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex justify-between"><span class="text-slate-400">Total Debt ($D):</span> <span class="text-white" id="drawer-total-debt">$108,500 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Short-Term Debt ($D_st):</span> <span class="text-white" id="drawer-st-debt">$14,200 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Cash & Equivalents ($C):</span> <span class="text-emerald-400" id="drawer-cash">$84,500 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Net Debt:</span> <span class="text-slate-200" id="drawer-net-debt">$24,000 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Total Assets ($A_book):</span> <span class="text-slate-300" id="drawer-assets">$530,000 M</span></div>
+            </div>
+          </div>
+
+          <div class="bg-terminal-900/70 p-4 rounded-xl border border-terminal-800 space-y-3">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-amber-400">Underwriting & Coverage Model</h4>
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex justify-between"><span class="text-slate-400">LTM Baseline EBITDA:</span> <span class="text-white" id="drawer-base-ebitda">$145,200 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Stress-Adjusted EBITDA:</span> <span class="text-amber-300" id="drawer-adj-ebitda">$139,400 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Adjusted Interest Expense:</span> <span class="text-rose-300" id="drawer-adj-interest">$3,550 M</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Model ICR:</span> <span class="text-emerald-400 font-bold" id="drawer-model-icr">39.2x</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Merton Default Dist:</span> <span class="text-cyan-300 font-bold" id="drawer-merton">21.40σ</span></div>
+            </div>
+          </div>
+
+          <div class="bg-terminal-900/70 p-4 rounded-xl border border-terminal-800 space-y-3">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-rose-400">Systemic Vector Diagnostics</h4>
+            <p class="text-xs text-slate-300 leading-relaxed" id="drawer-diagnostics">
+              Exposure to the "Century Duration Mirage": 3-year silicon replacement cycles capitalized against 10-to-30 year senior debt. Grid connection constraints create 48-month latency on AI revenue realization.
+            </p>
+            <div class="pt-2 border-t border-terminal-800 flex items-center justify-between text-xs font-mono">
+              <span class="text-slate-400">1-Yr Model Target:</span>
+              <span class="text-white font-bold text-sm" id="drawer-target-price">$415.00</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: SYSTEMIC TRANSMISSION VECTORS & STRESS ENGINE -->
+    <div id="tab-content-vectors" class="space-y-6 hidden">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Vector Alpha -->
+        <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-indigo-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-indigo-400 font-bold">VECTOR ALPHA</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">SaaS & Private Credit</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">"Deflationary Gravity" & Seat Flatlining</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Enterprise clients are rationalizing static human-seat licenses (8% to 15% annual contraction) in favor of agentic token pipelines. Because enterprise SaaS was historically underwritten at 25x–35x ARR assuming 12%+ compounding growth, recurring software cash flows are failing to service debt.
+          </p>
+          <div class="p-3 bg-terminal-900/80 rounded-xl border border-terminal-800 text-xs font-mono space-y-1.5">
+            <div class="flex justify-between text-slate-400">
+              <span>Direct Enterprise Obligors:</span>
+              <span class="text-slate-200 font-semibold">CRM, ADBE, ORCL</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Systemic Overhang:</span>
+              <span class="text-rose-400 font-semibold">$3.0 Trillion Private Credit LBOs</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Breakeven Threshold:</span>
+              <span class="text-amber-300 font-semibold">-18% Seat Churn &rarr; Covenant Defaults</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vector Beta -->
+        <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-cyan-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-cyan-400 font-bold">VECTOR BETA</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Hyperscaler Duration</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">The "Century Duration Mirage" & Heavy-Metal Railroads</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Hyperscalers have poured &gt;$200B annualized into GPU clusters, advanced cooling, and real estate. However, silicon clusters face complete technological obsolescence within 36 to 48 months. Financing these 3-year silicon assets with 10-to-30 year senior corporate bonds creates an extreme duration and depreciation mismatch.
+          </p>
+          <div class="p-3 bg-terminal-900/80 rounded-xl border border-terminal-800 text-xs font-mono space-y-1.5">
+            <div class="flex justify-between text-slate-400">
+              <span>Affected Obligors:</span>
+              <span class="text-slate-200 font-semibold">MSFT, AMZN, GOOGL, META</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Capital Conversion Risk:</span>
+              <span class="text-rose-400 font-semibold">ROIC Compression to Single Digits</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Annual CapEx Concentration:</span>
+              <span class="text-cyan-300 font-semibold">&gt; $200 Billion Aggregate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vector Gamma -->
+        <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-amber-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-amber-400 font-bold">VECTOR GAMMA</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Grid Interconnection</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">"The Power Mirage" & Transmission Queues</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Data center construction lead times (18 to 24 months) have radically decoupled from high-voltage electric transmission and transformer delivery times (48 to 60 months). Data centers sit partially idle or rely on expensive interim gas turbines, producing severe stranded-asset latency.
+          </p>
+          <div class="p-3 bg-terminal-900/80 rounded-xl border border-terminal-800 text-xs font-mono space-y-1.5">
+            <div class="flex justify-between text-slate-400">
+              <span>Exposed Power Obligors:</span>
+              <span class="text-slate-200 font-semibold">CEG, NEE, Regulated Utilities</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Interconnection Queue Delay:</span>
+              <span class="text-amber-300 font-semibold">5.5 Years Average (PJM/MISO)</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Economic Result:</span>
+              <span class="text-rose-400 font-semibold">CapEx Monetization Latency</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vector Delta -->
+        <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-rose-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-rose-400 font-bold">VECTOR DELTA</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">Index Remainder</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">Core 490 Corporate Refinancing Cliff</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            While the top 10 mega-caps sit on fortress liquidity ($500B+ cash), the remaining 490 index constituents face $1.10T in short-term obligations and a $1.6T maturity wall through 2028. Maturing bonds with 2.75% coupons are rolling into 6.00%+ yields, directly eroding BBB interest coverage.
+          </p>
+          <div class="p-3 bg-terminal-900/80 rounded-xl border border-terminal-800 text-xs font-mono space-y-1.5">
+            <div class="flex justify-between text-slate-400">
+              <span>Core 490 Total Debt:</span>
+              <span class="text-slate-200 font-semibold">$6.61 Trillion</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Refi Wall at Risk:</span>
+              <span class="text-rose-400 font-semibold">24% over 2026–2028</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Lower Quartile BBB ICR:</span>
+              <span class="text-amber-400 font-semibold">&le; 2.85x (Pre-Shock)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="glass-panel p-6 rounded-2xl">
+        <h4 class="text-sm font-semibold text-slate-100 mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          The Reflexive Feedback Loop Mechanics (Systemic Architecture)
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono text-slate-300">
+          <div class="bg-terminal-900 p-4 rounded-xl border border-terminal-800">
+            <span class="text-cyan-400 font-bold block mb-1">Step 1: CapEx Surge</span>
+            Hyperscalers issue long-term bonds to finance short-lived GPU compute clusters and power PPAs.
+          </div>
+          <div class="bg-terminal-900 p-4 rounded-xl border border-terminal-800">
+            <span class="text-indigo-400 font-bold block mb-1">Step 2: Deflationary Gravity</span>
+            Enterprise clients cut SaaS seats and rationalize IT spend to pay for inference tokens.
+          </div>
+          <div class="bg-terminal-900 p-4 rounded-xl border border-terminal-800">
+            <span class="text-amber-400 font-bold block mb-1">Step 3: Power Latency</span>
+            Grid delays prevent data center energization, stalling cash flow generation while debt service accrues.
+          </div>
+          <div class="bg-terminal-900 p-4 rounded-xl border border-terminal-800">
+            <span class="text-rose-400 font-bold block mb-1">Step 4: Refi Repricing</span>
+            Spreads widen, debt rollover costs spike, and marginal BBB issuers face negative rating momentum.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: ADAM-v30.2 FORMAL DOSSIER & APPENDICES -->
+    <div id="tab-content-dossier" class="space-y-6 hidden">
+      
+      <div class="glass-panel p-6 lg:p-8 rounded-2xl space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-terminal-700 pb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 font-semibold">FORMAL BROADCAST</span>
+              <span class="text-xs font-mono text-slate-400">DOC REF: ADAM-SOV-SP500-Q1-2026</span>
+            </div>
+            <h2 class="text-xl font-bold text-white mt-1">ADAM-v30.2 Sovereign Obligor Dossier: S&P 500 Baseline</h2>
+            <p class="text-xs text-slate-400">Bottom-up Corporate Credit Assessment, Merton Structural Default Calibration, and Transmission Vectors</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="copyDossierText()" class="px-3 py-1.5 rounded-lg bg-terminal-800 hover:bg-terminal-700 text-xs font-mono text-slate-200 border border-terminal-700 transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              Copy Report
+            </button>
+            <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-terminal-800 hover:bg-terminal-700 text-xs font-mono text-slate-200 border border-terminal-700 transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+              Print / PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Technical Content Body -->
+        <div class="prose prose-invert max-w-none text-slate-300 text-xs leading-relaxed space-y-6 font-sans">
+          
+          <div class="p-4 bg-rose-950/40 rounded-xl border border-rose-800/80 font-mono text-rose-200">
+            <strong class="text-rose-400 block mb-1">🔴 ADAM-v30.2 SYSTEM STATUS: ALERT</strong>
+            The bottom-up reconstitution of the S&P 500 corporate balance sheet demonstrates an optical solvency illusion. At the consolidated surface, an aggregate Interest Coverage Ratio of 9.91x and Merton Distance-to-Default of 16.20σ suggest unassailable liquidity. Deconstructed entity by entity, systemic vulnerability is bifurcated between the Hyperscaler "Century Duration Mirage" and Enterprise Software "seat flatlining," leaving the Core 490 exposed to an unforgiving refinancing wall.
+          </div>
+
+          <!-- Section 1: Mathematical Formulations -->
+          <div>
+            <h3 class="text-sm font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2">Appendix A: Mathematical Formulations & Calibration Engine</h3>
+            <div class="bg-terminal-900/90 p-4 rounded-xl border border-terminal-800 font-mono space-y-3 text-[11px]">
+              <div>
+                <p class="text-slate-400 font-semibold">1. Structural Distance-to-Default (Merton Framework Calibration):</p>
+                <div class="p-2 bg-terminal-950 rounded border border-terminal-800 text-cyan-300 my-1 overflow-x-auto">
+                  DD = [ ln(V_A / K) + (r_f - 0.5 * σ_A^2) * T ] / [ σ_A * sqrt(T) ]
+                </div>
+                <p class="text-slate-400">Where $V_A = E + D_{\text{total}}$, $K = D_{\text{st}} + 0.5 \cdot (D_{\text{total}} - D_{\text{st}})$, and $\sigma_A \approx \sigma_E \cdot (E / V_A)$.</p>
+              </div>
+
+              <div>
+                <p class="text-slate-400 font-semibold">2. Dynamic Interest Coverage Ratio (ICR):</p>
+                <div class="p-2 bg-terminal-950 rounded border border-terminal-800 text-emerald-300 my-1 overflow-x-auto">
+                  ICR_adj = [ EBITDA_base * (1 + Δ_revenue_drag) - Depreciation_accel ] / [ I_base + (D_st * Δ_refi_spread) ]
+                </div>
+              </div>
+
+              <div>
+                <p class="text-slate-400 font-semibold">3. 1-Year Forward Price Target Formulation:</p>
+                <div class="p-2 bg-terminal-950 rounded border border-terminal-800 text-sky-300 my-1 overflow-x-auto">
+                  P_target = [ (EBITDA_adj * Multiple_target) - NetDebt_adj ] / Shares_Outstanding
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Full Entity Reference Table -->
+          <div>
+            <h3 class="text-sm font-mono font-bold text-amber-400 uppercase tracking-wider mb-2">Appendix B: Obligor Baseline Telemetry Matrix (Q1 2026 Archive)</h3>
+            <div class="overflow-x-auto bg-terminal-900/80 rounded-xl border border-terminal-800">
+              <table class="w-full text-left font-mono text-[11px]">
+                <thead>
+                  <tr class="border-b border-terminal-700 text-slate-400 bg-terminal-950">
+                    <th class="p-2.5">Entity</th>
+                    <th class="p-2.5">Ticker</th>
+                    <th class="p-2.5 text-right">Debt ($M)</th>
+                    <th class="p-2.5 text-right">ST Debt ($M)</th>
+                    <th class="p-2.5 text-right">EBITDA ($M)</th>
+                    <th class="p-2.5 text-right">Interest ($M)</th>
+                    <th class="p-2.5 text-right">Cash ($M)</th>
+                    <th class="p-2.5 text-right">Eq Vol (σ_E)</th>
+                    <th class="p-2.5 text-right">OAS (bps)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-terminal-800 text-slate-300">
+                  <tr><td class="p-2 font-bold">Microsoft Corp.</td><td>MSFT</td><td class="text-right">108,500</td><td class="text-right">14,200</td><td class="text-right">145,200</td><td class="text-right">3,400</td><td class="text-right">84,500</td><td class="text-right">19.5%</td><td class="text-right">36</td></tr>
+                  <tr><td class="p-2 font-bold">Amazon.com Inc.</td><td>AMZN</td><td class="text-right">152,000</td><td class="text-right">22,500</td><td class="text-right">128,000</td><td class="text-right">4,100</td><td class="text-right">88,000</td><td class="text-right">22.8%</td><td class="text-right">48</td></tr>
+                  <tr><td class="p-2 font-bold">Alphabet Inc.</td><td>GOOGL</td><td class="text-right">31,500</td><td class="text-right">6,800</td><td class="text-right">132,000</td><td class="text-right">450</td><td class="text-right">115,000</td><td class="text-right">21.2%</td><td class="text-right">28</td></tr>
+                  <tr><td class="p-2 font-bold">Meta Platforms Inc.</td><td>META</td><td class="text-right">42,800</td><td class="text-right">4,200</td><td class="text-right">84,500</td><td class="text-right">1,250</td><td class="text-right">65,200</td><td class="text-right">26.4%</td><td class="text-right">42</td></tr>
+                  <tr><td class="p-2 font-bold">Salesforce Inc.</td><td>CRM</td><td class="text-right">14,100</td><td class="text-right">2,500</td><td class="text-right">13,800</td><td class="text-right">480</td><td class="text-right">14,800</td><td class="text-right">27.5%</td><td class="text-right">74</td></tr>
+                  <tr><td class="p-2 font-bold">Adobe Inc.</td><td>ADBE</td><td class="text-right">6,200</td><td class="text-right">1,800</td><td class="text-right">8,900</td><td class="text-right">190</td><td class="text-right">8,100</td><td class="text-right">29.0%</td><td class="text-right">62</td></tr>
+                  <tr><td class="p-2 font-bold">Oracle Corp.</td><td>ORCL</td><td class="text-right">88,500</td><td class="text-right">9,200</td><td class="text-right">24,200</td><td class="text-right">3,650</td><td class="text-right">11,200</td><td class="text-right">25.1%</td><td class="text-right">108</td></tr>
+                  <tr><td class="p-2 font-bold">Constellation Energy</td><td>CEG</td><td class="text-right">9,800</td><td class="text-right">1,400</td><td class="text-right">4,600</td><td class="text-right">460</td><td class="text-right">1,850</td><td class="text-right">34.2%</td><td class="text-right">112</td></tr>
+                  <tr><td class="p-2 font-bold">NextEra Energy</td><td>NEE</td><td class="text-right">78,500</td><td class="text-right">14,800</td><td class="text-right">19,200</td><td class="text-right">3,100</td><td class="text-right">2,800</td><td class="text-right">22.0%</td><td class="text-right">122</td></tr>
+                  <tr class="bg-terminal-950 font-bold text-white"><td class="p-2">Core 490 Remainder</td><td>SPX_CORE</td><td class="text-right">6,608,900</td><td class="text-right">1,102,800</td><td class="text-right">2,569,800</td><td class="text-right">301,070</td><td class="text-right">1,739,750</td><td class="text-right">17.8%</td><td class="text-right">134</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 3: Dialect Glossary -->
+          <div>
+            <h3 class="text-sm font-mono font-bold text-rose-400 uppercase tracking-wider mb-2">Appendix C: "Mkt myhm" Dialect Lexicon</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+              <div class="p-3 bg-terminal-900 rounded-lg border border-terminal-800">
+                <span class="text-cyan-300 font-bold">"Century Duration Mirage":</span> Sinking corporate funds into 36-month silicon assets backed by 30-year bond debt structures.
+              </div>
+              <div class="p-3 bg-terminal-900 rounded-lg border border-terminal-800">
+                <span class="text-indigo-300 font-bold">"Deflationary Gravity / Seat Flatlining":</span> AI task-runners replacing billable human software seats, eroding per-seat ARR.
+              </div>
+              <div class="p-3 bg-terminal-900 rounded-lg border border-terminal-800">
+                <span class="text-amber-300 font-bold">"The Power Mirage":</span> Grid connection queue latency preventing data center energization, leaving assets non-operational.
+              </div>
+              <div class="p-3 bg-terminal-900 rounded-lg border border-terminal-800">
+                <span class="text-rose-300 font-bold">"Reflexive Death Spiral":</span> Feedback loop where spread widening triggers rating downgrades, forcing forced asset sales.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-terminal-800 bg-terminal-950 py-4 px-6 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>ADAM-v30.2 Sovereign Obligor Terminal // Autonomous Quantitative Engine</div>
+      <div class="text-slate-400">Status: <span class="text-emerald-400">ONLINE</span> &bull; Dialect: Mkt myhm &bull; Systemic Anchor: Q1 2026</div>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       ADAM-v30.2 CORE DATASET: S&P 500 BOTTOM-UP OBLIGORS
+       ========================================================================== */
+    const OBLIGOR_DATA = [
+      {
+        id: 'MSFT',
+        ticker: 'MSFT',
+        name: 'Microsoft Corporation',
+        lei: 'INR2ETJR104677DF8053',
+        sector: 'Information Technology / Systems & Cloud',
+        tier: 'T1',
+        tierLabel: 'Hyperscaler',
+        currentPrice: 420.50,
+        sharesOut: 7420, // Millions of shares
+        marketCap: 3120000, // $M
+        totalDebt: 108500,
+        stDebt: 14200,
+        baseEbitda: 145200,
+        baseInterest: 3400,
+        cash: 84500,
+        assets: 530000,
+        eqVol: 0.195,
+        baseOas: 36,
+        basePt: 450.00,
+        capexExposure: 0.35, // High exposure to Century Duration Mirage
+        seatExposure: 0.15,  // Copilot enterprise seat friction
+        powerExposure: 0.25, // Data center grid bottlenecks
+        qualitative: 'Annual CapEx tracking ~$65B into GPU clusters. Capitalizing 3-year silicon replacement against 10-30 year debt. Northern Virginia grid queues create 48-month monetization latency.'
+      },
+      {
+        id: 'AMZN',
+        ticker: 'AMZN',
+        name: 'Amazon.com, Inc.',
+        lei: 'ZXF8T627K71182390141',
+        sector: 'Consumer Discretionary / Cloud Infrastructure (AWS)',
+        tier: 'T1',
+        tierLabel: 'Hyperscaler',
+        currentPrice: 205.20,
+        sharesOut: 10477,
+        marketCap: 2150000,
+        totalDebt: 152000,
+        stDebt: 22500,
+        baseEbitda: 128000,
+        baseInterest: 4100,
+        cash: 88000,
+        assets: 585000,
+        eqVol: 0.228,
+        baseOas: 48,
+        basePt: 225.00,
+        capexExposure: 0.40,
+        seatExposure: 0.05,
+        powerExposure: 0.35,
+        qualitative: 'Massive fleet capital lease renewals; AWS enterprise cloud audits slowing compute absorption. Direct nuclear and gas turbine off-take face FERC regulatory interconnection friction.'
+      },
+      {
+        id: 'GOOGL',
+        ticker: 'GOOGL',
+        name: 'Alphabet Inc.',
+        lei: '5493006MHB84DD0ZWV18',
+        sector: 'Communication Services / Cloud Platforms',
+        tier: 'T1',
+        tierLabel: 'Hyperscaler',
+        currentPrice: 182.40,
+        sharesOut: 12500,
+        marketCap: 2280000,
+        totalDebt: 31500,
+        stDebt: 6800,
+        baseEbitda: 132000,
+        baseInterest: 450,
+        cash: 115000,
+        assets: 435000,
+        eqVol: 0.212,
+        baseOas: 28,
+        basePt: 198.00,
+        capexExposure: 0.30,
+        seatExposure: 0.05,
+        powerExposure: 0.20,
+        qualitative: 'Fortress balance sheet with negative net debt (-$83.5B), but CapEx expansion to ~$52B depresses FCF conversion yield. Unit cost inflation across core search inference workloads.'
+      },
+      {
+        id: 'META',
+        ticker: 'META',
+        name: 'Meta Platforms, Inc.',
+        lei: '254900A1A28A81149B90',
+        sector: 'Communication Services / Interactive Media',
+        tier: 'T1',
+        tierLabel: 'Hyperscaler',
+        currentPrice: 608.00,
+        sharesOut: 2533,
+        marketCap: 1540000,
+        totalDebt: 42800,
+        stDebt: 4200,
+        baseEbitda: 84500,
+        baseInterest: 1250,
+        cash: 65200,
+        assets: 262000,
+        eqVol: 0.264,
+        baseOas: 42,
+        basePt: 650.00,
+        capexExposure: 0.45,
+        seatExposure: 0.02,
+        powerExposure: 0.25,
+        qualitative: 'Accelerated depreciation provisions on Gen-1 GPU clusters require multi-billion book write-downs. CapEx shifting corporate profile from asset-light ad platform to heavy-metal operator.'
+      },
+      {
+        id: 'CRM',
+        ticker: 'Salesforce, Inc.',
+        name: 'Salesforce, Inc.',
+        lei: '549300H2824L025Z4926',
+        sector: 'Information Technology / Enterprise SaaS',
+        tier: 'T2',
+        tierLabel: 'Enterprise SaaS',
+        currentPrice: 302.50,
+        sharesOut: 942,
+        marketCap: 285000,
+        totalDebt: 14100,
+        stDebt: 2500,
+        baseEbitda: 13800,
+        baseInterest: 480,
+        cash: 14800,
+        assets: 102000,
+        eqVol: 0.275,
+        baseOas: 74,
+        basePt: 310.00,
+        capexExposure: 0.05,
+        seatExposure: 0.50, // Acute exposure to Seat Flatlining
+        powerExposure: 0.02,
+        qualitative: 'Acute exposure to seat flatlining: Enterprise clients rationalizing per-seat licenses by 8-14% in favor of agentic autonomous task runners. Top-line ARR deceleration compressing margins.'
+      },
+      {
+        id: 'ADBE',
+        ticker: 'ADBE',
+        name: 'Adobe Inc.',
+        lei: '549300R3L9P9O9L8N884',
+        sector: 'Information Technology / Application Software',
+        tier: 'T2',
+        tierLabel: 'Enterprise SaaS',
+        currentPrice: 472.00,
+        sharesOut: 445,
+        marketCap: 210000,
+        totalDebt: 6200,
+        stDebt: 1800,
+        baseEbitda: 8900,
+        baseInterest: 190,
+        cash: 8100,
+        assets: 31500,
+        eqVol: 0.290,
+        baseOas: 62,
+        basePt: 495.00,
+        capexExposure: 0.05,
+        seatExposure: 0.45,
+        powerExposure: 0.02,
+        qualitative: 'Deflationary gravity penetrating core creative workflows. Generative model displacement eroding per-seat professional creative subscriptions. Organic seat growth zero-bound in mid-market.'
+      },
+      {
+        id: 'ORCL',
+        ticker: 'ORCL',
+        name: 'Oracle Corporation',
+        lei: '549300V5Q8D2P2U5S631',
+        sector: 'Information Technology / Enterprise Database & OCI',
+        tier: 'T2',
+        tierLabel: 'Enterprise SaaS',
+        currentPrice: 152.80,
+        sharesOut: 2748,
+        marketCap: 420000,
+        totalDebt: 88500,
+        stDebt: 9200,
+        baseEbitda: 24200,
+        baseInterest: 3650,
+        cash: 11200,
+        assets: 142000,
+        eqVol: 0.251,
+        baseOas: 108,
+        basePt: 155.00,
+        capexExposure: 0.30,
+        seatExposure: 0.25,
+        powerExposure: 0.20,
+        qualitative: 'High structural leverage: Gross Debt / EBITDA = 3.66x. Heavy CapEx for OCI data centers co-located with GPU clusters creates hybrid vulnerability between SaaS decay and hardware intensity.'
+      },
+      {
+        id: 'CEG',
+        ticker: 'CEG',
+        name: 'Constellation Energy Corp.',
+        lei: '5493006N8J2P4K8L9M12',
+        sector: 'Utilities / Independent Baseload Power',
+        tier: 'T3',
+        tierLabel: 'Grid & Energy',
+        currentPrice: 228.00,
+        sharesOut: 360,
+        marketCap: 82000,
+        totalDebt: 9800,
+        stDebt: 1400,
+        baseEbitda: 4600,
+        baseInterest: 460,
+        cash: 1850,
+        assets: 38200,
+        eqVol: 0.342,
+        baseOas: 112,
+        basePt: 240.00,
+        capexExposure: 0.15,
+        seatExposure: 0.00,
+        powerExposure: 0.50, // Pure exposure to Power Mirage
+        qualitative: 'Long-term nuclear PPA off-take contracts to hyperscalers face state regulatory scrutiny over retail ratepayer cross-subsidization. Heavy future capital commitments for reactor lifetime extension.'
+      },
+      {
+        id: 'NEE',
+        ticker: 'NEE',
+        name: 'NextEra Energy, Inc.',
+        lei: '5493008E8B6K5D4C3B21',
+        sector: 'Utilities / Regulated Electric & Renewables',
+        tier: 'T3',
+        tierLabel: 'Grid & Energy',
+        currentPrice: 81.60,
+        sharesOut: 2058,
+        marketCap: 168000,
+        totalDebt: 78500,
+        stDebt: 14800,
+        baseEbitda: 19200,
+        baseInterest: 3100,
+        cash: 2800,
+        assets: 182000,
+        eqVol: 0.220,
+        baseOas: 122,
+        basePt: 85.00,
+        capexExposure: 0.20,
+        seatExposure: 0.00,
+        powerExposure: 0.45,
+        qualitative: 'Capital structure highly sensitive to elevated interest rate baselines (rf = 4.25%). Grid interconnection queues average 5.5 years, delaying cash flow conversion on renewable portfolios.'
+      },
+      {
+        id: 'SPX_CORE',
+        ticker: 'SPX_CORE_EX10',
+        name: 'S&P 500 Broad Non-Financial Remainder (Core 490)',
+        lei: 'AGGREGATE-COMPOSITE-490',
+        sector: 'Diversified Core Non-Financials (Industrials, Discretionary, Healthcare, Energy)',
+        tier: 'T4',
+        tierLabel: 'Core 490 Composite',
+        currentPrice: 75.20, // Normalized unit price
+        sharesOut: 490226,
+        marketCap: 36865000,
+        totalDebt: 6608900,
+        stDebt: 1102800,
+        baseEbitda: 2569800,
+        baseInterest: 301070,
+        cash: 1739750,
+        assets: 41984300,
+        eqVol: 0.178,
+        baseOas: 134,
+        basePt: 74.50,
+        capexExposure: 0.10,
+        seatExposure: 0.12,
+        powerExposure: 0.10,
+        qualitative: 'Maturity wall rollover: ~24% of debt maturing 2026–2028 re-pricing from 2.5-3.5% coupons to prevailing 6%+ yields. Cumulative interest coverage eroding among BBB-rated industrials as pricing power wanes.'
+      }
+    ];
+
+    // Active Scenario State
+    let state = {
+      seatChurn: -10,        // %
+      capexWriteoff: 15,     // %
+      powerLatency: 12,      // Months
+      rfRate: 4.25,          // %
+      spreadShock: 0,        // bps
+      refiBump: 120,         // bps
+      selectedObligorId: 'MSFT'
+    };
+
+    let trajectoryChartInstance = null;
+
+    /* ==========================================================================
+       CALIBRATION & MATHEMATICAL ENGINE
+       ========================================================================== */
+    function calculateObligorMetrics(ob, s) {
+      // 1. EBITDA adjustment:
+      // Seat churn impact: negative drag based on exposure
+      const seatDragFactor = (s.seatChurn / 100) * ob.seatExposure;
+      // CapEx write-down / depreciation acceleration: negative drag based on exposure
+      const capexDragFactor = (s.capexWriteoff / 100) * ob.capexExposure * 0.45;
+      // Power latency monetization drag:
+      const powerDragFactor = (s.powerLatency / 36) * ob.powerExposure * 0.15;
+
+      const totalEbitdaDelta = seatDragFactor - capexDragFactor - powerDragFactor;
+      const adjEbitda = Math.max(ob.baseEbitda * (1 + totalEbitdaDelta), 100);
+
+      // 2. Interest Expense adjustment:
+      // Maturing short-term debt re-pricing + spread shock
+      const effectiveRefiRateDelta = (s.refiBump + s.spreadShock) / 10000;
+      const refiInterestIncrease = ob.stDebt * effectiveRefiRateDelta;
+      const adjInterest = Math.max(ob.baseInterest + refiInterestIncrease, 10);
+
+      // 3. Adjusted ICR
+      const icr = adjEbitda / adjInterest;
+
+      // 4. Spread & Yield adjustment
+      const adjOas = ob.baseOas + s.spreadShock + (icr < 4.0 ? 45 : 0) + (icr < 2.5 ? 90 : 0);
+
+      // 5. Merton Distance-to-Default (1-Year Horizon)
+      // Total Asset Market Value:
+      const equityCap = ob.marketCap;
+      const va = equityCap + ob.totalDebt;
+      // Asset volatility approximation:
+      const sigmaA = ob.eqVol * (equityCap / va);
+      // Default barrier K:
+      const k = ob.stDebt + 0.5 * (ob.totalDebt - ob.stDebt);
+      const rf = s.rfRate / 100;
+      const t = 1.0;
+
+      let dd = 15.0;
+      try {
+        const d1 = (Math.log(va / k) + (rf - 0.5 * Math.pow(sigmaA, 2)) * t) / (sigmaA * Math.sqrt(t));
+        dd = Math.max(d1, 0.5);
+      } catch (e) {
+        dd = 10.0;
+      }
+
+      // 6. 1-Year Forward Price Target Model:
+      // Multiplier impacted by ROIC compression, rate baseline, and ICR
+      const valuationDecline = (totalEbitdaDelta * 1.2) - ((s.rfRate - 4.25) * 0.05) - (s.spreadShock / 1000);
+      const targetCap = Math.max(equityCap * (1 + valuationDecline), equityCap * 0.4);
+      const targetPrice = targetCap / ob.sharesOut;
+      const priceDeltaPct = ((targetPrice - ob.currentPrice) / ob.currentPrice) * 100;
+
+      // Systemic status flag
+      let status = 'NOMINAL';
+      let statusClass = 'text-emerald-400 bg-emerald-950/80 border-emerald-800';
+      if (icr < 3.0 || dd < 7.0 || targetPrice < ob.currentPrice * 0.85) {
+        status = 'ALERT';
+        statusClass = 'text-rose-400 bg-rose-950/80 border-rose-800';
+      } else if (icr < 6.0 || dd < 11.0 || targetPrice < ob.currentPrice) {
+        status = 'ELEVATED';
+        statusClass = 'text-amber-400 bg-amber-950/80 border-amber-800';
+      }
+
+      return {
+        adjEbitda,
+        adjInterest,
+        icr,
+        adjOas,
+        dd,
+        targetPrice,
+        targetCap,
+        priceDeltaPct,
+        status,
+        statusClass
+      };
+    }
+
+    function recalculateAll() {
+      let aggDebt = 0;
+      let aggEbitda = 0;
+      let aggInterest = 0;
+      let aggCash = 0;
+      let aggMarketCap = 0;
+      let aggTargetCap = 0;
+      let coreIcr = 8.54;
+
+      const processed = OBLIGOR_DATA.map(ob => {
+        const m = calculateObligorMetrics(ob, state);
+        aggDebt += ob.totalDebt;
+        aggEbitda += m.adjEbitda;
+        aggInterest += m.adjInterest;
+        aggCash += ob.cash;
+        aggMarketCap += ob.marketCap;
+        aggTargetCap += m.targetCap;
+
+        if (ob.id === 'SPX_CORE') {
+          coreIcr = m.icr;
+        }
+
+        return { ...ob, ...m };
+      });
+
+      const aggIcr = aggEbitda / aggInterest;
+      
+      // Calculate consolidated Merton Distance to Default
+      const va = aggMarketCap + aggDebt;
+      const sigmaA = 0.184 * (aggMarketCap / va);
+      const k = 1180000 + 0.5 * (aggDebt - 1180000);
+      const rf = state.rfRate / 100;
+      const aggDd = (Math.log(va / k) + (rf - 0.5 * Math.pow(sigmaA, 2))) / sigmaA;
+
+      // Implied S&P 500 Index Level Target:
+      // Base S&P 500 = ~5,860; target scaled by targetCap / marketCap
+      const spxBaseline = 5860;
+      const spxTarget = Math.round(spxBaseline * (aggTargetCap / aggMarketCap));
+
+      // Update Top Global Tickers & KPIs
+      document.getElementById('ticker-med-icr').innerText = aggIcr.toFixed(2) + 'x';
+      document.getElementById('ticker-core-icr').innerText = coreIcr.toFixed(2) + 'x';
+      document.getElementById('ticker-merton-dd').innerText = aggDd.toFixed(2) + 'σ';
+
+      document.getElementById('kpi-merton-dd').innerText = aggDd.toFixed(2) + 'σ';
+      document.getElementById('kpi-aggregate-icr').innerText = aggIcr.toFixed(2) + 'x';
+      document.getElementById('kpi-spx-target').innerText = spxTarget.toLocaleString() + ' pts';
+      document.getElementById('kpi-marketcap-val').innerText = '$' + (aggTargetCap / 1000000).toFixed(2) + ' T';
+
+      const coreIcrDeltaEl = document.getElementById('kpi-core-icr-delta');
+      coreIcrDeltaEl.innerText = coreIcr.toFixed(2) + 'x (' + (coreIcr < 7.0 ? 'Fragile' : 'Compressed') + ')';
+      coreIcrDeltaEl.className = coreIcr < 5.0 ? 'text-rose-400 font-semibold' : 'text-amber-400 font-semibold';
+
+      const riskStatusEl = document.getElementById('kpi-risk-status');
+      if (coreIcr < 5.0 || aggDd < 12.0) {
+        riskStatusEl.innerText = 'CRITICAL ALERT';
+        riskStatusEl.className = 'text-2xl font-bold font-mono text-rose-500 mt-1 animate-pulse';
+      } else if (coreIcr < 7.5 || state.spreadShock >= 80) {
+        riskStatusEl.innerText = 'ALERT';
+        riskStatusEl.className = 'text-2xl font-bold font-mono text-rose-400 mt-1';
+      } else {
+        riskStatusEl.innerText = 'NOMINAL';
+        riskStatusEl.className = 'text-2xl font-bold font-mono text-emerald-400 mt-1';
+      }
+
+      // Render Obligor Table
+      renderObligorTable(processed);
+
+      // Render Heatmap Matrix
+      renderHeatmapMatrix();
+
+      // Update Forward Trajectory Chart
+      updateTrajectoryChart(spxTarget, state.spreadShock);
+
+      // If drawer is active, refresh it
+      if (state.selectedObligorId) {
+        const sel = processed.find(o => o.id === state.selectedObligorId);
+        if (sel) openDrawer(sel);
+      }
+    }
+
+    function renderObligorTable(items) {
+      const search = (document.getElementById('obligor-search').value || '').toLowerCase();
+      const tier = document.getElementById('tier-filter').value;
+      const tbody = document.getElementById('obligors-table-body');
+      tbody.innerHTML = '';
+
+      items
+        .filter(item => {
+          const matchSearch = item.ticker.toLowerCase().includes(search) ||
+                              item.name.toLowerCase().includes(search) ||
+                              item.lei.toLowerCase().includes(search);
+          const matchTier = tier === 'ALL' || item.tier === tier;
+          return matchSearch && matchTier;
+        })
+        .forEach(ob => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-terminal-800/80 cursor-pointer transition border-b border-terminal-800/50';
+          tr.onclick = () => openDrawer(ob);
+
+          const deltaClass = ob.priceDeltaPct >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          const deltaSign = ob.priceDeltaPct >= 0 ? '+' : '';
+
+          tr.innerHTML = `
+          <td class="p-3 font-bold text-white flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full ${ob.status === 'ALERT' ? 'bg-rose-500' : (ob.status === 'ELEVATED' ? 'bg-amber-400' : 'bg-emerald-400')}"></span>
+            ${ob.ticker}
+          </td>
+          <td class="p-3 text-slate-300">
+            <div class="truncate max-w-[200px]">${ob.name}</div>
+            <div class="text-[10px] text-slate-500 truncate">${ob.sector}</div>
+          </td>
+          <td class="p-3 text-right text-slate-300">$${ob.currentPrice.toFixed(2)}</td>
+          <td class="p-3 text-right font-bold text-slate-100">$${ob.targetPrice.toFixed(2)}</td>
+          <td class="p-3 text-right font-semibold ${deltaClass}">${deltaSign}${ob.priceDeltaPct.toFixed(1)}%</td>
+          <td class="p-3 text-right text-slate-300">$${(ob.totalDebt).toLocaleString()}</td>
+          <td class="p-3 text-right text-emerald-400">$${(ob.cash).toLocaleString()}</td>
+          <td class="p-3 text-right text-amber-300">$${Math.round(ob.adjEbitda).toLocaleString()}</td>
+          <td class="p-3 text-right font-bold ${ob.icr < 4.0 ? 'text-rose-400' : 'text-emerald-400'}">${ob.icr.toFixed(1)}x</td>
+          <td class="p-3 text-right text-slate-300">${Math.round(ob.adjOas)} bps</td>
+          <td class="p-3 text-right font-mono text-cyan-300">${ob.dd.toFixed(1)}σ</td>
+          <td class="p-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${ob.statusClass}">
+              ${ob.status}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+  }
+
+  function openDrawer(ob) {
+    if (!ob) return;
+
+    // Ensure metrics exist on the object; if absent, calculate dynamically on demand
+    const metrics = (ob.icr === undefined || ob.targetPrice === undefined)
+      ? calculateObligorMetrics(ob, state)
+      : {};
+    const entity = { ...ob, ...metrics };
+
+    state.selectedObligorId = entity.id;
+    const drawer = document.getElementById('entity-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('hidden');
+
+    document.getElementById('drawer-ticker').innerText = entity.ticker || '';
+    document.getElementById('drawer-name').innerText = entity.name || '';
+    document.getElementById('drawer-lei').innerText = `LEI: ${entity.lei || 'N/A'} | Sector: ${entity.sector || 'N/A'}`;
+    
+    const badge = document.getElementById('drawer-badge');
+    if (badge) {
+      badge.innerText = entity.status || 'NOMINAL';
+      badge.className = `text-xs px-2 py-0.5 rounded font-mono border ${entity.statusClass || ''}`;
+    }
+
+    document.getElementById('drawer-total-debt').innerText = `$${(entity.totalDebt || 0).toLocaleString()} M`;
+    document.getElementById('drawer-st-debt').innerText = `$${(entity.stDebt || 0).toLocaleString()} M`;
+    document.getElementById('drawer-cash').innerText = `$${(entity.cash || 0).toLocaleString()} M`;
+    const netDebt = (entity.totalDebt || 0) - (entity.cash || 0);
+    document.getElementById('drawer-net-debt').innerText = `$${netDebt.toLocaleString()} M`;
+    document.getElementById('drawer-assets').innerText = `$${(entity.assets || 0).toLocaleString()} M`;
+
+    document.getElementById('drawer-base-ebitda').innerText = `$${(entity.baseEbitda || 0).toLocaleString()} M`;
+    document.getElementById('drawer-adj-ebitda').innerText = `$${Math.round(entity.adjEbitda || 0).toLocaleString()} M`;
+    document.getElementById('drawer-adj-interest').innerText = `$${Math.round(entity.adjInterest || 0).toLocaleString()} M`;
+    document.getElementById('drawer-model-icr').innerText = `${(entity.icr ?? 0).toFixed(2)}x`;
+    document.getElementById('drawer-merton').innerText = `${(entity.dd ?? 0).toFixed(2)}σ`;
+
+    document.getElementById('drawer-diagnostics').innerText = entity.qualitative || '';
+    const deltaSign = (entity.priceDeltaPct ?? 0) >= 0 ? '+' : '';
+    document.getElementById('drawer-target-price').innerText = `$${(entity.targetPrice ?? entity.currentPrice ?? 0).toFixed(2)} (${deltaSign}${(entity.priceDeltaPct ?? 0).toFixed(1)}%)`;
+
+    // Smooth scroll to drawer if in obligors tab
+    drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeDrawer() {
+    document.getElementById('entity-drawer').classList.add('hidden');
+  }
+
+    function openDrawer(ob) {
+      state.selectedObligorId = ob.id;
+      const drawer = document.getElementById('entity-drawer');
+      drawer.classList.remove('hidden');
+
+      document.getElementById('drawer-ticker').innerText = ob.ticker;
+      document.getElementById('drawer-name').innerText = ob.name;
+      document.getElementById('drawer-lei').innerText = `LEI: ${ob.lei} | Sector: ${ob.sector}`;
+      
+      const badge = document.getElementById('drawer-badge');
+      badge.innerText = ob.status;
+      badge.className = `text-xs px-2 py-0.5 rounded font-mono border ${ob.statusClass}`;
+
+      document.getElementById('drawer-total-debt').innerText = `$${ob.totalDebt.toLocaleString()} M`;
+      document.getElementById('drawer-st-debt').innerText = `$${ob.stDebt.toLocaleString()} M`;
+      document.getElementById('drawer-cash').innerText = `$${ob.cash.toLocaleString()} M`;
+      const netDebt = ob.totalDebt - ob.cash;
+      document.getElementById('drawer-net-debt').innerText = `$${netDebt.toLocaleString()} M`;
+      document.getElementById('drawer-assets').innerText = `$${ob.assets.toLocaleString()} M`;
+
+      document.getElementById('drawer-base-ebitda').innerText = `$${ob.baseEbitda.toLocaleString()} M`;
+      document.getElementById('drawer-adj-ebitda').innerText = `$${Math.round(ob.adjEbitda).toLocaleString()} M`;
+      document.getElementById('drawer-adj-interest').innerText = `$${Math.round(ob.adjInterest).toLocaleString()} M`;
+      document.getElementById('drawer-model-icr').innerText = `${ob.icr.toFixed(2)}x`;
+      document.getElementById('drawer-merton').innerText = `${ob.dd.toFixed(2)}σ`;
+
+      document.getElementById('drawer-diagnostics').innerText = ob.qualitative;
+      document.getElementById('drawer-target-price').innerText = `$${ob.targetPrice.toFixed(2)} (${ob.priceDeltaPct >= 0 ? '+' : ''}${ob.priceDeltaPct.toFixed(1)}%)`;
+
+      // Smooth scroll to drawer if in obligors tab
+      drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeDrawer() {
+      document.getElementById('entity-drawer').classList.add('hidden');
+    }
+
+    function filterObligors() {
+      recalculateAll();
+    }
+
+    function renderHeatmapMatrix() {
+      const tbody = document.getElementById('heatmap-body');
+      tbody.innerHTML = '';
+
+      const seatScenarios = [0, -10, -20, -30];
+      const rateShifts = [-0.50, 0.0, 0.75, 1.50];
+
+      seatScenarios.forEach(seat => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-terminal-800/60';
+
+        let rowHtml = `<td class="p-2 text-left font-semibold text-slate-300">${seat}%</td>`;
+
+        rateShifts.forEach(rateDelta => {
+          // Compute synthetic Core 490 ICR for this coordinate
+          const testState = {
+            ...state,
+            seatChurn: seat,
+            rfRate: 4.25 + rateDelta,
+            refiBump: 120 + Math.max(0, rateDelta * 100)
+          };
+          const coreOb = OBLIGOR_DATA.find(o => o.id === 'SPX_CORE');
+          const m = calculateObligorMetrics(coreOb, testState);
+          const cellIcr = m.icr;
+
+          // Color scale based on ICR
+          let cellStyle = 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40';
+          if (cellIcr < 2.5) {
+            cellStyle = 'bg-red-600/90 text-white font-bold border border-red-400 animate-pulse';
+          } else if (cellIcr < 4.0) {
+            cellStyle = 'bg-rose-950/90 text-rose-300 font-semibold border border-rose-800';
+          } else if (cellIcr < 7.5) {
+            cellStyle = 'bg-amber-950/70 text-amber-300 border border-amber-800/50';
+          }
+
+          rowHtml += `
+            <td class="p-2">
+              <div class="py-1 px-1.5 rounded text-[11px] ${cellStyle}">
+                ${cellIcr.toFixed(2)}x
+              </div>
+            </td>
+          `;
+        });
+
+        tr.innerHTML = rowHtml;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function initTrajectoryChart() {
+      const ctx = document.getElementById('trajectoryChart').getContext('2d');
+      const months = ['Q1 \'26 (T0)', 'M+2', 'M+4', 'M+6', 'M+8', 'M+10', 'M+12 (Target)'];
+
+      trajectoryChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Implied S&P 500 Index Level',
+              data: [5860, 5820, 5780, 5710, 5650, 5600, 5580],
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.1)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: 0.3,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Blended OAS Spread (bps)',
+              data: [118, 124, 130, 142, 155, 168, 175],
+              borderColor: '#f43f5e',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0b0f19',
+              borderColor: '#1e293b',
+              borderWidth: 1,
+              titleFont: { family: '"JetBrains Mono"', size: 11 },
+              bodyFont: { family: '"JetBrains Mono"', size: 11 },
+              padding: 10
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { family: '"JetBrains Mono"', size: 10 } }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#38bdf8', font: { family: '"JetBrains Mono"', size: 10 } }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#f43f5e', font: { family: '"JetBrains Mono"', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTrajectoryChart(targetSpx, spreadShock) {
+      if (!trajectoryChartInstance) return;
+
+      const baseSpx = 5860;
+      const baseOas = 118;
+      const finalOas = baseOas + spreadShock + (state.seatChurn < -15 ? 40 : 15);
+
+      const spxCurve = [];
+      const oasCurve = [];
+
+      for (let i = 0; i <= 6; i++) {
+        const factor = i / 6;
+        // Non-linear trajectory
+        const curveFactor = Math.pow(factor, 1.2);
+        spxCurve.push(Math.round(baseSpx + (targetSpx - baseSpx) * curveFactor));
+        oasCurve.push(Math.round(baseOas + (finalOas - baseOas) * curveFactor));
+      }
+
+      trajectoryChartInstance.data.datasets[0].data = spxCurve;
+      trajectoryChartInstance.data.datasets[1].data = oasCurve;
+      trajectoryChartInstance.update();
+
+      document.getElementById('chart-terminal-spx').innerText = targetSpx.toLocaleString() + ' pts';
+      document.getElementById('chart-terminal-oas').innerText = '+' + Math.round(finalOas - baseOas) + ' bps';
+    }
+
+    function switchTab(tabKey) {
+      const tabs = ['cockpit', 'obligors', 'vectors', 'dossier'];
+      tabs.forEach(t => {
+        const content = document.getElementById(`tab-content-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabKey) {
+          content.classList.remove('hidden');
+          btn.className = 'tab-btn px-3 py-1.5 rounded-md text-white bg-terminal-700 transition font-bold';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'tab-btn px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 transition';
+        }
+      });
+    }
+
+    function applyScenario(type) {
+      if (type === 'baseline') {
+        state.seatChurn = -10;
+        state.capexWriteoff = 15;
+        state.powerLatency = 12;
+        state.rfRate = 4.25;
+        state.spreadShock = 0;
+        state.refiBump = 120;
+        showToast('Scenario Loaded: Q1 2026 Baseline');
+      } else if (type === 'stagflation') {
+        state.seatChurn = -15;
+        state.capexWriteoff = 25;
+        state.powerLatency = 30;
+        state.rfRate = 5.00;
+        state.spreadShock = 60;
+        state.refiBump = 180;
+        showToast('Scenario Loaded: Power Mirage & Gridlock Shock');
+      } else if (type === 'deathspiral') {
+        state.seatChurn = -28;
+        state.capexWriteoff = 35;
+        state.powerLatency = 36;
+        state.rfRate = 5.50;
+        state.spreadShock = 180;
+        state.refiBump = 260;
+        showToast('Scenario Loaded: Reflexive Spiral & Covenant Stress');
+      } else if (type === 'productivity') {
+        state.seatChurn = -3;
+        state.capexWriteoff = 5;
+        state.powerLatency = 6;
+        state.rfRate = 3.75;
+        state.spreadShock = 0;
+        state.refiBump = 45;
+        showToast('Scenario Loaded: Tech Soft Landing & ROIC Stabilization');
+      }
+      syncSlidersToState();
+      recalculateAll();
+    }
+
+    function resetToBaseline() {
+      applyScenario('baseline');
+    }
+
+    function syncSlidersToState() {
+      document.getElementById('slider-seat-churn').value = state.seatChurn;
+      document.getElementById('val-seat-churn').innerText = state.seatChurn + '%';
+
+      document.getElementById('slider-capex-writeoff').value = state.capexWriteoff;
+      document.getElementById('val-capex-writeoff').innerText = '+' + state.capexWriteoff + '%';
+
+      document.getElementById('slider-power-latency').value = state.powerLatency;
+      document.getElementById('val-power-latency').innerText = '+' + state.powerLatency + 'm';
+
+      document.getElementById('slider-rf-rate').value = state.rfRate;
+      document.getElementById('val-rf-rate').innerText = state.rfRate.toFixed(2) + '%';
+
+      document.getElementById('slider-spread-shock').value = state.spreadShock;
+      document.getElementById('val-spread-shock').innerText = '+' + state.spreadShock + ' bps';
+
+      document.getElementById('slider-refi-bump').value = state.refiBump;
+      document.getElementById('val-refi-bump').innerText = '+' + state.refiBump + ' bps';
+    }
+
+    function setupSliderListeners() {
+      const bind = (sliderId, valId, key, suffix, prefix = '') => {
+        const slider = document.getElementById(sliderId);
+        slider.addEventListener('input', (e) => {
+          state[key] = parseFloat(e.target.value);
+          document.getElementById(valId).innerText = `${prefix}${state[key]}${suffix}`;
+          recalculateAll();
+        });
+      };
+
+      bind('slider-seat-churn', 'val-seat-churn', 'seatChurn', '%');
+      bind('slider-capex-writeoff', 'val-capex-writeoff', 'capexWriteoff', '%', '+');
+      bind('slider-power-latency', 'val-power-latency', 'powerLatency', 'm', '+');
+      bind('slider-rf-rate', 'val-rf-rate', 'rfRate', '%');
+      bind('slider-spread-shock', 'val-spread-shock', 'spreadShock', ' bps', '+');
+      bind('slider-refi-bump', 'val-refi-bump', 'refiBump', ' bps', '+');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast-banner');
+      document.getElementById('toast-message').innerText = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3200);
+    }
+
+    function copyDossierText() {
+    const summaryText = `ADAM-v30.2 SOVEREIGN OBLIGOR ASSESSMENT BROADCAST\nTarget: S&P 500 Corporate Aggregate\nAnchor: Q1 2026 Macro Baseline\nAggregate Debt: $7.24T | Cash: $2.12T\nConsolidated ICR: ${document.getElementById('kpi-aggregate-icr').innerText} | Core 490 ICR: ${document.getElementById('ticker-core-icr').innerText}\nMerton Distance-to-Default: ${document.getElementById('kpi-merton-dd').innerText}\nTransmission Vectors: Deflationary Gravity, Century Duration Mirage, The Power Mirage, Core 490 Refi Cliff.`;
+    
+    const textArea = document.createElement("textarea");
+    textArea.value = summaryText;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      showToast('ADAM Dossier Broadcast Copied to Clipboard.');
+    } catch (err) {
+      showToast('Failed to copy to clipboard.');
+    }
+    document.body.removeChild(textArea);
+  }
+
+  window.onload = function() {
+    initTrajectoryChart();
+    setupSliderListeners();
+    syncSlidersToState();
+    // recalculateAll will compute all obligors and automatically open the default selected drawer ('MSFT') with calculated metrics
+    recalculateAll();
+  };
+</script>
+</body>
+</html>

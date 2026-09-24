@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADAM v30.1 :: Portable Vertical Slice — Institutional Financial OS</title>
+<meta name="description" content="ADAM — Autonomous Deterministic Alpha Matrix. Standalone portable demo of the institutional-grade neuro-symbolic multi-agent financial operating system.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   ADAM v30.1 — UNIFIED DESIGN SYSTEM
+   Single-file portable vertical slice
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --cyan: #00f3ff; --green: #0aff60; --red: #ff3333; --amber: #f59e0b;
+  --purple: #a855f7; --blue: #3b82f6; --magenta: #ff007a; --gold: #fbbf24;
+  --emerald: #10b981; --rose: #f43f5e; --violet: #8b5cf6; --orange: #f97316;
+  --bg: #050b14; --bg-secondary: #0a1225; --bg-card: rgba(10, 18, 35, 0.75);
+  --bg-glass: rgba(30, 41, 59, 0.45); --bg-hover: rgba(20, 28, 45, 0.85);
+  --text: #e8ecf0; --text-secondary: #94a3b8; --text-muted: #64748b; --text-dim: #3e4a5c;
+  --border: rgba(100, 116, 139, 0.2); --border-hover: rgba(100, 116, 139, 0.4);
+  --radius: 10px; --radius-sm: 6px;
+  --ease: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --gradient-brand: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+  --glow-cyan: 0 0 20px rgba(0, 243, 255, 0.15);
+  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-lg: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+[data-theme="light"] {
+  --bg: #f0f2f5; --bg-secondary: #e5e7eb; --bg-card: rgba(255,255,255,0.85);
+  --bg-glass: rgba(255,255,255,0.7); --bg-hover: rgba(255,255,255,0.95);
+  --text: #1a1a2e; --text-secondary: #4b5563; --text-muted: #6b7280; --text-dim: #9ca3af;
+  --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+  --cyan: #0891b2; --green: #059669; --red: #dc2626; --amber: #d97706; --purple: #7c3aed;
+  --blue: #2563eb; --emerald: #059669; --rose: #e11d48; --violet: #6d28d9;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow-x: hidden; line-height: 1.55;
+  display: flex; flex-direction: column;
+}
+.mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+a { color: inherit; text-decoration: none; transition: color var(--ease); }
+a:hover { color: var(--cyan); }
+
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    linear-gradient(rgba(0,243,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,243,255,0.012) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+[data-theme="light"] body::before { background: none; }
+
+#particle-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+[data-theme="light"] #particle-canvas { opacity: 0.3; }
+
+.scan-line {
+  position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+  background: rgba(0, 243, 255, 0.06); box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+  animation: scan 8s linear infinite; pointer-events: none; z-index: 999;
+}
+[data-theme="light"] .scan-line { display: none; }
+@keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 52px;
+  background: rgba(5, 11, 20, 0.94); backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] .topbar { background: rgba(255,255,255,0.92); }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--gradient-brand);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 14px; color: white;
+  box-shadow: 0 0 15px rgba(59,130,246,0.3);
+}
+.topbar-brand { font-size: 1.15rem; font-weight: 800; color: var(--cyan); letter-spacing: 3px; font-family: 'JetBrains Mono', monospace; }
+.topbar-badge { background: var(--cyan); color: #000; padding: 2px 7px; border-radius: 3px; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px; }
+.topbar-sub { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.8px; border-left: 1px solid var(--border); padding-left: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 6px; }
+.topbar-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; padding: 5px 10px; border: 1px solid var(--border); color: var(--text-muted); background: transparent; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--ease); letter-spacing: 0.5px; text-transform: uppercase; }
+.topbar-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow-cyan); }
+.theme-toggle { width: 30px; height: 30px; border: 1px solid var(--border); background: transparent; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all var(--ease); color: var(--text-muted); }
+.theme-toggle:hover { border-color: var(--amber); color: var(--amber); }
+
+.tab-bar { display: flex; gap: 0; overflow-x: auto; background: rgba(5, 11, 20, 0.8); border-bottom: 1px solid var(--border); position: sticky; top: 52px; z-index: 99; }
+[data-theme="light"] .tab-bar { background: rgba(255,255,255,0.85); }
+.tab-btn { padding: 10px 16px; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; transition: all var(--ease); white-space: nowrap; user-select: none; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; }
+.tab-btn:hover { color: var(--text-secondary); background: rgba(255,255,255,0.02); }
+.tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.tab-icon { font-size: 1rem; }
+
+.main-wrap { flex: 1; position: relative; z-index: 1; }
+.tab-panel { display: none; padding: 20px 24px; animation: fadeIn 0.35s ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.search-box { display: flex; align-items: center; gap: 8px; background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 14px; margin-bottom: 18px; max-width: 500px; }
+.search-box input { flex: 1; background: none; border: none; color: var(--text); font-size: 0.9rem; font-family: 'Inter', sans-serif; outline: none; }
+.search-box input::placeholder { color: var(--text-muted); }
+.search-shortcut { font-size: 0.65rem; color: var(--text-dim); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(12px); overflow: hidden; transition: all var(--ease); }
+.card:hover { border-color: var(--border-hover); box-shadow: var(--glow-blue); transform: translateY(-2px); }
+.card-header { padding: 12px 16px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(100,116,139,0.08); }
+.card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+.card-body { padding: 14px 16px; }
+
+.metric-grid { display: grid; gap: 14px; }
+.metric-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.metric-grid-5 { grid-template-columns: repeat(5, 1fr); }
+.metric-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.metric-card { padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(12px); transition: all var(--ease); }
+.metric-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+.metric-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+.metric-value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.metric-delta { font-size: 0.72rem; font-weight: 600; margin-top: 3px; }
+.delta-up { color: var(--emerald); }
+.delta-down { color: var(--rose); }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th { text-align: left; padding: 8px 12px; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-secondary); }
+.data-table td { padding: 6px 12px; border-bottom: 1px solid rgba(100,116,139,0.06); color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+.data-table tr:hover td { background: rgba(59,130,246,0.04); color: var(--text); }
+.scrollable-table { max-height: 380px; overflow-y: auto; border-radius: var(--radius); }
+
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em; }
+.badge-ig { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+.badge-hy { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+.badge-dist { background: rgba(244,63,94,0.15); color: #fb7185; border: 1px solid rgba(244,63,94,0.3); }
+.badge-live { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); animation: pulse-badge 2s infinite; }
+.badge-info { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+.badge-warn { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.badge-pass { background: rgba(16,185,129,0.15); color: var(--emerald); }
+.badge-fail { background: rgba(244,63,94,0.15); color: var(--rose); }
+@keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.module-card { display: block; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all var(--ease); }
+.module-card:hover { border-color: var(--border-hover); box-shadow: var(--glow-blue); transform: translateY(-2px); }
+.module-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+.module-card p { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5; }
+.module-card .tag { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.btn { padding: 8px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-glass); color: var(--text); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all var(--ease); display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; }
+.btn:hover { background: rgba(59,130,246,0.15); border-color: var(--blue); }
+.btn.active { border-color: var(--cyan); color: var(--cyan); background: rgba(0,243,255,0.08); }
+.btn-primary { background: var(--gradient-brand); border: none; color: white; }
+.btn-primary:hover { box-shadow: 0 0 20px rgba(59,130,246,0.4); transform: translateY(-1px); }
+.btn-danger { border-color: var(--rose); color: var(--rose); }
+.btn-danger:hover { background: rgba(244,63,94,0.15); }
+
+.input, select.input { padding: 7px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; outline: none; transition: border var(--ease); }
+.input:focus { border-color: var(--cyan); }
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 6px 0; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: var(--cyan); cursor: pointer; margin-top: -4px; box-shadow: 0 0 8px rgba(0,243,255,0.4); }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--border); border-radius: 2px; }
+
+.section-header { font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 14px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; font-size: 0.85rem; color: var(--text-secondary); }
+.section-header .icon { font-size: 1.1rem; }
+.section-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+
+.terminal-log { background: #000; border: 1px solid rgba(100,116,139,0.15); border-radius: var(--radius); padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.65; color: var(--text-secondary); max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+.t-cyan { color: var(--cyan); } .t-green { color: var(--emerald); } .t-red { color: var(--rose); } .t-amber { color: var(--amber); } .t-purple { color: var(--violet); } .t-dim { color: var(--text-dim); } .t-bold { color: var(--text); font-weight: 700; }
+
+.status-bar { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--text-muted); border-top: 1px solid var(--border); background: rgba(5,11,20,0.9); position: sticky; bottom: 0; z-index: 99; }
+[data-theme="light"] .status-bar { background: rgba(255,255,255,0.9); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.status-green { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+
+.ticker-bar { height: 26px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; position: relative; z-index: 98; }
+.ticker-content { display: flex; gap: 32px; white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-secondary); animation: ticker 60s linear infinite; }
+@keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-200%); } }
+
+.toast-container { position: fixed; bottom: 60px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
+.toast { padding: 8px 14px; background: rgba(5,11,20,0.95); border: 1px solid var(--cyan); border-radius: var(--radius-sm); color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards; backdrop-filter: blur(10px); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(20px); } }
+
+.chart-wrap { position: relative; width: 100%; height: 260px; }
+.chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+@media (max-width: 1200px) { .grid-4, .metric-grid-4, .metric-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .metric-grid-3, .metric-grid-4, .metric-grid-5 { grid-template-columns: 1fr; } .topbar-sub { display: none; } .tab-btn { padding: 8px 10px; font-size: 0.7rem; } }
+@media (max-width: 500px) { .topbar-right .topbar-btn { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<div class="scan-line"></div>
+
+<div class="ticker-bar"><div class="ticker-content" id="ticker">
+  <span><strong style="color:var(--emerald)">S&P 500:</strong> 7,606.07 <span style="color:var(--emerald)">+1.55%</span></span>
+  <span><strong style="color:var(--cyan)">10Y UST:</strong> 4.67% <span style="color:var(--cyan)">-6bps</span></span>
+  <span><strong style="color:var(--amber)">VIX:</strong> 15.79 <span style="color:var(--emerald)">-2.31%</span></span>
+  <span><strong style="color:var(--violet)">BTC:</strong> $63,892 <span style="color:var(--emerald)">+0.62%</span></span>
+  <span><strong style="color:var(--rose)">BRENT:</strong> $83.40 <span style="color:var(--rose)">-7.58%</span></span>
+  <span><strong style="color:var(--gold)">MM FUNDS:</strong> $7.893T</span>
+  <span><strong style="color:var(--cyan)">SYSTEM:</strong> ADAM v30.1 KERNEL ACTIVE</span>
+</div></div>
+
+<div class="topbar" id="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">A</div>
+    <span class="topbar-brand">ADAM</span>
+    <span class="topbar-badge mono">v30.1</span>
+    <span class="topbar-sub mono">PORTABLE VERTICAL SLICE</span>
+  </div>
+  <div class="topbar-right">
+    <div class="search-box" style="margin:0;max-width:220px;padding:4px 10px;">
+      <span style="font-size:0.8rem;">🔍</span>
+      <input type="text" id="global-search" placeholder="Search modules..." style="font-size:0.75rem;">
+      <span class="search-shortcut mono">/</span>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">🌙</button>
+  </div>
+</div>
+
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-btn active" data-tab="command" onclick="switchTab('command')"><span class="tab-icon">🖥️</span> Command Center</button>
+  <button class="tab-btn" data-tab="mayhem" onclick="switchTab('mayhem')"><span class="tab-icon">📟</span> Market Mayhem</button>
+  <button class="tab-btn" data-tab="twin" onclick="switchTab('twin')"><span class="tab-icon">🌐</span> Digital Twin</button>
+  <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')"><span class="tab-icon">🤖</span> Agent Gallery</button>
+  <button class="tab-btn" data-tab="credit" onclick="switchTab('credit')"><span class="tab-icon">📈</span> Credit Architect</button>
+  <button class="tab-btn" data-tab="intel" onclick="switchTab('intel')"><span class="tab-icon">📊</span> Intelligence Hub</button>
+  <button class="tab-btn" data-tab="benchmark" onclick="switchTab('benchmark')"><span class="tab-icon">🔬</span> Benchmark</button>
+</div>
+
+<div class="main-wrap">
+  <div class="tab-panel active" id="panel-command"></div>
+  <div class="tab-panel" id="panel-mayhem"></div>
+  <div class="tab-panel" id="panel-twin"></div>
+  <div class="tab-panel" id="panel-agents"></div>
+  <div class="tab-panel" id="panel-credit"></div>
+  <div class="tab-panel" id="panel-intel"></div>
+  <div class="tab-panel" id="panel-benchmark"></div>
+</div>
+
+<div class="status-bar">
+  <div><span class="status-dot status-green"></span> SYSTEM OK // ADAM v30.1 Kernel</div>
+  <div id="status-telemetry">PROV-O: COMPLIANT // LATENCY: <span id="stat-latency">12ms</span> // AGENTS: <span id="stat-agents">1,392</span></div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+(function() {
+'use strict';
+
+const SECTORS = ['Technology','Healthcare','Financials','Energy','Industrials','Consumer','Telecom','Materials','Utilities','Real Estate'];
+const RATINGS = ['AAA','AA+','AA','AA-','A+','A','A-','BBB+','BBB','BBB-','BB+','BB','BB-','B+','B','B-','CCC+','CCC','CCC-'];
+const AGENT_POLICIES = ['Liquidity Hoarder','Buyback Cut','Emergency Line Draw','Capex Reduction','Hedging Active'];
+const AGENT_STATES = ['OPTIMAL','STRESSED','CONSTRAINED','DISTRESSED'];
+
+function seededRandom(seed) { let s=seed; return function(){ s=(s*16807)%2147483647; return(s-1)/2147483646; }; }
+const rng = seededRandom(20260912);
+
+const ENTITIES = Array.from({length: 500}, (_, i) => {
+  const r = rng;
+  const sector = SECTORS[Math.floor(r() * SECTORS.length)];
+  const ratingIdx = Math.floor(r() * RATINGS.length);
+  const rating = RATINGS[ratingIdx];
+  const isIG = ratingIdx <= 9;
+  const pd = isIG ? +(r() * 2).toFixed(3) : +(2 + r() * 20).toFixed(3);
+  return {
+    id: 'ENT-'+String(i+1).padStart(4,'0'),
+    name: ['Apex','Nova','Quantum','Titan','Vertex','Omega','Nexus','Cipher','Prism','Helix'][i%10]+' '+sector.slice(0,4)+' '+['Corp','Inc','Ltd','Holdings','Group'][i%5],
+    sector, rating, isIG, pd, lgd: +(20 + r() * 50).toFixed(1),
+    ev: +(500 + r() * 9500).toFixed(0), leverage: +(1 + r() * 8).toFixed(1),
+    ebitdaMargin: +(5 + r() * 35).toFixed(1), fccr: +(0.5 + r() * 4).toFixed(2),
+    alphaPD: +(pd * (0.7 + r() * 0.6)).toFixed(3), betaPD: +(pd * (0.8 + r() * 0.8)).toFixed(3),
+    agentPolicy: AGENT_POLICIES[Math.floor(r() * AGENT_POLICIES.length)],
+    agentState: AGENT_STATES[Math.floor(r() * AGENT_STATES.length)]
+  };
+});
+
+const AGENTS = [
+  {name:'Nexus Orchestrator',role:'System Orchestrator',icon:'🧠',domain:'Workflow Runtime',tools:['delegate_task','checkpoint_state','jit_memory'],confidence:0.97,status:'ACTIVE',color:'--cyan'},
+  {name:'Underwriter Alpha',role:'Credit Underwriting',icon:'📋',domain:'TMT Leveraged Finance',tools:['extract_financials','evaluate_covenant','build_capital_structure'],confidence:0.94,status:'ACTIVE',color:'--blue'},
+  {name:'Underwriter Beta',role:'Credit Underwriting',icon:'📋',domain:'Healthcare & Industrials',tools:['extract_financials','evaluate_covenant','sector_analysis'],confidence:0.92,status:'ACTIVE',color:'--blue'},
+  {name:'Surveillance Hawk',role:'Portfolio Monitoring',icon:'👁️',domain:'Distress Detection',tools:['fetch_market_data','trigger_temporal_alert','covenant_monitor'],confidence:0.96,status:'ACTIVE',color:'--amber'},
+  {name:'Sentinel Prime',role:'Security & Compliance',icon:'🛡️',domain:'PROV-O Audit',tools:['validate_provenance','threat_scan','quarantine_module'],confidence:0.99,status:'ACTIVE',color:'--green'},
+  {name:'Risk Engine',role:'Quantitative Risk',icon:'⚡',domain:'PD/LGD/VaR',tools:['calculate_pd','monte_carlo','stress_test'],confidence:0.95,status:'ACTIVE',color:'--red'},
+  {name:'Market Swarm α',role:'System 1 Perception',icon:'🐝',domain:'Real-time Pricing',tools:['ingest_feed','parse_ticker','deposit_pheromone'],confidence:0.88,status:'ACTIVE',color:'--emerald'},
+  {name:'Market Swarm β',role:'System 1 Perception',icon:'🐝',domain:'News Sentiment',tools:['ingest_feed','nlp_sentiment','deposit_alert'],confidence:0.86,status:'ACTIVE',color:'--emerald'},
+  {name:'Fundamental Analyst',role:'Deep Analysis',icon:'🔬',domain:'10-K/10-Q Parsing',tools:['sec_filing_search','ratio_analysis','peer_comparison'],confidence:0.93,status:'ACTIVE',color:'--violet'},
+  {name:'Macro Strategist',role:'Macro Intelligence',icon:'🌍',domain:'Global Macro',tools:['fed_watch','yield_curve_analysis','gdp_nowcast'],confidence:0.91,status:'ACTIVE',color:'--orange'},
+  {name:'Contagion Modeler',role:'Systemic Risk',icon:'🕸️',domain:'DebtRank & Cascades',tools:['debtrank_simulate','eisenberg_noe','fire_sale_model'],confidence:0.94,status:'ACTIVE',color:'--rose'},
+  {name:'Quantum Engine',role:'Tail Risk Compute',icon:'⚛️',domain:'QAE & Ising Model',tools:['amplitude_estimation','spin_glass','percolation_detect'],confidence:0.89,status:'STANDBY',color:'--purple'},
+  {name:'Constitutional Auditor',role:'Fairness & Governance',icon:'⚖️',domain:'Neutrality v2.4',tools:['disparate_impact_check','deterministic_nonce','bias_scan'],confidence:0.98,status:'ACTIVE',color:'--gold'},
+  {name:'Memory Librarian',role:'Knowledge Management',icon:'📚',domain:'Qdrant Vector Store',tools:['semantic_search','jit_retrieval','embedding_index'],confidence:0.95,status:'ACTIVE',color:'--cyan'},
+  {name:'Report Generator',role:'Output Synthesis',icon:'📝',domain:'Document Assembly',tools:['template_render','chart_embed','pdf_export'],confidence:0.92,status:'ACTIVE',color:'--blue'},
+  {name:'DCF Engine',role:'Valuation',icon:'💰',domain:'Enterprise Value',tools:['dcf_model','wacc_calculator','terminal_value'],confidence:0.96,status:'ACTIVE',color:'--emerald'},
+  {name:'Covenant Checker',role:'Legal Analysis',icon:'📜',domain:'Credit Agreements',tools:['jsonlogic_eval','clause_parser','breach_detector'],confidence:0.94,status:'ACTIVE',color:'--amber'},
+  {name:'Whalescanner',role:'Institutional Flow',icon:'🐋',domain:'13F Analysis',tools:['filing_parser','position_tracker','crowding_score'],confidence:0.90,status:'ACTIVE',color:'--violet'},
+  {name:'Scenario Lab',role:'Simulation',icon:'🧪',domain:'Stress Testing',tools:['vae_generate','scenario_builder','backtest_engine'],confidence:0.88,status:'ACTIVE',color:'--purple'},
+  {name:'Policy Engine',role:'Governance Gateway',icon:'🚦',domain:'Intent Authorization',tools:['smt_solver','jsonlogic_gate','fail_closed_check'],confidence:0.99,status:'ACTIVE',color:'--green'},
+];
+
+const BENCHMARK = {id:'ADAM_NEUTRALITY_V2.4_EVAL',date:'2026-09-12',entityCount:500,sp500Sample:100,sections:[
+  {name:'Mathematical Determinism',status:'PASS',score:100,detail:'All numeric ops routed through Rust kernels. Zero floating-point divergence.'},
+  {name:'Disparate Impact Ratio',status:'PASS',score:98.5,detail:'DIR = 1.02 (within [0.80, 1.25] constitutional bound). No sector bias detected.'},
+  {name:'Adversarial Validation',status:'PASS',score:97.2,detail:'Alpha-Beta divergence < 2σ for 98.7% of entities. 6 flagged for secondary review.'},
+  {name:'PROV-O Cryptographic Nonce',status:'PASS',score:100,detail:'All 14,208 traces carry valid SHA-256 nonces. Chain integrity verified.'},
+  {name:'Human Fiduciary Override',status:'PASS',score:100,detail:'Override gate operational. 3 manual interventions logged and audited.'},
+  {name:'Sentiment Neutrality',status:'PASS',score:96.8,detail:'NLP sentiment classifier shows ±0.3% skew across sectors. Within tolerance.'},
+  {name:'Contagion Boundary',status:'WARN',score:89.4,detail:'DebtRank cascade in Scenario 7 reached 18.2% systemic loss (threshold: 15%). Elevated.'},
+  {name:'Latency SLA',status:'PASS',score:99.1,detail:'P99 latency: 47ms. P99.9: 112ms. All within 150ms SLA.'},
+],overallScore:97.6};
+
+const INTEL_REPORTS = [
+  {type:'Daily Briefing',date:'2026-03-27',title:'Trade Tensions Escalate: Tariff Regime Uncertainty Weighs on BSL Universe',tags:['macro','trade','credit']},
+  {type:'Daily Briefing',date:'2026-03-26',title:'Fed Minutes Signal Extended Pause; 10Y Stabilizes at 4.67%',tags:['fed','rates','macro']},
+  {type:'Market Pulse',date:'2026-03-27',title:'Weekly Credit Monitor: IG Spreads Tighten, HY Bifurcation Persists',tags:['credit','weekly','spreads']},
+  {type:'Market Mayhem',date:'2026-03-15',title:'Macro Divergence Report: US-China Decoupling & Supply Chain Fracture',tags:['geopolitics','macro','crisis']},
+  {type:'House View',date:'2026-02-01',title:'Q1 2026 Outlook: Navigating the Great Bifurcation',tags:['outlook','strategy','quarterly']},
+  {type:'Deep Dive',date:'2026-02-20',title:'The AI Debt Reckoning: TMT Leverage Cycle Analysis',tags:['AI','TMT','credit','deep-dive']},
+  {type:'Credit Report',date:'2026-01-23',title:'NVDA: Sovereign AI Infrastructure Play — Credit Assessment',tags:['NVDA','tech','credit']},
+  {type:'Equity Research',date:'2026-03-25',title:'1Q26 Equity Research Desk: Sector Rotation & Earnings Preview',tags:['equities','earnings','research']},
+  {type:'System Audit',date:'2026-01-15',title:'System 2 Audit Q1 2026: Governance & Compliance Review',tags:['audit','governance','compliance']},
+  {type:'Market Mayhem',date:'2026-03-01',title:'Iran Conflict Special Edition: Energy Shock Scenario Analysis',tags:['iran','energy','geopolitics','crisis']},
+];
+
+const initialized = {};
+let chartInstances = {};
+
+window.switchTab = function(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('panel-' + tabId);
+  const btn = document.querySelector('.tab-btn[data-tab="'+tabId+'"]');
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (!initialized[tabId]) { const fn = MODULES[tabId]; if (fn) { fn(); initialized[tabId] = true; } }
+};
+
+const MODULES = { command: initCommandCenter, mayhem: initMarketMayhem, twin: initDigitalTwin, agents: initAgentGallery, credit: initCreditArchitect, intel: initIntelHub, benchmark: initBenchmark };
+initialized.command = true; initCommandCenter();
+
+function initCommandCenter() {
+  const el = document.getElementById('panel-command');
+  const sectorCounts = {}; ENTITIES.forEach(e => { sectorCounts[e.sector] = (sectorCounts[e.sector]||0)+1; });
+  const igCount = ENTITIES.filter(e => e.isIG).length;
+  const avgPD = (ENTITIES.reduce((s,e) => s+e.pd, 0) / ENTITIES.length).toFixed(2);
+  const avgLev = (ENTITIES.reduce((s,e) => s+parseFloat(e.leverage), 0) / ENTITIES.length).toFixed(1);
+  el.innerHTML = '<div class="section-header"><span class="icon">❖</span> SYSTEM OVERVIEW</div><div class="metric-grid metric-grid-5" style="margin-bottom:20px;"><div class="metric-card"><div class="metric-label">Rated Entities</div><div class="metric-value" style="color:var(--cyan)">'+ENTITIES.length+'</div><div class="metric-delta delta-up">Active Universe</div></div><div class="metric-card"><div class="metric-label">Active Agents</div><div class="metric-value" style="color:var(--emerald)">'+AGENTS.filter(a=>a.status==='ACTIVE').length+'</div><div class="metric-delta delta-up">'+AGENTS.length+' total</div></div><div class="metric-card"><div class="metric-label">IG / HY Split</div><div class="metric-value" style="color:var(--blue)">'+igCount+' / '+(ENTITIES.length-igCount)+'</div><div class="metric-delta">'+(igCount/ENTITIES.length*100).toFixed(0)+'% Investment Grade</div></div><div class="metric-card"><div class="metric-label">Avg PD</div><div class="metric-value" style="color:var(--amber)">'+avgPD+'%</div><div class="metric-delta">Universe Weighted</div></div><div class="metric-card"><div class="metric-label">Avg Leverage</div><div class="metric-value" style="color:var(--violet)">'+avgLev+'x</div><div class="metric-delta">Debt / EBITDA</div></div></div><div class="section-header"><span class="icon">🚀</span> MODULE DIRECTORY</div><div class="section-desc">Each tab provides a fully interactive vertical slice of the ADAM platform.</div><div class="grid grid-3" style="margin-bottom:24px;"><div class="module-card" onclick="switchTab(\'mayhem\')" style="border-top:2px solid var(--rose)"><div class="tag" style="background:rgba(244,63,94,0.15);color:var(--rose);">TERMINAL</div><h4 style="color:var(--rose)">📟 Market Mayhem Terminal</h4><p>Credit & valuation workbench with PD/LGD models, Monte Carlo simulation, DCF builder, and contagion cascade analysis.</p></div><div class="module-card" onclick="switchTab(\'twin\')" style="border-top:2px solid var(--emerald)"><div class="tag" style="background:rgba(16,185,129,0.15);color:var(--emerald);">SIMULATION</div><h4 style="color:var(--emerald)">🌐 Digital Twin World Model</h4><p>500-entity adversarial divergence model with Alpha-Beta PD comparison, sector analysis, and DebtRank contagion metrics.</p></div><div class="module-card" onclick="switchTab(\'agents\')" style="border-top:2px solid var(--violet)"><div class="tag" style="background:rgba(139,92,246,0.15);color:var(--violet);">SWARM</div><h4 style="color:var(--violet)">🤖 Agent Gallery & Registry</h4><p>20 specialized AI agents across System 1 (perception) and System 2 (reasoning). View roles, tools, and confidence scores.</p></div><div class="module-card" onclick="switchTab(\'credit\')" style="border-top:2px solid var(--blue)"><div class="tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">FINANCE</div><h4 style="color:var(--blue)">📈 Credit & Valuation Architect</h4><p>Interactive DCF calculator, debt schedule builder, implied rating engine, and capital structure waterfall analysis.</p></div><div class="module-card" onclick="switchTab(\'intel\')" style="border-top:2px solid var(--gold)"><div class="tag" style="background:rgba(251,191,36,0.15);color:var(--gold);">INTEL</div><h4 style="color:var(--gold)">📊 Intelligence Hub</h4><p>Curated archive of daily briefings, market pulse reports, deep dives, and credit assessments spanning the full ADAM lifecycle.</p></div><div class="module-card" onclick="switchTab(\'benchmark\')" style="border-top:2px solid var(--cyan)"><div class="tag" style="background:rgba(0,243,255,0.15);color:var(--cyan);">AUDIT</div><h4 style="color:var(--cyan)">🔬 Benchmark Harness</h4><p>Constitutional compliance evaluation against NEUTRALITY v2.4. Disparate impact, deterministic math, and PROV-O audit.</p></div></div><div class="section-header"><span class="icon">📡</span> SECTOR DISTRIBUTION</div><div class="grid grid-2"><div class="card"><div class="card-header"><span class="card-title">Entity Distribution by Sector</span></div><div class="card-body"><div class="chart-wrap"><canvas id="cmd-sector-chart"></canvas></div></div></div><div class="card"><div class="card-header"><span class="card-title">Rating Distribution</span></div><div class="card-body"><div class="chart-wrap"><canvas id="cmd-rating-chart"></canvas></div></div></div></div>';
+  if (typeof Chart !== 'undefined') {
+    var sLabels = Object.keys(sectorCounts), sData = Object.values(sectorCounts);
+    var colors = ['#06b6d4','#3b82f6','#8b5cf6','#f43f5e','#f59e0b','#10b981','#ec4899','#f97316','#64748b','#14b8a6'];
+    new Chart(document.getElementById('cmd-sector-chart'), {type:'doughnut',data:{labels:sLabels,datasets:[{data:sData,backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:11}}}}}});
+    var rCounts = {}; ENTITIES.forEach(function(e){rCounts[e.rating]=(rCounts[e.rating]||0)+1;}); var rLabels = RATINGS.filter(function(r){return rCounts[r];}); var rData = rLabels.map(function(r){return rCounts[r]||0;});
+    new Chart(document.getElementById('cmd-rating-chart'), {type:'bar',data:{labels:rLabels,datasets:[{label:'Entities',data:rData,backgroundColor:rLabels.map(function(_,i){return i<=9?'rgba(16,185,129,0.6)':'rgba(245,158,11,0.6)';}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:'#64748b',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(100,116,139,0.1)'}}},plugins:{legend:{display:false}}}});
+  }
+}
+
+function initMarketMayhem() {
+  var el = document.getElementById('panel-mayhem');
+  el.innerHTML = '<div class="section-header"><span class="icon">📟</span> MARKET MAYHEM // QUANT MODELS & EXAM SUITE</div><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><button class="btn active" onclick="mmSwitchSub(\'mm-models\')" id="mm-btn-models">⚡ PD / LGD / DCF</button><button class="btn" onclick="mmSwitchSub(\'mm-monte\')" id="mm-btn-monte">🎲 Monte Carlo</button><button class="btn" onclick="mmSwitchSub(\'mm-waterfall\')" id="mm-btn-waterfall">📊 Capital Waterfall</button><button class="btn" onclick="mmSwitchSub(\'mm-contagion\')" id="mm-btn-contagion">🕸️ Contagion</button></div><div id="mm-models"><div class="grid grid-2" style="grid-template-columns:1fr 2fr;"><div class="card"><div class="card-header"><span class="card-title">Model Parameters</span></div><div class="card-body" style="font-size:0.8rem;"><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Leverage (Debt/EBITDA)</label><div style="display:flex;justify-content:space-between;"><span class="mono" id="mm-lev-v">4.2x</span></div><input type="range" id="mm-lev" min="1" max="10" step="0.2" value="4.2" oninput="mmRunModels()"></div><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Interest Coverage (ICR)</label><div style="display:flex;justify-content:space-between;"><span class="mono" id="mm-icr-v">2.5x</span></div><input type="range" id="mm-icr" min="0.5" max="10" step="0.2" value="2.5" oninput="mmRunModels()"></div><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Asset Tangibility (%)</label><div style="display:flex;justify-content:space-between;"><span class="mono" id="mm-tang-v">45%</span></div><input type="range" id="mm-tang" min="5" max="95" step="5" value="45" oninput="mmRunModels()"></div><hr style="border-color:var(--border);margin:12px 0;"><div style="margin-bottom:8px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Base FCF ($M)</label><input type="number" class="input" id="mm-fcf" value="120" style="width:100%;margin-top:4px;" onchange="mmRunModels()"></div><div style="margin-bottom:8px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">WACC (%)</label><input type="number" class="input" id="mm-wacc" value="9.5" step="0.5" style="width:100%;margin-top:4px;" onchange="mmRunModels()"></div><div style="margin-bottom:8px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Net Debt ($M)</label><input type="number" class="input" id="mm-debt" value="400" style="width:100%;margin-top:4px;" onchange="mmRunModels()"></div></div></div><div><div class="metric-grid metric-grid-3" style="margin-bottom:14px;"><div class="metric-card" style="border-left:3px solid var(--rose);"><div class="metric-label">1-Year PD</div><div class="metric-value" id="mm-pd" style="color:var(--rose)">6.82%</div><div class="metric-delta" id="mm-rating" style="color:var(--rose)">IMPLIED: B+</div></div><div class="metric-card" style="border-left:3px solid var(--amber);"><div class="metric-label">LGD</div><div class="metric-value" id="mm-lgd" style="color:var(--amber)">53.0%</div><div class="metric-delta">Recovery: <span id="mm-rr">47.0%</span></div></div><div class="metric-card" style="border-left:3px solid var(--emerald);"><div class="metric-label">Enterprise Value</div><div class="metric-value" id="mm-ev" style="color:var(--emerald)">$2,890M</div><div class="metric-delta">Equity: <span id="mm-eq">$2,490M</span></div></div></div><div class="card"><div class="card-header"><span class="card-title">DCF Projection & Terminal Value</span></div><div class="card-body"><div class="chart-wrap"><canvas id="mm-dcf-chart"></canvas></div></div></div></div></div></div><div id="mm-monte" style="display:none;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><strong>Monte Carlo Simulation</strong> — 10,000 stochastic iterations</div><button class="btn-primary btn" onclick="mmRunMonteCarlo()">▶ RUN SIMULATION</button></div><div class="metric-grid metric-grid-4" style="margin-bottom:14px;"><div class="metric-card"><div class="metric-label">Mean Portfolio</div><div class="metric-value" id="mc-mean" style="color:var(--cyan)">$4,120M</div></div><div class="metric-card"><div class="metric-label">VaR (95%)</div><div class="metric-value" id="mc-var" style="color:var(--amber)">-14.8%</div></div><div class="metric-card"><div class="metric-label">CVaR (99%)</div><div class="metric-value" id="mc-cvar" style="color:var(--rose)">-26.4%</div></div><div class="metric-card"><div class="metric-label">Stress Breach</div><div class="metric-value" id="mc-breach" style="color:var(--emerald)">18.2%</div></div></div><div class="card"><div class="card-header"><span class="card-title">Distribution of Terminal Portfolio Values</span></div><div class="card-body"><div class="chart-wrap"><canvas id="mc-chart"></canvas></div></div></div></div><div id="mm-waterfall" style="display:none;"><div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;"><div><strong>Capital Structure Waterfall</strong></div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Asset Value ($M):</label><input type="number" class="input" id="wf-val" value="650" style="width:100px;" onchange="mmRunWaterfall()"></div><div class="grid grid-2" style="grid-template-columns:1fr 2fr;"><div class="card"><div class="card-header"><span class="card-title">Collateral Haircuts</span></div><div class="card-body"><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">A/R Realization</label><span class="mono" id="wf-ar-v" style="float:right;font-size:0.75rem;">80%</span><input type="range" id="wf-ar" min="20" max="100" value="80" oninput="mmRunWaterfall()"></div><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Equipment Realization</label><span class="mono" id="wf-eq-v" style="float:right;font-size:0.75rem;">45%</span><input type="range" id="wf-eq" min="10" max="90" value="45" oninput="mmRunWaterfall()"></div><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">IP/Brand Realization</label><span class="mono" id="wf-ip-v" style="float:right;font-size:0.75rem;">30%</span><input type="range" id="wf-ip" min="0" max="80" value="30" oninput="mmRunWaterfall()"></div></div></div><div class="card"><div class="card-header"><span class="card-title">Waterfall Allocation</span></div><div class="card-body"><div id="wf-table"></div><div class="chart-wrap" style="height:200px;margin-top:12px;"><canvas id="wf-chart"></canvas></div></div></div></div></div><div id="mm-contagion" style="display:none;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><strong>Contagion & Tail Risk Matrix</strong></div><button class="btn btn-danger" onclick="mmRunContagion()">⚡ RUN CONTAGION STRESS</button></div><div class="grid grid-3" style="margin-bottom:14px;"><div class="card" style="border-left:3px solid var(--amber);"><div class="card-body"><h4 style="color:var(--amber);margin-bottom:6px;">🏦 Private Debt Transmission</h4><p style="font-size:0.75rem;color:var(--text-secondary);">Direct lenders facing illiquidity resort to PIK toggles and amend-and-extend loops. Contagion spreads when retail BDC marks lag restructuring by 2-3 quarters.</p><div class="badge badge-warn" style="margin-top:8px;">VULNERABILITY: HIGH</div></div></div><div class="card" style="border-left:3px solid var(--rose);"><div class="card-body"><h4 style="color:var(--rose);margin-bottom:6px;">🛢️ Geopolitical Energy Shock</h4><p style="font-size:0.75rem;color:var(--text-secondary);">Strait of Hormuz disruption risk threatens WTI/Brent spikes above $110/bbl. Halts industrial logistics and aviation BSL recovery paths.</p><div class="badge badge-fail" style="margin-top:8px;">VULNERABILITY: HIGH</div></div></div><div class="card" style="border-left:3px solid var(--cyan);"><div class="card-body"><h4 style="color:var(--cyan);margin-bottom:6px;">🚢 Supply Chain Bottlenecks</h4><p style="font-size:0.75rem;color:var(--text-secondary);">Section 232 tariffs and CBP country-of-smelt tracking create inventory clearing delays for automotive and electronics importers.</p><div class="badge badge-info" style="margin-top:8px;">VULNERABILITY: MODERATE</div></div></div></div><div class="card"><div class="card-header"><span class="card-title">Contagion Simulation Log</span></div><div class="card-body"><pre class="terminal-log" id="contagion-log">Awaiting simulation launch...\nPress RUN CONTAGION STRESS to initiate cascade propagation.</pre></div></div></div>';
+  mmRunModels();
+}
+
+window.mmSwitchSub = function(id) { ['mm-models','mm-monte','mm-waterfall','mm-contagion'].forEach(function(s){var e=document.getElementById(s);var b=document.getElementById('mm-btn-'+s.split('-')[1]);if(e)e.style.display=s===id?'block':'none';if(b){if(s===id)b.classList.add('active');else b.classList.remove('active');}}); };
+
+window.mmRunModels = function() {
+  var lev=parseFloat(document.getElementById('mm-lev').value),icr=parseFloat(document.getElementById('mm-icr').value),tang=parseFloat(document.getElementById('mm-tang').value),fcf=parseFloat(document.getElementById('mm-fcf').value),wacc=parseFloat(document.getElementById('mm-wacc').value)/100,debt=parseFloat(document.getElementById('mm-debt').value);
+  document.getElementById('mm-lev-v').textContent=lev.toFixed(1)+'x';document.getElementById('mm-icr-v').textContent=icr.toFixed(1)+'x';document.getElementById('mm-tang-v').textContent=tang+'%';
+  var pd=Math.min(99,Math.max(0.01,0.3*Math.pow(lev,1.8)/Math.pow(icr,1.2)*(1-tang/200)));var lgd=Math.min(95,Math.max(10,100-tang*0.8-15/lev));var rr=100-lgd;
+  var ratingMap=[[0.1,'AAA'],[0.3,'AA'],[0.5,'A+'],[1,'A'],[2,'BBB+'],[3,'BBB'],[5,'BB+'],[7,'BB'],[10,'B+'],[15,'B'],[25,'CCC'],[100,'D']];var impliedRating='D';for(var k=0;k<ratingMap.length;k++){if(pd<=ratingMap[k][0]){impliedRating=ratingMap[k][1];break;}}
+  var ev=0,cashflows=[];for(var y=1;y<=5;y++){var cf=fcf*Math.pow(1.10,y);ev+=cf/Math.pow(1+wacc,y);cashflows.push(cf);}var tv=cashflows[4]*1.025/(wacc-0.025);ev+=tv/Math.pow(1+wacc,5);
+  document.getElementById('mm-pd').textContent=pd.toFixed(2)+'%';document.getElementById('mm-rating').textContent='IMPLIED: '+impliedRating;document.getElementById('mm-lgd').textContent=lgd.toFixed(1)+'%';document.getElementById('mm-rr').textContent=rr.toFixed(1)+'%';document.getElementById('mm-ev').textContent='$'+Math.round(ev).toLocaleString()+'M';document.getElementById('mm-eq').textContent='$'+Math.round(ev-debt).toLocaleString()+'M';
+  if(typeof Chart!=='undefined'){if(chartInstances.mmDcf)chartInstances.mmDcf.destroy();chartInstances.mmDcf=new Chart(document.getElementById('mm-dcf-chart'),{type:'bar',data:{labels:['Y1','Y2','Y3','Y4','Y5','Terminal'],datasets:[{label:'Cash Flow ($M)',data:cashflows.map(function(c){return Math.round(c);}).concat([Math.round(tv/Math.pow(1+wacc,5))]),backgroundColor:['#06b6d4','#06b6d4','#06b6d4','#06b6d4','#06b6d4','#8b5cf6'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:function(v){return'$'+v+'M';}},grid:{color:'rgba(100,116,139,0.1)'}}},plugins:{legend:{display:false}}}});}
+};
+
+window.mmRunMonteCarlo = function() {
+  var N=10000,basePV=4120,results=[];for(var i=0;i<N;i++){var pv=basePV;for(var t=0;t<12;t++)pv*=(1+(Math.random()-0.5)*0.08);results.push(pv);}results.sort(function(a,b){return a-b;});
+  var mean=results.reduce(function(s,v){return s+v;},0)/N;var var95=((results[Math.floor(N*0.05)]-mean)/mean*100);var idx01=Math.floor(N*0.01);var cvar99=((results.slice(0,idx01).reduce(function(s,v){return s+v;},0)/idx01-mean)/mean*100);var breach=(results.filter(function(v){return v<basePV*0.85;}).length/N*100);
+  document.getElementById('mc-mean').textContent='$'+Math.round(mean).toLocaleString()+'M';document.getElementById('mc-var').textContent=var95.toFixed(1)+'%';document.getElementById('mc-cvar').textContent=cvar99.toFixed(1)+'%';document.getElementById('mc-breach').textContent=breach.toFixed(1)+'%';
+  if(typeof Chart!=='undefined'){var bins=50,min=results[0],max=results[N-1],bw=(max-min)/bins;var hist=Array(bins).fill(0);results.forEach(function(v){var idx=Math.min(bins-1,Math.floor((v-min)/bw));hist[idx]++;});var labels=Array.from({length:bins},function(_,i){return'$'+Math.round(min+i*bw)+'M';});if(chartInstances.mc)chartInstances.mc.destroy();chartInstances.mc=new Chart(document.getElementById('mc-chart'),{type:'bar',data:{labels:labels,datasets:[{label:'Frequency',data:hist,backgroundColor:hist.map(function(_,i){var v=min+i*bw;return v<basePV*0.85?'rgba(244,63,94,0.7)':v<basePV*0.95?'rgba(245,158,11,0.5)':'rgba(6,182,212,0.5)';}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{display:false},grid:{display:false}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(100,116,139,0.1)'}}},plugins:{legend:{display:false}}}});}showToast('Monte Carlo: 10K iterations complete');
+};
+
+window.mmRunWaterfall = function() {
+  var av=parseFloat(document.getElementById('wf-val').value),ar=parseFloat(document.getElementById('wf-ar').value)/100,eq=parseFloat(document.getElementById('wf-eq').value)/100,ip=parseFloat(document.getElementById('wf-ip').value)/100;
+  document.getElementById('wf-ar-v').textContent=Math.round(ar*100)+'%';document.getElementById('wf-eq-v').textContent=Math.round(eq*100)+'%';document.getElementById('wf-ip-v').textContent=Math.round(ip*100)+'%';
+  var total=av*(ar*0.3+eq*0.4+ip*0.3);var tranches=[{name:'DIP/Admin Claims',claim:15},{name:'Senior Secured (1st Lien)',claim:250},{name:'Senior Secured (2nd Lien)',claim:100},{name:'Senior Unsecured',claim:150},{name:'Subordinated / Mezzanine',claim:80},{name:'Equity',claim:50}];
+  var remaining=total;tranches.forEach(function(t){t.alloc=Math.min(t.claim,Math.max(0,remaining));t.recovery=t.claim>0?(t.alloc/t.claim*100):0;remaining-=t.alloc;});
+  var html='<table class="data-table"><thead><tr><th>Tranche</th><th>Claim ($M)</th><th>Alloc ($M)</th><th>Recovery</th><th>Status</th></tr></thead><tbody>';tranches.forEach(function(t){var color=t.recovery>=90?'var(--emerald)':t.recovery>=50?'var(--amber)':'var(--rose)';var status=t.recovery>=90?'FULL':t.recovery>0?'PARTIAL':'WIPED';html+='<tr><td>'+t.name+'</td><td>$'+t.claim+'M</td><td style="color:'+color+'">$'+t.alloc.toFixed(0)+'M</td><td style="color:'+color+'">'+t.recovery.toFixed(1)+'%</td><td><span class="badge '+(status==='FULL'?'badge-pass':status==='PARTIAL'?'badge-warn':'badge-fail')+'">'+status+'</span></td></tr>';});html+='</tbody></table>';document.getElementById('wf-table').innerHTML=html;
+  if(typeof Chart!=='undefined'){if(chartInstances.wf)chartInstances.wf.destroy();chartInstances.wf=new Chart(document.getElementById('wf-chart'),{type:'bar',data:{labels:tranches.map(function(t){return t.name.split('(')[0].trim();}),datasets:[{label:'Claim',data:tranches.map(function(t){return t.claim;}),backgroundColor:'rgba(100,116,139,0.3)',borderWidth:0},{label:'Recovered',data:tranches.map(function(t){return t.alloc;}),backgroundColor:tranches.map(function(t){return t.recovery>=90?'rgba(16,185,129,0.7)':t.recovery>0?'rgba(245,158,11,0.7)':'rgba(244,63,94,0.7)';}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{color:'#64748b',callback:function(v){return'$'+v+'M';}},grid:{color:'rgba(100,116,139,0.1)'}},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}}},plugins:{legend:{labels:{color:'#94a3b8'}}}}});}
+};
+
+window.mmRunContagion = function() {
+  var log=document.getElementById('contagion-log');log.innerHTML='';
+  var lines=['<span class="t-bold">[T=0] CONTAGION CASCADE INITIATED</span>','<span class="t-cyan">[T=1] Scanning 500 rated entities for vulnerability clusters...</span>','<span class="t-green">[T=2] DebtRank: Identifying top-20 systemic nodes by betweenness centrality</span>','<span class="t-amber">[T=3] ⚠ WARNING: Energy sector concentration > 15% of exposure graph</span>','<span class="t-red">[T=4] ✗ TRIGGER: ENT-0042 (Titan Energy Holdings) enters DISTRESSED state</span>','<span class="t-red">[T=5] ✗ CASCADE: 3 direct counterparties downgraded (ENT-0108, ENT-0291, ENT-0377)</span>','<span class="t-amber">[T=6] Fire-sale feedback loop activated: Asset liquidation pressure on $2.1B collateral pool</span>','<span class="t-purple">[T=7] Eisenberg-Noe clearing: 12 interbank exposures repriced</span>','<span class="t-red">[T=8] ✗ SECONDARY CASCADE: 7 additional entities breach covenant thresholds</span>','<span class="t-cyan">[T=9] Quantum tail risk check: CVaR 99.9% = -31.2% (ELEVATED)</span>','<span class="t-amber">[T=10] Systemic loss velocity: 18.2% of portfolio NAV over 8 time steps</span>','<span class="t-green">[T=11] Constitutional circuit breaker engaged: Human fiduciary override requested</span>','<span class="t-bold">[T=12] SIMULATION COMPLETE — Total systemic loss: 18.2% | Entities impacted: 23/500</span>'];
+  var i=0;var interval=setInterval(function(){if(i<lines.length){log.innerHTML+=lines[i]+'\n';log.scrollTop=log.scrollHeight;i++;}else{clearInterval(interval);showToast('Contagion simulation complete');}},400);
+};
+
+function initDigitalTwin() {
+  var el=document.getElementById('panel-twin');var sample=ENTITIES.slice(0,100);
+  var avgAlpha=(sample.reduce(function(s,e){return s+parseFloat(e.alphaPD);},0)/sample.length).toFixed(3);var avgBeta=(sample.reduce(function(s,e){return s+parseFloat(e.betaPD);},0)/sample.length).toFixed(3);var divergent=sample.filter(function(e){return Math.abs(e.alphaPD-e.betaPD)>3;}).length;
+  el.innerHTML='<div class="section-header"><span class="icon">🌐</span> DIGITAL TWIN — ADVERSARIAL WORLD MODEL</div><div class="section-desc">Alpha (Market Pricing) vs Beta (Risk Control Discriminator) — Adversarial divergence analysis across '+sample.length+' S&P 500 agent proxies.</div><div class="metric-grid metric-grid-4" style="margin-bottom:18px;"><div class="metric-card"><div class="metric-label">Avg Alpha PD</div><div class="metric-value" style="color:var(--blue)">'+avgAlpha+'%</div><div class="metric-delta">Market Pricing Model</div></div><div class="metric-card"><div class="metric-label">Avg Beta PD</div><div class="metric-value" style="color:var(--rose)">'+avgBeta+'%</div><div class="metric-delta">Risk Control Discriminator</div></div><div class="metric-card"><div class="metric-label">Divergent Entities</div><div class="metric-value" style="color:var(--amber)">'+divergent+'</div><div class="metric-delta">> 3% PD spread</div></div><div class="metric-card"><div class="metric-label">Universe Size</div><div class="metric-value" style="color:var(--cyan)">'+ENTITIES.length+'</div><div class="metric-delta">Total Rated Issuers</div></div></div><div class="grid grid-2"><div class="card"><div class="card-header"><span class="card-title">Alpha vs Beta PD Distribution</span></div><div class="card-body"><div class="chart-wrap"><canvas id="twin-scatter"></canvas></div></div></div><div class="card"><div class="card-header"><span class="card-title">Agent State Distribution</span></div><div class="card-body"><div class="chart-wrap"><canvas id="twin-state"></canvas></div></div></div></div><div class="card" style="margin-top:14px;"><div class="card-header"><span class="card-title">Entity Universe (Top 50)</span><div class="search-box" style="margin:0;max-width:200px;padding:3px 8px;"><input type="text" id="twin-search" placeholder="Filter..." style="font-size:0.72rem;" oninput="twinFilter()"></div></div><div class="card-body"><div class="scrollable-table"><table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Sector</th><th>Rating</th><th>Alpha PD</th><th>Beta PD</th><th>Divergence</th><th>Agent State</th></tr></thead><tbody id="twin-tbody"></tbody></table></div></div></div>';
+  window.twinRenderTable=function(data){document.getElementById('twin-tbody').innerHTML=data.slice(0,50).map(function(e){var div=Math.abs(e.alphaPD-e.betaPD).toFixed(3);var divColor=div>3?'var(--rose)':div>1?'var(--amber)':'var(--emerald)';var stateColor=e.agentState==='OPTIMAL'?'var(--emerald)':e.agentState==='STRESSED'?'var(--amber)':e.agentState==='CONSTRAINED'?'var(--blue)':'var(--rose)';return'<tr><td>'+e.id+'</td><td>'+e.name+'</td><td>'+e.sector+'</td><td><span class="badge '+(e.isIG?'badge-ig':'badge-hy')+'">'+e.rating+'</span></td><td>'+e.alphaPD+'%</td><td>'+e.betaPD+'%</td><td style="color:'+divColor+'">'+div+'%</td><td style="color:'+stateColor+'">'+e.agentState+'</td></tr>';}).join('');};
+  twinRenderTable(sample);
+  window.twinFilter=function(){var q=document.getElementById('twin-search').value.toLowerCase();twinRenderTable(sample.filter(function(e){return(e.name+e.sector+e.rating+e.id).toLowerCase().indexOf(q)!==-1;}));};
+  if(typeof Chart!=='undefined'){new Chart(document.getElementById('twin-scatter'),{type:'scatter',data:{datasets:[{label:'Alpha vs Beta PD',data:sample.map(function(e){return{x:parseFloat(e.alphaPD),y:parseFloat(e.betaPD)};}),backgroundColor:sample.map(function(e){return Math.abs(e.alphaPD-e.betaPD)>3?'rgba(244,63,94,0.7)':'rgba(59,130,246,0.5)';}),pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'Alpha PD (%)',color:'#94a3b8'},ticks:{color:'#64748b'},grid:{color:'rgba(100,116,139,0.1)'}},y:{title:{display:true,text:'Beta PD (%)',color:'#94a3b8'},ticks:{color:'#64748b'},grid:{color:'rgba(100,116,139,0.1)'}}},plugins:{legend:{display:false}}}});var stateCounts={};sample.forEach(function(e){stateCounts[e.agentState]=(stateCounts[e.agentState]||0)+1;});new Chart(document.getElementById('twin-state'),{type:'doughnut',data:{labels:Object.keys(stateCounts),datasets:[{data:Object.values(stateCounts),backgroundColor:['#10b981','#f59e0b','#3b82f6','#f43f5e'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}}}});}
+}
+
+function initAgentGallery() {
+  var el=document.getElementById('panel-agents');
+  el.innerHTML='<div class="section-header"><span class="icon">🤖</span> AGENT SWARM REGISTRY — '+AGENTS.length+' Specialized Agents</div><div class="section-desc">The ADAM v30.1 agent swarm operates across System 1 (fast perception) and System 2 (deliberate reasoning). Each agent has defined tool access and confidence bounds.</div><div class="metric-grid metric-grid-4" style="margin-bottom:18px;"><div class="metric-card"><div class="metric-label">Active Agents</div><div class="metric-value" style="color:var(--emerald)">'+AGENTS.filter(function(a){return a.status==='ACTIVE';}).length+'</div></div><div class="metric-card"><div class="metric-label">Avg Confidence</div><div class="metric-value" style="color:var(--cyan)">'+(AGENTS.reduce(function(s,a){return s+a.confidence;},0)/AGENTS.length*100).toFixed(1)+'%</div></div><div class="metric-card"><div class="metric-label">Total Tools</div><div class="metric-value" style="color:var(--violet)">'+AGENTS.reduce(function(s,a){return s+a.tools.length;},0)+'</div></div><div class="metric-card"><div class="metric-label">Standby</div><div class="metric-value" style="color:var(--amber)">'+AGENTS.filter(function(a){return a.status==='STANDBY';}).length+'</div></div></div><div class="grid grid-3" id="agent-cards"></div>';
+  document.getElementById('agent-cards').innerHTML=AGENTS.map(function(a){return'<div class="card" style="border-top:2px solid var('+a.color+');"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="font-size:1.4rem;">'+a.icon+'</div><span class="badge '+(a.status==='ACTIVE'?'badge-live':'badge-warn')+'">'+a.status+'</span></div><h4 style="font-size:0.9rem;font-weight:700;color:var('+a.color+');margin-bottom:3px;">'+a.name+'</h4><div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">'+a.role+' — '+a.domain+'</div><div style="margin-bottom:8px;"><div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px;">Confidence</div><div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden;"><div style="width:'+(a.confidence*100)+'%;height:100%;background:var('+a.color+');border-radius:4px;transition:width 1s ease;"></div></div><div style="font-size:0.7rem;text-align:right;margin-top:2px;color:var('+a.color+');font-weight:700;">'+(a.confidence*100).toFixed(0)+'%</div></div><div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Tools</div><div style="display:flex;flex-wrap:wrap;gap:4px;">'+a.tools.map(function(t){return'<span class="badge badge-info" style="font-size:0.58rem;">'+t+'</span>';}).join('')+'</div></div></div>';}).join('');
+}
+
+function initCreditArchitect() {
+  var el=document.getElementById('panel-credit');
+  el.innerHTML='<div class="section-header"><span class="icon">📈</span> CREDIT & VALUATION ARCHITECT</div><div class="grid grid-2" style="grid-template-columns:1fr 2fr;"><div class="card"><div class="card-header"><span class="card-title">DCF Parameters</span></div><div class="card-body"><div style="margin-bottom:10px;"><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Company Name</label><input type="text" class="input" id="ca-name" value="Apex TMT Holdings Inc." style="width:100%;margin-top:4px;"></div><div class="grid grid-2" style="gap:8px;margin-bottom:10px;"><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Revenue ($M)</label><input type="number" class="input" id="ca-rev" value="2400" style="width:100%;margin-top:4px;" onchange="caCalc()"></div><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">EBITDA ($M)</label><input type="number" class="input" id="ca-ebitda" value="480" style="width:100%;margin-top:4px;" onchange="caCalc()"></div></div><div class="grid grid-2" style="gap:8px;margin-bottom:10px;"><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Total Debt ($M)</label><input type="number" class="input" id="ca-debt" value="1800" style="width:100%;margin-top:4px;" onchange="caCalc()"></div><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Cash ($M)</label><input type="number" class="input" id="ca-cash" value="200" style="width:100%;margin-top:4px;" onchange="caCalc()"></div></div><div class="grid grid-2" style="gap:8px;margin-bottom:10px;"><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">CapEx ($M)</label><input type="number" class="input" id="ca-capex" value="120" style="width:100%;margin-top:4px;" onchange="caCalc()"></div><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Interest Rate (%)</label><input type="number" class="input" id="ca-rate" value="7.5" step="0.25" style="width:100%;margin-top:4px;" onchange="caCalc()"></div></div><div class="grid grid-2" style="gap:8px;margin-bottom:10px;"><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">Growth Y1-5 (%)</label><input type="number" class="input" id="ca-growth" value="8" style="width:100%;margin-top:4px;" onchange="caCalc()"></div><div><label class="mono" style="font-size:0.7rem;color:var(--text-muted);">WACC (%)</label><input type="number" class="input" id="ca-wacc" value="9.5" step="0.5" style="width:100%;margin-top:4px;" onchange="caCalc()"></div></div><button class="btn btn-primary" onclick="caCalc()" style="width:100%;justify-content:center;margin-top:8px;">⚡ CALCULATE</button></div></div><div><div class="metric-grid metric-grid-4" style="margin-bottom:14px;"><div class="metric-card" style="border-left:3px solid var(--emerald);"><div class="metric-label">Enterprise Value</div><div class="metric-value" id="ca-ev" style="color:var(--emerald)">—</div></div><div class="metric-card" style="border-left:3px solid var(--blue);"><div class="metric-label">Equity Value</div><div class="metric-value" id="ca-equity" style="color:var(--blue)">—</div></div><div class="metric-card" style="border-left:3px solid var(--amber);"><div class="metric-label">Leverage</div><div class="metric-value" id="ca-lev" style="color:var(--amber)">—</div></div><div class="metric-card" style="border-left:3px solid var(--rose);"><div class="metric-label">Implied Rating</div><div class="metric-value" id="ca-rating" style="color:var(--rose)">—</div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Key Credit Metrics</span></div><div class="card-body"><table class="data-table"><thead><tr><th>Metric</th><th>Value</th><th>Status</th></tr></thead><tbody id="ca-metrics"></tbody></table></div></div><div class="card"><div class="card-header"><span class="card-title">5-Year FCF Projection</span></div><div class="card-body"><div class="chart-wrap"><canvas id="ca-chart"></canvas></div></div></div></div></div>';
+  caCalc();
+}
+
+window.caCalc = function() {
+  var rev=+document.getElementById('ca-rev').value,ebitda=+document.getElementById('ca-ebitda').value,debt=+document.getElementById('ca-debt').value,cash=+document.getElementById('ca-cash').value,capex=+document.getElementById('ca-capex').value,rate=+document.getElementById('ca-rate').value/100,g=+document.getElementById('ca-growth').value/100,wacc=+document.getElementById('ca-wacc').value/100;
+  var fcf=ebitda-capex-debt*rate*0.65;var netDebt=debt-cash;var leverage=(ebitda>0?netDebt/ebitda:0).toFixed(1);var icr=(rate>0?ebitda/(debt*rate):0).toFixed(2);var fccr=(ebitda>0?fcf/((debt*rate)+capex*0.1):0).toFixed(2);var margin=(rev>0?ebitda/rev*100:0).toFixed(1);
+  var ev=0,cfs=[];for(var y=1;y<=5;y++){var cf=fcf*Math.pow(1+g,y);ev+=cf/Math.pow(1+wacc,y);cfs.push(Math.round(cf));}var tv=cfs[4]*1.025/(wacc-0.025);ev+=tv/Math.pow(1+wacc,5);var equity=ev-netDebt;
+  var pd=Math.min(99,Math.max(0.01,0.3*Math.pow(parseFloat(leverage),1.8)/Math.pow(parseFloat(icr),1.2)));var ratingMap=[[0.1,'AAA'],[0.3,'AA'],[0.5,'A+'],[1,'A'],[2,'BBB+'],[3,'BBB'],[5,'BB+'],[7,'BB'],[10,'B+'],[15,'B'],[25,'CCC'],[100,'D']];var rating='D';for(var k=0;k<ratingMap.length;k++){if(pd<=ratingMap[k][0]){rating=ratingMap[k][1];break;}}
+  document.getElementById('ca-ev').textContent='$'+Math.round(ev).toLocaleString()+'M';document.getElementById('ca-equity').textContent='$'+Math.round(equity).toLocaleString()+'M';document.getElementById('ca-lev').textContent=leverage+'x';document.getElementById('ca-rating').textContent=rating;
+  var metrics=[['EBITDA Margin',margin+'%',parseFloat(margin)>20?'STRONG':'WEAK'],['Net Leverage',leverage+'x',parseFloat(leverage)<4?'STRONG':parseFloat(leverage)<6?'ADEQUATE':'STRESSED'],['Interest Coverage',icr+'x',parseFloat(icr)>2.5?'STRONG':parseFloat(icr)>1.5?'ADEQUATE':'DISTRESSED'],['Fixed Charge Coverage',fccr+'x',parseFloat(fccr)>1.5?'STRONG':parseFloat(fccr)>1?'ADEQUATE':'WEAK'],['Unlevered FCF','$'+Math.round(fcf)+'M',fcf>0?'POSITIVE':'NEGATIVE'],['Implied PD (1Y)',pd.toFixed(2)+'%',pd<3?'LOW':pd<8?'MODERATE':'HIGH']];
+  document.getElementById('ca-metrics').innerHTML=metrics.map(function(m){var c=m[2]==='STRONG'||m[2]==='POSITIVE'||m[2]==='LOW'?'badge-pass':m[2]==='ADEQUATE'||m[2]==='MODERATE'?'badge-warn':'badge-fail';return'<tr><td>'+m[0]+'</td><td class="mono">'+m[1]+'</td><td><span class="badge '+c+'">'+m[2]+'</span></td></tr>';}).join('');
+  if(typeof Chart!=='undefined'){if(chartInstances.ca)chartInstances.ca.destroy();chartInstances.ca=new Chart(document.getElementById('ca-chart'),{type:'bar',data:{labels:['Y1','Y2','Y3','Y4','Y5','Terminal'],datasets:[{label:'FCF ($M)',data:cfs.concat([Math.round(tv/Math.pow(1+wacc,5))]),backgroundColor:['#06b6d4','#06b6d4','#06b6d4','#06b6d4','#06b6d4','#8b5cf6'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:function(v){return'$'+v+'M';}},grid:{color:'rgba(100,116,139,0.1)'}}},plugins:{legend:{display:false}}}});}
+};
+
+function initIntelHub() {
+  var el=document.getElementById('panel-intel');var types=[];INTEL_REPORTS.forEach(function(r){if(types.indexOf(r.type)===-1)types.push(r.type);});
+  el.innerHTML='<div class="section-header"><span class="icon">📊</span> INTELLIGENCE HUB — Report Archive</div><div class="section-desc">Curated archive of ADAM-generated intelligence spanning daily briefings, market pulse reports, newsletters, deep dives, and credit assessments.</div><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><button class="btn active" onclick="intelFilter(\'all\',this)">All ('+INTEL_REPORTS.length+')</button>'+types.map(function(t){return'<button class="btn" onclick="intelFilter(\''+t+'\',this)">'+t+' ('+INTEL_REPORTS.filter(function(r){return r.type===t;}).length+')</button>';}).join('')+'</div><div class="metric-grid metric-grid-3" style="margin-bottom:18px;"><div class="metric-card"><div class="metric-label">Total Reports</div><div class="metric-value" style="color:var(--cyan)">'+INTEL_REPORTS.length+'</div></div><div class="metric-card"><div class="metric-label">Report Types</div><div class="metric-value" style="color:var(--violet)">'+types.length+'</div></div><div class="metric-card"><div class="metric-label">Date Range</div><div class="metric-value" style="color:var(--emerald);font-size:1rem;">Jan—Mar 2026</div></div></div><div id="intel-list"></div>';
+  window.intelRender=function(reports){var typeColors={'Daily Briefing':'--gold','Market Pulse':'--cyan','Market Mayhem':'--rose','House View':'--emerald','Deep Dive':'--violet','Credit Report':'--blue','Equity Research':'--amber','System Audit':'--green'};document.getElementById('intel-list').innerHTML=reports.map(function(r){var c=typeColors[r.type]||'--text-secondary';return'<div class="card" style="margin-bottom:10px;border-left:3px solid var('+c+');"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="badge badge-info" style="font-size:0.6rem;background:rgba(59,130,246,0.1);color:var('+c+');">'+r.type+'</span><span class="mono" style="font-size:0.7rem;color:var(--text-muted);">'+r.date+'</span></div><h4 style="font-size:0.85rem;font-weight:700;">'+r.title+'</h4><div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">'+r.tags.map(function(t){return'<span class="badge" style="font-size:0.55rem;background:var(--bg-glass);color:var(--text-muted);border:1px solid var(--border);">'+t+'</span>';}).join('')+'</div></div><button class="btn" style="font-size:0.65rem;" onclick="showToast(\'Report viewer: '+r.type+' — '+r.date+'\')">View →</button></div></div>';}).join('');};
+  window.intelFilter=function(type,btn){document.querySelectorAll('#panel-intel .btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');intelRender(type==='all'?INTEL_REPORTS:INTEL_REPORTS.filter(function(r){return r.type===type;}));};
+  intelRender(INTEL_REPORTS);
+}
+
+function initBenchmark() {
+  var el=document.getElementById('panel-benchmark');var b=BENCHMARK;
+  el.innerHTML='<div class="section-header"><span class="icon">🔬</span> BENCHMARK HARNESS — NEUTRALITY V2.4 EVALUATION</div><div class="section-desc">Clean-room deterministic evaluation baseline for ADAM v30.1 runtime. Constitutional compliance scored against Tier 1 G-SIB Fiduciary Standard.</div><div class="metric-grid metric-grid-4" style="margin-bottom:18px;"><div class="metric-card" style="border-top:3px solid var(--emerald);"><div class="metric-label">Overall Score</div><div class="metric-value" style="color:var(--emerald)">'+b.overallScore+'%</div><div class="metric-delta delta-up">PASSING</div></div><div class="metric-card"><div class="metric-label">Entities Evaluated</div><div class="metric-value" style="color:var(--cyan)">'+b.entityCount+'</div></div><div class="metric-card"><div class="metric-label">S&P 500 Sample</div><div class="metric-value" style="color:var(--blue)">'+b.sp500Sample+'</div></div><div class="metric-card"><div class="metric-label">Evaluation Date</div><div class="metric-value" style="color:var(--violet);font-size:1rem;">'+b.date+'</div></div></div><div class="card" style="margin-bottom:14px;"><div class="card-header"><span class="card-title">Constitutional Compliance Matrix</span></div><div class="card-body"><table class="data-table"><thead><tr><th>Article</th><th>Score</th><th>Status</th><th>Detail</th></tr></thead><tbody>'+b.sections.map(function(s){return'<tr><td style="font-weight:600;">'+s.name+'</td><td class="mono" style="color:'+(s.score>=95?'var(--emerald)':s.score>=90?'var(--amber)':'var(--rose)')+'">'+s.score+'%</td><td><span class="badge '+(s.status==='PASS'?'badge-pass':s.status==='WARN'?'badge-warn':'badge-fail')+'">'+s.status+'</span></td><td style="font-size:0.7rem;color:var(--text-secondary);">'+s.detail+'</td></tr>';}).join('')+'</tbody></table></div></div><div class="grid grid-2"><div class="card"><div class="card-header"><span class="card-title">Score Distribution</span></div><div class="card-body"><div class="chart-wrap"><canvas id="bm-chart"></canvas></div></div></div><div class="card"><div class="card-header"><span class="card-title">Evaluation Manifest</span></div><div class="card-body"><pre class="terminal-log" style="max-height:240px;">'+JSON.stringify({benchmark_id:b.id,date:b.date,entity_count:b.entityCount,constitution_version:'ADAM_NEUTRALITY_V2.4',deterministic:true,compliance_target:'Tier 1 G-SIB Fiduciary Standard',overall_score:b.overallScore,w3c_prov_o_compliance:true,prng_seed:20260912},null,2)+'</pre></div></div></div>';
+  if(typeof Chart!=='undefined'){new Chart(document.getElementById('bm-chart'),{type:'bar',data:{labels:b.sections.map(function(s){return s.name.split(' ').slice(0,2).join(' ');}),datasets:[{label:'Score',data:b.sections.map(function(s){return s.score;}),backgroundColor:b.sections.map(function(s){return s.score>=95?'rgba(16,185,129,0.6)':s.score>=90?'rgba(245,158,11,0.6)':'rgba(244,63,94,0.6)';}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{min:80,max:100,ticks:{color:'#64748b',callback:function(v){return v+'%';}},grid:{color:'rgba(100,116,139,0.1)'}},y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}}},plugins:{legend:{display:false}}}});}
+}
+
+// Particle Canvas
+var canvas=document.getElementById('particle-canvas'),ctx=canvas.getContext('2d'),particles=[];
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initParticles(){particles=[];var count=Math.min(Math.floor((canvas.width*canvas.height)/22000),60);for(var i=0;i<count;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35,r:Math.random()*1.2+0.4});}}
+function drawParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);var isLight=document.documentElement.getAttribute('data-theme')==='light';var pColor=isLight?'rgba(8,145,178,':'rgba(0,243,255,';for(var i=0;i<particles.length;i++){var p=particles[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=pColor+'0.4)';ctx.fill();for(var j=i+1;j<particles.length;j++){var q=particles[j];var dx=p.x-q.x,dy=p.y-q.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=pColor+(0.1*(1-dist/110)).toFixed(3)+')';ctx.lineWidth=0.4;ctx.stroke();}}}requestAnimationFrame(drawParticles);}
+resizeCanvas();initParticles();drawParticles();window.addEventListener('resize',function(){resizeCanvas();initParticles();});
+
+// Theme Toggle
+var themeBtn=document.getElementById('theme-toggle');var savedTheme=localStorage.getItem('adam-theme');
+if(savedTheme){document.documentElement.setAttribute('data-theme',savedTheme);themeBtn.textContent=savedTheme==='light'?'☀️':'🌙';}
+themeBtn.addEventListener('click',function(){var isLight=document.documentElement.getAttribute('data-theme')==='light';var next=isLight?'dark':'light';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('adam-theme',next);themeBtn.textContent=next==='light'?'☀️':'🌙';showToast('Theme → '+next.toUpperCase());});
+
+// Toast
+window.showToast=function(msg){var container=document.getElementById('toast-container');var toast=document.createElement('div');toast.className='toast';toast.textContent='› '+msg;container.appendChild(toast);setTimeout(function(){toast.remove();},3000);};
+
+// Global Search
+var searchInput=document.getElementById('global-search');
+searchInput.addEventListener('input',function(){var q=searchInput.value.toLowerCase().trim();if(!q)return;var tabMap={command:'command',center:'command',overview:'command',system:'command',mayhem:'mayhem',market:'mayhem',terminal:'mayhem',monte:'mayhem',carlo:'mayhem',contagion:'mayhem',waterfall:'mayhem',twin:'twin',digital:'twin',adversarial:'twin',divergence:'twin',debtrank:'twin',entity:'twin',agent:'agents',swarm:'agents',gallery:'agents',roster:'agents',dcf:'credit',valuation:'credit',architect:'credit',leverage:'credit',intel:'intel',intelligence:'intel',report:'intel',briefing:'intel',pulse:'intel',newsletter:'intel',benchmark:'benchmark',audit:'benchmark',compliance:'benchmark',neutrality:'benchmark',constitutional:'benchmark'};for(var keyword in tabMap){if(q.indexOf(keyword)!==-1){switchTab(tabMap[keyword]);showToast('Navigated to: '+tabMap[keyword]);break;}}});
+document.addEventListener('keydown',function(e){if(e.key==='/'&&document.activeElement!==searchInput){e.preventDefault();searchInput.focus();searchInput.select();}if(e.key==='Escape'&&document.activeElement===searchInput){searchInput.value='';searchInput.blur();}});
+
+// Telemetry
+function updateTelemetry(){document.getElementById('stat-latency').textContent=(8+Math.floor(Math.random()*8))+'ms';document.getElementById('stat-agents').textContent=(1380+Math.floor(Math.random()*40)).toLocaleString();}
+updateTelemetry();setInterval(updateTelemetry,5000);
+
+// Boot
+setTimeout(function(){showToast('ADAM v30.1 INITIALIZED');},500);
+setTimeout(function(){showToast('Swarm neural network... [OK]');},1200);
+setTimeout(function(){showToast('7 modules loaded // PROV-O COMPLIANT');},1900);
+console.log('%c ADAM v30.1 VERTICAL SLICE ','background: #0aff60; color: #000; font-weight: bold; font-size: 14px;');
+
+})();
+</script>
+</body>
+</html>
