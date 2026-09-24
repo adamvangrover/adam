@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM v30 :: JSON Data Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 20px; background: #050b14; color: #0aff60; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        select { background: #000; color: #0aff60; border: 1px solid #333; padding: 8px; font-family: inherit; }
+        #jsonContainer { flex-grow: 1; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 20px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 0.85rem; }
+        .btn { background:none; border:1px solid #00f3ff; color:#00f3ff; padding:5px 10px; cursor:pointer; text-decoration: none; }
+        agent-directive { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0; font-size: 1.2rem;">DATA // JSON INSPECTOR</h1>
+        <div>
+            <select id="fileSelector" onchange="loadFile()">
+                <option value="machine_index.json">machine_index.json</option>
+                <option value="showcase/machine_index.json">showcase/machine_index.json</option>
+                <option value="showcase/site_map.json">showcase/site_map.json</option>
+                <option value="schemas/agent.schema.json">schemas/agent.schema.json</option>
+                <option value="schemas/context.schema.json">schemas/context.schema.json</option>
+                <option value="schemas/event.schema.json">schemas/event.schema.json</option>
+                <option value="schemas/guardrails.json">schemas/guardrails.json</option>
+                <option value="schemas/institutional_ai_training_ledger.json">schemas/institutional_ai_training_ledger.json</option>
+                <option value="schemas/provenance.schema.json">schemas/provenance.schema.json</option>
+                <option value="schemas/tool.schema.json">schemas/tool.schema.json</option>
+                <option value="prompt_library/credit_analysis.json">prompt_library/credit_analysis.json</option>
+                <option value="prompt_library/market_analysis.json">prompt_library/market_analysis.json</option>
+                <option value="prompt_library/unified_v1.json">prompt_library/unified_v1.json</option>
+                <option value="prompt_library/workflow.jsonl">prompt_library/workflow.jsonl</option>
+                <option value="schemas/telemetry_stream.schema.json">schemas/telemetry_stream.schema.json</option>
+            </select>
+            <a href="index.html" class="btn">[ RETURN ]</a>
+        </div>
+    </div>
+    <div id="jsonContainer">Select a file to load data...</div>
+    <agent-directive>{"type": "data_viewer", "context": "json"}</agent-directive>
+    <script>
+        async function loadFile() {
+            const file = document.getElementById('fileSelector').value;
+            const container = document.getElementById('jsonContainer');
+            container.innerText = "Loading " + file + "...";
+            try {
+                const response = await fetch(file);
+                if(!response.ok) throw new Error("HTTP error " + response.status);
+                const data = await response.json();
+                container.innerText = JSON.stringify(data, null, 4);
+            } catch(e) {
+                container.innerText = "Error loading " + file + ":\n\n" + e.toString();
+            }
+        }
+        // Load default
+        window.onload = loadFile;
+    </script>
+</body>
+</html>

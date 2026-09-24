@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM v30 :: Data Topography</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; background: #050b14; color: #10b981; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .btn { background:none; border:1px solid #00f3ff; color:#00f3ff; padding:5px 10px; cursor:pointer; text-decoration: none; }
+        agent-directive { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0; font-size: 1.2rem;">DATA // TOPOGRAPHY</h1>
+        <a href="index.html" class="btn">[ RETURN ]</a>
+    </div>
+    <div style="flex-grow: 1; position: relative;">
+        <canvas id="topoChart"></canvas>
+    </div>
+    <agent-directive>{"type": "visualization", "context": "data_topography"}</agent-directive>
+    <script>
+        const ctx = document.getElementById('topoChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['agent.schema', 'event.schema', 'telemetry.schema', 'context.schema', 'tool.schema'],
+                datasets: [{
+                    label: 'Schema Complexity / Depth',
+                    data: [8, 15, 6, 12, 5],
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    pointBackgroundColor: '#00f3ff'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#333' }, angleLines: { color: '#333' }, pointLabels: { color: '#888' } } } }
+        });
+    </script>
+</body>
+</html>
