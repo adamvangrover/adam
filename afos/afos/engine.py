@@ -1,4 +1,4 @@
-from afos.core_types import Obligor, Facility, RiskAssessmentOutput, ProvenanceHeader
+from afos.core_types import Obligor, Facility, RiskAssessmentOutput, ProvenanceHeader, ModelArbitrationOutput
 
 def calculate_expected_loss(obligor: Obligor, facility: Facility) -> float:
     """
@@ -37,4 +37,20 @@ def assess_facility_risk(obligor: Obligor, facility: Facility) -> RiskAssessment
         facility_id=facility.facility_id,
         expected_loss=expected_loss,
         facility_rating=rating
+    )
+
+def arbitrate_dual_models(pd_alpha: float, pd_beta: float, theta: float = 0.050, lambda_penalty: float = 1.0) -> ModelArbitrationOutput:
+    """
+    Arbitrates dual models by computing Bidirectional Disparity and One-Sided Downside Spread.
+    """
+    bidirectional_disparity = abs(pd_beta - pd_alpha)
+    arbitration_flag_triggered = bidirectional_disparity > theta
+    one_sided_downside_spread = max(0.0, pd_beta - pd_alpha)
+    capital_buffer_penalty = one_sided_downside_spread * lambda_penalty
+
+    return ModelArbitrationOutput(
+        bidirectional_disparity=bidirectional_disparity,
+        arbitration_flag_triggered=arbitration_flag_triggered,
+        one_sided_downside_spread=one_sided_downside_spread,
+        capital_buffer_penalty=capital_buffer_penalty
     )
