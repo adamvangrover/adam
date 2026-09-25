@@ -1,6 +1,6 @@
 import pytest
 from afos.core_types import Obligor, Facility
-from afos.engine import calculate_expected_loss, assess_facility_risk
+from afos.engine import calculate_expected_loss, assess_facility_risk, arbitrate_dual_models
 
 def test_calculate_expected_loss():
     obligor = Obligor(
@@ -99,3 +99,24 @@ def test_assess_facility_risk_bbb_bb_c():
     facility.loss_given_default = 0.15
     result = assess_facility_risk(obligor, facility)
     assert result.facility_rating == "C"
+
+def test_arbitrate_dual_models_no_flag():
+    result = arbitrate_dual_models(pd_alpha=0.10, pd_beta=0.12, theta=0.050, lambda_penalty=1.5)
+    assert result.bidirectional_disparity == pytest.approx(0.02)
+    assert result.arbitration_flag_triggered is False
+    assert result.one_sided_downside_spread == pytest.approx(0.02)
+    assert result.capital_buffer_penalty == pytest.approx(0.03)
+
+def test_arbitrate_dual_models_flag_triggered():
+    result = arbitrate_dual_models(pd_alpha=0.10, pd_beta=0.18, theta=0.050, lambda_penalty=2.0)
+    assert result.bidirectional_disparity == pytest.approx(0.08)
+    assert result.arbitration_flag_triggered is True
+    assert result.one_sided_downside_spread == pytest.approx(0.08)
+    assert result.capital_buffer_penalty == pytest.approx(0.16)
+
+def test_arbitrate_dual_models_downside_spread():
+    result = arbitrate_dual_models(pd_alpha=0.15, pd_beta=0.10, theta=0.050, lambda_penalty=1.0)
+    assert result.bidirectional_disparity == pytest.approx(0.05)
+    assert result.arbitration_flag_triggered is False
+    assert result.one_sided_downside_spread == pytest.approx(0.0)
+    assert result.capital_buffer_penalty == pytest.approx(0.0)

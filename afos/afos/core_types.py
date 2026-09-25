@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
 
@@ -30,3 +30,12 @@ class RiskAssessmentOutput(BaseModel):
     facility_id: str
     expected_loss: float
     facility_rating: str
+
+class ModelArbitrationOutput(BaseModel):
+    """Output schema for dual-model PD arbitration."""
+    model_config = ConfigDict(strict=True, extra='forbid')
+
+    bidirectional_disparity: float = Field(..., description="Absolute difference between challenger and baseline PDs.")
+    arbitration_flag_triggered: bool = Field(..., description="Flag indicating if bidirectional divergence exceeded the threshold.")
+    one_sided_downside_spread: float = Field(..., description="Max(0, PD_beta - PD_alpha).")
+    capital_buffer_penalty: float = Field(..., description="Penalty applied based on the downside spread.")
