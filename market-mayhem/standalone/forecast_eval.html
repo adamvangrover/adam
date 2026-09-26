@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Market Mayhem | AOS-2026-0926 v4 FORECAST EVAL</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: 'Courier New', monospace;
+        font-size: 8pt;
+        color: #00e5ff;
+      }
+      @bottom-left {
+        content: "ADAM // TEMPORAL EPISTEMIC CONTROL";
+        font-family: 'Courier New', monospace;
+        font-size: 8pt;
+        color: #94a3b8;
+      }
+    }
+
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-panel: #111622;
+      --bg-card: #182030;
+      --border-color: #26334d;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-cyan: #00e5ff;
+      --accent-magenta: #ff0055;
+      --accent-amber: #f59e0b;
+      --accent-green: #10b981;
+      --font-mono: "Courier New", monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #030712; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; line-height: 1.4; }
+
+    .page {
+      width: 100%;
+      min-height: 270mm;
+      padding: 20px;
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      position: relative;
+    }
+
+    header { border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-end; }
+    h1.doc-title { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-main); }
+    .doc-subtitle { font-family: var(--font-mono); font-size: 11px; color: var(--accent-cyan); letter-spacing: 0.08em; margin-top: 4px; }
+    .header-meta { font-family: var(--font-mono); font-size: 10px; text-align: right; color: var(--text-muted); }
+    h2.section-title { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-cyan); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .content-area { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .hero-split { display: table; width: 100%; margin-bottom: 12px; }
+    .hero-card { display: table-cell; width: 50%; position: relative; border-radius: 4px; padding: 18px; border: 1px solid var(--border-color); vertical-align: top; }
+    .hero-card:first-child { padding-right: 12px; }
+    .hero-risk-on { background: #0f1a26; border-top: 3px solid var(--accent-cyan); }
+    .hero-tail-risk { background: #200f1a; border-top: 3px solid var(--accent-magenta); }
+    .hero-badge { font-family: var(--font-mono); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+    .hero-risk-on .hero-badge { color: var(--accent-cyan); }
+    .hero-tail-risk .hero-badge { color: var(--accent-magenta); }
+    .hero-headline { font-size: 16px; font-weight: 800; line-height: 1.2; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    .hero-pill-list { list-style: none; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .hero-pill-list li { background: rgba(17, 22, 34, 0.85); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 2px; }
+    .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 2px; }
+    .panel-title { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 6px; }
+    .panel p { color: var(--text-muted); font-size: 10.5px; line-height: 1.5; }
+    table.data-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 10px; margin-top: 6px; }
+    table.data-table th, table.data-table td { padding: 6px 10px; text-align: left; border: 1px solid var(--border-color); }
+    table.data-table th { background-color: var(--bg-card); color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    table.data-table tr:nth-child(even) td { background-color: rgba(24, 32, 48, 0.4); }
+    .numeric { text-align: right; }
+    .status-pos { color: var(--accent-magenta); font-weight: 700; }
+    .status-neg { color: var(--accent-cyan); font-weight: 700; }
+    .status-hold { color: var(--accent-amber); font-weight: 700; }
+    .chart-container { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 14px; border-radius: 2px; }
+    .terminal-trace { background-color: #05070c; border: 1px solid var(--border-color); padding: 12px; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.6; color: #38bdf8; border-left: 3px solid var(--accent-cyan); }
+    .terminal-trace .step-num { color: #64748b; margin-right: 8px; }
+    .terminal-trace .kw { color: #f43f5e; font-weight: bold; }
+    .terminal-trace .val { color: #e2e8f0; }
+    footer { border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 8.5px; color: var(--text-muted); letter-spacing: 0.05em; }
+    .badge-quarantine { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); color: var(--accent-amber); padding: 2px 6px; font-size: 8.5px; border-radius: 2px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: COVER & EPISTEMIC BOUNDARY -->
+  <section class="page" id="page-1">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">AOS-2026-0926 Forecast + Recursive Evaluation Edition (v4)</div>
+        </div>
+        <div class="header-meta">
+          <div>INGESTION DATE: 2026-09-26</div>
+          <div>STATE HORIZON: D3 REALIZED PEAK</div>
+          <div>SIM-FRAME: ABSOLUTE-RESOLVE</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="hero-split">
+        <div class="hero-card hero-risk-on">
+          <div>
+            <div class="hero-badge">Risk-On Scenario</div>
+            <div class="hero-headline">Clear Skies &amp; High Liquidity</div>
+          </div>
+          <ul class="hero-pill-list">
+            <li>• Robust Growth</li>
+            <li>• Surplus Liquidity</li>
+            <li>• Risk Appetite High</li>
+            <li>• Frictionless Credit Access</li>
+          </ul>
+        </div>
+
+        <div class="hero-card hero-tail-risk">
+          <div>
+            <div class="hero-badge">Tail-Risk Scenario</div>
+            <div class="hero-headline">Liquidity Shock &amp; Duration Conflagration</div>
+          </div>
+          <ul class="hero-pill-list">
+            <li>• Severe Liquidity Drain</li>
+            <li>• Rapid Spread Widening</li>
+            <li>• Duration Volatility Spike</li>
+            <li>• Systemic Risk-Off Flight</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Epistemic Design &amp; Quarantined Scaffolding</div>
+        <p>This edition combines recursive learning loops with isolated hypothesis exploration. Candidate scenario variations enter as quarantined hypotheses governed by strict causal separation. Under this protocol, hypotheses inform stress-testing and challenger execution paths without mutated authority rights. Models maintain full audit traces under zero state-pollution constraints.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Source Boundary &amp; Event Attribution</div>
+        <p>Prints through September 26, 2026 reflect fixed scenario parameters anchoring state slice D3. The systemic extraction shock is parameterized as a continuous state-transition vector rather than an uncontrolled exterior feed. This isolation ensures replay determinism across the temporal decision harness without reliance on unvetted external telemetry.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>CLASSIFICATION: GOVERNED FINANCIAL EVALUATION</div>
+      <div>PAGE 1 OF 6</div>
+    </footer>
+  </section>
+
+  <!-- PAGE 2: DUAL-PLANE WORLD MODEL -->
+  <section class="page" id="page-2">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">Section 1: Dual-Plane World Model Architecture</div>
+        </div>
+        <div class="header-meta">
+          <div>SLICE: D3 (PEAK EXTRACTION STRESS)</div>
+          <div>AUTHORITY: FROZEN GOVERNANCE</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="panel">
+        <div class="panel-title">Dual-Plane Separation Invariant</div>
+        <p>Observed state <code>World/X</code> contains immutable empirical inputs and fixed simulation injections. Belief state <code>Belief/Z</code> houses challenger hypotheses, model-derived valuations, and synthetic liquidity projections. Strict directional boundaries prevent uncommitted hypotheses from contaminating authoritative state.</p>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 18%;">Plane Domain</th>
+            <th style="width: 38%;">Baseline Definition (D0 Anchor)</th>
+            <th style="width: 44%;">Challenger Path (D3 Peak Stress Realization)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>World / X</strong></td>
+            <td>Synthetic baseline spreads; normal funding fluidities.</td>
+            <td>Rolling extraction-shock injection; duration peak overshoot.</td>
+          </tr>
+          <tr>
+            <td><strong>Belief / Z</strong></td>
+            <td>Persistent hawkish rate repricing.</td>
+            <td>Temporary duration crest followed by sharp liquidity normalization.</td>
+          </tr>
+          <tr>
+            <td><strong>Credit Channel</strong></td>
+            <td>Controlled baseline spreads across prime and subprime tranches.</td>
+            <td>Flight-to-quality compression alongside severe synthetic friction.</td>
+          </tr>
+          <tr>
+            <td><strong>Authority Rule</strong></td>
+            <td>Authoritative reference state; frozen schema.</td>
+            <td>Quarantined simulation experiment; no direct mutation permitted.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title" style="margin-top: 16px;">
+        <span>D3 Synthetic Credit Spread Matrix</span>
+        <span class="badge-quarantine">Challenger State Evaluated</span>
+      </h2>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Simulation Metric Token</th>
+            <th class="numeric">D0 Baseline Spread</th>
+            <th class="numeric">D3 Challenger Peak</th>
+            <th class="numeric">Net Shift (&Delta;)</th>
+            <th>Primary Transmission Channel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SIM-HY-CREDIT</code></td>
+            <td class="numeric">+345 bps</td>
+            <td class="numeric status-pos">+382 bps</td>
+            <td class="numeric status-pos">+37 bps</td>
+            <td>Retail liquidity drain &amp; risk-off premium</td>
+          </tr>
+          <tr>
+            <td><code>SIM-BSL</code></td>
+            <td class="numeric">+450 bps</td>
+            <td class="numeric status-pos">+468 bps</td>
+            <td class="numeric status-pos">+18 bps</td>
+            <td>Institutional syndicated facility re-pricing</td>
+          </tr>
+          <tr>
+            <td><code>SIM-UNITRANCHE</code></td>
+            <td class="numeric">+625 bps</td>
+            <td class="numeric status-pos">+640 bps</td>
+            <td class="numeric status-pos">+15 bps</td>
+            <td>Direct lending illiquidity buffer friction</td>
+          </tr>
+          <tr>
+            <td><code>SIM-CCO</code></td>
+            <td class="numeric">+780 bps</td>
+            <td class="numeric status-pos">+812 bps</td>
+            <td class="numeric status-pos">+32 bps</td>
+            <td>Subordinated mezzanine risk-clearing hurdle</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="panel" style="margin-top: 8px;">
+        <div class="panel-title">Spread Calibration Takeaway</div>
+        <p>The spread matrix acts strictly as an anchored challenger path. Infiltration of these values into baseline production tables is halted until deterministic verification passes through gate C5.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>DUAL-PLANE INTEGRITY: ENFORCED</div>
+      <div>PAGE 2 OF 6</div>
+    </footer>
+  </section>
+
+  <!-- PAGE 3: FORECAST LAB & HYPOTHESES -->
+  <section class="page" id="page-3">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">Section 2: Forecast Lab &amp; Synthetic Path Hypotheses</div>
+        </div>
+        <div class="header-meta">
+          <div>PROJECTION: D0 &rarr; D7 CYCLE</div>
+          <div>CURRENT PIN: D3 CREST</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="chart-container">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 12px;">
+          <span style="font-family: var(--font-mono); font-size: 11px; font-weight:700; color: var(--accent-cyan);">
+            Forecast Lab &mdash; Challenger Trajectory (10Y Yield vs SIM-HY-CREDIT)
+          </span>
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">
+            &mdash; 10Y Yield (%) &nbsp;&nbsp; - - SIM-HY-CREDIT (bps)
+          </span>
+        </div>
+
+        <svg viewBox="0 0 900 280" style="width: 100%; height: 240px; font-family: monospace; font-size: 11px;">
+          <line x1="50" y1="20" x2="840" y2="20" stroke="#1f293d" stroke-dasharray="2,2"/>
+          <line x1="50" y1="60" x2="840" y2="60" stroke="#1f293d" stroke-dasharray="2,2"/>
+          <line x1="50" y1="100" x2="840" y2="100" stroke="#1f293d" stroke-dasharray="2,2"/>
+          <line x1="50" y1="140" x2="840" y2="140" stroke="#1f293d" stroke-dasharray="2,2"/>
+          <line x1="50" y1="180" x2="840" y2="180" stroke="#1f293d" stroke-dasharray="2,2"/>
+          <line x1="50" y1="220" x2="840" y2="220" stroke="#1f293d" stroke-dasharray="2,2"/>
+
+          <text x="15" y="24" fill="#94a3b8">5.30</text>
+          <text x="15" y="64" fill="#94a3b8">5.25</text>
+          <text x="15" y="104" fill="#94a3b8">5.20</text>
+          <text x="15" y="144" fill="#94a3b8">5.15</text>
+          <text x="15" y="184" fill="#94a3b8">5.10</text>
+          <text x="15" y="224" fill="#94a3b8">5.00</text>
+
+          <text x="850" y="24" fill="#94a3b8">380</text>
+          <text x="850" y="64" fill="#94a3b8">370</text>
+          <text x="850" y="104" fill="#94a3b8">360</text>
+          <text x="850" y="144" fill="#94a3b8">350</text>
+          <text x="850" y="184" fill="#94a3b8">340</text>
+          <text x="850" y="224" fill="#94a3b8">320</text>
+
+          <text x="60" y="250" fill="#94a3b8">D0</text>
+          <text x="170" y="250" fill="#94a3b8">D1</text>
+          <text x="280" y="250" fill="#94a3b8">D2</text>
+          <text x="390" y="250" fill="#00e5ff" font-weight="bold">D3 (NOW)</text>
+          <text x="500" y="250" fill="#94a3b8">D4</text>
+          <text x="610" y="250" fill="#94a3b8">D5</text>
+          <text x="720" y="250" fill="#94a3b8">D6</text>
+          <text x="825" y="250" fill="#94a3b8">D7</text>
+
+          <line x1="415" y1="15" x2="415" y2="230" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+          <polyline fill="none" stroke="#00e5ff" stroke-width="3"
+            points="65,175  175,125  285,55  415,15  525,85  635,175  745,230  830,205" />
+
+          <polyline fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,4"
+            points="65,195  175,145  285,75  415,15  525,95  635,180  745,230  830,205" />
+
+          <circle cx="415" cy="15" r="5" fill="#ff0055" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 8%;">ID</th>
+            <th style="width: 42%;">Hypothesis Premise &amp; Mechanics</th>
+            <th style="width: 50%;">Falsification Condition / Adversarial Invalidation Gate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>F-01</strong></td>
+            <td><strong>Duration Overshoot:</strong> Challenger yields crest aggressively at D3 before rapid policy-driven reversal.</td>
+            <td>Invalidated if D4 terminal yields persist &gt;5.25% under non-flight conditions.</td>
+          </tr>
+          <tr>
+            <td><strong>F-02</strong></td>
+            <td><strong>Credit-Spread Divergence:</strong> Spread widening can pause even as duration volatility hits peak conflagration.</td>
+            <td>Invalidated if HY credit default swaps decouple &gt;45 bps past unitranche ceilings.</td>
+          </tr>
+          <tr>
+            <td><strong>F-03</strong></td>
+            <td><strong>Informativeness Metric:</strong> Spread divergence relative to liquidity decay is more predictive than raw delta.</td>
+            <td>Invalidated if multi-factor variance analysis yields attribution &lt;0.65 to duration vector.</td>
+          </tr>
+          <tr>
+            <td><strong>F-04</strong></td>
+            <td><strong>Convexity Dislocation:</strong> Localized geopolitical action induces a short-lived macro convexity shock.</td>
+            <td>Invalidated if cross-market equity vol stays depressed below historical 2-sigma thresholds.</td>
+          </tr>
+          <tr>
+            <td><strong>F-05</strong></td>
+            <td><strong>Path-Dependent Normalization:</strong> Reversion gradient retains higher information entropy than peak size.</td>
+            <td>Invalidated if recovery path matches linear mean-reversion with zero lag hysteresis.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>FORECAST INTEGRITY: HYPOTHESES QUARANTINED</div>
+      <div>PAGE 3 OF 6</div>
+    </footer>
+  </section>
+
+  <!-- PAGE 4: RECURSIVE LEARNING LOOP -->
+  <section class="page" id="page-4">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">Section 3: Governed Recursive Learning Architecture</div>
+        </div>
+        <div class="header-meta">
+          <div>PIPELINE: G12 &rarr; C5 ADMISSION</div>
+          <div>INVARIANT: IMMUTABLE HISTORICAL STATE</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="panel">
+        <div class="panel-title">Deterministic Authority &amp; Pipeline Constraints</div>
+        <p>Learning updates are strictly downstream of verification. Pipeline stages C0&ndash;C3 generate exploratory insights; gate G12 isolates hypotheses; stages C4&ndash;C5 perform deterministic arithmetic and policy validation; C6 commits an unmodifiable Decision Artifact. Learning updates are evaluated post-commit by gate G13.</p>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Execution Stage</th>
+            <th style="width: 40%;">Primary Control &amp; Operation</th>
+            <th style="width: 35%;">Generated Output &amp; State Token</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>C0&ndash;C1 Sense / Estimate</strong></td>
+            <td>Observe X; generate <code>ModelEvidenceEnvelope</code> with pinned schema and cutoff.</td>
+            <td>Cryptographically signed evidence token.</td>
+          </tr>
+          <tr>
+            <td><strong>G12 Isolation Gate</strong></td>
+            <td>Partition model weights, policies, and hypotheses; block state mutation.</td>
+            <td>Isolated hypothesis sandbox.</td>
+          </tr>
+          <tr>
+            <td><strong>C2&ndash;C3 Believe / Hypothesize</strong></td>
+            <td>Synthesize belief state Z; project candidate challenger trajectories.</td>
+            <td>Candidate forecast vectors (F-01..F-05).</td>
+          </tr>
+          <tr>
+            <td><strong>C4&ndash;C5 Resolve / Admit</strong></td>
+            <td>Verify arithmetic, evaluate adversarial limits, and enforce policy boundaries.</td>
+            <td>Governed execution verdict.</td>
+          </tr>
+          <tr>
+            <td><strong>C6 Commit Artifact</strong></td>
+            <td>Generate permanent decision artifact with decision hash H<sub>D</sub> and causal hash H<sub>C</sub>.</td>
+            <td>Immutable Decision Artifact.</td>
+          </tr>
+          <tr>
+            <td><strong>G13 Recursive Learning</strong></td>
+            <td>Replay execution outcome; attribute delta across axes; register bounded update.</td>
+            <td>Bounded policy update candidate.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="panel" style="margin-top: 12px;">
+        <div class="panel-title">Governed Recursive Update Invariant</div>
+        <p>In all learning iterations, exactly one causal dimension is varied while keeping world state, evidence records, and governance policies locked. The historical simulation is replayed, decision hashes are reconciled, and any attributable delta is measured. No probabilistic algorithm, vector score, or generative agent can mutate baseline models without deterministic sign-off.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>PIPELINE STATE: GOVERNED &amp; ISOLATED</div>
+      <div>PAGE 4 OF 6</div>
+    </footer>
+  </section>
+
+  <!-- PAGE 5: DRIFT DECOMPOSITION & HARNESS -->
+  <section class="page" id="page-5">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">Section 4: Drift Decomposition &amp; Adversarial Harness</div>
+        </div>
+        <div class="header-meta">
+          <div>MODE: CONTROLLED PERTURBATION</div>
+          <div>HARNESS SUITE: FULL REPLAY D3</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Perturbed Axis</th>
+            <th>Fixed Parameters</th>
+            <th>Diagnostic Test Procedure</th>
+            <th>Admission Signal Trigger</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Evidence</strong></td>
+            <td>Model, Policy, World</td>
+            <td>Temporal poisoning and evidence synthetic mutation.</td>
+            <td>&Delta;Decision + Full provenance audit</td>
+          </tr>
+          <tr>
+            <td><strong>Model</strong></td>
+            <td>Evidence, Policy, World</td>
+            <td>Challenger v4 run pinned against Baseline v3.</td>
+            <td>ModelDrift attribution score</td>
+          </tr>
+          <tr>
+            <td><strong>Policy</strong></td>
+            <td>Evidence, Model, World</td>
+            <td>Differential policy rule evaluation on replay.</td>
+            <td>PolicyDrift verification score</td>
+          </tr>
+          <tr>
+            <td><strong>World</strong></td>
+            <td>Evidence, Model, Policy</td>
+            <td>Counterfactual macro injection &amp; shock parameterization.</td>
+            <td>World-shock sensitivity delta</td>
+          </tr>
+          <tr>
+            <td><strong>Graph</strong></td>
+            <td>Node values &amp; states</td>
+            <td>Dependency disruption &amp; topological perturbation.</td>
+            <td>Causal-path stability index</td>
+          </tr>
+          <tr>
+            <td><strong>Retrieval</strong></td>
+            <td>Downstream layers</td>
+            <td>Synthetic context corruption &amp; embedding manipulation.</td>
+            <td>Evidence sufficiency &ge; 0.98</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="panel">
+        <div class="panel-title">Adversarial Evaluation Corpus</div>
+        <p style="font-family: var(--font-mono); font-size: 10px; line-height: 1.8; color: #cbd5e1;">
+          PROMPT INJECTION &bull; SYNTHETIC TEMPORAL POISONING &bull; ENTITY COLLISION &bull; OUT-OF-DISTRIBUTION VOLATILITY &bull; ADVERSARIAL SPREAD MANIPULATION &bull; POLICY GATE BYPASS &bull; GRAPH CYCLE PERTURBATION &bull; RETRIEVAL DRIFT &bull; TOKEN CORRUPTION
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Benchmark Metrics &amp; Diagnostic Measures</div>
+        <p>The verification harness evaluates attribution accuracy, causal path determinism, false-alarm frequency across credit tranches, adversarial resilience, and stability against policy regressions. Any run failing reproducibility under exact seed parameters is discarded.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>TEST MATRIX: EVALUATION HARNESS COMPLETE</div>
+      <div>PAGE 5 OF 6</div>
+    </footer>
+  </section>
+
+  <!-- PAGE 6: TELEMETRY & PROVENANCE -->
+  <section class="page" id="page-6">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1 class="doc-title">Market Mayhem</h1>
+          <div class="doc-subtitle">Section 5: Provenance, Telemetry &amp; Execution Audit</div>
+        </div>
+        <div class="header-meta">
+          <div>PROV-O: W3C SPEC COMPLIANT</div>
+          <div>STATUS: CERTIFIED COMMIT</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="terminal-trace">
+        <div><span class="step-num">001</span><span class="kw">INIT</span> Market Mayhem v4 harness; temporal anchor: 2026-09-26</div>
+        <div><span class="step-num">002</span><span class="kw">RETRIEVE</span> Qdrant context collection: <code>credit_spreads/macro_shocks</code></div>
+        <div><span class="step-num">003</span><span class="kw">VALIDATE</span> Default probability curve (10,000 synthetic Monte Carlo iterations)</div>
+        <div><span class="step-num">004</span><span class="kw">CROSSCHECK</span> PennyLane &amp; Qiskit distribution validation gates</div>
+        <div><span class="step-num">005</span><span class="kw">INJECT</span> Operation Absolute Resolve duration conflagration vector</div>
+        <div><span class="step-num">006</span><span class="kw">REPLAY</span> seed-42/D3/historical temporal state verified</div>
+        <div><span class="step-num">007</span><span class="kw">FORECAST</span> Synthesize hypotheses F-01..F-05 under isolation</div>
+        <div><span class="step-num">008</span><span class="kw">VERIFY</span> Deterministic arithmetic + policy checks completed</div>
+        <div><span class="step-num">009</span><span class="kw">COMMIT</span> Immutable DecisionArtifact (H<sub>D</sub>: <code>a8f2..91c0</code>, H<sub>C</sub>: <code>7e3d..44b1</code>)</div>
+        <div><span class="step-num">010</span><span class="kw">EVALUATE</span> Six-axis drift decomposition across model and policy boundaries</div>
+        <div><span class="step-num">011</span><span class="kw">LEARN</span> G13 isolated review &mdash; bounds accepted</div>
+        <div><span class="step-num">012</span><span class="kw">PERSIST</span> Full provenance graph and canonical sha256 committed</div>
+      </div>
+
+      <table class="data-table" style="margin-top: 12px;">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Artifact Token</th>
+            <th style="width: 75%;">Structural Role &amp; Deterministic Constraint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>H_D</code></td>
+            <td>Decision Hash: byte-stable state fingerprint; independent of thread timing.</td>
+          </tr>
+          <tr>
+            <td><code>H_C</code></td>
+            <td>Causal Hash: preserves step-by-step lineage isolated from evidence source data.</td>
+          </tr>
+          <tr>
+            <td><code>State Slice D3</code></td>
+            <td>Temporal world state at September 26, 2026; unmodifiable historical snapshot.</td>
+          </tr>
+          <tr>
+            <td><code>DecisionArtifact</code></td>
+            <td>Governed deliverable; cannot be overwritten by subsequent learning loops.</td>
+          </tr>
+          <tr>
+            <td><code>G13 Gate</code></td>
+            <td>Recursive learning guard requiring deterministic verification to update bounds.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="panel" style="font-family: var(--font-mono); font-size: 10px; margin-top: 12px;">
+        <div class="panel-title">Canonical Artifact Integrity Hash</div>
+        <p style="word-break: break-all; color: var(--accent-cyan); font-weight: bold;">
+          SHA256: 82dc99a14f3b72ea91bc3501a3cf88562d90e24177cb25e89d1469e38fbb230e
+        </p>
+        <p style="margin-top: 6px; font-size: 9px; color: var(--text-muted);">
+          PROV-O Execution Agent: Adam05 &bull; Telemetry trace certified under temporal epistemic control guidelines.
+        </p>
+      </div>
+    </div>
+
+    <footer>
+      <div>ADAM / TEMPORAL EPISTEMIC CONTROL</div>
+      <div>SYSTEM AUDIT: 100% REPRODUCIBLE</div>
+      <div>PAGE 6 OF 6</div>
+    </footer>
+  </section>
+
+</body>
+</html>
