@@ -366,3 +366,15 @@ The objective of ADAM is not to force inherently stochastic or heuristic neural 
 $$\boxed{\text{ADAM makes non-determinism epistemically visible, temporally bounded, provenance-constrained, and authority-isolated.}}$$
 
 ADAM functions as an append-only epistemic state machine with a closed authority loop: probabilistic models hypothesize, deterministic kernels verify, cryptographic signatures commit, and empirical outcomes reconcile.
+
+## 9. Implementation Mapping Matrix
+
+| Formal Layer | Governance Authority | Enforcing Construct | Mathematical / Operational Guarantee |
+|---|---|---|---|
+| C_0 | Evidence Authority | Append-only Hash-chained Storage | Monotonic integrity; preserves t_e vs. t_k chronology |
+| C_1 – C_3 | None (Non-Authoritative) | Isolated Processes; Zero Authority Tokens | Probabilistic outputs cannot call external tools or mutate state |
+| G_{12} Boundary | Admission | Structural Rust Type Barriers | Rejects forged provenance or elevated permissions |
+| C_4 | Verification Authority | Integer Basis-Point Solvers (BasisPoints) | Deterministic mathematical validation; zero IEEE 754 drift |
+| C_5 | Policy Authority | AST Matchers & Degraded Mode Fallbacks | Preempts epistemic lockup; automated restatement unrolling |
+| C_6 | Execution Authority | Signed State Transition Ledger | Provably unbroken W3C PROV-O hash chaining |
+| C_7 | Audit Authority | Telemetry Settlement Reconciler | Reconciles fills against commits; logs deltas into C_0' |
