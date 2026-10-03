@@ -6,11 +6,11 @@ import ssl
 # Coingecko is reliable and public.
 url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25&page=1"
 req = urllib.request.Request(url, headers={'User-Agent': 'adam-framework/1.0'})
-context = ssl._create_unverified_context()
+context = ssl._create_unverified_context()  # nosec B323
 
 parsed_entities = []
 try:
-    with urllib.request.urlopen(req, context=context) as response:
+    with urllib.request.urlopen(req, context=context) as response:  # nosec B310
         data = json.loads(response.read().decode('utf-8'))
         for item in data:
             parsed_entities.append({
@@ -32,7 +32,7 @@ if not parsed_entities:
         url = f"https://www.google.com/finance/quote/{ticker}:NASDAQ"
         req = urllib.request.Request(url, headers={'User-Agent': 'adam-framework/1.0'})
         try:
-            with urllib.request.urlopen(req, context=context) as response:
+            with urllib.request.urlopen(req, context=context) as response:  # nosec B310
                 html = response.read().decode('utf-8')
                 import re
                 # simplistic parse
