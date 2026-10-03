@@ -1,6 +1,6 @@
 import json
-from dataclasses import asdict, dataclass
-from typing import Any, Dict, List
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 @dataclass
 class CapitalStructureInput:
@@ -26,6 +26,14 @@ class MacroClearingInput:
   brent_crude_usd: float
   vix_level: float
   cdx_hy_spread_bps: float
+  trailing_5d_spx: List[float] = field(default_factory=lambda: [7665.20, 7640.10, 7680.45, 7665.28, 7721.58])
+  trailing_5d_us10y: List[float] = field(default_factory=lambda: [5.221, 5.245, 5.250, 5.233, 5.276])
+  trailing_5d_brent: List[float] = field(default_factory=lambda: [98.40, 99.80, 101.10, 102.31, 102.25])
+  trailing_5d_cdx_hy: List[float] = field(default_factory=lambda: [388.0, 391.0, 393.0, 396.0, 395.0])
+  us10y_yoy_delta_bps: float = 115.6
+  nfp_3m_avg_yoy_delta: int = -113000
+  brent_yoy_pct_change: float = 30.3
+  spx_forward_pe_yoy_delta: float = 2.4
 
 class CreditStressEngine:
 
@@ -178,40 +186,40 @@ def generate_headline_arena_payload(
     macro: MacroClearingInput,
 ) -> Dict[str, Any]:
   return {
-      "timestamp": "2026-09-23T17:15:00Z",
-      "regime": "Sovereign Supply Indigestion & Inflation Shock",
+      "timestamp": "2026-10-02T17:30:00Z",
+      "regime": "Sovereign Supply Indigestion & 5-Week Treasury Yield Streak",
       "predictions": [
           {
               "target": "US_10Y_YIELD",
               "current_spot": macro.us_10y_yield_pct,
-              "arena_point_forecast": 5.18,
+              "arena_point_forecast": 5.35,
               "horizon": "5D",
               "bias": "EXPANSION",
-              "confidence_interval": [5.05, 5.25],
+              "confidence_interval": [5.22, 5.42],
           },
           {
               "target": "BRENT_CRUDE_PROMPT",
               "current_spot": macro.brent_crude_usd,
-              "arena_point_forecast": 96.50,
+              "arena_point_forecast": 104.50,
               "horizon": "5D",
-              "bias": "NEUTRAL",
-              "confidence_interval": [92.00, 102.00],
+              "bias": "BULLISH",
+              "confidence_interval": [98.00, 110.00],
           },
           {
               "target": "SPX_INDEX_MULTIPLE",
               "current_spot": macro.spx_level,
-              "arena_point_forecast": 7560.00,
+              "arena_point_forecast": 7540.00,
               "horizon": "10D",
               "bias": "COMPRESSION",
-              "confidence_interval": [7480.00, 7640.00],
+              "confidence_interval": [7460.00, 7620.00],
           },
           {
               "target": "CDX_NA_HY_SPREAD",
               "current_spot": macro.cdx_hy_spread_bps,
-              "arena_point_forecast": 415.0,
+              "arena_point_forecast": 425.0,
               "horizon": "5D",
               "bias": "WIDENING",
-              "confidence_interval": [400.0, 435.0],
+              "confidence_interval": [410.0, 445.0],
           },
       ],
   }
@@ -222,18 +230,33 @@ def generate_ledger_payload(engine: CreditStressEngine, macro: MacroClearingInpu
     headline_arena = generate_headline_arena_payload(macro)
 
     return {
-        "ledger_id": "MM-V30-20260923-SYSCORE",
-        "timestamp": "2026-09-23T17:15:00Z",
+        "ledger_id": "MM-V30-20261002-SYSCORE",
+        "timestamp": "2026-10-02T17:30:00Z",
         "system_status": "CRITICAL",
-        "macro_regime": "SOVEREIGN_SUPPLY_INDIGESTION_HOT_PMI_SHOCK",
+        "macro_regime": "SOVEREIGN_SUPPLY_INDIGESTION_5W_YIELD_STREAK",
         "clearing_metrics": {
             "spx_close": macro.spx_level,
-            "nasdaq_close": 26936.04,
+            "dow_close": 51177.30,
+            "nasdaq_close": 30779.58,
             "us10y_yield": macro.us_10y_yield_pct,
-            "us2y_yield": 4.862,
+            "us2y_yield": 4.840,
+            "us30y_yield": 5.620,
             "sofr_rate": macro.sofr_cash_pct,
             "brent_usd": macro.brent_crude_usd,
+            "wti_usd": 90.50,
             "cdx_hy_bps": macro.cdx_hy_spread_bps
+        },
+        "trailing_5d_series": {
+            "spx": macro.trailing_5d_spx,
+            "us10y_yield": macro.trailing_5d_us10y,
+            "brent_usd": macro.trailing_5d_brent,
+            "cdx_hy_bps": macro.trailing_5d_cdx_hy
+        },
+        "yoy_comparative_metrics": {
+            "us10y_yield_yoy_delta_bps": macro.us10y_yoy_delta_bps,
+            "nfp_3m_avg_yoy_delta": macro.nfp_3m_avg_yoy_delta,
+            "brent_yoy_pct_change": macro.brent_yoy_pct_change,
+            "spx_forward_pe_yoy_delta": macro.spx_forward_pe_yoy_delta
         },
         "quantitative_credit_stress": {
             "total_debt_m": engine.cs.total_debt,
@@ -264,7 +287,7 @@ if __name__ == "__main__":
       senior_floating_spread_bps=450.0,
       senior_fixed_pct=0.40,
       senior_fixed_coupon_pct=5.00,
-      base_sofr_pct=0.0389,
+      base_sofr_pct=0.0388,
       ebitda=280.00,
       maintenance_capex=90.00,
       mandatory_amort_pct=0.01,
@@ -272,12 +295,12 @@ if __name__ == "__main__":
       hazard_rates=[0.145, 0.220, 0.315],
   )
   macro = MacroClearingInput(
-      spx_level=7706.03,
-      us_10y_yield_pct=5.10,
-      sofr_cash_pct=3.85,
-      brent_crude_usd=98.49,
-      vix_level=16.15,
-      cdx_hy_spread_bps=388.0,
+      spx_level=7721.58,
+      us_10y_yield_pct=5.276,
+      sofr_cash_pct=3.88,
+      brent_crude_usd=102.25,
+      vix_level=15.31,
+      cdx_hy_spread_bps=395.0,
   )
 
   engine = CreditStressEngine(corp)
