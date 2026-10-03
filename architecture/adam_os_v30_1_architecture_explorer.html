@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM OS v30.1 | Architecture & Dependency Explorer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            amber: '#d97706',
+                            emerald: '#059669',
+                            rose: '#e11d48',
+                            indigo: '#4f46e5',
+                            cyan: '#0891b2'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart Container Constraints Styling -->
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+            }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Slate & Institutional Warm Amber -->
+    <!-- Application Structure Plan: The SPA is organized into five core thematic zones for exploring ADAM OS v30.1:
+         1. Architectural Overview & Environmental Isolation (Path A vs Path B, System 1 vs System 2 comparative radar chart).
+         2. Autonomous Conviction Simulator (Interactive slider for Confidence score C, Dual Model PD inputs, and live state routing).
+         3. Dependency Ecosystem & Lockfile Matrix (Interactive catalog of adam-project v23.5.0 lockfile packages, category distribution chart, and Python 3.11/3.12 marker resolution inspector).
+         4. MCP Tool Registry & Covenant Sandbox (Interactive covenant headroom calculator, live bar chart, and tool schema registry).
+         5. W3C PROV-O Audit Log & Cryptographic Lineage (Append-only audit trail viewer with live SHA256 entry modal).
+         This structure provides clear navigation between architectural governance, machine learning dependencies, and fiduciary controls. -->
+    <!-- Visualization & Content Choices: 
+         - Report Info: System 1 vs System 2 Metrics -> Radar Chart (Chart.js Canvas) -> Compares latency, determinism, and stateful depth.
+         - Report Info: Lockfile Dependencies -> Donut Chart (Chart.js Canvas) -> Visualizes distribution of package clusters (AI, MCP, Data, Quant, GPU).
+         - Report Info: Confidence Tiers -> Interactive Conviction Simulator -> Dynamically calculates tier routing (Autonomous, HITL, Abort).
+         - Report Info: MCP Covenant Tool -> Interactive Calculator + Bar Chart (Chart.js Canvas) -> Live leverage and FCCR headroom evaluation.
+         - Report Info: Audit Trail -> W3C PROV-O Append Log -> Interactive HTML list with live SHA256 modal commitment.
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All icons are rendered using Unicode symbols or CSS badges. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 border-b border-slate-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                        ADAM OS <span class="text-xs px-2 py-0.5 rounded bg-indigo-900 text-indigo-200 border border-indigo-700 font-mono">v30.1</span>
+                    </span>
+                    <span class="hidden md:inline-block text-slate-400 text-xs border-l border-slate-700 pl-3 italic">
+                        "Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."
+                    </span>
+                </div>
+                <nav class="hidden lg:flex space-x-1" id="desktop-nav">
+                    <button onclick="switchTab('tab-architecture')" id="nav-tab-architecture" class="nav-btn px-3 py-2 rounded-md text-sm font-medium transition-colors bg-slate-800 text-white border-b-2 border-indigo-500">
+                        1. Architecture
+                    </button>
+                    <button onclick="switchTab('tab-conviction')" id="nav-tab-conviction" class="nav-btn px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+                        2. Conviction Tiers
+                    </button>
+                    <button onclick="switchTab('tab-dependencies')" id="nav-tab-dependencies" class="nav-btn px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+                        3. Lockfile Ecosystem
+                    </button>
+                    <button onclick="switchTab('tab-mcp')" id="nav-tab-mcp" class="nav-btn px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+                        4. MCP Sandbox
+                    </button>
+                    <button onclick="switchTab('tab-audit')" id="nav-tab-audit" class="nav-btn px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-300 hover:text-white hover:bg-slate-800">
+                        5. Audit & Lineage
+                    </button>
+                </nav>
+                <div class="flex items-center gap-2 text-xs font-mono bg-slate-800 px-2.5 py-1.5 rounded border border-slate-700">
+                    <span class="text-slate-400">STACK:</span>
+                    <span class="text-emerald-400 font-semibold">adam-project v23.5.0</span>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation bar -->
+        <div class="lg:hidden flex overflow-x-auto bg-slate-950 px-2 py-2 border-t border-slate-800 space-x-1 text-xs">
+            <button onclick="switchTab('tab-architecture')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-white whitespace-nowrap">Architecture</button>
+            <button onclick="switchTab('tab-conviction')" class="mobile-nav-btn px-3 py-1.5 rounded text-slate-400 hover:bg-slate-800 whitespace-nowrap">Conviction</button>
+            <button onclick="switchTab('tab-dependencies')" class="mobile-nav-btn px-3 py-1.5 rounded text-slate-400 hover:bg-slate-800 whitespace-nowrap">Dependencies</button>
+            <button onclick="switchTab('tab-mcp')" class="mobile-nav-btn px-3 py-1.5 rounded text-slate-400 hover:bg-slate-800 whitespace-nowrap">MCP Sandbox</button>
+            <button onclick="switchTab('tab-audit')" class="mobile-nav-btn px-3 py-1.5 rounded text-slate-400 hover:bg-slate-800 whitespace-nowrap">Audit Log</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Banner Summary Callout -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-xl p-6 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-500/20 text-indigo-300 text-xs font-mono font-semibold px-2.5 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wider">
+                            Tier 1 G-SIB Fiduciary Frame
+                        </span>
+                        <span class="text-slate-400 text-xs font-mono">Requires Python &ge;3.11, &lt;3.13</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">ADAM OS v30.1 Specification & Ecosystem Explorer</h1>
+                    <p class="mt-2 text-slate-300 text-sm max-w-3xl leading-relaxed">
+                        An interactive operational dashboard for analyzing fiduciary execution, environmental isolation (Path A vs. Path B), neuro-symbolic cognitive graphs, MCP tool routing, and the <code class="text-indigo-200 font-mono">adam-project v23.5.0</code> dependency stack.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 min-w-[240px] font-mono text-xs">
+                    <div class="bg-slate-800/80 p-2.5 rounded border border-slate-700/80">
+                        <div class="text-slate-400 text-[10px]">LOCKED PACKAGES</div>
+                        <div class="text-emerald-400 font-bold text-base mt-0.5">95+ Dependencies</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2.5 rounded border border-slate-700/80">
+                        <div class="text-slate-400 text-[10px]">CONVICTION THRESHOLD</div>
+                        <div class="text-amber-400 font-bold text-base mt-0.5">C &ge; 0.85</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2.5 rounded border border-slate-700/80">
+                        <div class="text-slate-400 text-[10px]">AOF RECURSION LIMIT</div>
+                        <div class="text-indigo-300 font-bold text-base mt-0.5">8 Cycles</div>
+                    </div>
+                    <div class="bg-slate-800/80 p-2.5 rounded border border-slate-700/80">
+                        <div class="text-slate-400 text-[10px]">TOKEN BUDGET LIMIT</div>
+                        <div class="text-indigo-300 font-bold text-base mt-0.5">150k Tokens</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: ARCHITECTURE & BIFURCATION -->
+        <!-- ========================================================================= -->
+        <section id="tab-architecture" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-indigo-600 font-mono text-lg">01.</span> Core Architectural Mandates & System Bifurcation
+                </h2>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    This section details the fundamental structural mandates of ADAM OS v30.1. To guarantee Tier 1 G-SIB financial reliability, the system strictly separates fiduciary production execution (<strong>Path A</strong>) from rapid experimental discovery (<strong>Path B</strong>). Furthermore, cognitive processing is bifurcated between an asynchronous autonomic neural swarm (<strong>System 1</strong>) and a stateful neuro-symbolic graph orchestrator (<strong>System 2</strong>).
+                </p>
+            </div>
+
+            <!-- Path A vs Path B Isolation Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Path A Card -->
+                <div class="bg-white rounded-xl shadow-sm border-2 border-emerald-500/30 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-mono font-bold px-3 py-1 rounded-bl">
+                        PRODUCTION / FIDUCIARY
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg font-mono">
+                            A
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Path A: The Core</h3>
+                            <p class="text-xs text-slate-500 font-mono">core/agents/ | core/credit_sentinel/</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3 text-sm">
+                        <div>
+                            <span class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Mandate:</span>
+                            <p class="text-slate-600 text-xs mt-0.5">Deterministic execution, zero hallucination, and Tier 1 G-SIB reliability standards.</p>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Functional Scope:</span>
+                            <p class="text-slate-600 text-xs mt-0.5">Underwriting, capital sizing, covenant compliance, and portfolio surveillance.</p>
+                        </div>
+                        <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200/60">
+                            <span class="font-semibold text-emerald-900 text-xs uppercase tracking-wide block mb-1">Non-Negotiable Invariants:</span>
+                            <ul class="text-xs text-emerald-800 space-y-1 list-disc list-inside">
+                                <li>Strict Pydantic type safety at all I/O boundaries</li>
+                                <li>Mandatory <code class="bg-emerald-100 px-1 rounded text-emerald-900 font-mono">try/except</code> wrappers around external calls</li>
+                                <li>W3C PROV-O audit trails committed before node exit</li>
+                                <li>Zero unhandled exceptions or procedural fallback</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path B Card -->
+                <div class="bg-white rounded-xl shadow-sm border-2 border-indigo-500/30 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-mono font-bold px-3 py-1 rounded-bl">
+                        LAB / EXPERIMENTAL
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-lg font-mono">
+                            B
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Path B: The Lab</h3>
+                            <p class="text-xs text-slate-500 font-mono">experimental/ | research/ | tinker_lab/</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3 text-sm">
+                        <div>
+                            <span class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Mandate:</span>
+                            <p class="text-slate-600 text-xs mt-0.5">Rapid discovery, maximal token throughput, and exploratory swarm optimization.</p>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Functional Scope:</span>
+                            <p class="text-slate-600 text-xs mt-0.5">Novel agentic topologies, synthetic financial stress testing, and experimental models.</p>
+                        </div>
+                        <div class="bg-rose-50 p-3 rounded-lg border border-rose-200/60">
+                            <span class="font-semibold text-rose-900 text-xs uppercase tracking-wide block mb-1">Strict Isolation Rule:</span>
+                            <p class="text-xs text-rose-800 font-medium">
+                                Code resident in Path B <strong>must never</strong> be imported into Path A under any circumstance. Boundary violations trigger immediate PR rejection in CI/CD.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System 1 vs System 2 Cognitive Breakdown -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <div class="lg:col-span-5 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-900">Decoupled Cognitive Engine Performance</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        ADAM OS v30.1 rejects monolithic synchronous loops in favor of a bifurcated model balancing sub-second reflexes with state-preserving deep reasoning.
+                    </p>
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-center justify-between font-bold text-slate-800">
+                                <span class="flex items-center gap-1.5 text-xs">
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                    System 1: Neural Swarm
+                                </span>
+                                <span class="text-slate-500 font-mono text-[11px]">&lt; 100ms Latency</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 mt-1">
+                                Asynchronous Python Pub/Sub (<code class="bg-slate-200 px-1 rounded text-slate-800 font-mono">AsyncAgentBase</code>) driving real-time SEC EDGAR feeds and deal premium volatility skews.
+                            </p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-center justify-between font-bold text-slate-800">
+                                <span class="flex items-center gap-1.5 text-xs">
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                                    System 2: Neuro-Symbolic Graph
+                                </span>
+                                <span class="text-slate-500 font-mono text-[11px]">Stateful / Deterministic</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 mt-1">
+                                Temporal workflow DAGs backed by Qdrant JIT vector memory executing multi-scenario cash flow modeling and covenant headroom evaluation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparative Chart -->
+                <div class="lg:col-span-7 flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-2 px-2">
+                        <span class="text-xs font-semibold text-slate-700">Cognitive Profile Benchmark</span>
+                        <span class="text-[10px] text-slate-400 font-mono">Canvas Chart.js Render</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cognitiveRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: AUTONOMOUS CONVICTION TIERS & SIMULATOR -->
+        <!-- ========================================================================= -->
+        <section id="tab-conviction" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-indigo-600 font-mono text-lg">02.</span> Autonomous Confidence Tiers & Decision Rubric
+                </h2>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    Every analytical decision generated by an agent must emit an explicit conviction score ($C \in [0.0, 1.0]$) alongside its traceable reasoning lineage. The System Orchestrator evaluates this metric against constitutional thresholds to determine whether to execute autonomously, pause for human operator review (HITL), or trigger an immediate system abort.
+                </p>
+            </div>
+
+            <!-- Interactive Conviction Simulator Widget -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls Column -->
+                <div class="lg:col-span-6 space-y-5">
+                    <h3 class="text-md font-bold text-slate-900 border-b pb-2 flex items-center justify-between">
+                        <span>Decision Routing Simulator</span>
+                        <span class="text-xs font-mono font-normal bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Live Interactive Control</span>
+                    </h3>
+
+                    <!-- Slider for Conviction Score -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm font-medium">
+                            <label for="conviction-slider" class="text-slate-700">Primary Conviction Metric ($C$):</label>
+                            <span id="conviction-value-display" class="font-mono font-bold text-indigo-600 text-base bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-200">0.88</span>
+                        </div>
+                        <input id="conviction-slider" type="range" min="0.00" max="1.00" step="0.01" value="0.88" 
+                               oninput="updateConvictionSimulator()"
+                               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                            <span>0.00 (Hard Reject)</span>
+                            <span>0.50 (HITL Floor)</span>
+                            <span>0.85 (Autonomous Cutoff)</span>
+                            <span>1.00 (Perfect)</span>
+                        </div>
+                    </div>
+
+                    <!-- Dual Model PD Inputs for Divergence Calculation -->
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+                        <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block">Bidirectional Divergence Testing ($\|\text{Model}_\alpha - \text{Model}_\beta\| > \theta$)</span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="model-alpha-pd" class="block text-[11px] font-medium text-slate-600">Model Alpha PD ($PD_\alpha$):</label>
+                                <input id="model-alpha-pd" type="number" step="0.001" min="0" max="0.5" value="0.024" 
+                                       oninput="updateConvictionSimulator()"
+                                       class="mt-1 w-full text-xs font-mono px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="model-beta-pd" class="block text-[11px] font-medium text-slate-600">Model Beta PD ($PD_\beta$):</label>
+                                <input id="model-beta-pd" type="number" step="0.001" min="0" max="0.5" value="0.026" 
+                                       oninput="updateConvictionSimulator()"
+                                       class="mt-1 w-full text-xs font-mono px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-mono text-slate-600 pt-1">
+                            <span>System Divergence Threshold ($\theta$): <strong class="text-slate-800">0.015</strong></span>
+                            <span>Delta: <strong id="divergence-delta-display" class="text-slate-800">0.002</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Impact Context Selector -->
+                    <div>
+                        <label for="impact-level" class="block text-xs font-semibold text-slate-700">Action Impact Context:</label>
+                        <select id="impact-level" onchange="updateConvictionSimulator()" class="mt-1 w-full text-xs font-mono px-3 py-2 bg-white border border-slate-300 rounded-md">
+                            <option value="low">Low/Medium Impact (Covenant Surveillance, Data Fetching)</option>
+                            <option value="high">High Impact (Capital Commitment, Binding Regulatory Report)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Simulation Routing Outcome -->
+                <div class="lg:col-span-6 flex flex-col justify-between bg-slate-900 text-white rounded-xl p-6 relative overflow-hidden">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="text-xs font-mono text-slate-400">ROUTING ENGINE EVALUATION</span>
+                            <span id="routing-status-pill" class="text-xs font-mono px-2.5 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                                AUTONOMOUS EXECUTION
+                            </span>
+                        </div>
+
+                        <div>
+                            <div class="text-[11px] text-slate-400 font-mono uppercase tracking-wider">Target Pipeline Action</div>
+                            <div id="routing-action-title" class="text-lg font-bold text-white mt-0.5">
+                                Pipeline Proceeds Autonomously
+                            </div>
+                            <p id="routing-action-desc" class="text-xs text-slate-300 mt-1 leading-relaxed">
+                                Conviction score satisfies $C \ge 0.85$ and model divergence is within allowable threshold $\theta$. W3C PROV-O audit hash generated and committed to Temporal state.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950 p-3 rounded font-mono text-xs border border-slate-800 space-y-1">
+                            <div class="text-slate-500 text-[10px]">TELEMETRY CONTEXT GENERATED</div>
+                            <div class="text-slate-300">Action Event: <span id="telemetry-event" class="text-indigo-400">EXEC_AUTONOMOUS_PIPELINE</span></div>
+                            <div class="text-slate-300">Lineage Hash: <span id="telemetry-hash" class="text-emerald-400 text-[10px]">SHA256: 8f3a...c92b</span></div>
+                            <div class="text-slate-300">Arbitration Status: <span id="telemetry-arbitration" class="text-slate-200">PASS (No Divergence)</span></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">
+                        Rule Source: <code class="text-slate-200">CONSTITUTION.md Article II & Article VI</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: DEPENDENCY ECOSYSTEM & LOCKFILE MATRIX -->
+        <!-- ========================================================================= -->
+        <section id="tab-dependencies" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-indigo-600 font-mono text-lg">03.</span> Locked Dependency Stack Analysis (<code class="text-slate-700 font-mono">adam-project v23.5.0</code>)
+                </h2>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    This section analyzes the locked dependency ecosystem specified in the <code class="bg-slate-100 px-1 rounded font-mono text-slate-800">uv.lock</code> snapshot (revision 3). The core package targets <code class="bg-slate-100 px-1 rounded font-mono text-slate-800">Python &ge;3.11, &lt;3.13</code> with resolution markers handling conditional multi-agent dependencies (such as <code class="bg-slate-100 px-1 rounded font-mono text-slate-800">mesa</code> 3.3.1 for Python &lt;3.12 vs 3.5.0 for &ge;3.12).
+                </p>
+            </div>
+
+            <!-- Lockfile Overview Analytics Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Donut Chart -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-slate-800">Dependency Category Breakdown</span>
+                        <span class="text-[10px] font-mono text-slate-400">95 Locked Packages</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="depCategoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Python Resolution Marker Detail Card -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="text-md font-bold text-slate-900 flex items-center gap-2">
+                        <span>Resolution Markers & Conditional Pinned Specs</span>
+                        <span class="text-xs font-mono bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-200">uv lock revision = 3</span>
+                    </h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        The dependency resolution engine enforces deterministic environment boundaries for enterprise financial security and quantum credit modeling.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <span class="text-indigo-600 font-bold block">python_full_version &lt; '3.12'</span>
+                            <div class="text-slate-700">mesa == 3.3.1</div>
+                            <div class="text-slate-400 text-[10px]">PyPI Simple Registry</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <span class="text-indigo-600 font-bold block">python_full_version &ge; '3.12'</span>
+                            <div class="text-slate-700">mesa == 3.5.0</div>
+                            <div class="text-slate-400 text-[10px]">PyPI Simple Registry</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <span class="text-emerald-600 font-bold block">Accelerate Subsystem</span>
+                            <div class="text-slate-700">accelerate == 1.13.0</div>
+                            <div class="text-slate-400 text-[10px]">Py3 wheel / sdist sha256 verified</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                            <span class="text-emerald-600 font-bold block">Primary AI Engine</span>
+                            <div class="text-slate-700">pydantic == 2.11.10</div>
+                            <div class="text-slate-400 text-[10px]">fastapi==0.128.0 | openai==1.98.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filterable Package Matrix -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <h3 class="text-md font-bold text-slate-900">Package Ecosystem Search & Inspection</h3>
+                    <!-- Category Filters -->
+                    <div class="flex flex-wrap gap-1.5 text-xs font-mono">
+                        <button onclick="filterDeps('all')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-900 text-white font-medium">All</button>
+                        <button onclick="filterDeps('ai')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">AI & Swarms</button>
+                        <button onclick="filterDeps('mcp')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">MCP Standards</button>
+                        <button onclick="filterDeps('quant')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Quant & SEC</button>
+                        <button onclick="filterDeps('db')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">Data & Vector</button>
+                        <button onclick="filterDeps('gpu')" class="dep-filter-btn px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200">ML / GPU</button>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative">
+                    <input id="dep-search-input" type="text" placeholder="Search package by name (e.g. edgartools, dspy, fastmcp, qiskit, pydantic)..." 
+                           oninput="searchDependencies()"
+                           class="w-full text-xs font-mono px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                </div>
+
+                <!-- Package Grid Cards -->
+                <div id="dep-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <!-- Dynamic rendering by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: MCP TOOL REGISTRY & COVENANT SANDBOX -->
+        <!-- ========================================================================= -->
+        <section id="tab-mcp" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-indigo-600 font-mono text-lg">04.</span> Model Context Protocol (MCP) Tool Registry
+                </h2>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    To eliminate numerical hallucination, agents do not perform freeform generative arithmetic. Instead, financial ratio calculations, SEC statement parsing, and covenant headroom evaluations are delegated to deterministic tools registered in <code class="bg-slate-100 px-1 rounded font-mono text-slate-800">mcp.json</code>.
+                </p>
+            </div>
+
+            <!-- MCP Tool Interactive Calculator & Graph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Sandbox Inputs -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="border-b pb-2">
+                        <span class="text-xs font-mono text-indigo-600 font-bold uppercase tracking-wider block">Tool Execution Sandbox</span>
+                        <h3 class="text-lg font-bold text-slate-900">covenant_headroom_calculator</h3>
+                        <p class="text-xs text-slate-500 mt-1">Executes stateless jsonLogic rules to compute FCCR and leverage headroom.</p>
+                    </div>
+
+                    <form id="covenant-form" onsubmit="event.preventDefault(); calculateCovenantHeadroom();" class="space-y-3 text-xs">
+                        <div>
+                            <label for="input-ebitda" class="block font-semibold text-slate-700">Adjusted EBITDA ($M):</label>
+                            <input id="input-ebitda" type="number" value="145.0" step="0.5" class="mt-1 w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded font-mono focus:bg-white">
+                        </div>
+                        <div>
+                            <label for="input-debt" class="block font-semibold text-slate-700">Total Debt ($M):</label>
+                            <input id="input-debt" type="number" value="520.0" step="1.0" class="mt-1 w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded font-mono focus:bg-white">
+                        </div>
+                        <div>
+                            <label for="input-interest" class="block font-semibold text-slate-700">Interest Expense ($M):</label>
+                            <input id="input-interest" type="number" value="32.0" step="0.5" class="mt-1 w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded font-mono focus:bg-white">
+                        </div>
+                        <div>
+                            <label for="input-ruleset" class="block font-semibold text-slate-700">Governance Ruleset UUID:</label>
+                            <input id="input-ruleset" type="text" readonly value="qdrant-rule-fccr-2026-v30" class="mt-1 w-full px-3 py-2 bg-slate-100 text-slate-500 border border-slate-200 rounded font-mono text-[11px]">
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm">
+                            Execute MCP Tool Call
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Sandbox Chart & Output -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-slate-800">Dynamic Headroom Evaluation Chart</span>
+                            <span class="text-[10px] font-mono text-slate-400">Max Leverage Limit: 4.5x</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="covenantChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Output Details Card -->
+                    <div class="grid grid-cols-2 gap-3 font-mono text-xs">
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <div class="text-slate-500 text-[10px]">TOTAL LEVERAGE RATIO</div>
+                            <div id="output-leverage" class="text-base font-bold text-slate-900 mt-0.5">3.59x</div>
+                            <div id="output-leverage-status" class="text-[10px] text-emerald-600 font-semibold mt-0.5">Compliant (0.91x Headroom)</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200">
+                            <div class="text-slate-500 text-[10px]">FIXED CHARGE COVERAGE (FCCR)</div>
+                            <div id="output-fccr" class="text-base font-bold text-slate-900 mt-0.5">4.53x</div>
+                            <div id="output-fccr-status" class="text-[10px] text-emerald-600 font-semibold mt-0.5">Compliant (Min 1.25x req)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MCP Registry Tools Index -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <h3 class="text-md font-bold text-slate-900">Registered MCP Tools (<code class="font-mono text-slate-600">mcp.json</code> Schema)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="p-3.5 bg-slate-50 rounded border border-slate-200">
+                        <div class="font-mono font-bold text-indigo-700">financial_statement_parser</div>
+                        <p class="text-slate-600 mt-1">Extracts exact XBRL tags (EBITDA, Total Debt, Interest) from indexed SEC EDGAR filings via <code class="bg-slate-200 px-1 rounded font-mono">edgartools</code>.</p>
+                    </div>
+                    <div class="p-3.5 bg-slate-50 rounded border border-slate-200">
+                        <div class="font-mono font-bold text-indigo-700">divergence_validator</div>
+                        <p class="text-slate-600 mt-1">Evaluates bidirectional divergence between Model Alpha and Model Beta against system threshold $\theta$.</p>
+                    </div>
+                    <div class="p-3.5 bg-slate-50 rounded border border-slate-200">
+                        <div class="font-mono font-bold text-indigo-700">covenant_headroom_calculator</div>
+                        <p class="text-slate-600 mt-1">Executes stateless jsonLogic to derive FCCR and leverage headroom based on current balance sheet data.</p>
+                    </div>
+                    <div class="p-3.5 bg-slate-50 rounded border border-slate-200">
+                        <div class="font-mono font-bold text-indigo-700">prov_o_audit_logger</div>
+                        <p class="text-slate-600 mt-1">Commits cryptographic SHA256 hashes and reasoning lineage to Temporal state before node exit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: AUDIT LOG & LINEAGE VERIFICATION -->
+        <!-- ========================================================================= -->
+        <section id="tab-audit" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-indigo-600 font-mono text-lg">05.</span> W3C PROV-O Audit Log & Cryptographic Lineage
+                </h2>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    All system operations produce immutable, append-only audit entries. Every entry is stamped with cryptographic hashes, operator overrides, confidence scores, and strict source citations to ensure full institutional auditability.
+                </p>
+            </div>
+
+            <!-- Append-Only Audit Trail Viewer -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4">
+                    <div>
+                        <h3 class="text-md font-bold text-slate-900">System Audit & Operator Review Log</h3>
+                        <p class="text-xs text-slate-500 font-mono">File Target: audit_log.md | Protocol: ARCHITECT_INFINITE</p>
+                    </div>
+                    <button onclick="openMockLogModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded shadow-sm font-mono flex items-center gap-1">
+                        <span>+ Append Operator Review Entry</span>
+                    </button>
+                </div>
+
+                <!-- Audit Entries Container -->
+                <div id="audit-log-list" class="space-y-4 font-mono text-xs">
+                    <!-- Entry 0001 (From Source Report) -->
+                    <div class="p-4 bg-slate-900 text-slate-100 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-2 text-[11px]">
+                            <span class="text-emerald-400 font-bold">[ENTRY: 0001] - SYSTEM RATIFICATION & TOOLING INITIALIZATION</span>
+                            <span class="text-slate-400">TIMESTAMP: 2026-09-13T12:55:43 EDT</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-300">
+                            <div>LOCATION: <span class="text-slate-100">New York, NY, US</span></div>
+                            <div>ENVIRONMENT: <span class="text-slate-100">Adam OS v30.1.0 (Path A)</span></div>
+                            <div>MODEL: <span class="text-slate-100">Gemini 3.1 Pro (Paid Tier)</span></div>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded border border-slate-800 space-y-1.5 text-slate-300 text-[11px]">
+                            <div><strong>Action Context:</strong> Operator reviewed append-only log initialization for additional surgical tooling and autonomous agents.</div>
+                            <div><strong>Target Artifact:</strong> CONSTITUTION.md & adam-project v23.5.0 lockfile</div>
+                            <div><strong>Execution Summary:</strong> Constitutional baseline formally ratified. Validated isolation constraints (Path A vs. Path B), Pydantic mandates, and LaTeX threshold metrics ($C \ge 0.85$).</div>
+                            <div class="text-emerald-400"><strong>Conviction Score:</strong> C = 1.0 (Manual Operator Sign-off)</div>
+                        </div>
+                        <div class="text-[10px] text-slate-500 break-all pt-1 border-t border-slate-800/60">
+                            PROV-O LINEAGE HASH: <span class="text-indigo-300">SHA256: 7a9b3f2e1d4c6a8b0f5e9d2c1a3b5f7e4d6c8a0b2f1e3d5c7a9b1f3e5d7c9a2b</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono">
+            <div>ADAM OS v30.1 | Fiduciary Architectural Compliance Framework</div>
+            <div class="flex items-center gap-4">
+                <span>W3C PROV-O Lineage</span>
+                <span>Tier 1 G-SIB Standard</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal for Appending New Audit Log Entry -->
+    <div id="log-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-base font-bold text-slate-900">Append New Audit Entry</h3>
+                <button onclick="closeMockLogModal()" class="text-slate-400 hover:text-slate-600 font-mono text-lg font-bold">&times;</button>
+            </div>
+            <form id="new-log-form" onsubmit="event.preventDefault(); appendNewLog();" class="space-y-3 text-xs">
+                <div>
+                    <label for="modal-action" class="block font-semibold text-slate-700">Action Summary:</label>
+                    <input id="modal-action" type="text" required value="Executed lockfile dependency validation for adam-project v23.5.0." class="mt-1 w-full px-3 py-2 border rounded font-mono">
+                </div>
+                <div>
+                    <label for="modal-target" class="block font-semibold text-slate-700">Target Artifact / Agent:</label>
+                    <input id="modal-target" type="text" required value="uv.lock / core/credit_sentinel/governance.py" class="mt-1 w-full px-3 py-2 border rounded font-mono">
+                </div>
+                <div>
+                    <label for="modal-conviction" class="block font-semibold text-slate-700">Conviction Metric (C):</label>
+                    <input id="modal-conviction" type="number" step="0.01" min="0" max="1" value="0.95" class="mt-1 w-full px-3 py-2 border rounded font-mono">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeMockLogModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded font-semibold hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded font-semibold hover:bg-emerald-700">Commit Audit Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Package Data Store from adam-project v23.5.0 lockfile
+        const dependencyPackages = [
+            { name: "pydantic", spec: "==2.11.10", cat: "ai", desc: "Type validation & schema enforcement" },
+            { name: "pydantic-ai", spec: ">=0.1.0", cat: "ai", desc: "Agentic AI schema validation framework" },
+            { name: "pydantic-settings", spec: "==2.12.0", cat: "ai", desc: "Environment setting management" },
+            { name: "dspy", spec: "==3.0.4", cat: "ai", desc: "Declarative LM prompt compiler" },
+            { name: "dspy-ai", spec: "==3.0.4", cat: "ai", desc: "DSPy framework suite" },
+            { name: "langchain", spec: "==1.2.0", cat: "ai", desc: "Composable LLM orchestration" },
+            { name: "langgraph", spec: "==1.0.5", cat: "ai", desc: "Stateful multi-agent DAG engine" },
+            { name: "semantic-kernel", spec: "==1.39.0", cat: "ai", desc: "Microsoft enterprise agent kernel" },
+            { name: "anthropic", spec: ">=0.40.0", cat: "ai", desc: "Claude API client" },
+            { name: "openai", spec: "==1.98.0", cat: "ai", desc: "OpenAI GPT API client" },
+            { name: "mcp", spec: ">=1.0.0", cat: "mcp", desc: "Model Context Protocol core standard" },
+            { name: "fastmcp", spec: ">=0.1.0", cat: "mcp", desc: "High-throughput MCP server wrapper" },
+            { name: "edgartools", spec: "==5.8.1", cat: "quant", desc: "SEC EDGAR XBRL & filing parser" },
+            { name: "ccxt", spec: ">=4.5.0", cat: "quant", desc: "Crypto & market trading data stream" },
+            { name: "qiskit", spec: ">=1.2.0", cat: "quant", desc: "IBM Quantum computing SDK" },
+            { name: "qiskit-finance", spec: ">=0.4.0", cat: "quant", desc: "Quantum portfolio optimization" },
+            { name: "pyportfolioopt", spec: ">=1.5.5", cat: "quant", desc: "Mean-variance portfolio optimization" },
+            { name: "numpy-financial", spec: ">=1.0.0", cat: "quant", desc: "Elementary financial functions (NPV, IRR)" },
+            { name: "neo4j", spec: "==6.0.3", cat: "db", desc: "Graph database client for HDKG v30.1" },
+            { name: "duckdb", spec: "latest", cat: "db", desc: "In-process analytical SQL engine" },
+            { name: "redis", spec: "==7.1.0", cat: "db", desc: "Pub/Sub message broker & caching" },
+            { name: "sqlalchemy", spec: "==2.0.45", cat: "db", desc: "SQL ORM & database Abstraction" },
+            { name: "alembic", spec: "==1.17.2", cat: "db", desc: "Database schema migration engine" },
+            { name: "torch", spec: ">=2.0.0", cat: "gpu", desc: "Deep learning tensor computation framework" },
+            { name: "transformers", spec: "latest", cat: "gpu", desc: "Hugging Face transformer models" },
+            { name: "accelerate", spec: "==1.13.0", cat: "gpu", desc: "Distributed GPU multi-node training" },
+            { name: "bitsandbytes", spec: "latest", cat: "gpu", desc: "8-bit & 4-bit CUDA quantization" },
+            { name: "triton", spec: "latest", cat: "gpu", desc: "Parallel GPU kernel compiler" },
+            { name: "fastapi", spec: "==0.128.0", cat: "mcp", desc: "Asynchronous REST & WebSocket server" },
+            { name: "celery", spec: "==5.6.2", cat: "mcp", desc: "Distributed task queue processing" },
+            { name: "opentelemetry-api", spec: "==1.39.1", cat: "mcp", desc: "Enterprise telemetry & tracing" },
+            { name: "mesa", spec: "3.3.1 / 3.5.0", cat: "ai", desc: "Agent-based simulation (Marker dependent)" }
+        ];
+
+        // State variables
+        let radarChartInstance = null;
+        let depCategoryChartInstance = null;
+        let covenantChartInstance = null;
+        let entryCounter = 2;
+        let activeCategory = 'all';
+
+        // Init on DOM Content Loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initCognitiveRadarChart();
+            initDepCategoryChart();
+            initCovenantChart();
+            renderDependencies();
+            updateConvictionSimulator();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            const target = document.getElementById(tabId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white', 'border-b-2', 'border-indigo-500');
+                btn.classList.add('text-slate-300');
+            });
+            const activeNavBtn = document.getElementById(`nav-${tabId}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('bg-slate-800', 'text-white', 'border-b-2', 'border-indigo-500');
+                activeNavBtn.classList.remove('text-slate-300');
+            }
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Re-render charts on tab switch
+            if (tabId === 'tab-architecture' && radarChartInstance) {
+                radarChartInstance.resize();
+            } else if (tabId === 'tab-dependencies' && depCategoryChartInstance) {
+                depCategoryChartInstance.resize();
+            } else if (tabId === 'tab-mcp' && covenantChartInstance) {
+                covenantChartInstance.resize();
+            }
+        }
+
+        // Radar Chart Initialization (System 1 vs System 2)
+        function initCognitiveRadarChart() {
+            const ctx = document.getElementById('cognitiveRadarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Latency Speed', 'Determinism', 'Stateful Depth', 'Throughput', 'Auditability', 'Context Retention'],
+                    datasets: [
+                        {
+                            label: 'System 1 (Neural Swarm)',
+                            data: [95, 60, 40, 90, 70, 50],
+                            backgroundColor: 'rgba(217, 119, 6, 0.25)',
+                            borderColor: '#d97706',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#d97706'
+                        },
+                        {
+                            label: 'System 2 (Neuro-Symbolic Graph)',
+                            data: [45, 100, 95, 55, 100, 95],
+                            backgroundColor: 'rgba(79, 70, 229, 0.25)',
+                            borderColor: '#4f46e5',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#4f46e5'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e2e8f0' },
+                            grid: { color: '#e2e8f0' },
+                            pointLabels: {
+                                font: { size: 10, family: 'Inter' },
+                                color: '#475569'
+                            },
+                            ticks: { display: false, max: 100 }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label.length > 16) label = label.substring(0, 16) + '...';
+                                    return `${label}: ${context.raw}% rating`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dependency Category Donut Chart
+        function initDepCategoryChart() {
+            const ctx = document.getElementById('depCategoryChart').getContext('2d');
+            depCategoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AI & Agent Frameworks', 'MCP & Tool Protocols', 'Quant & Financial Engines', 'Data & Vector DBs', 'GPU & Core ML'],
+                    datasets: [{
+                        data: [28, 18, 22, 14, 18],
+                        backgroundColor: ['#4f46e5', '#0891b2', '#059669', '#d97706', '#e11d48'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10, family: 'Inter' }, boxWidth: 10 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    let label = ctx.label || '';
+                                    if (label.length > 16) label = label.substring(0, 16) + '...';
+                                    return `${label}: ${ctx.raw}% share`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render Dependency Cards Grid
+        function renderDependencies() {
+            const container = document.getElementById('dep-grid');
+            const query = document.getElementById('dep-search-input').value.toLowerCase();
+
+            const filtered = dependencyPackages.filter(item => {
+                const matchesCat = (activeCategory === 'all' || item.cat === activeCategory);
+                const matchesQuery = item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
+                return matchesCat && matchesQuery;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-mono text-xs">No matching lockfile packages found.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(pkg => `
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-slate-900">${pkg.name}</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded ${getCategoryBadgeStyle(pkg.cat)}">${pkg.spec}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-tight">${pkg.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryBadgeStyle(cat) {
+            switch(cat) {
+                case 'ai': return 'bg-indigo-100 text-indigo-800';
+                case 'mcp': return 'bg-cyan-100 text-cyan-800';
+                case 'quant': return 'bg-emerald-100 text-emerald-800';
+                case 'db': return 'bg-amber-100 text-amber-800';
+                case 'gpu': return 'bg-rose-100 text-rose-800';
+                default: return 'bg-slate-200 text-slate-800';
+            }
+        }
+
+        function filterDeps(category) {
+            activeCategory = category;
+            document.querySelectorAll('.dep-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            event.target.classList.remove('bg-slate-100', 'text-slate-700');
+            event.target.classList.add('bg-slate-900', 'text-white');
+            renderDependencies();
+        }
+
+        function searchDependencies() {
+            renderDependencies();
+        }
+
+        // Conviction Simulator Routing Logic
+        function updateConvictionSimulator() {
+            const cVal = parseFloat(document.getElementById('conviction-slider').value);
+            document.getElementById('conviction-value-display').innerText = cVal.toFixed(2);
+
+            const modelAlpha = parseFloat(document.getElementById('model-alpha-pd').value) || 0;
+            const modelBeta = parseFloat(document.getElementById('model-beta-pd').value) || 0;
+            const delta = Math.abs(modelAlpha - modelBeta);
+            document.getElementById('divergence-delta-display').innerText = delta.toFixed(3);
+
+            const impact = document.getElementById('impact-level').value;
+
+            const statusPill = document.getElementById('routing-status-pill');
+            const actionTitle = document.getElementById('routing-action-title');
+            const actionDesc = document.getElementById('routing-action-desc');
+            const telemetryEvent = document.getElementById('telemetry-event');
+            const telemetryHash = document.getElementById('telemetry-hash');
+            const telemetryArbitration = document.getElementById('telemetry-arbitration');
+
+            const mockHash = 'SHA256: ' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+            telemetryHash.innerText = mockHash;
+
+            const isDivergent = delta > 0.015;
+            telemetryArbitration.innerText = isDivergent ? 'FAILED (Divergence > 0.015)' : 'PASS (No Divergence)';
+
+            if (cVal < 0.50) {
+                statusPill.className = "text-xs font-mono px-2.5 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
+                statusPill.innerText = "HARD REJECTION & ABORT";
+                actionTitle.innerText = "Transaction Immediately Aborted";
+                actionDesc.innerText = `Conviction score (${cVal.toFixed(2)}) is below hard rejection threshold (0.50). System emits CRITICAL_CONVICTION_BREACH and purges state.`;
+                telemetryEvent.innerText = "CRITICAL_CONVICTION_BREACH";
+                telemetryEvent.className = "text-rose-400";
+            } else if (cVal < 0.85 || isDivergent || impact === 'high') {
+                statusPill.className = "text-xs font-mono px-2.5 py-0.5 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40";
+                statusPill.innerText = "HITL OPERATOR REVIEW REQUIRED";
+                actionTitle.innerText = "Workflow Execution Paused Safely";
+
+                let reason = [];
+                if (cVal < 0.85) reason.push(`Conviction score (${cVal.toFixed(2)}) is in human evaluation tier [0.50, 0.85)`);
+                if (isDivergent) reason.push(`Model divergence (${delta.toFixed(3)}) exceeds threshold theta (0.015)`);
+                if (impact === 'high') reason.push("Action involves high-impact capital commitment limit");
+
+                actionDesc.innerText = `Task dispatched to Nexus orchestrator for manual operator sign-off. Reason: ${reason.join('; ')}.`;
+                telemetryEvent.innerText = "ESCALATE_TO_HITL_NEXUS";
+                telemetryEvent.className = "text-amber-400";
+            } else {
+                statusPill.className = "text-xs font-mono px-2.5 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+                statusPill.innerText = "AUTONOMOUS EXECUTION";
+                actionTitle.innerText = "Pipeline Completes Autonomously";
+                actionDesc.innerText = `Conviction metric C (${cVal.toFixed(2)}) satisfies C >= 0.85 threshold. Execution completed with zero operator intervention.`;
+                telemetryEvent.innerText = "EXEC_AUTONOMOUS_PIPELINE";
+                telemetryEvent.className = "text-emerald-400";
+            }
+        }
+
+        // MCP Covenant Headroom Bar Chart Init
+        function initCovenantChart() {
+            const ctx = document.getElementById('covenantChart').getContext('2d');
+            covenantChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Leverage Ratio (x)', 'FCCR Coverage (x)'],
+                    datasets: [
+                        {
+                            label: 'Current Financial Metric',
+                            data: [3.59, 4.53],
+                            backgroundColor: ['#4f46e5', '#059669'],
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Covenant Limit / Floor',
+                            data: [4.50, 1.25],
+                            backgroundColor: ['#cbd5e1', '#cbd5e1'],
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11, weight: '500' } }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    let label = ctx.dataset.label || '';
+                                    if (label.length > 16) label = label.substring(0, 16) + '...';
+                                    return `${label}: ${ctx.raw}x`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Calculate Covenant Headroom via Simulated MCP Call
+        function calculateCovenantHeadroom() {
+            const ebitda = parseFloat(document.getElementById('input-ebitda').value) || 1.0;
+            const debt = parseFloat(document.getElementById('input-debt').value) || 0.0;
+            const interest = parseFloat(document.getElementById('input-interest').value) || 1.0;
+
+            const leverage = (debt / ebitda).toFixed(2);
+            const fccr = (ebitda / interest).toFixed(2);
+
+            document.getElementById('output-leverage').innerText = leverage + 'x';
+            document.getElementById('output-fccr').innerText = fccr + 'x';
+
+            const leverageCompliant = leverage <= 4.50;
+            const fccrCompliant = fccr >= 1.25;
+
+            const leverageHeadroom = (4.50 - leverage).toFixed(2);
+            const levStatus = document.getElementById('output-leverage-status');
+            if (leverageCompliant) {
+                levStatus.className = "text-[10px] text-emerald-600 font-semibold mt-0.5";
+                levStatus.innerText = `Compliant (${leverageHeadroom}x headroom)`;
+            } else {
+                levStatus.className = "text-[10px] text-rose-600 font-semibold mt-0.5";
+                levStatus.innerText = `BREACH (${Math.abs(leverageHeadroom)}x excess)`;
+            }
+
+            const fccrStatus = document.getElementById('output-fccr-status');
+            if (fccrCompliant) {
+                fccrStatus.className = "text-[10px] text-emerald-600 font-semibold mt-0.5";
+                fccrStatus.innerText = `Compliant (Min 1.25x req)`;
+            } else {
+                fccrStatus.className = "text-[10px] text-rose-600 font-semibold mt-0.5";
+                fccrStatus.innerText = `BREACH (Coverage deficit)`;
+            }
+
+            if (covenantChartInstance) {
+                covenantChartInstance.data.datasets[0].data = [parseFloat(leverage), parseFloat(fccr)];
+                covenantChartInstance.update();
+            }
+        }
+
+        // Mock Modal Handlers for Audit Log
+        function openMockLogModal() {
+            document.getElementById('log-modal').classList.remove('hidden');
+        }
+
+        function closeMockLogModal() {
+            document.getElementById('log-modal').classList.add('hidden');
+        }
+
+        function appendNewLog() {
+            const action = document.getElementById('modal-action').value;
+            const target = document.getElementById('modal-target').value;
+            const conviction = document.getElementById('modal-conviction').value;
+
+            const now = new Date().toISOString();
+            const entryNum = String(entryCounter++).padStart(4, '0');
+            const mockHash = 'SHA256: ' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+
+            const logHtml = `
+            <div class="p-4 bg-slate-900 text-slate-100 rounded-xl border border-slate-800 space-y-3">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-2 text-[11px]">
+                    <span class="text-amber-400 font-bold">[ENTRY: ${entryNum}] - OPERATOR AUDIT ENTRY</span>
+                    <span class="text-slate-400">TIMESTAMP: ${now}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-300">
+                    <div>LOCATION: <span class="text-slate-100">New York, NY, US</span></div>
+                    <div>ENVIRONMENT: <span class="text-slate-100">Adam OS v30.1.0 (Path A)</span></div>
+                    <div>MODEL: <span class="text-slate-100">Gemini 3.1 Pro</span></div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded border border-slate-800 space-y-1.5 text-slate-300 text-[11px]">
+                    <div><strong>Action Context:</strong> ${action}</div>
+                    <div><strong>Target Artifact:</strong> ${target}</div>
+                    <div class="text-emerald-400"><strong>Conviction Score:</strong> C = ${conviction} (Manual Operator Sign-off)</div>
+                </div>
+                <div class="text-[10px] text-slate-500 break-all pt-1 border-t border-slate-800/60">
+                    PROV-O LINEAGE HASH: <span class="text-indigo-300">${mockHash}</span>
+                </div>
+            </div>`;
+
+            const container = document.getElementById('audit-log-list');
+            container.insertAdjacentHTML('afterbegin', logHtml);
+            closeMockLogModal();
+        }
+    </script>
+</body>
+</html>
