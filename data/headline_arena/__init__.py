@@ -15,3 +15,10 @@ Modules:
 """
 __version__ = "1.0.0"
 __agent__ = "ADAM-Macro-Sentinel"
+
+"""
+Headline Arena Autonomous Dispatch & Upgrade Harness.
+ADAM-Macro-Sentinel Engine — Autonomous Macroeconomic Intelligence & Forecasting.
+"""
+
+__version__ = "2.5.0"
