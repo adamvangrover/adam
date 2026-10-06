@@ -13,7 +13,7 @@ def fetch_btc():
     url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     try:
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:  # nosec B310
             data = json.loads(response.read().decode())
             return float(data['bitcoin']['usd'])
     except Exception:
