@@ -5,6 +5,7 @@ Multi-Agent Deliberation, Monte Carlo Stress Testing, and Executive Rationale Fo
 from __future__ import annotations
 
 import math
+import zlib
 import numpy as np
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -46,7 +47,7 @@ class MultiAgentDeliberationEngine:
         posteriors = self.pipeline.evaluate_bayesian_posterior(profile)
 
         # 2. Monte Carlo simulation across 10,000 runs
-        np.random.seed(int(hash(challenge_id) % (2**32 - 1)))
+        np.random.seed(zlib.crc32(challenge_id.encode()))  # deterministic across processes
         
         # Drift parameter based on order flow & prior trend
         drift = profile.order_flow_imbalance * sigma_daily * 0.5
