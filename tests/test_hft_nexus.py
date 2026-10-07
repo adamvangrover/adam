@@ -1,7 +1,7 @@
-import unittest
-import struct
 import asyncio
-from core.trading.hft.hft_engine_nexus import NexusEngine, NexusConfig, AvellanedaStoikovStrategy
+import unittest
+
+from core.trading.hft.hft_engine_nexus import AvellanedaStoikovStrategy, NexusConfig, NexusEngine
 
 
 class TestAvellanedaStoikov(unittest.TestCase):
