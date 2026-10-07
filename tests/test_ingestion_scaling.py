@@ -4,12 +4,14 @@ tests/test_ingestion_scaling.py
 Verifies the scalable ingestion pipeline across different data sizes and strategies.
 """
 
-import os
-import pytest
-import shutil
 import json
-from core.data_processing.ingestion_engine import IngestionEngine
+import os
+import shutil
+
+import pytest
+
 from core.data_processing.chunking_engine import ChunkingEngine
+from core.data_processing.ingestion_engine import IngestionEngine
 
 TEST_DATA_DIR = "tests/data/ingestion_test"
 
@@ -64,7 +66,7 @@ async def test_ingestion_persistent_strategy(setup_teardown):
     output_path = result["output_path"]
     assert os.path.exists(output_path)
 
-    with open(output_path, 'r') as f:
+    with open(output_path) as f:
         lines = f.readlines()
         assert len(lines) == result["chunks_generated"]
         first_chunk = json.loads(lines[0])
