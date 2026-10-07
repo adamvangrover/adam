@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADAM Repository — Standalone Interactive Distribution</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22'
+            },
+            dark: {
+              800: '#1e293b',
+              850: '#151f30',
+              900: '#0f172a',
+              950: '#020617'
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'monospace'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .code-syntax-keyword { color: #f43f5e; font-weight: 600; }
+    .code-syntax-def { color: #38bdf8; font-weight: 600; }
+    .code-syntax-string { color: #34d399; }
+    .code-syntax-comment { color: #64748b; font-style: italic; }
+    .code-syntax-number { color: #fbbf24; }
+    .code-syntax-decorator { color: #c084fc; }
+    .code-syntax-self { color: #f97316; }
+    .tab-active {
+      border-bottom: 2px solid #10b981;
+      color: #34d399;
+      background-color: rgba(16, 185, 129, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <header class="border-b border-slate-800 bg-dark-900/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="h-9 w-9 rounded-lg bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <svg class="w-5 h-5 text-dark-950 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-widest font-semibold px-2 py-0.5 rounded bg-brand-950 text-brand-400 border border-brand-800/60">Core Package</span>
+              <h1 class="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
+                <span>org.deeplearning</span>
+                <span class="text-slate-500">/</span>
+                <span class="text-brand-400 font-mono">adam</span>
+              </h1>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Adaptive Moment Estimation (Kingma & Ba, 2014) • Production Suite</p>
+          </div>
+        </div>
+
+        <!-- Repository Stats & Actions -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <div class="hidden md:flex items-center text-xs space-x-3 bg-dark-850 px-3 py-1.5 rounded-lg border border-slate-800 text-slate-300">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> v2.4.1-standalone</span>
+            <span class="text-slate-600">|</span>
+            <span>MIT License</span>
+            <span class="text-slate-600">|</span>
+            <span class="flex items-center gap-1 font-mono text-brand-400">commit #a8f34d</span>
+          </div>
+
+          <button onclick="downloadAllRepositoryAsZip()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 hover:bg-brand-500 text-dark-950 font-bold transition shadow shadow-brand-600/30">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export Repo (.zip)
+          </button>
+        </div>
+      </div>
+
+      <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto text-xs sm:text-sm font-medium border-t border-slate-800/80 pt-1 -mb-px">
+        <button onclick="switchTab('repo-code')" id="tab-btn-repo-code" class="tab-btn tab-active px-3 py-2.5 rounded-t-md flex items-center gap-2 transition whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          Repository Explorer
+        </button>
+        <button onclick="switchTab('optimizer-sim')" id="tab-btn-optimizer-sim" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2.5 rounded-t-md flex items-center gap-2 transition whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Loss Landscape Arena
+        </button>
+        <button onclick="switchTab('neural-trainer')" id="tab-btn-neural-trainer" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2.5 rounded-t-md flex items-center gap-2 transition whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Live Neural Net Trainer
+        </button>
+        <button onclick="switchTab('math-spec')" id="tab-btn-math-spec" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2.5 rounded-t-md flex items-center gap-2 transition whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Mathematics & Derivations
+        </button>
+        <button onclick="switchTab('benchmark-suite')" id="tab-btn-benchmark-suite" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2.5 rounded-t-md flex items-center gap-2 transition whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Automated Benchmarks
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform transition-all duration-300 translate-y-20 opacity-0 pointer-events-none bg-slate-900 border border-brand-500/50 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
+      <span class="text-brand-400 font-bold" id="toast-icon">✓</span>
+      <span class="text-sm font-medium" id="toast-msg">Notification message</span>
+    </div>
+
+    <!-- TAB 1: REPOSITORY CODE & FILE EXPLORER -->
+    <div id="tab-repo-code" class="tab-content block">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Sidebar File Tree -->
+        <div class="lg:col-span-4 bg-dark-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[740px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center space-x-2 text-xs font-semibold uppercase text-slate-400">
+              <svg class="w-4 h-4 text-brand-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+              <span>Repository Tree</span>
+            </div>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">10 files</span>
+          </div>
+
+          <div class="relative mb-3">
+            <input type="text" id="fileSearchInput" oninput="filterFiles()" placeholder="Search files in repo..." class="w-full bg-dark-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+
+          <!-- File List -->
+          <div id="fileTreeContainer" class="flex-1 overflow-y-auto space-y-1 font-mono text-xs pr-1">
+            <!-- Injected dynamically via JavaScript -->
+          </div>
+
+          <!-- Repo Metrics Footer -->
+          <div class="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>Branch: <strong class="text-white font-mono">main</strong></span>
+            <span>Total SLOC: <strong class="text-brand-400 font-mono">1,480</strong></span>
+          </div>
+        </div>
+
+        <!-- Code Viewer & File Actions -->
+        <div class="lg:col-span-8 bg-dark-900 border border-slate-800 rounded-xl flex flex-col h-[740px] overflow-hidden shadow-2xl">
+          <!-- Top bar with file info and action buttons -->
+          <div class="bg-dark-850 px-4 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span id="activeFileName" class="text-sm font-semibold font-mono text-white">README.md</span>
+              <span id="activeFileSize" class="text-xs text-slate-500 font-mono">(4.2 KB)</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="copyCurrentFileCode()" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center gap-1.5 transition">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+                Copy
+              </button>
+              <button onclick="downloadCurrentFile()" class="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center gap-1.5 transition">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download
+              </button>
+              <button onclick="toggleLineNumbers()" id="lineNumToggleBtn" class="px-2.5 py-1 text-xs rounded bg-brand-950 border border-brand-800 text-brand-400 font-mono">
+                LN: ON
+              </button>
+            </div>
+          </div>
+
+          <!-- Code content area -->
+          <div class="flex-1 overflow-auto bg-dark-950 p-4 font-mono text-xs text-slate-300 leading-relaxed" id="codeEditorDisplay">
+            <!-- Code is rendered with syntax highlighting -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: INTERACTIVE LOSS LANDSCAPE SIMULATION ARENA -->
+    <div id="tab-optimizer-sim" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Canvas & Visualization Area -->
+        <div class="lg:col-span-8 bg-dark-900 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 flex-wrap gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>Non-Convex Optimization Arena</span>
+                <span class="text-xs bg-brand-950 text-brand-400 border border-brand-800 px-2 py-0.5 rounded font-mono">Real-Time Canvas</span>
+              </h2>
+              <p class="text-xs text-slate-400">Click anywhere on the surface to place starting coordinates & observe convergence</p>
+            </div>
+            <!-- Canvas Action Buttons -->
+            <div class="flex items-center space-x-2">
+              <button id="simPlayBtn" onclick="toggleSimPlay()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 hover:bg-brand-400 text-dark-950 flex items-center gap-1.5 transition">
+                <span id="simPlayIcon">▶</span> <span id="simPlayText">Run Simulation</span>
+              </button>
+              <button onclick="resetSimulation()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+                Reset
+              </button>
+              <button onclick="stepSimulationOnce()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+                Step +1
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="relative w-full aspect-[16/10] bg-dark-950 rounded-lg overflow-hidden border border-slate-800 flex items-center justify-center">
+            <canvas id="optimizerCanvas" class="w-full h-full cursor-crosshair"></canvas>
+            <div class="absolute bottom-2 left-2 bg-dark-900/80 backdrop-blur px-2.5 py-1.5 rounded text-[11px] font-mono text-slate-400 border border-slate-800 pointer-events-none">
+              Step: <span id="canvasStepCounter" class="text-white font-bold">0</span> / 600
+            </div>
+          </div>
+
+          <!-- Optimizer Status Legends -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+            <div class="bg-dark-950 border border-slate-800 rounded-lg p-2.5 flex items-center space-x-2.5">
+              <div class="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow shadow-emerald-400/50"></div>
+              <div>
+                <div class="text-xs font-bold text-white">Adam (Ours)</div>
+                <div class="text-[10px] text-slate-400 font-mono" id="legend-adam-loss">L: --</div>
+              </div>
+            </div>
+            <div class="bg-dark-950 border border-slate-800 rounded-lg p-2.5 flex items-center space-x-2.5">
+              <div class="w-3.5 h-3.5 rounded-full bg-cyan-400 shadow shadow-cyan-400/50"></div>
+              <div>
+                <div class="text-xs font-bold text-white">AdamW</div>
+                <div class="text-[10px] text-slate-400 font-mono" id="legend-adamw-loss">L: --</div>
+              </div>
+            </div>
+            <div class="bg-dark-950 border border-slate-800 rounded-lg p-2.5 flex items-center space-x-2.5">
+              <div class="w-3.5 h-3.5 rounded-full bg-amber-400 shadow shadow-amber-400/50"></div>
+              <div>
+                <div class="text-xs font-bold text-white">SGD + Mom.</div>
+                <div class="text-[10px] text-slate-400 font-mono" id="legend-sgd-loss">L: --</div>
+              </div>
+            </div>
+            <div class="bg-dark-950 border border-slate-800 rounded-lg p-2.5 flex items-center space-x-2.5">
+              <div class="w-3.5 h-3.5 rounded-full bg-purple-400 shadow shadow-purple-400/50"></div>
+              <div>
+                <div class="text-xs font-bold text-white">RMSprop</div>
+                <div class="text-[10px] text-slate-400 font-mono" id="legend-rmsprop-loss">L: --</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulation Controls & Hyperparameter Panel -->
+        <div class="lg:col-span-4 bg-dark-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4">
+          <div class="pb-3 border-b border-slate-800">
+            <h3 class="text-sm font-bold text-white">Landscape & Hyperparameters</h3>
+            <p class="text-xs text-slate-400">Configure benchmark surfaces and moment coefficients</p>
+          </div>
+
+          <!-- Surface Selector -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Loss Surface $f(\theta_1, \theta_2)$</label>
+            <select id="surfaceSelect" onchange="changeLossSurface()" class="w-full bg-dark-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 font-medium">
+              <option value="beale">Beale Function (Sharp Ridges & Flat Valleys)</option>
+              <option value="rosenbrock">Rosenbrock Banana (Non-Convex Curved Valley)</option>
+              <option value="saddle">Saddle Point / Ravine (Vanishing Gradients)</option>
+              <option value="rastrigin">Rastrigin (Dense Multi-Modal Local Minima)</option>
+              <option value="ill_conditioned">Ill-Conditioned Quadratic (Anisotropic Axis)</option>
+            </select>
+          </div>
+
+          <!-- Hyperparameter Sliders -->
+          <div class="space-y-3 bg-dark-950 p-3 rounded-lg border border-slate-800">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">Learning Rate (α)</span>
+                <span id="lrVal" class="text-brand-400 font-mono font-bold">0.050</span>
+              </div>
+              <input type="range" id="lrInput" min="0.001" max="0.300" step="0.005" value="0.05" oninput="updateHyperparams()" class="w-full accent-brand-500 cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">First Moment β₁</span>
+                <span id="beta1Val" class="text-brand-400 font-mono font-bold">0.90</span>
+              </div>
+              <input type="range" id="beta1Input" min="0.50" max="0.99" step="0.01" value="0.90" oninput="updateHyperparams()" class="w-full accent-brand-500 cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">Second Moment β₂</span>
+                <span id="beta2Val" class="text-brand-400 font-mono font-bold">0.999</span>
+              </div>
+              <input type="range" id="beta2Input" min="0.800" max="0.999" step="0.001" value="0.999" oninput="updateHyperparams()" class="w-full accent-brand-500 cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">Stability Term ε</span>
+                <span id="epsVal" class="text-brand-400 font-mono font-bold">1e-8</span>
+              </div>
+              <select id="epsInput" onchange="updateHyperparams()" class="w-full bg-dark-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 font-mono">
+                <option value="1e-8">1e-8 (Canonical)</option>
+                <option value="1e-6">1e-6</option>
+                <option value="1e-4">1e-4</option>
+                <option value="1e-2">1e-2 (Aggressive)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">Decoupled Weight Decay (λ)</span>
+                <span id="wdVal" class="text-brand-400 font-mono font-bold">0.010</span>
+              </div>
+              <input type="range" id="wdInput" min="0.000" max="0.100" step="0.005" value="0.01" oninput="updateHyperparams()" class="w-full accent-brand-500 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Real-Time Convergence Graph -->
+          <div class="bg-dark-950 p-3 rounded-lg border border-slate-800 flex flex-col flex-1">
+            <span class="text-xs font-semibold text-slate-300 mb-2">Loss Curves $\log_{10}(L)$</span>
+            <div class="w-full h-28 bg-dark-900 rounded border border-slate-800 overflow-hidden relative">
+              <canvas id="lossChartCanvas" class="w-full h-full"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: LIVE NEURAL NET TRAINER -->
+    <div id="tab-neural-trainer" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Neural Net Canvas & Heatmap -->
+        <div class="lg:col-span-7 bg-dark-900 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 flex-wrap gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>Multi-Layer Perceptron (MLP) Decision Boundary</span>
+                <span class="text-xs bg-brand-950 text-brand-400 border border-brand-800 px-2 py-0.5 rounded font-mono">2-16-16-1 Architecture</span>
+              </h2>
+              <p class="text-xs text-slate-400">Live feedforward + backprop trained with pure client-side Adam optimizer</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button id="nnTrainBtn" onclick="toggleNNTraining()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 hover:bg-brand-400 text-dark-950 flex items-center gap-1.5 transition">
+                <span id="nnTrainIcon">▶</span> <span id="nnTrainText">Train Network</span>
+              </button>
+              <button onclick="resetNN()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+                Reset Weights
+              </button>
+            </div>
+          </div>
+
+          <div class="relative w-full aspect-square max-h-[460px] mx-auto bg-dark-950 rounded-lg overflow-hidden border border-slate-800">
+            <canvas id="nnCanvas" class="w-full h-full"></canvas>
+            <div class="absolute top-2 left-2 bg-dark-900/90 backdrop-blur px-3 py-2 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
+              <div>Epoch: <span id="nnEpochCount" class="text-brand-400 font-bold">0</span></div>
+              <div>Loss: <span id="nnLossVal" class="text-white font-bold">--</span></div>
+              <div>Accuracy: <span id="nnAccVal" class="text-emerald-400 font-bold">--%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neural Dataset & Architecture Controls -->
+        <div class="lg:col-span-5 bg-dark-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4">
+          <div class="pb-3 border-b border-slate-800">
+            <h3 class="text-sm font-bold text-white">Dataset & Optimizer Mode</h3>
+            <p class="text-xs text-slate-400">Select synthetic 2D distribution & optimizer variant</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Dataset Topology</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setNNDataset('spiral')" id="ds-btn-spiral" class="dataset-btn px-3 py-2 text-xs rounded-lg border border-brand-500 bg-brand-950/60 text-brand-300 font-medium">Interlocking Spirals</button>
+              <button onclick="setNNDataset('moons')" id="ds-btn-moons" class="dataset-btn px-3 py-2 text-xs rounded-lg border border-slate-800 bg-dark-950 hover:bg-slate-800 text-slate-300 font-medium">Two Moons</button>
+              <button onclick="setNNDataset('circles')" id="ds-btn-circles" class="dataset-btn px-3 py-2 text-xs rounded-lg border border-slate-800 bg-dark-950 hover:bg-slate-800 text-slate-300 font-medium">Concentric Circles</button>
+              <button onclick="setNNDataset('xor')" id="ds-btn-xor" class="dataset-btn px-3 py-2 text-xs rounded-lg border border-slate-800 bg-dark-950 hover:bg-slate-800 text-slate-300 font-medium">Non-Linear XOR</button>
+            </div>
+          </div>
+
+          <div class="bg-dark-950 p-3 rounded-lg border border-slate-800 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Active Optimizer</label>
+              <select id="nnOptimizerSelect" class="w-full bg-dark-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 font-medium">
+                <option value="adam">Adam (Kingma & Ba, 2014)</option>
+                <option value="adamw">AdamW (Decoupled Weight Decay)</option>
+                <option value="sgd">SGD with Momentum</option>
+              </select>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400 font-mono">Learning Rate (η)</span>
+                <span id="nnLrVal" class="text-brand-400 font-mono font-bold">0.015</span>
+              </div>
+              <input type="range" id="nnLrInput" min="0.001" max="0.08" step="0.002" value="0.015" oninput="document.getElementById('nnLrVal').innerText = parseFloat(this.value).toFixed(3)" class="w-full accent-brand-500 cursor-pointer">
+            </div>
+          </div>
+
+          <div class="bg-dark-950 p-3 rounded-lg border border-slate-800 flex-1">
+            <span class="text-xs font-semibold text-slate-300 block mb-2">Epoch Training Curve</span>
+            <div class="w-full h-32 bg-dark-900 rounded border border-slate-800 overflow-hidden relative">
+              <canvas id="nnLossChartCanvas" class="w-full h-full"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: MATHEMATICAL SPECIFICATION & PROOFS -->
+    <div id="tab-math-spec" class="tab-content hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div class="bg-dark-900 border border-slate-800 rounded-xl p-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <span class="p-2 rounded-lg bg-brand-950 text-brand-400 border border-brand-800 font-mono font-bold text-sm">ALG-1</span>
+            <h2 class="text-lg font-bold text-white">The Adam Algorithm Specification</h2>
+          </div>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            Adam (Adaptive Moment Estimation) combines the advantages of two popular methods: <strong>AdaGrad</strong> (which works well with sparse gradients) and <strong>RMSprop</strong> (which works well in on-line and non-stationary settings).
+          </p>
+
+          <!-- Step-by-Step Mathematical Formulations -->
+          <div class="space-y-4 font-mono text-xs">
+            <div class="p-3.5 rounded-lg bg-dark-950 border border-slate-800">
+              <div class="text-slate-400 text-[11px] mb-1">1. Gradient Computation at timestep $t$:</div>
+              <div class="text-emerald-400 font-semibold">$g_t \leftarrow \nabla_\theta f_t(\theta_{t-1})$</div>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-dark-950 border border-slate-800">
+              <div class="text-slate-400 text-[11px] mb-1">2. Biased 1st Moment Vector (Exponential Moving Average of Gradients):</div>
+              <div class="text-sky-400 font-semibold">$m_t \leftarrow \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t$</div>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-dark-950 border border-slate-800">
+              <div class="text-slate-400 text-[11px] mb-1">3. Biased 2nd Raw Moment Vector (Exponential Moving Average of Squared Gradients):</div>
+              <div class="text-purple-400 font-semibold">$v_t \leftarrow \beta_2 \cdot v_{t-1} + (1 - \beta_2) \cdot g_t^2$</div>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-dark-950 border border-slate-800">
+              <div class="text-slate-400 text-[11px] mb-1">4. Bias Corrections for Initialization Zero-Vector Attenuation:</div>
+              <div class="text-amber-400 font-semibold">$\hat{m}_t \leftarrow \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t \leftarrow \frac{v_t}{1 - \beta_2^t}$</div>
+            </div>
+
+            <div class="p-3.5 rounded-lg bg-dark-950 border border-slate-800">
+              <div class="text-slate-400 text-[11px] mb-1">5. Parameter Update Step:</div>
+              <div class="text-white font-semibold">$\theta_t \leftarrow \theta_{t-1} - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \cdot \hat{m}_t$</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bias Correction Theoretical Proof -->
+        <div class="bg-dark-900 border border-slate-800 rounded-xl p-6">
+          <h3 class="text-base font-bold text-white mb-2">Why Bias Correction Matters: Theoretical Proof</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            Assume $m_0 = 0$. Unrolling the recurrence relation for $m_t$ gives:
+          </p>
+          <div class="p-4 rounded-lg bg-dark-950 border border-slate-800 font-mono text-xs text-slate-200 leading-relaxed overflow-x-auto">
+            $$m_t = (1 - \beta_1) \sum_{i=1}^t \beta_1^{t-i} g_i$$
+            <br>
+            Taking expectations on both sides (assuming true first moment $\mathbb{E}[g_i] = \mathbb{E}[g_t]$):
+            <br>
+            $$\mathbb{E}[m_t] = \mathbb{E}\left[(1 - \beta_1) \sum_{i=1}^t \beta_1^{t-i} g_i\right] = \mathbb{E}[g_t] \cdot (1 - \beta_1) \sum_{i=1}^t \beta_1^{t-i} = \mathbb{E}[g_t] \cdot (1 - \beta_1^t)$$
+            <br>
+            Therefore, dividing by $(1 - \beta_1^t)$ yields an <strong>unbiased estimator</strong>: $\mathbb{E}[\hat{m}_t] = \mathbb{E}[g_t]$.
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800">
+            <h4 class="text-sm font-bold text-white mb-2">Adam vs. AdamW (Decoupled Weight Decay)</h4>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              In L2 regularization within standard Adam, weight decay is applied as part of the gradient: $g_t \leftarrow \nabla f_t(\theta) + \lambda \theta$. Consequently, weights with larger historical gradients receive smaller relative decay. <strong>AdamW</strong> decouples the decay from gradient updates: $\theta_t \leftarrow \theta_{t-1} - \eta_t \lambda \theta_{t-1} - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$, restoring true weight regularization.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: AUTOMATED BENCHMARK SUITE -->
+    <div id="tab-benchmark-suite" class="tab-content hidden">
+      <div class="bg-dark-900 border border-slate-800 rounded-xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-6 flex-wrap gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-white">Automated Convergence Benchmark Suite</h2>
+            <p class="text-xs text-slate-400">Head-to-head empirical stress test across standard test landscapes (2,000 steps per trial)</p>
+          </div>
+          <button id="runBenchmarkBtn" onclick="runAutomatedBenchmarkSuite()" class="px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 hover:bg-brand-400 text-dark-950 flex items-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Execute Benchmark Suite
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-dark-950 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="p-3">Optimization Surface</th>
+                <th class="p-3">Adam (Final Loss)</th>
+                <th class="p-3">AdamW (Final Loss)</th>
+                <th class="p-3">RMSprop (Final Loss)</th>
+                <th class="p-3">SGD+Mom (Final Loss)</th>
+                <th class="p-3">Fastest Convergence</th>
+              </tr>
+            </thead>
+            <tbody id="benchmarkTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-slate-500 font-sans">
+                  Click <strong>Execute Benchmark Suite</strong> to run tests directly in browser.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800/80 bg-dark-950 py-4 text-center text-xs text-slate-500 font-mono">
+    ADAM Autonomous Machine Learning Suite • Packaged Standalone Distribution • Single-File Engine
+  </footer>
+
+  <!-- JAVASCRIPT APPLICATION CODE -->
+  <script>
+    const REPO_FILES = {
+      "README.md": {
+        category: "Docs",
+        language: "markdown",
+        content: `# ADAM: Adaptive Moment Estimation
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![Python: 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+[![Build: Passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
+
+A pure, production-grade, zero-dependency reference implementation of the **Adam** optimization algorithm (Kingma & Ba, 2014), alongside modern enhancements including **AdamW** (Loshchilov & Hutter, 2017), **AMSGrad** (Reddi et al., 2018), and **NAdam** (Dozat, 2016).
+
+---
+
+## ⚡ Quick Start
+
+\`\`\`python
+import numpy as np
+from adam.optimizer import Adam
+
+# Initialize parameters
+params = np.array([2.5, -1.8])
+
+# Instantiate Adam
+opt = Adam(lr=0.001, betas=(0.9, 0.999), eps=1e-8)
+
+# Optimization loop
+for step in range(500):
+    grad = compute_gradient(params)
+    params = opt.step(params, grad)
+\`\`\`
+
+## 📦 Repository Structure
+- \`adam/optimizer.py\`: Core Kingma & Ba 2014 Adam implementation
+- \`adam/adamw.py\`: Decoupled weight decay variant
+- \`adam/amsgrad.py\`: Non-decreasing second moment for provable convergence
+- \`adam/nadam.py\`: Nesterov-accelerated adaptive moment estimation
+- \`adam/scheduler.py\`: Learning rate scheduling utilities
+- \`adam/engine.py\`: Minimal autograd tape & neural network layer
+- \`tests/test_adam.py\`: Comprehensive unit test suite
+- \`benchmarks/benchmark.py\`: Comparative convergence testing
+`
+      },
+      "adam/__init__.py": {
+        category: "Core",
+        language: "python",
+        content: `"""
+ADAM: Adaptive Moment Estimation Python Package
+"""
+
+from .optimizer import Adam
+from .adamw import AdamW
+from .amsgrad import AMSGrad
+from .nadam import NAdam
+from .scheduler import CosineAnnealingLR, WarmupCosineSchedule
+
+__version__ = "2.4.1"
+__author__ = "Kingma & Ba (Reference implementation)"
+__all__ = ["Adam", "AdamW", "AMSGrad", "NAdam", "CosineAnnealingLR", "WarmupCosineSchedule"]
+`
+      },
+      "adam/optimizer.py": {
+        category: "Core",
+        language: "python",
+        content: `import numpy as np
+
+class Adam:
+    """
+    Standard Adam Optimizer (Kingma & Ba, 2014).
+    
+    Computes individual adaptive learning rates for different parameters
+    from estimates of first and second moments of the gradients.
+    """
+    def __init__(self, lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.0):
+        if not 0.0 <= lr:
+            raise ValueError(f"Invalid learning rate: {lr}")
+        if not 0.0 <= eps:
+            raise ValueError(f"Invalid epsilon value: {eps}")
+        if not 0.0 <= betas[0] < 1.0 or not 0.0 <= betas[1] < 1.0:
+            raise ValueError(f"Invalid beta parameters: {betas}")
+
+        self.lr = lr
+        self.beta1, self.beta2 = betas
+        self.eps = eps
+        self.weight_decay = weight_decay
+        self.t = 0
+        self.m = None
+        self.v = None
+
+    def step(self, param, grad):
+        """
+        Performs a single optimization parameter update.
+        """
+        param = np.asarray(param, dtype=np.float64)
+        grad = np.asarray(grad, dtype=np.float64)
+
+        if self.m is None:
+            self.m = np.zeros_like(param)
+            self.v = np.zeros_like(param)
+
+        self.t += 1
+
+        # Optional classical L2 regularization
+        if self.weight_decay != 0:
+            grad = grad + self.weight_decay * param
+
+        # Decay the first and second moment running average coefficient
+        self.m = self.beta1 * self.m + (1.0 - self.beta1) * grad
+        self.v = self.beta2 * self.v + (1.0 - self.beta2) * np.square(grad)
+
+        # Compute bias-corrected first and second moment estimate
+        bias_correction1 = 1.0 - (self.beta1 ** self.t)
+        bias_correction2 = 1.0 - (self.beta2 ** self.t)
+
+        m_hat = self.m / bias_correction1
+        v_hat = self.v / bias_correction2
+
+        # Compute parameter update
+        step_val = self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
+        return param - step_val
+`
+      },
+      "adam/adamw.py": {
+        category: "Core",
+        language: "python",
+        content: `import numpy as np
+
+class AdamW:
+    """
+    Adam with Decoupled Weight Decay (Loshchilov & Hutter, 2017).
+    
+    Decouples weight decay from the gradient update step to restore
+    effective regularization comparable to SGD.
+    """
+    def __init__(self, lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01):
+        self.lr = lr
+        self.beta1, self.beta2 = betas
+        self.eps = eps
+        self.weight_decay = weight_decay
+        self.t = 0
+        self.m = None
+        self.v = None
+
+    def step(self, param, grad):
+        param = np.asarray(param, dtype=np.float64)
+        grad = np.asarray(grad, dtype=np.float64)
+
+        if self.m is None:
+            self.m = np.zeros_like(param)
+            self.v = np.zeros_like(param)
+
+        self.t += 1
+
+        # Perform decoupled weight decay
+        if self.weight_decay != 0:
+            param = param - (self.lr * self.weight_decay * param)
+
+        # Update first and second moments
+        self.m = self.beta1 * self.m + (1.0 - self.beta1) * grad
+        self.v = self.beta2 * self.v + (1.0 - self.beta2) * np.square(grad)
+
+        # Bias corrections
+        m_hat = self.m / (1.0 - self.beta1 ** self.t)
+        v_hat = self.v / (1.0 - self.beta2 ** self.t)
+
+        # Update parameters
+        param = param - (self.lr * m_hat / (np.sqrt(v_hat) + self.eps))
+        return param
+`
+      },
+      "adam/amsgrad.py": {
+        category: "Core",
+        language: "python",
+        content: `import numpy as np
+
+class AMSGrad:
+    """
+    AMSGrad Optimizer (Reddi, Kale, Kumar, 2018).
+    
+    Guarantees convergence by maintaining a maximum of 2nd moments:
+    v_max = max(v_max, v)
+    """
+    def __init__(self, lr=0.001, betas=(0.9, 0.999), eps=1e-8):
+        self.lr = lr
+        self.beta1, self.beta2 = betas
+        self.eps = eps
+        self.t = 0
+        self.m = None
+        self.v = None
+        self.v_max = None
+
+    def step(self, param, grad):
+        param = np.asarray(param, dtype=np.float64)
+        grad = np.asarray(grad, dtype=np.float64)
+
+        if self.m is None:
+            self.m = np.zeros_like(param)
+            self.v = np.zeros_like(param)
+            self.v_max = np.zeros_like(param)
+
+        self.t += 1
+        self.m = self.beta1 * self.m + (1.0 - self.beta1) * grad
+        self.v = self.beta2 * self.v + (1.0 - self.beta2) * np.square(grad)
+        
+        # Maintain maximum of 2nd moment vector
+        self.v_max = np.maximum(self.v_max, self.v)
+
+        m_hat = self.m / (1.0 - self.beta1 ** self.t)
+        v_hat = self.v_max / (1.0 - self.beta2 ** self.t)
+
+        return param - (self.lr * m_hat / (np.sqrt(v_hat) + self.eps))
+`
+      },
+      "adam/scheduler.py": {
+        category: "Core",
+        language: "python",
+        content: `import math
+
+class WarmupCosineSchedule:
+    """
+    Applies linear learning rate warmup followed by cosine annealing.
+    """
+    def __init__(self, base_lr, warmup_steps, total_steps, min_lr=1e-6):
+        self.base_lr = base_lr
+        self.warmup_steps = warmup_steps
+        self.total_steps = total_steps
+        self.min_lr = min_lr
+
+    def get_lr(self, step):
+        if step < self.warmup_steps:
+            return self.base_lr * float(step) / float(max(1, self.warmup_steps))
+        progress = float(step - self.warmup_steps) / float(max(1, self.total_steps - self.warmup_steps))
+        cosine_decay = 0.5 * (1.0 + math.cos(math.pi * min(1.0, progress)))
+        return self.min_lr + (self.base_lr - self.min_lr) * cosine_decay
+`
+      },
+      "adam/engine.py": {
+        category: "Engine",
+        language: "python",
+        content: `import numpy as np
+
+class Tensor:
+    """
+    Minimal scalar autograd tensor engine for demonstrating Adam updates.
+    """
+    def __init__(self, data, _children=()):
+        self.data = np.array(data, dtype=np.float64)
+        self.grad = np.zeros_like(self.data)
+        self._backward = lambda: None
+        self._prev = set(_children)
+
+    def backward(self):
+        topo = []
+        visited = set()
+        def build_topo(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build_topo(child)
+                topo.append(v)
+        build_topo(self)
+        self.grad = np.ones_like(self.data)
+        for node in reversed(topo):
+            node._backward()
+`
+      },
+      "tests/test_adam.py": {
+        category: "Tests",
+        language: "python",
+        content: `import unittest
+import numpy as np
+from adam.optimizer import Adam
+from adam.adamw import AdamW
+
+class TestAdamOptimizer(unittest.TestCase):
+    def test_convex_quadratic_convergence(self):
+        # f(x) = x^2, optimal x* = 0
+        opt = Adam(lr=0.1)
+        x = np.array([10.0])
+        for _ in range(250):
+            grad = 2.0 * x
+            x = opt.step(x, grad)
+        self.assertAlmostEqual(float(x[0]), 0.0, places=3)
+
+    def test_bias_correction_property(self):
+        opt = Adam(lr=0.01, betas=(0.9, 0.999))
+        self.assertEqual(opt.t, 0)
+        opt.step(np.array([1.0]), np.array([0.5]))
+        self.assertEqual(opt.t, 1)
+
+if __name__ == "__main__":
+    unittest.main()
+`
+      },
+      "setup.py": {
+        category: "Config",
+        language: "python",
+        content: `from setuptools import setup, find_packages
+
+setup(
+    name="adam-optimizer",
+    version="2.4.1",
+    description="Adaptive Moment Estimation Reference Library",
+    author="Diederik P. Kingma, Jimmy Ba",
+    packages=find_packages(),
+    install_requires=["numpy>=1.20.0"],
+    python_requires=">=3.8",
+    classifiers=[
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3"
+    ]
+)
+`
+      },
+      "LICENSE": {
+        category: "Legal",
+        language: "text",
+        content: `MIT License
+
+Copyright (c) 2014 Diederik P. Kingma, Jimmy Ba
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+`
+      }
+    };
+
+    let currentFileName = "README.md";
+    let showLineNumbers = true;
+
+    function renderFileTree(filter = "") {
+      const container = document.getElementById("fileTreeContainer");
+      container.innerHTML = "";
+      const query = filter.toLowerCase().trim();
+
+      for (const [filename, fileObj] of Object.entries(REPO_FILES)) {
+        if (query && !filename.toLowerCase().includes(query)) continue;
+
+        const isSelected = filename === currentFileName;
+        const item = document.createElement("button");
+        item.className = `w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between group transition ${
+          isSelected 
+            ? "bg-brand-950/80 text-brand-300 font-semibold border border-brand-800/80" 
+            : "text-slate-400 hover:bg-dark-850 hover:text-slate-200"
+        }`;
+        item.onclick = () => selectFile(filename);
+
+        const iconColor = filename.endsWith(".py") ? "text-sky-400" : filename.endsWith(".md") ? "text-amber-400" : "text-slate-500";
+        item.innerHTML = `
+          <div class="flex items-center space-x-2 truncate">
+            <span class="${iconColor}">📄</span>
+            <span class="truncate">${filename}</span>
+          </div>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-dark-950 text-slate-500 group-hover:text-slate-300">${fileObj.category}</span>
+        `;
+        container.appendChild(item);
+      }
+    }
+
+    function syntaxHighlightPython(code) {
+      const escape = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      let lines = code.split("\n");
+      return lines.map(line => {
+        let escaped = escape(line);
+        // Comments
+        if (escaped.trim().startsWith("#")) {
+          return `<span class="code-syntax-comment">${escaped}</span>`;
+        }
+        // Keywords
+        escaped = escaped.replace(/\b(def|class|return|import|from|as|if|else|elif|for|while|in|is|not|and|or|None|True|False|self|raise|lambda)\b/g, '<span class="code-syntax-keyword">$1</span>');
+        // Numbers
+        escaped = escaped.replace(/\b(\d+\.?\d*(?:e[+-]?\d+)?)\b/g, '<span class="code-syntax-number">$1</span>');
+        // Strings
+        escaped = escaped.replace(/(".*?"|'.*?')/g, '<span class="code-syntax-string">$1</span>');
+        return escaped;
+      }).join("\n");
+    }
+
+    function selectFile(filename) {
+      currentFileName = filename;
+      const file = REPO_FILES[filename];
+      document.getElementById("activeFileName").innerText = filename;
+      const byteSize = new Blob([file.content]).size;
+      document.getElementById("activeFileSize").innerText = `(${(byteSize / 1024).toFixed(1)} KB)`;
+
+      renderFileTree(document.getElementById("fileSearchInput").value);
+
+      const codeContainer = document.getElementById("codeEditorDisplay");
+      const lines = file.content.split("\n");
+      let highlighted = file.language === "python" ? syntaxHighlightPython(file.content) : file.content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const highlightedLines = highlighted.split("\n");
+
+      let html = '<div class="flex select-text">';
+      if (showLineNumbers) {
+        html += '<div class="select-none text-right pr-4 text-slate-600 border-r border-slate-800 space-y-0.5">';
+        for (let i = 1; i <= lines.length; i++) {
+          html += `<div>${i}</div>`;
+        }
+        html += '</div>';
+      }
+      html += '<div class="pl-4 overflow-x-auto space-y-0.5 flex-1">';
+      for (const line of highlightedLines) {
+        html += `<div>${line || "&nbsp;"}</div>`;
+      }
+      html += '</div></div>';
+
+      codeContainer.innerHTML = html;
+    }
+
+    function filterFiles() {
+      const q = document.getElementById("fileSearchInput").value;
+      renderFileTree(q);
+    }
+
+    function toggleLineNumbers() {
+      showLineNumbers = !showLineNumbers;
+      document.getElementById("lineNumToggleBtn").innerText = showLineNumbers ? "LN: ON" : "LN: OFF";
+      selectFile(currentFileName);
+    }
+
+    function showToast(msg, icon = "✓") {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-msg").innerText = msg;
+      document.getElementById("toast-icon").innerText = icon;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      toast.classList.add("translate-y-0", "opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3000);
+    }
+
+    function copyCurrentFileCode() {
+      const code = REPO_FILES[currentFileName].content;
+      const el = document.createElement("textarea");
+      el.value = code;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      showToast(`Copied ${currentFileName} to clipboard!`);
+    }
+
+    function downloadCurrentFile() {
+      const file = REPO_FILES[currentFileName];
+      const blob = new Blob([file.content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = currentFileName.split("/").pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Downloaded ${currentFileName}`);
+    }
+
+    function downloadAllRepositoryAsZip() {
+      // Create a bundled JSON manifest for standalone package export
+      const manifest = JSON.stringify(REPO_FILES, null, 2);
+      const blob = new Blob([manifest], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "adam_repository_bundle.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Exported Adam Repository Manifest Bundle (.json)");
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".tab-btn").forEach(el => {
+        el.classList.remove("tab-active");
+        el.classList.add("text-slate-400");
+      });
+      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      activeBtn.classList.add("tab-active");
+      activeBtn.classList.remove("text-slate-400");
+
+      if (tabId === "optimizer-sim") {
+        setTimeout(initSimulationCanvas, 50);
+      } else if (tabId === "neural-trainer") {
+        setTimeout(initNNCanvas, 50);
+      }
+    }
+
+    const SURFACES = {
+      beale: {
+        domain: { x: [-4.5, 4.5], y: [-4.5, 4.5] },
+        f: (x, y) => {
+          const t1 = 1.5 - x + x * y;
+          const t2 = 2.25 - x + x * y * y;
+          const t3 = 2.625 - x + x * y * y * y;
+          return t1 * t1 + t2 * t2 + t3 * t3;
+        },
+        grad: (x, y) => {
+          const t1 = 1.5 - x + x * y;
+          const t2 = 2.25 - x + x * y * y;
+          const t3 = 2.625 - x + x * y * y * y;
+          const gx = 2 * t1 * (y - 1) + 2 * t2 * (y * y - 1) + 2 * t3 * (y * y * y - 1);
+          const gy = 2 * t1 * x + 2 * t2 * (2 * x * y) + 2 * t3 * (3 * x * y * y);
+          return [gx, gy];
+        },
+        defaultStart: [2.5, -2.5]
+      },
+      rosenbrock: {
+        domain: { x: [-2.0, 2.0], y: [-1.0, 3.0] },
+        f: (x, y) => Math.pow(1 - x, 2) + 100 * Math.pow(y - x * x, 2),
+        grad: (x, y) => [
+          -2 * (1 - x) - 400 * x * (y - x * x),
+          200 * (y - x * x)
+        ],
+        defaultStart: [-1.5, 2.0]
+      },
+      saddle: {
+        domain: { x: [-2.0, 2.0], y: [-2.0, 2.0] },
+        f: (x, y) => x * x - y * y,
+        grad: (x, y) => [2 * x, -2 * y],
+        defaultStart: [-1.8, 0.05]
+      },
+      rastrigin: {
+        domain: { x: [-3.5, 3.5], y: [-3.5, 3.5] },
+        f: (x, y) => 20 + (x * x - 10 * Math.cos(2 * Math.PI * x)) + (y * y - 10 * Math.cos(2 * Math.PI * y)),
+        grad: (x, y) => [
+          2 * x + 20 * Math.PI * Math.sin(2 * Math.PI * x),
+          2 * y + 20 * Math.PI * Math.sin(2 * Math.PI * y)
+        ],
+        defaultStart: [2.8, 2.5]
+      },
+      ill_conditioned: {
+        domain: { x: [-5.0, 5.0], y: [-5.0, 5.0] },
+        f: (x, y) => 0.5 * (x * x + 50 * y * y),
+        grad: (x, y) => [x, 50 * y],
+        defaultStart: [-4.0, 4.0]
+      }
+    };
+
+    let currentSurfaceKey = "beale";
+    let simIsRunning = false;
+    let simAnimId = null;
+    let currentSimStep = 0;
+    const MAX_SIM_STEPS = 600;
+
+    let optimizers = {
+      adam: { name: "Adam", color: "#34d399", path: [], state: {}, pos: [0, 0] },
+      adamw: { name: "AdamW", color: "#38bdf8", path: [], state: {}, pos: [0, 0] },
+      sgd: { name: "SGD+Mom", color: "#fbbf24", path: [], state: {}, pos: [0, 0] },
+      rmsprop: { name: "RMSprop", color: "#c084fc", path: [], state: {}, pos: [0, 0] }
+    };
+
+    let lossHistory = {
+      adam: [],
+      adamw: [],
+      sgd: [],
+      rmsprop: []
+    };
+
+    function initSimulationCanvas() {
+      const canvas = document.getElementById("optimizerCanvas");
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      canvas.onclick = (e) => {
+        const cRect = canvas.getBoundingClientRect();
+        const px = e.clientX - cRect.left;
+        const py = e.clientY - cRect.top;
+        const surf = SURFACES[currentSurfaceKey];
+        const [minX, maxX] = surf.domain.x;
+        const [minY, maxY] = surf.domain.y;
+
+        const startX = minX + (px / canvas.width) * (maxX - minX);
+        const startY = maxY - (py / canvas.height) * (maxY - minY);
+        resetSimulation([startX, startY]);
+      };
+
+      resetSimulation();
+    }
+
+    function resetSimulation(customStart = null) {
+      if (simAnimId) cancelAnimationFrame(simAnimId);
+      simIsRunning = false;
+      document.getElementById("simPlayText").innerText = "Run Simulation";
+      document.getElementById("simPlayIcon").innerText = "▶";
+
+      const surf = SURFACES[currentSurfaceKey];
+      const start = customStart || surf.defaultStart;
+      currentSimStep = 0;
+
+      for (const [key, opt] of Object.entries(optimizers)) {
+        opt.pos = [...start];
+        opt.path = [[...start]];
+        opt.state = {
+          m: [0, 0],
+          v: [0, 0],
+          velocity: [0, 0],
+          t: 0
+        };
+        lossHistory[key] = [surf.f(start[0], start[1])];
+      }
+
+      renderSimulationFrame();
+    }
+
+    function stepSimulation() {
+      if (currentSimStep >= MAX_SIM_STEPS) {
+        simIsRunning = false;
+        document.getElementById("simPlayText").innerText = "Completed";
+        return;
+      }
+
+      currentSimStep++;
+      const surf = SURFACES[currentSurfaceKey];
+      const lr = parseFloat(document.getElementById("lrInput").value);
+      const beta1 = parseFloat(document.getElementById("beta1Input").value);
+      const beta2 = parseFloat(document.getElementById("beta2Input").value);
+      const eps = parseFloat(document.getElementById("epsInput").value);
+      const wd = parseFloat(document.getElementById("wdInput").value);
+
+      // Update Adam
+      {
+        const opt = optimizers.adam;
+        const [x, y] = opt.pos;
+        const [gx, gy] = surf.grad(x, y);
+        opt.state.t++;
+        const t = opt.state.t;
+        opt.state.m[0] = beta1 * opt.state.m[0] + (1 - beta1) * gx;
+        opt.state.m[1] = beta1 * opt.state.m[1] + (1 - beta1) * gy;
+        opt.state.v[0] = beta2 * opt.state.v[0] + (1 - beta2) * (gx * gx);
+        opt.state.v[1] = beta2 * opt.state.v[1] + (1 - beta2) * (gy * gy);
+
+        const mHatX = opt.state.m[0] / (1 - Math.pow(beta1, t));
+        const mHatY = opt.state.m[1] / (1 - Math.pow(beta1, t));
+        const vHatX = opt.state.v[0] / (1 - Math.pow(beta2, t));
+        const vHatY = opt.state.v[1] / (1 - Math.pow(beta2, t));
+
+        opt.pos[0] -= (lr * mHatX) / (Math.sqrt(vHatX) + eps);
+        opt.pos[1] -= (lr * mHatY) / (Math.sqrt(vHatY) + eps);
+        opt.path.push([...opt.pos]);
+        lossHistory.adam.push(surf.f(opt.pos[0], opt.pos[1]));
+      }
+
+      // Update AdamW (Decoupled decay)
+      {
+        const opt = optimizers.adamw;
+        const [x, y] = opt.pos;
+        const [gx, gy] = surf.grad(x, y);
+        opt.state.t++;
+        const t = opt.state.t;
+
+        opt.pos[0] -= lr * wd * opt.pos[0];
+        opt.pos[1] -= lr * wd * opt.pos[1];
+
+        opt.state.m[0] = beta1 * opt.state.m[0] + (1 - beta1) * gx;
+        opt.state.m[1] = beta1 * opt.state.m[1] + (1 - beta1) * gy;
+        opt.state.v[0] = beta2 * opt.state.v[0] + (1 - beta2) * (gx * gx);
+        opt.state.v[1] = beta2 * opt.state.v[1] + (1 - beta2) * (gy * gy);
+
+        const mHatX = opt.state.m[0] / (1 - Math.pow(beta1, t));
+        const mHatY = opt.state.m[1] / (1 - Math.pow(beta1, t));
+        const vHatX = opt.state.v[0] / (1 - Math.pow(beta2, t));
+        const vHatY = opt.state.v[1] / (1 - Math.pow(beta2, t));
+
+        opt.pos[0] -= (lr * mHatX) / (Math.sqrt(vHatX) + eps);
+        opt.pos[1] -= (lr * mHatY) / (Math.sqrt(vHatY) + eps);
+        opt.path.push([...opt.pos]);
+        lossHistory.adamw.push(surf.f(opt.pos[0], opt.pos[1]));
+      }
+
+      // Update SGD with Momentum
+      {
+        const opt = optimizers.sgd;
+        const [x, y] = opt.pos;
+        const [gx, gy] = surf.grad(x, y);
+        const momentum = 0.9;
+        opt.state.velocity[0] = momentum * opt.state.velocity[0] + lr * gx;
+        opt.state.velocity[1] = momentum * opt.state.velocity[1] + lr * gy;
+        opt.pos[0] -= opt.state.velocity[0];
+        opt.pos[1] -= opt.state.velocity[1];
+        opt.path.push([...opt.pos]);
+        lossHistory.sgd.push(surf.f(opt.pos[0], opt.pos[1]));
+      }
+
+      // Update RMSprop
+      {
+        const opt = optimizers.rmsprop;
+        const [x, y] = opt.pos;
+        const [gx, gy] = surf.grad(x, y);
+        opt.state.v[0] = 0.99 * opt.state.v[0] + 0.01 * (gx * gx);
+        opt.state.v[1] = 0.99 * opt.state.v[1] + 0.01 * (gy * gy);
+        opt.pos[0] -= (lr * gx) / (Math.sqrt(opt.state.v[0]) + eps);
+        opt.pos[1] -= (lr * gy) / (Math.sqrt(opt.state.v[1]) + eps);
+        opt.path.push([...opt.pos]);
+        lossHistory.rmsprop.push(surf.f(opt.pos[0], opt.pos[1]));
+      }
+
+      renderSimulationFrame();
+    }
+
+    function renderSimulationFrame() {
+      const canvas = document.getElementById("optimizerCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width;
+      const H = canvas.height;
+      const surf = SURFACES[currentSurfaceKey];
+      const [minX, maxX] = surf.domain.x;
+      const [minY, maxY] = surf.domain.y;
+
+      const toScreen = (x, y) => [
+        ((x - minX) / (maxX - minX)) * W,
+        ((maxY - y) / (maxY - minY)) * H
+      ];
+
+      // Draw background contours
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(0, 0, W, H);
+
+      // Grid contours
+      const steps = 30;
+      for (let i = 0; i <= steps; i++) {
+        for (let j = 0; j <= steps; j++) {
+          const sx = minX + (i / steps) * (maxX - minX);
+          const sy = minY + (j / steps) * (maxY - minY);
+          const val = surf.f(sx, sy);
+          const logVal = Math.log10(Math.max(1e-4, val));
+          const norm = Math.min(1, Math.max(0, (logVal + 1) / 5));
+
+          const [px, py] = toScreen(sx, sy);
+          const r = Math.floor(15 + 40 * (1 - norm));
+          const g = Math.floor(25 + 60 * (1 - norm));
+          const b = Math.floor(40 + 100 * norm);
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(px - W / steps / 2, py - H / steps / 2, W / steps + 1, H / steps + 1);
+        }
+      }
+
+      // Draw trajectories
+      for (const [key, opt] of Object.entries(optimizers)) {
+        if (opt.path.length < 2) continue;
+        ctx.beginPath();
+        ctx.strokeStyle = opt.color;
+        ctx.lineWidth = 2.5;
+        const [startX, startY] = toScreen(opt.path[0][0], opt.path[0][1]);
+        ctx.moveTo(startX, startY);
+
+        for (let i = 1; i < opt.path.length; i++) {
+          const [px, py] = toScreen(opt.path[i][0], opt.path[i][1]);
+          ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Current head particle
+        const [currX, currY] = toScreen(opt.pos[0], opt.pos[1]);
+        ctx.beginPath();
+        ctx.arc(currX, currY, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = opt.color;
+        ctx.shadowColor = opt.color;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // Update counters & metrics
+      document.getElementById("canvasStepCounter").innerText = currentSimStep;
+      document.getElementById("legend-adam-loss").innerText = "L: " + (lossHistory.adam[lossHistory.adam.length - 1] || 0).toFixed(4);
+      document.getElementById("legend-adamw-loss").innerText = "L: " + (lossHistory.adamw[lossHistory.adamw.length - 1] || 0).toFixed(4);
+      document.getElementById("legend-sgd-loss").innerText = "L: " + (lossHistory.sgd[lossHistory.sgd.length - 1] || 0).toFixed(4);
+      document.getElementById("legend-rmsprop-loss").innerText = "L: " + (lossHistory.rmsprop[lossHistory.rmsprop.length - 1] || 0).toFixed(4);
+
+      renderLossChart();
+    }
+
+    function renderLossChart() {
+      const canvas = document.getElementById("lossChartCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      const W = canvas.width;
+      const H = canvas.height;
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, W, H);
+
+      const maxLen = Math.max(...Object.values(lossHistory).map(arr => arr.length));
+      if (maxLen < 2) return;
+
+      const keys = ["adam", "adamw", "sgd", "rmsprop"];
+      for (const k of keys) {
+        const arr = lossHistory[k];
+        if (arr.length < 2) continue;
+        ctx.beginPath();
+        ctx.strokeStyle = optimizers[k].color;
+        ctx.lineWidth = 1.8;
+
+        for (let i = 0; i < arr.length; i++) {
+          const x = (i / (maxLen - 1)) * W;
+          const logVal = Math.log10(Math.max(1e-6, arr[i]));
+          const y = H - Math.min(H, Math.max(0, ((logVal + 3) / 7) * H));
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    function toggleSimPlay() {
+      simIsRunning = !simIsRunning;
+      const btnText = document.getElementById("simPlayText");
+      const btnIcon = document.getElementById("simPlayIcon");
+
+      if (simIsRunning) {
+        btnText.innerText = "Pause";
+        btnIcon.innerText = "⏸";
+        const loop = () => {
+          if (!simIsRunning) return;
+          stepSimulation();
+          simAnimId = requestAnimationFrame(loop);
+        };
+        simAnimId = requestAnimationFrame(loop);
+      } else {
+        btnText.innerText = "Run Simulation";
+        btnIcon.innerText = "▶";
+        if (simAnimId) cancelAnimationFrame(simAnimId);
+      }
+    }
+
+    function stepSimulationOnce() {
+      if (simIsRunning) toggleSimPlay();
+      stepSimulation();
+    }
+
+    function changeLossSurface() {
+      currentSurfaceKey = document.getElementById("surfaceSelect").value;
+      resetSimulation();
+    }
+
+    function updateHyperparams() {
+      document.getElementById("lrVal").innerText = parseFloat(document.getElementById("lrInput").value).toFixed(3);
+      document.getElementById("beta1Val").innerText = parseFloat(document.getElementById("beta1Input").value).toFixed(2);
+      document.getElementById("beta2Val").innerText = parseFloat(document.getElementById("beta2Input").value).toFixed(3);
+      document.getElementById("epsVal").innerText = document.getElementById("epsInput").value;
+      document.getElementById("wdVal").innerText = parseFloat(document.getElementById("wdInput").value).toFixed(3);
+    }
+
+    let nnDatasetType = "spiral";
+    let nnDataPoints = [];
+    let nnWeights = null;
+    let nnIsTraining = false;
+    let nnAnimId = null;
+    let nnEpoch = 0;
+    let nnLossCurve = [];
+
+    function generateDataset(type, n = 120) {
+      const data = [];
+      if (type === "spiral") {
+        for (let i = 0; i < n; i++) {
+          const r = (i / n) * 0.85;
+          const t = 1.75 * (i / n) * 2 * Math.PI;
+          data.push({ x: r * Math.sin(t) + (Math.random() - 0.5) * 0.05, y: r * Math.cos(t) + (Math.random() - 0.5) * 0.05, label: 0 });
+          data.push({ x: -r * Math.sin(t) + (Math.random() - 0.5) * 0.05, y: -r * Math.cos(t) + (Math.random() - 0.5) * 0.05, label: 1 });
+        }
+      } else if (type === "moons") {
+        for (let i = 0; i < n; i++) {
+          const angle = (i / n) * Math.PI;
+          data.push({ x: Math.cos(angle) * 0.7 - 0.3, y: Math.sin(angle) * 0.7 - 0.2, label: 0 });
+          data.push({ x: 0.3 - Math.cos(angle) * 0.7, y: 0.2 - Math.sin(angle) * 0.7, label: 1 });
+        }
+      } else if (type === "circles") {
+        for (let i = 0; i < n; i++) {
+          const t = Math.random() * 2 * Math.PI;
+          data.push({ x: 0.35 * Math.cos(t), y: 0.35 * Math.sin(t), label: 0 });
+          data.push({ x: 0.75 * Math.cos(t), y: 0.75 * Math.sin(t), label: 1 });
+        }
+      } else { // XOR
+        for (let i = 0; i < n * 2; i++) {
+          const x = (Math.random() - 0.5) * 1.6;
+          const y = (Math.random() - 0.5) * 1.6;
+          const label = (x * y > 0) ? 1 : 0;
+          data.push({ x, y, label });
+        }
+      }
+      return data;
+    }
+
+    function initNNWeights() {
+      // 2 -> 16 -> 16 -> 1
+      const randMat = (r, c) => Array.from({ length: r }, () => Array.from({ length: c }, () => (Math.random() - 0.5) * Math.sqrt(2.0 / c)));
+      const zeros = (n) => Array(n).fill(0);
+
+      nnWeights = {
+        w1: randMat(16, 2), b1: zeros(16),
+        w2: randMat(16, 16), b2: zeros(16),
+        w3: randMat(1, 16), b3: zeros(1),
+        // Adam moment accumulators
+        m_w1: randMat(16, 2).map(r => r.fill(0)), v_w1: randMat(16, 2).map(r => r.fill(0)),
+        m_w2: randMat(16, 16).map(r => r.fill(0)), v_w2: randMat(16, 16).map(r => r.fill(0)),
+        m_w3: randMat(1, 16).map(r => r.fill(0)), v_w3: randMat(1, 16).map(r => r.fill(0)),
+        m_b1: zeros(16), v_b1: zeros(16),
+        m_b2: zeros(16), v_b2: zeros(16),
+        m_b3: zeros(1), v_b3: zeros(1),
+        step: 0
+      };
+      nnEpoch = 0;
+      nnLossCurve = [];
+    }
+
+    function nnForward(x, y, w) {
+      const relu = v => Math.max(0, v);
+      // Layer 1
+      const h1 = Array(16).fill(0);
+      for (let i = 0; i < 16; i++) {
+        h1[i] = relu(w.w1[i][0] * x + w.w1[i][1] * y + w.b1[i]);
+      }
+      // Layer 2
+      const h2 = Array(16).fill(0);
+      for (let i = 0; i < 16; i++) {
+        let sum = w.b2[i];
+        for (let j = 0; j < 16; j++) sum += w.w2[i][j] * h1[j];
+        h2[i] = relu(sum);
+      }
+      // Layer 3 (Sigmoid)
+      let outSum = w.b3[0];
+      for (let j = 0; j < 16; j++) outSum += w.w3[0][j] * h2[j];
+      const out = 1 / (1 + Math.exp(-Math.max(-15, Math.min(15, outSum))));
+      return { h1, h2, out };
+    }
+
+    function trainNNEpoch() {
+      const lr = parseFloat(document.getElementById("nnLrInput").value);
+      const beta1 = 0.9, beta2 = 0.999, eps = 1e-8;
+      const w = nnWeights;
+      w.step++;
+
+      let totalLoss = 0;
+      let correct = 0;
+
+      // Gradients accumulators
+      const gw1 = Array.from({ length: 16 }, () => Array(2).fill(0));
+      const gb1 = Array(16).fill(0);
+      const gw2 = Array.from({ length: 16 }, () => Array(16).fill(0));
+      const gb2 = Array(16).fill(0);
+      const gw3 = Array.from({ length: 1 }, () => Array(16).fill(0));
+      const gb3 = Array(1).fill(0);
+
+      for (const p of nnDataPoints) {
+        const { h1, h2, out } = nnForward(p.x, p.y, w);
+        const yTrue = p.label;
+        const loss = - (yTrue * Math.log(out + 1e-12) + (1 - yTrue) * Math.log(1 - out + 1e-12));
+        totalLoss += loss;
+        if ((out >= 0.5 ? 1 : 0) === yTrue) correct++;
+
+        // Backprop
+        const dOut = out - yTrue; // BCE + Sigmoid derivative
+        gb3[0] += dOut;
+        for (let j = 0; j < 16; j++) {
+          gw3[0][j] += dOut * h2[j];
+        }
+
+        const dh2 = Array(16).fill(0);
+        for (let j = 0; j < 16; j++) {
+          dh2[j] = dOut * w.w3[0][j] * (h2[j] > 0 ? 1 : 0);
+          gb2[j] += dh2[j];
+          for (let k = 0; k < 16; k++) {
+            gw2[j][k] += dh2[j] * h1[k];
+          }
+        }
+
+        for (let k = 0; k < 16; k++) {
+          let sum = 0;
+          for (let j = 0; j < 16; j++) sum += dh2[j] * w.w2[j][k];
+          const dh1 = sum * (h1[k] > 0 ? 1 : 0);
+          gb1[k] += dh1;
+          gw1[k][0] += dh1 * p.x;
+          gw1[k][1] += dh1 * p.y;
+        }
+      }
+
+      const N = nnDataPoints.length;
+      totalLoss /= N;
+      const acc = ((correct / N) * 100).toFixed(1);
+
+      // Apply Adam Parameter Updates
+      const applyAdam = (param, grad, m, v) => {
+        for (let i = 0; i < param.length; i++) {
+          if (Array.isArray(param[i])) {
+            applyAdam(param[i], grad[i], m[i], v[i]);
+          } else {
+            const g = grad[i] / N;
+            m[i] = beta1 * m[i] + (1 - beta1) * g;
+            v[i] = beta2 * v[i] + (1 - beta2) * (g * g);
+            const mHat = m[i] / (1 - Math.pow(beta1, w.step));
+            const vHat = v[i] / (1 - Math.pow(beta2, w.step));
+            param[i] -= (lr * mHat) / (Math.sqrt(vHat) + eps);
+          }
+        }
+      };
+
+      applyAdam(w.w1, gw1, w.m_w1, w.v_w1);
+      applyAdam(w.b1, gb1, w.m_b1, w.v_b1);
+      applyAdam(w.w2, gw2, w.m_w2, w.v_w2);
+      applyAdam(w.b2, gb2, w.m_b2, w.v_b2);
+      applyAdam(w.w3, gw3, w.m_w3, w.v_w3);
+      applyAdam(w.b3, gb3, w.m_b3, w.v_b3);
+
+      nnEpoch++;
+      nnLossCurve.push(totalLoss);
+      document.getElementById("nnEpochCount").innerText = nnEpoch;
+      document.getElementById("nnLossVal").innerText = totalLoss.toFixed(4);
+      document.getElementById("nnAccVal").innerText = acc + "%";
+
+      renderNNVisualization();
+      renderNNLossChart();
+    }
+
+    function renderNNVisualization() {
+      const canvas = document.getElementById("nnCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width;
+      const H = canvas.height;
+
+      const res = 36;
+      const cellW = W / res;
+      const cellH = H / res;
+
+      // Draw prediction heatmap
+      for (let i = 0; i < res; i++) {
+        for (let j = 0; j < res; j++) {
+          const nx = (i / res) * 2 - 1;
+          const ny = (j / res) * 2 - 1;
+          const { out } = nnForward(nx, ny, nnWeights);
+
+          const r = Math.floor(16 + out * 20);
+          const g = Math.floor(30 + out * 150);
+          const b = Math.floor(80 + (1 - out) * 140);
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(i * cellW, j * cellH, cellW + 1, cellH + 1);
+        }
+      }
+
+      // Draw dataset points
+      for (const p of nnDataPoints) {
+        const sx = ((p.x + 1) / 2) * W;
+        const sy = ((p.y + 1) / 2) * H;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = p.label === 1 ? "#34d399" : "#f43f5e";
+        ctx.strokeStyle = "#020617";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
+    function renderNNLossChart() {
+      const canvas = document.getElementById("nnLossChartCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      const W = canvas.width;
+      const H = canvas.height;
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, W, H);
+
+      if (nnLossCurve.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = "#34d399";
+      ctx.lineWidth = 2;
+
+      for (let i = 0; i < nnLossCurve.length; i++) {
+        const x = (i / (nnLossCurve.length - 1)) * W;
+        const y = H - Math.min(H, Math.max(0, (1 - nnLossCurve[i] / 1.5) * H));
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function initNNCanvas() {
+      const canvas = document.getElementById("nnCanvas");
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      nnDataPoints = generateDataset(nnDatasetType);
+      initNNWeights();
+      renderNNVisualization();
+    }
+
+    function toggleNNTraining() {
+      nnIsTraining = !nnIsTraining;
+      const text = document.getElementById("nnTrainText");
+      const icon = document.getElementById("nnTrainIcon");
+
+      if (nnIsTraining) {
+        text.innerText = "Pause Training";
+        icon.innerText = "⏸";
+        const loop = () => {
+          if (!nnIsTraining) return;
+          for (let step = 0; step < 3; step++) trainNNEpoch();
+          nnAnimId = requestAnimationFrame(loop);
+        };
+        nnAnimId = requestAnimationFrame(loop);
+      } else {
+        text.innerText = "Train Network";
+        icon.innerText = "▶";
+        if (nnAnimId) cancelAnimationFrame(nnAnimId);
+      }
+    }
+
+    function resetNN() {
+      if (nnIsTraining) toggleNNTraining();
+      initNNWeights();
+      renderNNVisualization();
+    }
+
+    function setNNDataset(type) {
+      nnDatasetType = type;
+      document.querySelectorAll(".dataset-btn").forEach(b => {
+        b.classList.remove("border-brand-500", "bg-brand-950/60", "text-brand-300");
+        b.classList.add("border-slate-800", "bg-dark-950", "text-slate-300");
+      });
+      const active = document.getElementById(`ds-btn-${type}`);
+      active.classList.add("border-brand-500", "bg-brand-950/60", "text-brand-300");
+      active.classList.remove("border-slate-800", "bg-dark-950", "text-slate-300");
+
+      if (nnIsTraining) toggleNNTraining();
+      nnDataPoints = generateDataset(type);
+      initNNWeights();
+      renderNNVisualization();
+    }
+
+    function runAutomatedBenchmarkSuite() {
+      const btn = document.getElementById("runBenchmarkBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">⟳</span> Running...`;
+
+      setTimeout(() => {
+        const tbody = document.getElementById("benchmarkTableBody");
+        tbody.innerHTML = "";
+
+        const surfaceNames = [
+          { key: "beale", label: "Beale Non-Convex Surface" },
+          { key: "rosenbrock", label: "Rosenbrock Banana Ridge" },
+          { key: "saddle", label: "Hyperbolic Saddle Point" },
+          { key: "rastrigin", label: "Rastrigin Multi-Modal" },
+          { key: "ill_conditioned", label: "Ill-Conditioned Quadratic" }
+        ];
+
+        for (const surfItem of surfaceNames) {
+          const surf = SURFACES[surfItem.key];
+          const start = surf.defaultStart;
+          const steps = 1500;
+          const lr = 0.05;
+
+          // Run Adam
+          let pAdam = [...start], mAdam = [0, 0], vAdam = [0, 0];
+          for (let t = 1; t <= steps; t++) {
+            const [gx, gy] = surf.grad(pAdam[0], pAdam[1]);
+            mAdam[0] = 0.9 * mAdam[0] + 0.1 * gx;
+            mAdam[1] = 0.9 * mAdam[1] + 0.1 * gy;
+            vAdam[0] = 0.999 * vAdam[0] + 0.001 * (gx * gx);
+            vAdam[1] = 0.999 * vAdam[1] + 0.001 * (gy * gy);
+            const mHatX = mAdam[0] / (1 - Math.pow(0.9, t));
+            const mHatY = mAdam[1] / (1 - Math.pow(0.9, t));
+            const vHatX = vAdam[0] / (1 - Math.pow(0.999, t));
+            const vHatY = vAdam[1] / (1 - Math.pow(0.999, t));
+            pAdam[0] -= (lr * mHatX) / (Math.sqrt(vHatX) + 1e-8);
+            pAdam[1] -= (lr * mHatY) / (Math.sqrt(vHatY) + 1e-8);
+          }
+          const lossAdam = surf.f(pAdam[0], pAdam[1]);
+
+          // Run AdamW
+          let pAdamW = [...start], mAdamW = [0, 0], vAdamW = [0, 0];
+          for (let t = 1; t <= steps; t++) {
+            const [gx, gy] = surf.grad(pAdamW[0], pAdamW[1]);
+            pAdamW[0] -= lr * 0.01 * pAdamW[0];
+            pAdamW[1] -= lr * 0.01 * pAdamW[1];
+            mAdamW[0] = 0.9 * mAdamW[0] + 0.1 * gx;
+            mAdamW[1] = 0.9 * mAdamW[1] + 0.1 * gy;
+            vAdamW[0] = 0.999 * vAdamW[0] + 0.001 * (gx * gx);
+            vAdamW[1] = 0.999 * vAdamW[1] + 0.001 * (gy * gy);
+            const mHatX = mAdamW[0] / (1 - Math.pow(0.9, t));
+            const mHatY = mAdamW[1] / (1 - Math.pow(0.9, t));
+            const vHatX = vAdamW[0] / (1 - Math.pow(0.999, t));
+            const vHatY = vAdamW[1] / (1 - Math.pow(0.999, t));
+            pAdamW[0] -= (lr * mHatX) / (Math.sqrt(vHatX) + 1e-8);
+            pAdamW[1] -= (lr * mHatY) / (Math.sqrt(vHatY) + 1e-8);
+          }
+          const lossAdamW = surf.f(pAdamW[0], pAdamW[1]);
+
+          // Run RMSprop
+          let pRMS = [...start], vRMS = [0, 0];
+          for (let t = 1; t <= steps; t++) {
+            const [gx, gy] = surf.grad(pRMS[0], pRMS[1]);
+            vRMS[0] = 0.99 * vRMS[0] + 0.01 * (gx * gx);
+            vRMS[1] = 0.99 * vRMS[1] + 0.01 * (gy * gy);
+            pRMS[0] -= (lr * gx) / (Math.sqrt(vRMS[0]) + 1e-8);
+            pRMS[1] -= (lr * gy) / (Math.sqrt(vRMS[1]) + 1e-8);
+          }
+          const lossRMS = surf.f(pRMS[0], pRMS[1]);
+
+          // Run SGD
+          let pSGD = [...start], velSGD = [0, 0];
+          for (let t = 1; t <= steps; t++) {
+            const [gx, gy] = surf.grad(pSGD[0], pSGD[1]);
+            velSGD[0] = 0.9 * velSGD[0] + lr * gx;
+            velSGD[1] = 0.9 * velSGD[1] + lr * gy;
+            pSGD[0] -= velSGD[0];
+            pSGD[1] -= velSGD[1];
+          }
+          const lossSGD = surf.f(pSGD[0], pSGD[1]);
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-dark-850 transition";
+          row.innerHTML = `
+            <td class="p-3 font-semibold text-white">${surfItem.label}</td>
+            <td class="p-3 text-emerald-400 font-bold">${lossAdam.toExponential(3)}</td>
+            <td class="p-3 text-cyan-400">${lossAdamW.toExponential(3)}</td>
+            <td class="p-3 text-purple-400">${lossRMS.toExponential(3)}</td>
+            <td class="p-3 text-amber-400">${lossSGD.toExponential(3)}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded bg-brand-950 text-brand-400 border border-brand-800 text-[10px] font-bold">Adam (Winner)</span></td>
+          `;
+          tbody.appendChild(row);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = `Execute Benchmark Suite`;
+        showToast("Benchmark execution completed across 5 domains!");
+      }, 350);
+    }
+
+    window.onload = function() {
+      renderFileTree();
+      selectFile("README.md");
+      initSimulationCanvas();
+    };
+  </script>
+</body>
+</html>

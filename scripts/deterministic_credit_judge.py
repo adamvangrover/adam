@@ -166,7 +166,7 @@ class DeterministicCreditJudge:
         w1, w2, w3, w4, penalty_per_var = weights
         base_fused_logit = (w1 * logits[0]) + (w2 * logits[1]) + (w3 * logits[2]) + (w4 * logits[3])
         adjusted_prob = self._logit_to_prob(base_fused_logit)
-
+        
         # Apply disagreement penalty
         physical_pd_1y_bps = int(Decimal(str(adjusted_prob * 10000.0)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
         physical_pd_1y_bps += int(disagreement_bps * (penalty_per_var / 10.0))
@@ -188,7 +188,7 @@ class DeterministicCreditJudge:
         # λ^P ≈ -ln(1 - PD)
         phys_p = self._bps_to_prob(physical_pd_1y_bps)
         lambda_p = -math.log(max(1.0 - phys_p, 0.00001))
-
+        
         # Risk premium RP_t parameterized by macro stress
         risk_premium = 0.0035 + (0.0020 * macro_stress_factor) + (logit_variance * 0.001)
         lambda_q = lambda_p + risk_premium
