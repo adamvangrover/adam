@@ -1,6 +1,8 @@
 import pytest
+
 from core.agents.insider_activity_agent import InsiderActivityAgent
 from core.schemas.agent_schema import AgentInput
+
 
 @pytest.fixture
 def insider_activity_agent():
