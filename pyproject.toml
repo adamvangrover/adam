@@ -21,22 +21,101 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-async-web = ["fastapi>=0.128.0", "uvicorn>=0.34.0", "Flask>=3.1.3", "Flask-Cors>=6.0.2", "Flask-SocketIO>=5.6.0", "Flask-JWT-Extended>=4.7.1", "aiohttp>=3.13.4", "anyio>=4.12.0", "websockets>=15.0.1"]
-data-science = ["numpy>=1.26.0", "pandas>=2.0.0", "scipy>=1.11.0", "scikit-learn>=1.3.0", "sympy", "statsmodels>=0.14.6", "optuna>=4.6.0"]
-ml-tensors = ["torch>=2.9.0", "transformers>=5.0.0rc3", "sentence-transformers>=3.4.1", "triton", "peft"]
-orchestration = ["openai>=1.0.0", "anthropic>=0.40.0", "litellm>=1.0.0", "langchain>=1.2.0", "langchain-core>=1.3.3", "langgraph>=1.0.10", "dspy-ai>=3.0.4", "mesa>=3.0.0", "pydantic-ai>=1.56.0"]
-finance = ["yfinance>=1.1.0", "ta>=0.11.0", "PyPortfolioOpt>=1.5.5", "edgartools>=5.8.1", "numpy-financial>=1.0.0", "pandas"]
-quantum = ["qiskit>=1.2.0", "qiskit-finance>=0.4.0", "qiskit-aer>=0.14.0", "numpy"]
-infrastructure = ["SQLAlchemy>=2.0.45", "neo4j>=6.0.3", "redis>=7.1.0", "celery>=5.6.2", "kombu>=5.6.2"]
-observability = ["opentelemetry-api>=1.39.1", "opentelemetry-sdk>=1.39.1", "mcp>=1.0.0", "fastmcp>=3.2.0"]
-full-kernel = ["fastapi", "numpy", "pandas", "scipy", "torch", "litellm", "langchain", "yfinance", "SQLAlchemy", "redis", "celery"]
-risk-agent = ["numpy", "pandas", "scipy", "scikit-learn", "yfinance", "SQLAlchemy", "redis", "openai"]
+async-web = [
+    "fastapi>=0.128.0",
+    "uvicorn>=0.34.0",
+    "Flask>=3.1.3",
+    "Flask-Cors>=6.0.2",
+    "Flask-SocketIO>=5.6.0",
+    "Flask-JWT-Extended>=4.7.1",
+    "aiohttp>=3.13.4",
+    "anyio>=4.12.0",
+    "websockets>=15.0.1",
+]
+data-science = [
+    "numpy>=1.26.0",
+    "pandas>=2.0.0",
+    "scipy>=1.11.0",
+    "scikit-learn>=1.3.0",
+    "sympy",
+    "statsmodels>=0.14.6",
+    "optuna>=4.6.0",
+]
+ml-tensors = [
+    "torch>=2.9.0",
+    "transformers>=5.0.0rc3",
+    "sentence-transformers>=3.4.1",
+    "triton",
+    "peft",
+]
+orchestration = [
+    "openai>=1.0.0",
+    "anthropic>=0.40.0",
+    "litellm>=1.0.0",
+    "langchain>=1.2.0",
+    "langchain-core>=1.3.3",
+    "langgraph>=1.0.10",
+    "dspy-ai>=3.0.4",
+    "mesa>=3.0.0",
+    "pydantic-ai>=1.56.0",
+]
+finance = [
+    "yfinance>=1.1.0",
+    "ta>=0.11.0",
+    "PyPortfolioOpt>=1.5.5",
+    "edgartools>=5.8.1",
+    "numpy-financial>=1.0.0",
+    "pandas",
+]
+quantum = [
+    "qiskit>=1.2.0",
+    "qiskit-finance>=0.4.0",
+    "qiskit-aer>=0.14.0",
+    "numpy",
+]
+infrastructure = [
+    "SQLAlchemy>=2.0.45",
+    "neo4j>=6.0.3",
+    "redis>=7.1.0",
+    "celery>=5.6.2",
+    "kombu>=5.6.2",
+]
+observability = [
+    "opentelemetry-api>=1.39.1",
+    "opentelemetry-sdk>=1.39.1",
+    "mcp>=1.0.0",
+    "fastmcp>=3.2.0",
+]
+full-kernel = [
+    "fastapi",
+    "numpy",
+    "pandas",
+    "scipy",
+    "torch",
+    "litellm",
+    "langchain",
+    "yfinance",
+    "SQLAlchemy",
+    "redis",
+    "celery",
+]
+risk-agent = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn",
+    "yfinance",
+    "SQLAlchemy",
+    "redis",
+    "openai",
+]
 
 [tool.maturin]
 python-source = "."
 module-name = "rust_ext"
 features = ["pyo3/extension-module"]
 manifest-path = "rust_ext/Cargo.toml"
+python-packages = ["core", "services", "src", "adam_v3"]
 
 [dependency-groups]
 dev = [
@@ -67,7 +146,6 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
-ignore = ["ANN101", "ANN102"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
