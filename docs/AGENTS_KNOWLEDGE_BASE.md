@@ -127,6 +127,9 @@
 - [ ] **API Auth:** Implement Middleware for `/api/agents` and `/api/simulations`.
 
 ### P1: Architectural Refactoring (Bolt)
+- [ ] **Merge Graph Classes:** Consolidate `core/engine` and `core/v23_graph_engine` versions of `UnifiedKnowledgeGraph`.
+- [x] **Deduplicate Scrubbers:** Unified `GoldStandardArtifact` and `GoldStandardScrubber` in `core/data_processing/utils.py`.
+- [x] **Multi-State Reasoning Grader:** Added `evals/graders/multi_state_reasoning_evaluator.py` evaluating trace fidelity, fact insertion F1, reasoning rubrics, and ECE.
 - [x] **Archive Graph PoCs:** Moved `experimental/v23_prototypes/v23_graph_engine` to `archive/v23_prototypes/` (superseded by `core/engine/cyclical_reasoning_graph.py`).
 - [ ] **Deduplicate Scrubbers:** Merge `utils.py` and `universal_ingestor.py` logic.
 - [ ] **Fix Async Loggers:** Ensure all Swarm agents use append mode.
