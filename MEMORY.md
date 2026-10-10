@@ -30,7 +30,8 @@ Directly sourced from the collective Agent Knowledge Base (`docs/AGENTS_KNOWLEDG
 
 ### P1: Architectural Refactoring (Bolt)
 - [ ] **Merge Graph Classes:** Consolidate `core/engine` and `core/v23_graph_engine` versions of `UnifiedKnowledgeGraph`.
-- [ ] **Deduplicate Scrubbers:** Merge `utils.py` and `universal_ingestor.py` logic.
+- [x] **Deduplicate Scrubbers:** Unified `GoldStandardArtifact` and `GoldStandardScrubber` in `core/data_processing/utils.py`.
+- [x] **Multi-State Reasoning Grader:** Added `evals/graders/multi_state_reasoning_evaluator.py` evaluating trace fidelity, fact insertion F1, reasoning rubrics, and Expected Calibration Error.
 - [ ] **Fix Async Loggers:** Ensure all Swarm agents use append mode.
 
 ### P2: UX Improvements (Palette)
@@ -76,4 +77,4 @@ Decomposition of monolithic models into distinct, composable capabilities for ta
 Robust testing and continuous learning to ensure agent alignment and systemic stability across simulated conditions.
 - **Market Evaluation:** Evaluators like `eval_crisis_sim.py` and `eval_illiquid_market.py` ensure the system can navigate extreme financial shocks and liquidity crunches.
 - **RAG & Knowledge Retrieval:** `eval_rag_pipeline.py` ensures factual grounding and precise context injection from the Knowledge Graph.
-- **Unified Grading:** Leveraging `unified_eval.py` to calculate composite scores across precision, recall, and logical consistency.
+- **Unified Grading:** Leveraging `unified_eval.py` and `MultiStateReasoningEvaluator` (`evals/graders/multi_state_reasoning_evaluator.py`) to calculate trace fidelity, fact insertion F1, reasoning rubrics, and Expected Calibration Error (ECE) across multi-state reasoning pipelines.

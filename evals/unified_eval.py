@@ -50,6 +50,16 @@ def main():
         "logs": judge_res["output"] + "\n" + judge_res["error"]
     }
 
+    # 4. Multi-State Reasoning Evaluator
+    print("Running Multi-State Reasoning Evaluator...")
+    start_time = time.time()
+    multi_state_res = run_command(["uv", "run", "pytest", "tests/evals/test_multi_state_reasoning_evaluator.py"])
+    results["evaluations"]["multi_state_reasoning"] = {
+        "duration_seconds": round(time.time() - start_time, 2),
+        "status": multi_state_res["status"],
+        "logs": multi_state_res["output"] + "\n" + multi_state_res["error"]
+    }
+
     # Output JSON Report
     report_path = "evals/data/unified_eval_report.json"
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
