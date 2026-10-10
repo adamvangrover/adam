@@ -70,7 +70,8 @@ async def test_hive_mind_initialization():
     hm = HiveMind(worker_count=10)
     await hm.initialize()
 
-    assert len(hm.workers) == 10
+    # The new architecture spawns an additional Sentinel worker, bringing the total to worker_count + 1
+    assert len(hm.workers) == 11
 
     # Check role distribution
     roles = [w.role for w in hm.workers]
