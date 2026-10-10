@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeEvolutionCandidate",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "base_revision",
+    "task_hash",
+    "expert",
+    "router",
+    "patch",
+    "scope"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_revision": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "task_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "expert": {
+      "type": "object",
+      "required": ["id", "artifact_hash", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "artifact_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "version": { "type": "string" }
+      }
+    },
+    "router": {
+      "type": "object",
+      "required": ["artifact_hash", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "seed": { "type": "integer" }
+      }
+    },
+    "patch": {
+      "type": "object",
+      "required": ["format", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "unified-diff"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["files"],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deletions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
