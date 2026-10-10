@@ -1,20 +1,22 @@
-# Adam OS Daily Brief
+# Adam Financial Operating System - Daily Brief
 **Date:** 2026-06-16
 
 ## Market Overview
-The S&P 500 is trading at 7554.29, reflecting continued strength in tech and AI infrastructure. Overall market sentiment remains cautious but resilient amid recent geopolitical tensions and shifting macro narratives.
+The S&P 500 closed at 7511.35 today. The month has been characterized by a massive equity market broadening, shifting Fed leadership (Kevin Warsh taking over), and accelerating inflation metrics (Core PCE at 3.4% YoY).
 
-## Macro Indicators
-*   **10-Year Treasury Yield:** 4.469%
-*   **Oil (WTI):** $81.50
-*   **Gold:** $4336.10
-*   **Bitcoin:** $66315.78
+## Macro Indicators (State 0: Live Ingestion)
+* **US 10-Year Treasury Yield:** 4.31%
+* **US 2-Year Treasury Yield:** 4.01%
+* **S&P 500 Index:** 7511.35
+* **High Yield Credit Spread:** 288 bps
+* **Cost of Debt Proxy:** 7.19%
 
-## Risk Radar
-*   **Tech Sector Volatility:** AI infrastructure companies like Nvidia face steep valuation pressures due to competitive developments from players like DeepSeek.
-*   **Geopolitics & Trade:** Arabica coffee prices hit a record level due to tariff and sanction disputes involving the U.S. and Colombia.
-*   **Commodities:** Gold and Silver have seen short-term pullbacks, potentially indicating a shift in safe-haven demand.
+## Risk Radar & Catalysts
+* **Fed Leadership & Policy:** Markets are rapidly repricing rate expectations higher in response to the leadership transition.
+* **Geopolitical De-escalation:** A signed Memorandum of Understanding in the Middle East has driven a sharp drop in oil prices, easing stagflation fears.
+* **AI Capital Expenditures:** Record-setting equity issuance continues, highlighted by an $85B Alphabet follow-on and SpaceX's IPO.
+* **Credit/Refinancing:** Structural default models indicate an implied commercial real estate default probability of 1.29%.
 
 ## Agent Insights
-*   **Risk Officer:** The elevated 10-year yield suggests persistent inflation expectations. Tech valuations must be monitored for sudden re-ratings due to yield pressures.
-*   **Macro Sentinel:** The decoupling of crypto and traditional tech stocks is notable. With Bitcoin maintaining above $66k while some AI hardware faces headwinds, capital rotation is underway.
+* **Macro Sentinel:** "Operating under State 0: Primary Ingestion (Live Anchor). Hawkish repricing is driving a flattening of the yield curve."
+* **Risk Officer:** "Corporate bonds remain incredibly resilient despite heavy supply. The ICE BofA US High Yield Index OAS is grinding down toward the 2.70% area."
