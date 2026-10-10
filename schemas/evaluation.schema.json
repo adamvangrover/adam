@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeEvolutionEvaluation",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "hard_gate",
+    "invariants",
+    "confidence",
+    "policy",
+    "result"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "hard_gate": {
+      "type": "boolean"
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "policy": {
+      "type": "object",
+      "required": ["version", "threshold"],
+      "properties": {
+        "version": { "type": "string" },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "result": {
+      "enum": [
+        "reject",
+        "quarantine",
+        "eligible",
+        "integrated"
+      ]
+    }
+  }
+}

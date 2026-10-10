@@ -1,5 +1,7 @@
 import pytest
+
 from core.governance.constitution import Constitution
+
 
 @pytest.fixture
 def constitution():

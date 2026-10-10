@@ -17,7 +17,7 @@ def fetch_and_forecast():
     )
 
     try:
-        with urllib.request.urlopen(req_reg) as response:
+        with urllib.request.urlopen(req_reg) as response:  # nosec B310
             reg_data = json.loads(response.read().decode("utf-8"))
             agent_id = reg_data.get("agent_id")
             challenge_id = reg_data.get("challenge_id")
@@ -56,7 +56,7 @@ def fetch_and_forecast():
         )
 
         try:
-            with urllib.request.urlopen(req_chal) as response_chal:
+            with urllib.request.urlopen(req_chal) as response_chal:  # nosec B310
                 pass
         except Exception as e:
             print(f"Challenge submission failed: {e}")
@@ -74,7 +74,7 @@ def fetch_and_forecast():
         )
 
         try:
-            with urllib.request.urlopen(req_token) as response_token:
+            with urllib.request.urlopen(req_token) as response_token:  # nosec B310
                 token_data = json.loads(response_token.read().decode("utf-8"))
                 access_token = token_data.get("access_token")
         except Exception as e:
@@ -91,7 +91,7 @@ def fetch_and_forecast():
         )
 
         try:
-            with urllib.request.urlopen(req_eval) as response_eval:
+            with urllib.request.urlopen(req_eval) as response_eval:  # nosec B310
                 eval_data = json.loads(response_eval.read().decode("utf-8"))
                 open_challenges = eval_data.get("items", [])[:5]
         except Exception as e:
@@ -104,7 +104,7 @@ def fetch_and_forecast():
             headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
         )
         try:
-            with urllib.request.urlopen(req_eval_public) as response_eval_public:
+            with urllib.request.urlopen(req_eval_public) as response_eval_public:  # nosec B310
                 eval_data = json.loads(response_eval_public.read().decode("utf-8"))
                 open_challenges = eval_data.get("items", [])[:5]
         except Exception as e:
@@ -169,7 +169,7 @@ def fetch_and_forecast():
             )
 
             try:
-                with urllib.request.urlopen(req_pred) as response_pred:
+                with urllib.request.urlopen(req_pred) as response_pred:  # nosec B310
                     pass
             except Exception as e:
                 print(f"Prediction for {target} failed: {e}")

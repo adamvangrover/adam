@@ -1,5 +1,6 @@
+from scripts.hitl_feedback_loop import FeedbackLoop, HumanFeedback
 from scripts.swarm_ledger import AppendOnlyLedger
-from scripts.hitl_feedback_loop import HumanFeedback, FeedbackLoop
+
 
 def test_submit_feedback():
     ledger = AppendOnlyLedger()
