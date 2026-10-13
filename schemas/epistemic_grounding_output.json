@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/epistemic_grounding_output/v1",
+  "title": "Epistemic Grounding Output Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill_id",
+    "status",
+    "claims",
+    "promotion_allowed",
+    "correlation_id"
+  ],
+  "properties": {
+    "skill_id": {
+      "const": "epistemic_grounding"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASSED", "REVIEW_REQUIRED", "REJECTED"]
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claim_id",
+          "text",
+          "epistemic_status",
+          "evidence_refs",
+          "verification_method",
+          "reason_codes"
+        ],
+        "properties": {
+          "claim_id": { "type": "string" },
+          "text": { "type": "string" },
+          "epistemic_status": {
+            "type": "string",
+            "enum": ["UNVERIFIED", "PENDING", "VERIFIED", "CONTESTED", "SUPERSEDED", "REJECTED"]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "verification_method": { "type": "string" },
+          "reason_codes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "promotion_allowed": {
+      "type": "boolean"
+    },
+    "correlation_id": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "epistemic_grounding",
+  "version": "1.0.0",
+  "entrypoint": "skills.epistemic_grounding:run",
+  "input_schema": "schemas/epistemic_grounding_input.json",
+  "output_schema": "schemas/epistemic_grounding_output.json",
+  "execution": {
+    "timeout_seconds": 30,
+    "max_attempts": 1,
+    "network_access": false,
+    "filesystem_scope": "repository_read_only"
+  },
+  "capabilities": [
+    "repository.read",
+    "provenance.append"
+  ],
+  "side_effect_class": "append_only_audit",
+  "authority_level": "proposal_only"
+}

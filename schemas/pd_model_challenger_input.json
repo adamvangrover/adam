@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/pd_model_challenger_input/v1",
+  "title": "PD Model Challenger Input Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "correlation_id",
+    "obligor_id",
+    "pd_fraction",
+    "lgd_fraction",
+    "ead_amount",
+    "fccr_ratio",
+    "incumbent_el_amount"
+  ],
+  "properties": {
+    "correlation_id": { "type": "string" },
+    "obligor_id": { "type": "string" },
+    "pd_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+    "lgd_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+    "ead_amount": { "type": "number", "minimum": 0 },
+    "fccr_ratio": { "type": "number", "minimum": 0 },
+    "incumbent_el_amount": { "type": "number", "minimum": 0 },
+    "tolerance_threshold": { "type": "number", "minimum": 0 }
+  }
+}

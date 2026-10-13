@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/epistemic_grounding_input/v1",
+  "title": "Epistemic Grounding Input Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "correlation_id",
+    "assertions",
+    "commit_sha"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string"
+    },
+    "commit_sha": {
+      "type": "string"
+    },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "text"],
+        "properties": {
+          "claim_id": { "type": "string" },
+          "text": { "type": "string" },
+          "source_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

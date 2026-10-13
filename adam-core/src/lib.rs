@@ -1,3 +1,5 @@
+pub mod memory;
+
 use ring::digest::{Context, SHA256};
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;

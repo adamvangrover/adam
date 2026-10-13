@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/pd_model_challenger_output/v1",
+  "title": "PD Model Challenger Output Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill_id",
+    "status",
+    "obligor_id",
+    "challenger_el_amount",
+    "incumbent_el_amount",
+    "variance_amount",
+    "tolerance_exceeded",
+    "correlation_id",
+    "authority_level"
+  ],
+  "properties": {
+    "skill_id": { "const": "pd_model_challenger" },
+    "status": { "type": "string", "enum": ["COMPLETED", "FAILED", "QUARANTINED"] },
+    "obligor_id": { "type": "string" },
+    "challenger_el_amount": { "type": "number" },
+    "incumbent_el_amount": { "type": "number" },
+    "variance_amount": { "type": "number" },
+    "tolerance_exceeded": { "type": "boolean" },
+    "correlation_id": { "type": "string" },
+    "authority_level": { "type": "string", "enum": ["proposal_only"] }
+  }
+}
