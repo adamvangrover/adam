@@ -34,7 +34,7 @@ class LakehouseConnector(BaseTool):
             except Exception as e:
                 pass
 
-    def execute(self, sql_query: str) -> str:
+    def execute(self, sql_query: str, params: dict = None) -> str:
         """
         Executes a SQL query against the Fabric Lakehouse.
         Graceful Fallback: If connection fails (simulated), queries local Parquet/JSON files.
@@ -46,12 +46,12 @@ class LakehouseConnector(BaseTool):
 
         # SIMULATE CONNECTION FAILURE -> FALLBACK
         try:
-            return self._query_local_lake(sql_query)
+            return self._query_local_lake(sql_query, params)
         except Exception as e:
             logger.error(f"Lakehouse query failed: {e}")
             return json.dumps({"error": f"Fallback failed: {e}"})
 
-    def _query_local_lake(self, query: str) -> str:
+    def _query_local_lake(self, query: str, params: dict = None) -> str:
         # Use DuckDB for real SQL execution over local files
         try:
             import duckdb
@@ -83,7 +83,10 @@ class LakehouseConnector(BaseTool):
                 # Execute the provided query
                 # Note: We assume the query references the 'financials' table
                 # A more robust system would map query tables to local files dynamically
-                result_df = con.execute(query).df()
+                if params:
+                    result_df = con.execute(query, parameters=params).df()
+                else:
+                    result_df = con.execute(query).df()
                 return "\n".join([json.dumps(record) for record in result_df.to_dict(orient="records")])
 
         except ImportError:
