@@ -3,11 +3,10 @@ EVE v2.0 — Early Value Engine (Institutional Single-Name Underwriting Engine)
 Deterministic, 5-phase quantitative valuation and 2LoD adversarial risk protocol.
 """
 
-from typing import Dict, Any, List, Optional
 import hashlib
 import json
-import math
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class EarlyValueEngine:
       Phase 5: SHA-256 Institutional IC Memo Generation & Integrity Gate Validation
     """
 
-    def __init__(self, company_data: Dict[str, Any]):
+    def __init__(self, company_data: dict[str, Any]) -> None:
         self.raw_data = company_data
         self.ticker = company_data.get("ticker", "UNKNOWN")
         self.company_name = company_data.get("company_name", company_data.get("ticker", "Issuer"))
@@ -62,7 +61,7 @@ class EarlyValueEngine:
     # =========================================================================
     # PHASE 1: OPERATING ECONOMIC SCRUB & NORMALIZATION
     # =========================================================================
-    def execute_phase1_normalization(self) -> Dict[str, Any]:
+    def execute_phase1_normalization(self) -> dict[str, Any]:
         """
         Reconciles GAAP to EVE Cash EBITDA (subtracting structural SBC as real economic cost).
         Calculates NOPAT, ROIC, WACC, Financial/Economic Net Debt, and Economic Profit.
@@ -108,7 +107,7 @@ class EarlyValueEngine:
     # =========================================================================
     # PHASE 2: PROBABILISTIC SCENARIO MODELING & 5 VALUATION CLOCKS
     # =========================================================================
-    def execute_phase2_probabilistic_scenarios(self, p1_res: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_phase2_probabilistic_scenarios(self, p1_res: dict[str, Any]) -> dict[str, Any]:
         """
         Executes Base (50%), Bull (25%), Bear (25%) probabilistic modeling and Challenger Engine.
         Calculates 5 Valuation Clocks (PIT, +1Y, +5Y, Through-Cycle, Terminal).
@@ -116,11 +115,11 @@ class EarlyValueEngine:
         wacc = p1_res["wacc"]
 
         # Helper to compute DCF intrinsic share price for a scenario
-        def _dcf_scenario(growth: float, margin_mult: float, wacc_adj: float = 0.0) -> Dict[str, float]:
+        def _dcf_scenario(growth: float, margin_mult: float, wacc_adj: float = 0.0) -> dict[str, float]:
             sc_wacc = wacc + wacc_adj
             cf = self.free_cash_flow * margin_mult
             proj_cfs = []
-            for t in range(1, 6):
+            for _t in range(1, 6):
                 cf *= (1.0 + growth)
                 proj_cfs.append(cf)
 
@@ -159,7 +158,6 @@ class EarlyValueEngine:
 
         # Clock 5: Terminal Value with excess return decay
         terminal_nopat = p1_res["nopat"] * ((1.0 + self.terminal_growth) ** 5)
-        terminal_reinvestment = terminal_nopat * (self.terminal_growth / max(0.01, self.terminal_roic))
         terminal_economic_profit = terminal_nopat - (wacc * self.invested_capital * 1.2)
         clock5_terminal = max(0.0, terminal_economic_profit / wacc)
 
@@ -188,7 +186,7 @@ class EarlyValueEngine:
     # =========================================================================
     # PHASE 3: 2LoD ADVERSARIAL RED-TEAM STRESS TESTING
     # =========================================================================
-    def execute_phase3_adversarial_red_team(self, p1_res: Dict[str, Any], p2_res: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_phase3_adversarial_red_team(self, p1_res: dict[str, Any], p2_res: dict[str, Any]) -> dict[str, Any]:
         """
         Executes mandatory thesis-breaking stress tests:
           Test A: Terminal ROIC Convergence to WACC (Terminal ROIC = WACC)
@@ -208,7 +206,10 @@ class EarlyValueEngine:
         # TEST B: +300 bps Credit Shock
         shocked_cost_of_debt = self.pre_tax_cost_of_debt + 0.030
         shocked_interest_exp = self.total_debt * shocked_cost_of_debt
-        shocked_fcf = max(0.0, self.free_cash_flow - (shocked_interest_exp - self.total_debt * self.pre_tax_cost_of_debt) * (1.0 - self.tax_rate))
+        base_debt_tax_effect = (
+            (shocked_interest_exp - self.total_debt * self.pre_tax_cost_of_debt) * (1.0 - self.tax_rate)
+        )
+        shocked_fcf = max(0.0, self.free_cash_flow - base_debt_tax_effect)
         test_b_price = base_pv * (shocked_fcf / max(1.0, self.free_cash_flow))
 
         # TEST C: Persistent Elevated CapEx Stress (+50% CapEx)
@@ -252,7 +253,11 @@ class EarlyValueEngine:
     # =========================================================================
     # PHASE 4: CAPITAL STRUCTURE ROLLUP & SECURITY-LEVEL PRICING
     # =========================================================================
-    def execute_phase4_capital_structure_pricing(self, p1_res: Dict[str, Any], p2_res: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_phase4_capital_structure_pricing(
+        self,
+        p1_res: dict[str, Any],
+        p2_res: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Rolls up Enterprise Value to Equity Value per share.
         Prices material capital structure securities (Equity, Senior Debt, Convertibles/Hybrids).
@@ -314,11 +319,11 @@ class EarlyValueEngine:
     # =========================================================================
     def execute_phase5_memo_and_integrity_gate(
         self,
-        p1_res: Dict[str, Any],
-        p2_res: Dict[str, Any],
-        p3_res: Dict[str, Any],
-        p4_res: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        p1_res: dict[str, Any],
+        p2_res: dict[str, Any],
+        p3_res: dict[str, Any],
+        p4_res: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Runs 15-point Valuation Integrity Gate check.
         Generates Institutional IC Decision Dossier and computes SHA-256 audit digest.
@@ -367,7 +372,8 @@ INTEGRITY-GATE STATUS:   {integrity_status}
 OPERATING ECONOMICS:
 -------------------
 Revenue:                 ${self.revenue:,.2f} M
-EVE Cash EBITDA:         ${p1_res['eve_cash_ebitda']:,.2f} M (GAAP EBITDA ${p1_res['gaap_ebitda']:,.2f} M - SBC ${p1_res['sbc_adjustment']:,.2f} M)
+EVE Cash EBITDA:         ${p1_res['eve_cash_ebitda']:,.2f} M
+                         (GAAP EBITDA ${p1_res['gaap_ebitda']:,.2f} M - SBC ${p1_res['sbc_adjustment']:,.2f} M)
 Free Cash Flow:          ${self.free_cash_flow:,.2f} M
 ROIC:                    {p1_res['roic']*100:.2f}%
 WACC:                    {p1_res['wacc']*100:.2f}%
@@ -384,10 +390,14 @@ ADVERSARIAL TAIL:        ${p3_res['adversarial_tail_value']:.2f}
 
 2LoD ADVERSARIAL RED-TEAM STRESS:
 --------------------------------
-1. Terminal ROIC=WACC:   ${p3_res['test_a_roic_wacc_convergence']['stressed_fair_value']:.2f} ({p3_res['test_a_roic_wacc_convergence']['value_drawdown_pct']:.2f}%)
-2. +300bps Credit Shock: ${p3_res['test_b_credit_shock_300bps']['stressed_fair_value']:.2f} ({p3_res['test_b_credit_shock_300bps']['value_drawdown_pct']:.2f}%)
-3. CapEx Stress (+50%):  ${p3_res['test_c_capex_stress']['stressed_fair_value']:.2f} ({p3_res['test_c_capex_stress']['value_drawdown_pct']:.2f}%)
-4. Margin Compression:  ${p3_res['test_d_margin_compression']['stressed_fair_value']:.2f} ({p3_res['test_d_margin_compression']['value_drawdown_pct']:.2f}%)
+1. Terminal ROIC=WACC:   ${p3_res['test_a_roic_wacc_convergence']['stressed_fair_value']:.2f}
+   Drawdown:             ({p3_res['test_a_roic_wacc_convergence']['value_drawdown_pct']:.2f}%)
+2. +300bps Credit Shock: ${p3_res['test_b_credit_shock_300bps']['stressed_fair_value']:.2f}
+   Drawdown:             ({p3_res['test_b_credit_shock_300bps']['value_drawdown_pct']:.2f}%)
+3. CapEx Stress (+50%):  ${p3_res['test_c_capex_stress']['stressed_fair_value']:.2f}
+   Drawdown:             ({p3_res['test_c_capex_stress']['value_drawdown_pct']:.2f}%)
+4. Margin Compression:  ${p3_res['test_d_margin_compression']['stressed_fair_value']:.2f}
+   Drawdown:             ({p3_res['test_d_margin_compression']['value_drawdown_pct']:.2f}%)
 
 TOP THESIS BREAKERS & KILL CONDITIONS:
 -------------------------------------
@@ -419,7 +429,7 @@ TOP THESIS BREAKERS & KILL CONDITIONS:
     # =========================================================================
     # MASTER RUNNER
     # =========================================================================
-    def run_underwriting_protocol(self) -> Dict[str, Any]:
+    def run_underwriting_protocol(self) -> dict[str, Any]:
         """
         Executes all 5 phases in sequence and returns complete underwriting dossier.
         """

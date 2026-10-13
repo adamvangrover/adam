@@ -2,12 +2,15 @@
 Pytest unit tests for adam_finance/eve_engine.py (EVE v2.0 Protocol)
 """
 
+from typing import Any
+
 import pytest
+
 from adam_finance.eve_engine import EarlyValueEngine
 
 
 @pytest.fixture
-def sample_company_data():
+def sample_company_data() -> dict[str, Any]:
     return {
         "ticker": "MSFT",
         "company_name": "Microsoft Corporation",
@@ -37,7 +40,7 @@ def sample_company_data():
     }
 
 
-def test_phase1_operating_economic_scrub(sample_company_data):
+def test_phase1_operating_economic_scrub(sample_company_data: dict[str, Any]) -> None:
     engine = EarlyValueEngine(sample_company_data)
     p1 = engine.execute_phase1_normalization()
 
@@ -60,7 +63,7 @@ def test_phase1_operating_economic_scrub(sample_company_data):
     assert 0.05 <= p1["wacc"] <= 0.12
 
 
-def test_phase2_probabilistic_scenarios_and_clocks(sample_company_data):
+def test_phase2_probabilistic_scenarios_and_clocks(sample_company_data: dict[str, Any]) -> None:
     engine = EarlyValueEngine(sample_company_data)
     p1 = engine.execute_phase1_normalization()
     p2 = engine.execute_phase2_probabilistic_scenarios(p1)
@@ -90,7 +93,7 @@ def test_phase2_probabilistic_scenarios_and_clocks(sample_company_data):
     assert "clock5_terminal_economic_profit" in clocks
 
 
-def test_phase3_adversarial_red_team_stress(sample_company_data):
+def test_phase3_adversarial_red_team_stress(sample_company_data: dict[str, Any]) -> None:
     engine = EarlyValueEngine(sample_company_data)
     p1 = engine.execute_phase1_normalization()
     p2 = engine.execute_phase2_probabilistic_scenarios(p1)
@@ -109,7 +112,7 @@ def test_phase3_adversarial_red_team_stress(sample_company_data):
     assert p3["test_d_margin_compression"]["stressed_fair_value"] <= pit_pv
 
 
-def test_phase4_capital_structure_pricing(sample_company_data):
+def test_phase4_capital_structure_pricing(sample_company_data: dict[str, Any]) -> None:
     engine = EarlyValueEngine(sample_company_data)
     p1 = engine.execute_phase1_normalization()
     p2 = engine.execute_phase2_probabilistic_scenarios(p1)
@@ -120,7 +123,7 @@ def test_phase4_capital_structure_pricing(sample_company_data):
     assert len(p4["security_price_map"]) >= 2
 
 
-def test_phase5_memo_and_integrity_gate(sample_company_data):
+def test_phase5_memo_and_integrity_gate(sample_company_data: dict[str, Any]) -> None:
     engine = EarlyValueEngine(sample_company_data)
     full_res = engine.run_underwriting_protocol()
 

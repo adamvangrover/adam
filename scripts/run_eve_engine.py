@@ -5,21 +5,21 @@ Executes institutional single-name underwriting protocol for Microsoft (MSFT) or
 """
 
 import argparse
-import sys
-from datetime import datetime, timezone
 import json
+from datetime import UTC, datetime
+from typing import Any
 
 from adam_finance.eve_engine import EarlyValueEngine
 
 
-def get_msft_default_data() -> dict:
+def get_msft_default_data() -> dict[str, Any]:
     """
     Returns baseline MSFT 10-K financial metrics for EVE v2.0 underwriting.
     """
     return {
         "ticker": "MSFT",
         "company_name": "Microsoft Corporation",
-        "valuation_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "valuation_date": datetime.now(UTC).strftime("%Y-%m-%d"),
         "current_price": 420.00,
         "shares_outstanding": 7430.0,
         "revenue": 245122.0,
@@ -45,7 +45,7 @@ def get_msft_default_data() -> dict:
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="EVE v2.0 Institutional Underwriting CLI")
     parser.add_argument("--ticker", type=str, default="MSFT", help="Company Ticker (default: MSFT)")
     parser.add_argument("--json", action="store_true", help="Output raw JSON results")
