@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/agent_skill_manifest/v1",
+  "title": "ADAM Agent Skill Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_id",
+    "version",
+    "entrypoint",
+    "input_schema",
+    "output_schema",
+    "execution",
+    "capabilities",
+    "side_effect_class",
+    "authority_level"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "skill_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "entrypoint": {
+      "type": "string"
+    },
+    "input_schema": {
+      "type": "string"
+    },
+    "output_schema": {
+      "type": "string"
+    },
+    "execution": {
+      "type": "object",
+      "required": [
+        "timeout_seconds",
+        "max_attempts",
+        "network_access",
+        "filesystem_scope"
+      ],
+      "properties": {
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "network_access": {
+          "type": "boolean"
+        },
+        "filesystem_scope": {
+          "type": "string",
+          "enum": ["read_only", "repository_read_only", "ephemeral_write", "full"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "side_effect_class": {
+      "type": "string",
+      "enum": ["read_only", "append_only_audit", "state_mutation"]
+    },
+    "authority_level": {
+      "type": "string",
+      "enum": ["proposal_only", "diagnostic_only", "admitted_authority"]
+    }
+  }
+}

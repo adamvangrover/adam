@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/memory_node/v1",
+  "title": "ADAM Memory Node",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "memory_id",
+    "schema_version",
+    "tier",
+    "kind",
+    "epistemic_status",
+    "content",
+    "content_hash",
+    "provenance",
+    "correlation_id"
+  ],
+  "properties": {
+    "memory_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "tier": {
+      "enum": ["M0", "M1", "M2", "M3"]
+    },
+    "kind": {
+      "enum": [
+        "observation",
+        "hypothesis",
+        "validated_claim",
+        "decision",
+        "execution_trace",
+        "policy",
+        "repository_artifact"
+      ]
+    },
+    "epistemic_status": {
+      "enum": [
+        "UNVERIFIED",
+        "PENDING",
+        "VERIFIED",
+        "CONTESTED",
+        "SUPERSEDED",
+        "REJECTED"
+      ]
+    },
+    "content": {
+      "type": "object"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "activity_id",
+        "agent_id",
+        "policy_version"
+      ],
+      "properties": {
+        "activity_id": {
+          "type": "string"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "policy_version": {
+          "type": "string"
+        },
+        "parent_record_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effective_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "observed_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "supersedes": {
+      "type": ["string", "null"]
+    }
+  }
+}
