@@ -41,6 +41,8 @@ Never use `dispatch --dispatch-confirmed` for live sends: it regenerates forecas
 - Energy collapse → equity/copper relief rally (R5: CL −2.7%, RB −7.6% → ES +0.6%, HG +0.9%).
 
 ## Calibration heuristics
-- Confidence is scored: cap ≈ shrunk hit rate + 0.10 (see `learn.py`), floor 0.50. Avoid blanket 0.72.
+- Confidence = `confidence.map_confidence` (no uplift): tier by margin over runner-up (TIE <0.03, LEAN <0.07, MODERATE <0.12, STRONG), −0.03 if a directional median move sits inside the dead zone. `auto` mode uses `calibration.json` (cap + reliability, needs n≥2); manual runs: `HA_CONF_MODE=fixed` → table 0.50/0.53/0.57/0.62. Tier + reasons appear in the dossier's tail-risk line.
 - Templated rationales score ~69 on quality; asset-specific, evidence-cited text is the next upgrade.
+- Tuning loop: `python3 -m headline_arena.backtest [--refresh]` (walk-forward, 42 variants, production math) → `--shadow` on each new batch → `--score-shadow` after settlement. Results: `data/memory/backtest_results.json`, `shadow_runs.jsonl`.
+- Backtest 2026-10-14 (694 walk-forward calls): best = reversion flow 0.8 + K10/r1.0 track (42.4% hit, Brier 0.664) vs repeat-last baseline 39.3%, uniform-guess Brier 0.667. Edge is small (~1.6 SE). Band rule (abs vs rel) made no material difference. Fixed table + large flow is worst (overconfident). Model under-calls neutral (5–13% vs 19% actual).
 - Monte Carlo seed is `zlib.crc32(challenge_id)` — staged output is reproducible.
