@@ -5,6 +5,7 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 from core.agents.agent_base import AgentBase
+from core.security.sector_validator import validate_sector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -37,10 +38,15 @@ class IndustrySpecialistAgent(AgentBase):
         Returns:
             object: An instance of the industry specialist class.
         """
+        specialist_class_name = validate_sector(sector)
+        if not specialist_class_name:
+            logger.warning(f"Sector validation failed for sector: {sector}. Using generic fallback.")
+            return None
+
+        normalized_sector = sector.lower().strip()
         try:
-            module = importlib.import_module(f"core.agents.industry_specialists.{sector}")
-            class_name = sector.capitalize() + "Specialist"  # Example: TechnologySpecialist
-            specialist_class = getattr(module, class_name)
+            module = importlib.import_module(f"core.agents.industry_specialists.{normalized_sector}")
+            specialist_class = getattr(module, specialist_class_name)
             return specialist_class(self.config)  # Instantiate the specialist class
         except ImportError:
             logger.warning(f"No specialist found for sector: {sector}. Using generic fallback.")
