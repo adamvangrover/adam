@@ -2,6 +2,7 @@
 
 import importlib
 import os
+
 from core.utils.config_utils import load_config
 
 
@@ -23,16 +24,37 @@ class PluginManager:
         for plugin_name in os.listdir(self.plugin_dir):
             if os.path.isdir(os.path.join(self.plugin_dir, plugin_name)):
                 try:
+                    import re
+                    from pathlib import Path
+
+                    if not re.match(r"^[a-zA-Z0-9_]+$", plugin_name):
+                        print(f"Error loading plugin {plugin_name}: Invalid plugin name format")
+                        continue
+
                     # Load plugin configuration
-                    config_path = os.path.join(self.plugin_dir, plugin_name, "config.json")
+                    plugin_path = os.path.join(self.plugin_dir, plugin_name)
+                    if not Path(plugin_path).resolve().is_relative_to(Path(self.plugin_dir).resolve()):
+                        print(f"Error loading plugin {plugin_name}: Path traversal detected")
+                        continue
+
+                    config_path = os.path.join(plugin_path, "config.json")
                     plugin_config = load_config(config_path)
 
                     # Import plugin module
                     module_name = f"{self.plugin_dir}.{plugin_name}.{plugin_name}"
                     module = importlib.import_module(module_name)
 
-                    # Instantiate plugin class
-                    plugin_class = getattr(module, plugin_config["class_name"])
+                    # Instantiate plugin class safely
+                    class_name = plugin_config.get("class_name")
+                    if not class_name or not re.match(r"^[a-zA-Z0-9_]+$", class_name):
+                        print(f"Error loading plugin {plugin_name}: Invalid class name format")
+                        continue
+
+                    plugin_class = getattr(module, class_name)
+                    if not isinstance(plugin_class, type):
+                        print(f"Error loading plugin {plugin_name}: Class {class_name} is not a valid type")
+                        continue
+
                     plugin = plugin_class(plugin_config)
 
                     # Register plugin

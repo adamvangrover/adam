@@ -1,9 +1,10 @@
 # core/agents/industry_specialist_agent.py
 
+import asyncio
 import importlib
 import logging
-import asyncio
-from typing import Dict, Any, Optional
+from typing import Any
+
 from core.agents.agent_base import AgentBase
 
 # Configure logging
@@ -15,7 +16,7 @@ class IndustrySpecialistAgent(AgentBase):
     Agent specializing in industry analysis by dynamically loading sector specialists.
     """
 
-    def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
+    def __init__(self, config: dict[str, Any], kernel: Any | None = None):
         """
         Initializes the Industry Specialist Agent.
 
@@ -29,7 +30,7 @@ class IndustrySpecialistAgent(AgentBase):
 
     def load_specialist(self, sector):
         """
-        Dynamically loads the industry specialist module for the given sector.
+        Loads the industry specialist module for the given sector securely.
 
         Args:
             sector (str): The name of the sector.
@@ -37,13 +38,19 @@ class IndustrySpecialistAgent(AgentBase):
         Returns:
             object: An instance of the industry specialist class.
         """
+        from core.security.sector_validator import validate_sector
+
+        class_name = validate_sector(sector)
+        if not class_name:
+            logger.warning(f"No specialist found for sector: {sector}. Using generic fallback.")
+            return None
+
         try:
-            module = importlib.import_module(f"core.agents.industry_specialists.{sector}")
-            class_name = sector.capitalize() + "Specialist"  # Example: TechnologySpecialist
+            module = importlib.import_module(f"core.agents.industry_specialists.{sector.lower().strip()}")
             specialist_class = getattr(module, class_name)
             return specialist_class(self.config)  # Instantiate the specialist class
         except ImportError:
-            logger.warning(f"No specialist found for sector: {sector}. Using generic fallback.")
+            logger.warning(f"Module not found for sector: {sector}. Using generic fallback.")
             return None
         except Exception as e:
             logger.error(f"Error loading specialist for {sector}: {e}")
