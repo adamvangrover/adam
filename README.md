@@ -325,7 +325,9 @@ git clone https://github.com/adamvangrover/adam.git
 cd adam
 
 # 3. Sync Dependencies
-uv sync
+uv sync --extra full-kernel
+# or for credit risk workflows:
+# uv sync --extra risk-agent --extra finance
 
 # 4. Activate Environment
 source .venv/bin/activate
