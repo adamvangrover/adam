@@ -60,7 +60,8 @@
   "agent_registry": {
     "core_agents": [
       { "name": "Nexus (Orchestrator)", "role": "Workflow runtime, task dispatch", "location": "core/engine/orchestrator.py" },
-      { "name": "Underwriting Agent", "role": "Credit analysis, capital structures", "sector": "TMT / Leveraged Finance" },
+      { "name": "Underwriting Agent (AFOS-UWR-01)", "role": "Credit analysis, capital structures", "sector": "TMT / Leveraged Finance" },
+      { "name": "Compliance Agent (AFOS-CMP-01)", "role": "Regulatory capital & audit verification", "location": "core/agents/compliance_agent.py" },
       { "name": "Surveillance Agent", "role": "Portfolio monitoring, threat telemetry" },
       { "name": "Sentinel Agent", "role": "Security, PROV-O compliance audits" },
       { "name": "Architect Agent (Jules)", "role": "Repository architecture, refactoring" }
@@ -139,7 +140,7 @@
       "validation": "Pydantic BaseModel"
     },
     "agent_output": {
-      "fields": ["answer (str)", "sources (List[str])", "confidence (float 0.0-1.0)", "metadata (Dict)"],
+      "fields": ["answer (str)", "sources (List[str])", "confidence (float 0.0-1.0)", "metadata (Dict)", "prov_o_audit_trail (List[Dict])"],
       "validation": "Pydantic BaseModel"
     }
   }

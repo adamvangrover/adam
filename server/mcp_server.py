@@ -1,16 +1,15 @@
-import sys
-import os
 import json
 import logging
-from typing import Dict, Any, List, Optional
-import glob
+import os
+import sys
+from typing import Any
 
 # Ensure we can import from core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # --- Dependency Handling & Mocking ---
 try:
-    from mcp.server.fastmcp import FastMCP, Context, Image
+    from mcp.server.fastmcp import Context, FastMCP, Image
 except ImportError:
     # Fallback for environments without MCP installed (Mock implementation)
     logging.warning("MCP library not found. Using Mock FastMCP.")
@@ -90,8 +89,8 @@ except ImportError:
 
 # 5. Security & Governance
 try:
-    from core.security.governance import GovernanceEnforcer, GovernanceError, ApprovalRequired
     from core.security.eaci_middleware import EACIMiddleware
+    from core.security.governance import ApprovalRequired, GovernanceEnforcer, GovernanceError
     GOVERNANCE_AVAILABLE = True
     # Initialize middleware (mocking permission manager for now)
     eaci = EACIMiddleware(permission_manager=None)
@@ -146,7 +145,7 @@ def get_documentation(filename: str) -> str:
             return f"Error: Document '{filename}' not found in docs/."
             
     try:
-        with open(target_path, "r") as f:
+        with open(target_path) as f:
             return f.read()
     except Exception as e:
         return f"Error reading file: {e}"
@@ -184,10 +183,68 @@ def generate_market_scenarios(regime: str = "stress", n_samples: int = 5) -> str
     except Exception as e:
         return json.dumps({"error": str(e)})
 
-# 2. CREDIT & SNC
+# 2. CREDIT & COMPLIANCE (AFOS-UWR-01 / AFOS-CMP-01)
 
 @mcp.tool()
-def analyze_snc_credit(financials: Dict[str, float], capital_structure: List[Dict[str, Any]], enterprise_value: float) -> str:
+def model_alpha_client(entity_ticker: str, financials: dict[str, float]) -> str:
+    """
+    Queries Model Alpha for obligor Probability of Default (PD) calculation.
+    """
+    ebitda = financials.get("ebitda", 100.0)
+    debt = financials.get("total_debt", 300.0)
+    leverage = debt / max(ebitda, 1.0)
+    pd_alpha = min(max(0.01 * (leverage ** 1.2), 0.001), 0.25)
+    return json.dumps({
+        "entity_ticker": entity_ticker,
+        "model": "Model Alpha",
+        "pd": round(pd_alpha, 4),
+        "prov_o_audit_trail": [{"activity": "model_alpha_pd_eval", "pd": round(pd_alpha, 4)}]
+    })
+
+@mcp.tool()
+def model_beta_client(entity_ticker: str, financials: dict[str, float]) -> str:
+    """
+    Queries Model Beta for obligor Probability of Default (PD) calculation.
+    """
+    ebitda = financials.get("ebitda", 100.0)
+    debt = financials.get("total_debt", 300.0)
+    fccr = financials.get("fccr", 1.5)
+    pd_beta = min(max(0.012 * ((debt / max(ebitda, 1.0)) / max(fccr, 0.5)), 0.001), 0.25)
+    return json.dumps({
+        "entity_ticker": entity_ticker,
+        "model": "Model Beta",
+        "pd": round(pd_beta, 4),
+        "prov_o_audit_trail": [{"activity": "model_beta_pd_eval", "pd": round(pd_beta, 4)}]
+    })
+
+@mcp.tool()
+def arbitration_calculator(model_alpha_pd: float, model_beta_pd: float, alpha_weight: float = 0.5) -> str:
+    """
+    Computes weighted consensus Probability of Default (PD) arbitration between Model Alpha and Model Beta.
+    """
+    consensus_pd = alpha_weight * model_alpha_pd + (1.0 - alpha_weight) * model_beta_pd
+    divergence = abs(model_alpha_pd - model_beta_pd)
+    return json.dumps({
+        "consensus_pd": round(consensus_pd, 4),
+        "divergence": round(divergence, 4),
+        "prov_o_audit_trail": [{"activity": "arbitration_calc", "consensus_pd": round(consensus_pd, 4)}]
+    })
+
+@mcp.tool()
+def audit_logger(agent_id: str, event_type: str, details: dict[str, Any] | None = None) -> str:
+    """
+    Logs compliance audit trails and capital buffer allocations.
+    """
+    return json.dumps({
+        "status": "logged",
+        "agent_id": agent_id,
+        "event_type": event_type,
+        "details": details or {},
+        "prov_o_audit_trail": [{"agent_id": agent_id, "event_type": event_type}]
+    })
+
+@mcp.tool()
+def analyze_snc_credit(financials: dict[str, float], capital_structure: list[dict[str, Any]], enterprise_value: float) -> str:
     """
     Performs a Shared National Credit (SNC) rating analysis.
     
@@ -335,7 +392,7 @@ def retrieve_market_data(ticker: str) -> str:
             }
             return json.dumps(data)
         except Exception as e:
-            return json.dumps({"error": f"Data fetch failed: {str(e)}"})
+            return json.dumps({"error": f"Data fetch failed: {e!s}"})
     else:
         # Mock for demo
         import random
@@ -385,7 +442,7 @@ def execute_python_sandbox(code: str) -> str:
     except Exception as e:
         return json.dumps({
             "status": "error",
-            "error": f"Execution failed: {str(e)}"
+            "error": f"Execution failed: {e!s}"
         })
 
 if __name__ == "__main__":

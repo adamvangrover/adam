@@ -66,6 +66,8 @@ finance = [
     "edgartools>=5.8.1",
     "numpy-financial>=1.0.0",
     "pandas",
+    "weasyprint>=60.0",
+    "markdown>=3.5",
 ]
 quantum = [
     "qiskit>=1.2.0",
@@ -79,6 +81,7 @@ infrastructure = [
     "redis>=7.1.0",
     "celery>=5.6.2",
     "kombu>=5.6.2",
+    "qdrant-client>=1.13.0",
 ]
 observability = [
     "opentelemetry-api>=1.39.1",
@@ -87,34 +90,27 @@ observability = [
     "fastmcp>=3.2.0",
 ]
 full-kernel = [
-    "fastapi",
-    "numpy",
-    "pandas",
-    "scipy",
-    "torch",
-    "litellm",
-    "langchain",
-    "yfinance",
-    "SQLAlchemy",
-    "redis",
-    "celery",
+    "adam-kernel[async-web,data-science,ml-tensors,orchestration,finance,infrastructure,observability]",
 ]
 risk-agent = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "scikit-learn",
-    "yfinance",
-    "SQLAlchemy",
-    "redis",
-    "openai",
+    "adam-kernel[data-science,finance,infrastructure]",
+    "openai>=1.0.0",
 ]
 
 [tool.maturin]
 python-source = "."
 features = ["pyo3/extension-module"]
 manifest-path = "rust_ext/Cargo.toml"
-python-packages = ["core", "services", "src", "adam_v3"]
+python-packages = [
+    "core",
+    "services",
+    "src",
+    "adam_os",
+    "adam_swarm",
+    "adam_finance",
+    "adam_governance",
+    "adam_graph",
+]
 
 [dependency-groups]
 dev = [
@@ -128,7 +124,6 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest>=9.0.3",
     "ruff>=0.14.10",
-    "black>=26.3.1",
     "mypy>=1.19.1",
 ]
 
@@ -150,7 +145,20 @@ select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
 max-complexity = 10
 
 [tool.ruff.lint.isort]
-known-first-party = ["adam", "nexus", "sentinel", "odyssey", "bolt"]
+known-first-party = [
+    "adam",
+    "core",
+    "services",
+    "adam_os",
+    "adam_swarm",
+    "adam_finance",
+    "adam_governance",
+    "adam_graph",
+    "nexus",
+    "sentinel",
+    "odyssey",
+    "bolt",
+]
 
 [tool.ruff.format]
 quote-style = "double"
