@@ -12,5 +12,26 @@ Modules:
 - hil_validation_node: Provides the mechanism for Human-in-the-Loop validation as a native, auditable state in the reasoning graph.
 """
 
-from .cyclical_reasoning_graph import cyclical_reasoning_app, build_cyclical_reasoning_graph
-from .snc_graph import snc_graph_app, build_snc_graph
+try:
+    from .cyclical_reasoning_graph import cyclical_reasoning_app, build_cyclical_reasoning_graph
+    from .snc_graph import snc_graph_app, build_snc_graph
+except Exception:
+    cyclical_reasoning_app = None
+    build_cyclical_reasoning_graph = None
+    snc_graph_app = None
+    build_snc_graph = None
+from .eve_v2_engine import (
+    EVEUnderwritingEngine,
+    EVEUnderwritingResult,
+    ValuationClockOutput,
+    FundamentalEngineOutput,
+    MarketEngineOutput,
+    CapitalAllocationOutput,
+    AdversarialBreakthrough,
+    ChallengerEngineOutput,
+    SecurityPricingItem,
+    CapitalStructureRecommendation,
+    DataConfidenceScore,
+    SingleEngineDominanceError,
+    UnpricedSecurityError,
+)
