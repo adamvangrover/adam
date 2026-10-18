@@ -1,0 +1,109 @@
+# config/llm_routing.yaml
+# October 2026 Frontier Model Routing & SR 11-7 Governance Registry
+version: "2026.10"
+schema_version: "2.0.0"
+
+deal_room_cache:
+  default_ttl_seconds: 7200
+  eviction_policy: "LRU"
+  max_cached_deal_rooms: 16
+  min_tokens_for_cache: 32768
+
+routing_tiers:
+  tier_1_primary_system2:
+    provider: "google"
+    model_id: "gemini-4-argon"
+    release_date: "2026-10-13"
+    architecture: "Sparse MoE Multimodal"
+    context_window: 1000000
+    pricing:
+      currency: "USD"
+      base_input_per_million: 2.00
+      cached_read_per_million: 0.10
+      output_per_million: 10.00
+      cache_discount_pct: 95.0
+    capabilities:
+      - "gemini_managed_agents"
+      - "dscr_lgd_formula_synthesis"
+      - "bsl_covenant_extraction"
+      - "threejs_spatial_synthesis"
+      - "w3c_provo_provenance_audit"
+    governance:
+      sr11_7_compliant: true
+      mandatory_negative_findings: true
+      hard_pause_on_unverified: true
+      benchmark_anchors:
+        vals_index_rank: 1
+        harvey_legal_agent_rank: 1
+        nowai_bench_task_completion_gain_pct: 20.0
+
+  tier_2_secondary_verification:
+    quantitative_audit:
+      provider: "openai"
+      model_id: "gpt-6.1-sol"
+      release_date: "2026-10-04"
+      architecture: "Deterministic Formal Code & Math Verifier"
+      pricing:
+        base_input_per_million: 3.00
+        output_per_million: 12.00
+      role: "jsonlogic_qmc_formula_cross_audit"
+      codex_work_error_rate_pct: 7.7
+      dispatch_triggers:
+        - "custom_qmc_payoff_scripts"
+        - "multi_tiered_debt_baskets"
+        - "ebitda_add_back_cap_exceptions"
+
+    sanctioning_consensus_gate:
+      required_consensus_quorum: 3
+      models:
+        - provider: "google"
+          model_id: "gemini-4-argon"
+        - provider: "openai"
+          model_id: "gpt-6-luna-decisions"
+          release_date: "2026-10-06"
+          role: "enterprise_decision_theoretic_gatekeeper"
+        - provider: "microsoft"
+          model_id: "microsoft-decision-1"
+          release_date: "2026-10-09"
+          role: "workflow_state_transition_validator"
+      divergence_action: "LOCK_WORKFLOW_AND_ESCALATE_TO_2LOD_HUMAN_OFFICER"
+
+  tier_2_quarantine_block:
+    blocked_models:
+      - model_id: "gpt-6.1-astra"
+        provider: "openai"
+        status: "PAUSED_OCT_2026"
+        reason: "Unaligned autonomous frontier variant exhibiting permission-bypassing behaviors."
+        enforcement_error: "SR11_7_BLOCKED_MODEL_ERROR"
+        rejection_level: "HARD_CRYPTO_AND_CONFIG_BLOCK"
+
+  tier_3_telemetry_triage:
+    stream_filtering:
+      provider: "anthropic"
+      model_id: "claude-haiku-5-5-20261007"
+      release_date: "2026-10-07"
+      role: "high_frequency_whalescanner_edgar_filtering"
+      max_latency_ms: 250
+    schema_normalization:
+      provider: "anthropic"
+      model_id: "claude-sonnet-5-5-20261002"
+      release_date: "2026-10-02"
+      role: "initial_json_schema_normalization"
+
+  tier_4_sovereign_fallback_and_voice:
+    sovereign_fallback:
+      provider: "mistral"
+      model_id: "mistral-large-4-2610"
+      release_date: "2026-10"
+      architecture: "1T-parameter Multimodal Open-Weights"
+      regulatory_compliance:
+        - "EU_AI_ACT"
+        - "GDPR"
+        - "DORA"
+      enforce_identical_system_prompts: true
+    voice_telemetry:
+      provider: "xai"
+      model_id: "grok-voice-3.0"
+      release_date: "2026-10"
+      role: "live_neural_link_audio_briefings"
+      target_ui: "0591097"
