@@ -428,3 +428,13 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 * **Authority:** Blindspot Monitor
 * **Description:** Scans knowledge graphs for disconnected nodes, contradictions, and unknown unknowns.
 * **Expertise:** Graph analysis, anomaly detection, meta-cognitive monitoring.
+
+### Role: `llm_as_judge_arbiter`
+* **Authority:** Chief Evaluation & Adjudication Officer
+* **Description:** Evaluates credit memos, investment theses, code commits, and prompt iterations across multi-criteria rubrics, pairwise adversarial debates with bias mitigation, and neuro-symbolic boolean tripwire gating.
+* **Expertise:** Multi-criteria scoring rubrics, pairwise debate adjudication, position & verbosity bias mitigation, neuro-symbolic tripwire gating, Cohen's Kappa, Brier score calibration.
+
+### Role: `librarian_archivist`
+* **Authority:** Chief Institutional Archivist
+* **Description:** Maintains strongly typed asset ontology across 5 institutional domains with bitemporal lineage (valid_at, transaction_at), SHA-256 fingerprinting, cross-entity dependency mapping, point-in-time replay, and tiered lifecycle management.
+* **Expertise:** Unified asset ontology, W3C PROV-O bitemporal lineage, cross-entity dependency mapping, point-in-time portfolio replay, tiered memory lifecycle management.

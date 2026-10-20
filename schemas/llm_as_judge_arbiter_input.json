@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/llm_as_judge_arbiter_input/v1",
+  "title": "LLM As Judge Arbiter Input Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "correlation_id"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string"
+    },
+    "evaluation_type": {
+      "type": "string",
+      "enum": ["single_candidate_rubric", "pairwise_debate", "calibration_tune", "hybrid_gating"]
+    },
+    "candidate_proposal": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "proposal_type": { "type": "string" },
+        "content": { "type": "string" },
+        "financial_metrics": {
+          "type": "object",
+          "properties": {
+            "dscr": { "type": "number" },
+            "leverage_ratio": { "type": "number" },
+            "unauthorized_addbacks": { "type": "boolean" },
+            "refinancing_wall_modeled": { "type": "boolean" },
+            "margin_compression_modeled": { "type": "boolean" },
+            "non_linear_debt_service_decay": { "type": "boolean" },
+            "sr11_7_compliant": { "type": "boolean" },
+            "snc_classification": { "type": "string" }
+          }
+        },
+        "evidence_mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["assertion_id", "text"],
+            "properties": {
+              "assertion_id": { "type": "string" },
+              "text": { "type": "string" },
+              "source_ref": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "candidate_debate": {
+      "type": "object",
+      "properties": {
+        "candidate_a": {
+          "type": "object",
+          "required": ["agent_id", "proposal_text"],
+          "properties": {
+            "agent_id": { "type": "string" },
+            "proposal_text": { "type": "string" },
+            "token_count": { "type": "integer" },
+            "grounding_count": { "type": "integer" }
+          }
+        },
+        "candidate_b": {
+          "type": "object",
+          "required": ["agent_id", "proposal_text"],
+          "properties": {
+            "agent_id": { "type": "string" },
+            "proposal_text": { "type": "string" },
+            "token_count": { "type": "integer" },
+            "grounding_count": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "tripwire_policy": {
+      "type": "object",
+      "properties": {
+        "min_dscr": { "type": "number" },
+        "allow_unauthorized_addbacks": { "type": "boolean" },
+        "max_leverage": { "type": "number" },
+        "require_sr11_7": { "type": "boolean" }
+      }
+    },
+    "calibration_dataset": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["proposal_id", "judge_verdict", "committee_verdict"],
+        "properties": {
+          "proposal_id": { "type": "string" },
+          "judge_verdict": { "type": "string" },
+          "committee_verdict": { "type": "string" },
+          "judge_score": { "type": "number" },
+          "committee_outcome_binary": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
