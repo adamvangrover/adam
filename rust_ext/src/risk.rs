@@ -46,3 +46,30 @@ pub fn calculate_var(py: Python<'_>, returns: Vec<f64>, confidence: f64, method:
         })
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calculate_var_valid() {
+        pyo3::prepare_freethreaded_python();
+        Python::with_gil(|py| {
+            let returns = vec![-0.05, -0.02, 0.01, 0.03, 0.04];
+            let res = calculate_var(py, returns, 0.95, "historical".to_string()).unwrap();
+            assert_eq!(res.method, "historical");
+            assert!(res.deterministic);
+            assert!(res.value > 0.0);
+        });
+    }
+
+    #[test]
+    fn test_calculate_var_invalid_confidence() {
+        pyo3::prepare_freethreaded_python();
+        Python::with_gil(|py| {
+            let returns = vec![-0.05, 0.01];
+            let res = calculate_var(py, returns, 1.5, "historical".to_string());
+            assert!(res.is_err());
+        });
+    }
+}
