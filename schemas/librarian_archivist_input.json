@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/librarian_archivist_input/v1",
+  "title": "Librarian Archivist Input Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "correlation_id"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string"
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["catalog_register", "point_in_time_replay", "map_dependencies", "manage_lifecycle_transitions"]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifact_id", "domain", "entity_type"],
+        "properties": {
+          "artifact_id": { "type": "string" },
+          "domain": {
+            "type": "string",
+            "enum": ["credit_facilities", "quantitative_models", "software_repositories", "project_backlogs", "research_intelligence"]
+          },
+          "entity_type": { "type": "string" },
+          "attributes": { "type": "object" },
+          "valid_at": { "type": "string" },
+          "transaction_at": { "type": "string" },
+          "current_lifecycle_tier": {
+            "type": "string",
+            "enum": ["hot_memory", "warm_searchable", "cold_audit_storage"]
+          },
+          "status": { "type": "string" },
+          "content_payload": { "type": ["string", "object"] }
+        }
+      }
+    },
+    "dependency_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "target_id", "relation_type"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "target_id": { "type": "string" },
+          "relation_type": { "type": "string" }
+        }
+      }
+    },
+    "replay_query": {
+      "type": "object",
+      "properties": {
+        "as_of_valid_at": { "type": "string" },
+        "as_of_transaction_at": { "type": "string" },
+        "target_domains": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

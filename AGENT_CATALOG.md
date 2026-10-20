@@ -109,6 +109,79 @@ This document is the central registry and Agent Card catalog for all autonomous 
 
 ---
 
+### `llm_as_judge_arbiter` (`AFOS-EVAL-01`)
+
+* **Role ID:** `llm_as_judge_arbiter`
+* **File:** `skills/llm_as_judge_arbiter.py`
+* **Bounded Context:** `Evaluation, Debate Adjudication & Policy Governance`
+* **Persona / Authority:** Chief Evaluation & Adjudication Officer
+* **Description:** Performs multi-criteria rubric evaluation (empirical groundedness, reasoning rigor, policy compliance), head-to-head debate adjudication with position and verbosity bias mitigation, neuro-symbolic boolean tripwire gating, and human alignment calibration ($\kappa$ and Brier score).
+* **Expertise:** Multi-criteria scoring rubrics, pairwise adversarial adjudication, bias mitigation, neuro-symbolic tripwires, Cohen's Kappa, Brier score calibration.
+* **State Schema:**
+```json
+{
+  "agent_role": "llm_as_judge_arbiter",
+  "correlation_id": "string",
+  "outcome": "ADMIT_PROPOSAL | REJECT | ESCALATE | QUARANTINED | ABSTAIN",
+  "rubric_scores": {
+    "empirical_groundedness": "float",
+    "reasoning_rigor_downside": "float",
+    "policy_regulatory_compliance": "float",
+    "weighted_composite_score": "float"
+  },
+  "tripwire_status": {
+    "passed": "boolean",
+    "triggered_tripwires": ["string"]
+  },
+  "calibration_metrics": {
+    "cohens_kappa": "float",
+    "brier_score": "float"
+  },
+  "prov_o_audit_trail": []
+}
+```
+* **Allowed Tools:** `epistemic_grounding_validator`, `jsonlogic_evaluator`, `prov_o_audit_logger`
+* **Operating Confidence Tier:** Proposal Only; Hard Abort on tripwire failure regardless of qualitative LLM score.
+* **Contractual Constraints:**
+  - MUST enforce hard deterministic tripwires (e.g., DSCR < 1.05x or unauthorized covenant add-backs) to override qualitative scores.
+  - MUST perform candidate position swapping and token length normalization in pairwise debate adjudication.
+
+---
+
+### `librarian_archivist` (`AFOS-LIB-01`)
+
+* **Role ID:** `librarian_archivist`
+* **File:** `skills/librarian_archivist.py`
+* **Bounded Context:** `Asset, Investment & Project Development Lineage`
+* **Persona / Authority:** Chief Institutional Archivist
+* **Description:** Maintains a strongly typed catalog across 5 institutional domains with bitemporal lineage, SHA-256 fingerprinting, cross-entity dependency mapping, point-in-time replay, and tiered lifecycle management.
+* **Expertise:** Unified asset ontology, W3C PROV-O bitemporal lineage, cross-entity dependency graphs, point-in-time portfolio replay, tiered memory lifecycle.
+* **State Schema:**
+```json
+{
+  "agent_role": "librarian_archivist",
+  "correlation_id": "string",
+  "catalog_summary": {
+    "total_artifacts": "integer",
+    "artifacts_by_domain": "object",
+    "artifacts_by_tier": "object"
+  },
+  "dependency_graph": {
+    "edge_count": "integer",
+    "critical_paths": ["string"]
+  },
+  "lifecycle_transitions": [],
+  "prov_o_audit_trail": []
+}
+```
+* **Allowed Tools:** `prov_o_audit_logger`, `qdrant_cache_manager`, `git_tools`
+* **Operating Confidence Tier:** Proposal Only; Append-only audit logging.
+* **Contractual Constraints:**
+  - MUST tag every artifact with valid_at, transaction_at, and SHA-256 content hashes.
+  - MUST generate cache invalidation signals upon lifecycle tier transitions.
+
+---
+
 ## Specialized Macro & Intelligence Agents
 
 ### `macro_liquidity_agent`

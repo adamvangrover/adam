@@ -34,6 +34,18 @@ SKILL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "entrypoint": "skills.pd_model_challenger:run",
         "input_schema": "schemas/pd_model_challenger_input.json",
         "output_schema": "schemas/pd_model_challenger_output.json"
+    },
+    "llm_as_judge_arbiter": {
+        "manifest_path": "schemas/llm_as_judge_arbiter_manifest.json",
+        "entrypoint": "skills.llm_as_judge_arbiter:run",
+        "input_schema": "schemas/llm_as_judge_arbiter_input.json",
+        "output_schema": "schemas/llm_as_judge_arbiter_output.json"
+    },
+    "librarian_archivist": {
+        "manifest_path": "schemas/librarian_archivist_manifest.json",
+        "entrypoint": "skills.librarian_archivist:run",
+        "input_schema": "schemas/librarian_archivist_input.json",
+        "output_schema": "schemas/librarian_archivist_output.json"
     }
 }
 

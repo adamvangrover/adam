@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/librarian_archivist_output/v1",
+  "title": "Librarian Archivist Output Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill_id",
+    "status",
+    "correlation_id",
+    "catalog_summary",
+    "bitemporal_lineage_records",
+    "dependency_graph",
+    "lifecycle_transitions",
+    "reason_codes"
+  ],
+  "properties": {
+    "skill_id": {
+      "const": "librarian_archivist"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASSED", "COMPLETED", "REVIEW_REQUIRED", "QUARANTINED"]
+    },
+    "correlation_id": {
+      "type": "string"
+    },
+    "catalog_summary": {
+      "type": "object",
+      "required": ["total_artifacts", "artifacts_by_domain", "artifacts_by_tier"],
+      "properties": {
+        "total_artifacts": { "type": "integer" },
+        "artifacts_by_domain": { "type": "object" },
+        "artifacts_by_tier": { "type": "object" }
+      }
+    },
+    "bitemporal_lineage_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifact_id", "sha256_hash", "valid_at", "transaction_at", "prov_o_ref"],
+        "properties": {
+          "artifact_id": { "type": "string" },
+          "sha256_hash": { "type": "string" },
+          "valid_at": { "type": "string" },
+          "transaction_at": { "type": "string" },
+          "prov_o_ref": { "type": "string" }
+        }
+      }
+    },
+    "dependency_graph": {
+      "type": "object",
+      "required": ["edge_count", "edges"],
+      "properties": {
+        "edge_count": { "type": "integer" },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source_id", "target_id", "relation_type"],
+            "properties": {
+              "source_id": { "type": "string" },
+              "target_id": { "type": "string" },
+              "relation_type": { "type": "string" }
+            }
+          }
+        },
+        "critical_paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "lifecycle_transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifact_id", "previous_tier", "new_tier", "transition_reason", "cache_invalidation_signal"],
+        "properties": {
+          "artifact_id": { "type": "string" },
+          "previous_tier": { "type": "string" },
+          "new_tier": { "type": "string" },
+          "transition_reason": { "type": "string" },
+          "cache_invalidation_signal": { "type": "string" }
+        }
+      }
+    },
+    "replay_snapshot": {
+      "type": "object",
+      "properties": {
+        "as_of_valid_at": { "type": "string" },
+        "as_of_transaction_at": { "type": "string" },
+        "active_artifacts": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "prov_o_audit_trail": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}
