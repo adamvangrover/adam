@@ -12,12 +12,15 @@ import copy
 import datetime
 import hashlib
 import json
+import logging
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Literal
 
 from core.provenance.prov import ProvActivity, ProvAgent, ProvEntity
+
+logger = logging.getLogger(__name__)
 
 MUTABLE_COMPONENTS = (
     "system_prompt",
@@ -31,6 +34,38 @@ MUTABLE_COMPONENTS = (
 LOCKED_COMPONENTS = ("guardrails",)  # SR 11-7 invariant: Editor/Composer cannot alter guardrails
 
 
+class Harness2TelemetryLogger:
+    """Structured Telemetry Logger for Harness² SR 11-7 Auditability."""
+
+    def __init__(
+        self,
+        sink: Callable[[str, dict], None] | None = None,
+        log_file: Path | None = None,
+    ):
+        self.sink = sink
+        self.log_file = log_file
+
+    def emit(self, event_type: str, payload: dict) -> None:
+        event = {
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "event_type": event_type,
+            "payload": payload,
+        }
+        logger.debug(f"[Telemetry] {event_type}: {payload}")
+        if self.sink:
+            try:
+                self.sink(event_type, payload)
+            except Exception as err:
+                logger.warning(f"Telemetry sink exception: {err}")
+        if self.log_file:
+            try:
+                self.log_file.parent.mkdir(parents=True, exist_ok=True)
+                with self.log_file.open("a", encoding="utf-8") as f:
+                    f.write(json.dumps(event) + "\n")
+            except Exception as err:
+                logger.warning(f"Telemetry log write exception: {err}")
+
+
 def create_w3c_prov_bundle(
     task_id: str,
     domain: str,
@@ -40,7 +75,7 @@ def create_w3c_prov_bundle(
     """Generates a W3C PROV-O compliant provenance record and SHA-256 digest."""
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
     agent = ProvAgent(
-        id=f"agent:harness2_controller",
+        id="agent:harness2_controller",
         agent_type="software",
         attributes={"framework": "ADAM_OS_v30.1", "compliance": "SR_11_7"},
     )
@@ -207,6 +242,7 @@ class Harness2Controller:
             [str, ExecutionTrace, list[ExecutionTrace], str], dict
         ],
         reflector_fn: Callable[[str, ExecutionTrace, ExecutionTrace, dict], str],
+        telemetry_logger: Harness2TelemetryLogger | None = None,
     ):
         self.base_harness = base_harness
         self.library = library
@@ -214,6 +250,7 @@ class Harness2Controller:
         self.editor_fn = editor_fn
         self.composer_fn = composer_fn
         self.reflector_fn = reflector_fn
+        self.telemetry = telemetry_logger or Harness2TelemetryLogger()
 
     def run_task(
         self,
@@ -241,6 +278,16 @@ class Harness2Controller:
             attributes={"harness_id": current_harness.fingerprint()},
         )
         ref_trace.provenance_digest = ref_digest
+
+        self.telemetry.emit(
+            "harness2.reference_executed",
+            {
+                "task_id": task_id,
+                "domain": domain,
+                "base_fingerprint": current_harness.fingerprint(),
+                "prov_digest": ref_digest,
+            },
+        )
 
         accumulated_patch: dict = {}
 
@@ -276,6 +323,15 @@ class Harness2Controller:
                 )
                 trace.provenance_digest = p_digest
                 probe_traces.append(trace)
+
+            self.telemetry.emit(
+                "harness2.probes_evaluated",
+                {
+                    "task_id": task_id,
+                    "probe_count": len(probe_traces),
+                    "mode": mode,
+                },
+            )
 
             # Compose final harness from behavioral contrasts across all 2k probes
             accumulated_patch = self.composer_fn(
@@ -325,6 +381,16 @@ class Harness2Controller:
         )
         final_trace.provenance_digest = final_digest
 
+        self.telemetry.emit(
+            "harness2.composed_adopted",
+            {
+                "task_id": task_id,
+                "final_fingerprint": final_harness.fingerprint(),
+                "patch_keys": list(accumulated_patch.keys()),
+                "prov_digest": final_digest,
+            },
+        )
+
         # Level 2: Experience Reflection -> Commit adopted harness + EXPERIENCE.md
         lessons_md = self.reflector_fn(
             task_prompt, ref_trace, final_trace, accumulated_patch
@@ -337,5 +403,13 @@ class Harness2Controller:
                 lessons_markdown=lessons_md,
             ),
             adopted_harness=final_harness,
+        )
+
+        self.telemetry.emit(
+            "harness2.experience_committed",
+            {
+                "task_id": task_id,
+                "domain": domain,
+            },
         )
         return final_trace

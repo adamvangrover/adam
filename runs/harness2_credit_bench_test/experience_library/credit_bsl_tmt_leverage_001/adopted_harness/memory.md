@@ -1,0 +1,1 @@
+Canonical deal-room state initialized.

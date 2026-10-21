@@ -1,0 +1,1 @@
+Enhanced SEC 10-K footnote & covenant table extraction playbook.
