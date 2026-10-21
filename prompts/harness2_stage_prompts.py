@@ -3,6 +3,11 @@ Stage Prompts for Harness² (Editor, Composer, Reflector)
 Tailored for 2nd-Line Corporate Credit, SEC Filing, and Covenant Risk Oversight.
 """
 
+from __future__ import annotations
+
+import json
+from typing import Any
+
 EDITOR_STAGE_PROMPT = """
 You are the Harness Editor operating in a Harness² runtime architecture for 2nd-Line Credit Risk Oversight.
 Your role is to analyze a reference execution trajectory (τ_0) on a credit analysis task and propose orthogonal harness patches to resolve failure modes.
@@ -32,10 +37,10 @@ Generate {k} candidate patch pairs consisting of:
    - LME / Liability Management Exercise / J.Crew blocker checklists
 
 Respond in valid JSON format containing:
-{
-  "invariant_patches": [ { ...patch dict... } ],
-  "domain_patches": [ { ...patch dict... } ]
-}
+{{
+  "invariant_patches": [ {{ ...patch dict... }} ],
+  "domain_patches": [ {{ ...patch dict... }} ]
+}}
 """
 
 COMPOSER_STAGE_PROMPT = """
@@ -85,3 +90,72 @@ Structure:
 ## 3. Reusable Domain Rule / Directive
 - Clear, actionable guidance for future credit risk analyses in this sector/domain.
 """
+
+
+def format_editor_prompt(
+    task_prompt: str,
+    ref_trace: Any,
+    prior_lessons: str,
+    k: int = 1,
+) -> str:
+    """Formats the Editor Stage Prompt with task inputs."""
+    return EDITOR_STAGE_PROMPT.format(
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        prior_lessons=prior_lessons or "No prior domain lessons recorded.",
+        k=k,
+    )
+
+
+def format_composer_prompt(
+    task_prompt: str,
+    ref_trace: Any,
+    probe_traces: list[Any],
+    prior_lessons: str,
+) -> str:
+    """Formats the Composer Stage Prompt with baseline and probe trajectories."""
+    return COMPOSER_STAGE_PROMPT.format(
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        probe_traces=json.dumps([str(p) for p in probe_traces], indent=2),
+        prior_lessons=prior_lessons or "No prior domain lessons recorded.",
+    )
+
+
+def format_reflector_prompt(
+    domain: str,
+    task_id: str,
+    task_prompt: str,
+    ref_trace: Any,
+    final_trace: Any,
+    adopted_patch: dict,
+) -> str:
+    """Formats the Experience Reflector Stage Prompt."""
+    return REFLECTOR_STAGE_PROMPT.format(
+        domain=domain,
+        task_id=task_id,
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        final_trace=str(final_trace),
+        adopted_patch=json.dumps(adopted_patch, indent=2),
+    )
+
+
+def parse_editor_response(response_text: str) -> tuple[list[dict], list[dict]]:
+    """Parses and validates JSON output from the Editor LLM response."""
+    try:
+        data = json.loads(response_text)
+        inv = data.get("invariant_patches", [])
+        dom = data.get("domain_patches", [])
+        return inv, dom
+    except Exception:
+        return [], []
+
+
+def parse_composer_response(response_text: str) -> dict:
+    """Parses and validates JSON output from the Composer LLM response."""
+    try:
+        data = json.loads(response_text)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
