@@ -21,14 +21,14 @@ This directory contains deterministic, governed agent skills operating within th
 - **Input Schema**: `schemas/llm_as_judge_arbiter_input.json`
 - **Output Schema**: `schemas/llm_as_judge_arbiter_output.json`
 - **Capabilities**: `multi_criteria_evaluation`, `pairwise_adversarial_adjudication`, `neuro_symbolic_tripwire_gating`, `human_alignment_calibration`
-- **Purpose**: Performs multi-criteria scoring rubrics across empirical groundedness, reasoning rigor & downside completeness, and policy compliance; head-to-head pairwise debate adjudication with position & verbosity bias mitigation; neuro-symbolic boolean tripwire gating (e.g., DSCR < 1.05x); and human alignment calibration computing Cohen's Kappa ($\kappa$) and Brier scores against committee outcomes.
+- **Purpose**: Performs multi-criteria scoring rubrics across empirical groundedness, reasoning rigor & downside completeness, and policy compliance (SR 11-7, SNC classifications, liquidity runway limits); head-to-head pairwise debate adjudication with position & verbosity bias mitigation and token density tracking; neuro-symbolic boolean tripwire gating (e.g., DSCR < 1.05x, unauthorized covenant add-backs, liquidity runway breach); and human alignment calibration computing Cohen's Kappa ($\kappa$) and Brier scores against Investment and Credit Committee outcomes.
 
 ### 4. Librarian & Archivist (`skills/librarian_archivist.py`)
 - **Manifest**: `schemas/librarian_archivist_manifest.json` (skill_id: `librarian_archivist`)
 - **Input Schema**: `schemas/librarian_archivist_input.json`
 - **Output Schema**: `schemas/librarian_archivist_output.json`
 - **Capabilities**: `unified_asset_ontology`, `bitemporal_lineage_replay`, `cross_entity_dependency_mapping`, `tiered_archival_lifecycle`
-- **Purpose**: Maintains a strongly typed catalog connecting 5 primary institutional domains (Credit Facilities, Quantitative Models, Software Repositories, Project Backlogs, Research Intelligence) with bitemporal lineage (`valid_at`, `transaction_at`), SHA-256 fingerprinting, PROV-O metadata, cross-entity dependency mapping, point-in-time replay, and tiered archival lifecycle management (`hot_memory` -> `warm_searchable` -> `cold_audit_storage`).
+- **Purpose**: Maintains a strongly typed catalog connecting 5 primary institutional domains (Credit Facilities, Quantitative Models, Software Repositories, Project Backlogs, Research Intelligence) with bitemporal lineage (`valid_at`, `transaction_at`), SHA-256 fingerprinting, PROV-O metadata, cross-entity dependency mapping with critical path extraction, point-in-time replay, and tiered archival lifecycle management (`hot_memory` -> `warm_searchable` -> `cold_audit_storage`) with automated cache invalidation signals.
 
 ## Governance & Authority Invariants
 - Skills run with `authority_level: proposal_only`. No skill can directly grant canonical state admission or approve credit decisions.

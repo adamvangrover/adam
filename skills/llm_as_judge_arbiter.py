@@ -68,6 +68,11 @@ def evaluate_policy_compliance(financial_metrics: Dict[str, Any]) -> Tuple[float
         score -= 0.3
         reason_codes.append(f"POLICY_SNC_WARNING:{snc_class}")
 
+    liquidity_days = financial_metrics.get("liquidity_runway_days")
+    if liquidity_days is not None and liquidity_days < 90:
+        score -= 0.2
+        reason_codes.append(f"POLICY_LIQUIDITY_RUNWAY_WARNING:{liquidity_days}_DAYS")
+
     score = max(0.0, round(score, 4))
     return score, reason_codes
 
@@ -76,6 +81,7 @@ def check_tripwires(financial_metrics: Dict[str, Any], policy: Dict[str, Any]) -
     min_dscr = policy.get("min_dscr", 1.05)
     allow_unauthorized_addbacks = policy.get("allow_unauthorized_addbacks", False)
     max_leverage = policy.get("max_leverage", None)
+    min_liquidity_days = policy.get("min_liquidity_runway_days", None)
     require_sr11_7 = policy.get("require_sr11_7", True)
 
     triggered = []
@@ -92,6 +98,10 @@ def check_tripwires(financial_metrics: Dict[str, Any], policy: Dict[str, Any]) -
     if max_leverage is not None and leverage is not None and leverage > max_leverage:
         triggered.append(f"TRIPWIRE_LEVERAGE_EXCEEDED:leverage={leverage}>max={max_leverage}")
 
+    liquidity_days = financial_metrics.get("liquidity_runway_days")
+    if min_liquidity_days is not None and liquidity_days is not None and liquidity_days < min_liquidity_days:
+        triggered.append(f"TRIPWIRE_LIQUIDITY_RUNWAY_BREACH:runway={liquidity_days}<min={min_liquidity_days}")
+
     sr11_7 = financial_metrics.get("sr11_7_compliant", True)
     if require_sr11_7 and not sr11_7:
         triggered.append("TRIPWIRE_SR11_7_VIOLATION")
@@ -104,11 +114,16 @@ def adjudicate_pairwise_debate(candidate_a: Dict[str, Any], candidate_b: Dict[st
     Performs pairwise debate adjudication with:
     1. Position-bias mitigation via candidate order swapping (eval A vs B and B vs A)
     2. Verbosity-bias mitigation via token length normalization ratio penalty
+    3. Explicit token density metrics and position bias detection indicators
     """
     tok_a = max(1, candidate_a.get("token_count", 500))
     tok_b = max(1, candidate_b.get("token_count", 500))
     g_a = candidate_a.get("grounding_count", 1)
     g_b = candidate_b.get("grounding_count", 1)
+
+    # Token density (groundings per token x 100)
+    density_a = round(g_a / tok_a, 6)
+    density_b = round(g_b / tok_b, 6)
 
     # Base raw scores from grounding density
     raw_score_a = g_a / (math.log(tok_a + 1) + 1e-5)
@@ -134,18 +149,25 @@ def adjudicate_pairwise_debate(candidate_a: Dict[str, Any], candidate_b: Dict[st
 
     winner_order_2 = "candidate_b" if raw_score_b_swapped > raw_score_a_swapped else ("candidate_a" if raw_score_a_swapped > raw_score_b_swapped else "tie")
 
+    position_bias_detected = (winner_order_1 != winner_order_2 and winner_order_1 != "tie" and winner_order_2 != "tie")
+
     # Symmetric consensus check
-    if winner_order_1 == winner_order_2 or winner_order_1 == "tie":
+    if not position_bias_detected and (winner_order_1 == winner_order_2 or winner_order_1 == "tie"):
         final_winner = winner_order_1
     else:
-        final_winner = "tie"  # Position bias detected -> fall back to tie/escalate
+        final_winner = "tie"  # Position bias detected or asymmetric -> fall back to tie
 
     consensus_score = round(max(raw_score_a, raw_score_b) / (raw_score_a + raw_score_b + 1e-5), 4)
 
     return {
         "winner": final_winner,
+        "token_density": {
+            "candidate_a": density_a,
+            "candidate_b": density_b
+        },
         "bias_mitigation_applied": {
             "position_swapped": True,
+            "position_bias_detected": position_bias_detected,
             "verbosity_length_normalized": True,
             "token_ratio": round(token_ratio, 4)
         },

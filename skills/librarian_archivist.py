@@ -68,23 +68,36 @@ def process_bitemporal_lineage(artifacts: List[Dict[str, Any]]) -> Tuple[List[Di
 def process_dependency_mapping(edges: List[Dict[str, Any]]) -> Dict[str, Any]:
     graph_edges = []
     critical_paths = []
+    cross_domain_edges = 0
 
     for edge in edges:
         src = edge.get("source_id", "")
         tgt = edge.get("target_id", "")
         rel = edge.get("relation_type", "DEPENDS_ON")
+        src_dom = edge.get("source_domain")
+        tgt_dom = edge.get("target_domain")
 
-        graph_edges.append({
+        edge_obj = {
             "source_id": src,
             "target_id": tgt,
             "relation_type": rel
-        })
+        }
+        if src_dom:
+            edge_obj["source_domain"] = src_dom
+        if tgt_dom:
+            edge_obj["target_domain"] = tgt_dom
 
-        if "REGIME" in rel or "IMPACTS" in rel or "REMEDIATES" in rel:
+        graph_edges.append(edge_obj)
+
+        if src_dom and tgt_dom and src_dom != tgt_dom:
+            cross_domain_edges += 1
+
+        if "REGIME" in rel or "IMPACTS" in rel or "REMEDIATES" in rel or "CRITICAL" in rel or rel == "MACRO_SHIFT_AFFECTS_FACILITY":
             critical_paths.append(f"{src} --[{rel}]--> {tgt}")
 
     return {
         "edge_count": len(graph_edges),
+        "cross_domain_edges_count": cross_domain_edges,
         "edges": graph_edges,
         "critical_paths": critical_paths
     }
