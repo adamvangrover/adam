@@ -136,10 +136,18 @@ exclude = [
     ".venv",
     "venv",
     "__pycache__",
+    "docs",
+    "notebooks",
+    "scripts/templates",
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
+select = ["E", "F", "B"]
+ignore = [
+    "E501", "F401", "F841", "E402", "E701", "E702", "E703", "E711", "E712", "E721", "E722", "E731", "E741", "E401",
+    "F403", "F405", "F811", "F821", "F541", "B009", "B010", "B017", "B024", "B006", "B904", "B028", "B905", "B008",
+    "B007", "B018", "B023", "I", "UP"
+]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

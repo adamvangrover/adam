@@ -394,7 +394,6 @@ class NeuroSymbolicPlanner:
                     )
                 else:
                     # Async wrapper for sync fallback
-                    import asyncio
                     import functools
                     agent_result = await asyncio.to_thread(
                         functools.partial(
