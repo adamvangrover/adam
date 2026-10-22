@@ -13,8 +13,8 @@ Currently tracking active development branches, infrastructure changes, and core
 
 ## 🧠 System Architecture
 
-Adam v26.0 is architected as a **Hybrid Cognitive Engine**, fusing the speed of neural networks (System 1) with the precision of symbolic logic (System 2) across three distinct layers:
-1. **Intelligence Layer (The "Brain"):** Houses the Neuro-Symbolic Planner (decomposes goals), the Agent Swarm (specialized domain agents), and the Consensus Engine.
+Adam v30.1-R is architected as a **Unified Financial Operating System**, fusing System 1 neural swarms with System 2 deterministic graph planners across three distinct layers:
+1. **Intelligence Layer (The "Brain"):** Houses the Neuro-Symbolic Planner (decomposes goals), the Agent Swarm (specialized domain agents), `LMTContagionOrchestratorAgent` (v30.1-R gate clearance & LMT contagion), and the Consensus Engine.
 2. **Compute Layer (The "Engine"):** Houses the `LiveMockEngine` (high-fidelity market simulation), `CrisisSimulationEngine` (stress testing), and the Rust Pricing Engine.
 3. **Data Layer (The "Memory"):** Handles ingestion via `Universal Ingestor` and storage via the Knowledge Graph (Neo4j) and Vector Store.
 
@@ -70,6 +70,7 @@ Strict operational guidelines for context, tokens, orchestration, and state inte
 ## 🧩 Machine Markers & Agent Skills (Domain Expertise)
 
 Decomposition of monolithic models into distinct, composable capabilities for targeted domain reasoning.
+- **ADAM v30.1-R Gate Clearance & LMT Contagion Orchestration:** Chained sequence of 5 skills: `cache-search-recall` & `world-modeling` (Phase 1: Bitemporal Macro Lock), `credit-risk-briefing` & `graph-credit-contagion` (Phase 2: Single-Obligor Stress, LMT Priming Tree & Syndicate GNN), `pd-backtesting-calibration` (Phase 3: Out-of-Time PD Calibration & 2LoD Floor), `llm-as-judge-arbiter` (Phase 4: Underwriter vs Challenger Debate & 7 Release Gates), and `librarian-archivist` (Phase 5: W3C PROV-O Lineage & SHA-256 Digest Seal).
 - **Credit & Financial Analysis:** Implementations include `FundamentalAnalysisSkill` and `SNCRatingAssistSkill` for strict financial modeling.
 - **Advanced Reasoning:** Implementations include `CounterfactualReasoningSkill` and `HybridForecastingSkill` for predictive modeling and `XAISkill` for Explainable AI output.
 - **Workflow & RAG:** Implementations include `WorkflowCompositionSkill` and specific `rag_skills/` to orchestrate data retrieval dynamically.

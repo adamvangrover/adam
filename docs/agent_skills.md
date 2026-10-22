@@ -149,3 +149,23 @@ No description provided
 #### `generate_spec`
 - **Description**: Generates a SPEC.md file from a high-level goal.
 - **Parameters**:
+
+---
+## LMTContagionOrchestratorAgent
+ADAM v30.1-R End-to-End Gate Clearance & LMT Contagion Orchestrator Agent.
+
+### Skills
+#### `cache_search_recall_lock`
+- **Description**: Locks bitemporal macro regime state vector and verifies cache freshness.
+
+#### `lmt_priming_contagion_resolution`
+- **Description**: Evaluates LMT priming decision tree and second-order syndicate GNN contagion.
+
+#### `pd_backtesting_calibration`
+- **Description**: Calculates out-of-time Brier, CRPS, Gini, and enforces 2LoD model override floor.
+
+#### `neurosymbolic_gate_arbitration`
+- **Description**: Adjudicates Underwriter vs. Challenger debate across 7 v30.1-R release gates.
+
+#### `prov_o_archival_seal`
+- **Description**: Generates W3C PROV-O bitemporal lineage record and SHA-256 digest.
