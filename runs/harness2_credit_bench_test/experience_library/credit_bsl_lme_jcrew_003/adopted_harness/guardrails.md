@@ -1,0 +1,1 @@
+LOCKED (SR 11-7 Invariant): Net leverage ceiling = 6.5x. DSCR floor = 1.25x. Unsubsidized EBITDA add-backs exceeding 15% of TTM EBITDA strictly prohibited without 2LoD approval. All claims must cite primary 10-K filings or Credit Agreement sections.

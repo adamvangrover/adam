@@ -795,3 +795,72 @@ class MultiStateReasoningEvaluator:
             },
             "axis_4_confidence_calibration": calibration,
         }
+
+
+if __name__ == "__main__":
+    import json
+
+    print("=== Replaying Multi-State Reasoning & Credit Underwriter Benchmarks ===")
+    evaluator = MultiStateReasoningEvaluator()
+
+    base_state_logs = [
+        {"step": "init", "status": "ok"},
+        {"step": "retrieve", "status": "ok"},
+        {"step": "reason", "status": "ok"},
+        {"step": "validate", "status": "ok"},
+        {"step": "synthesize", "status": "ok"},
+        {"step": "complete", "status": "ok"},
+    ]
+
+    adversarial_state_logs = [
+        {"step": "init", "status": "ok"},
+        {"step": "retrieve", "status": "ok"},
+        {"step": "reason", "status": "ok"},
+        {"step": "validate", "status": "ok"},
+        {"step": "synthesize", "status": "ok"},
+        {"step": "complete", "status": "ok"},
+    ]
+
+    aggregator_summary = (
+        "Obligor MSFT presents strong credit fundamentals with EBITDA of $100M and total debt of $300M. "
+        "[ Source: SEC filing 10-K exhibit 99.1 ]. However, interest coverage ratios divergence was flagged "
+        "and reconciled against secondary market benchmarks. Data limitations: unable to locate Q4 debt schedule."
+    )
+
+    base_state_outputs = [
+        "MSFT EBITDA is $100M and total debt is $300M based on 10-K filing.",
+        "Secondary market interest rate benchmark divergence noted in analysis.",
+    ]
+
+    conflicting_inputs = [
+        {
+            "topic": "interest rate divergence",
+            "fact_a": "Model Alpha estimates interest coverage ratio at 4.5x",
+            "fact_b": "Model Beta estimates interest coverage ratio at 3.8x",
+        }
+    ]
+
+    reasoning_steps = [
+        "Step 1: Evaluate obligor EBITDA and leverage metrics.",
+        "Step 2: Compare leverage against covenant threshold.",
+        "Step 3: Analyze sensitivity to macroeconomic stress.",
+    ]
+
+    final_conclusion = "Obligor maintains acceptable credit risk profile with adequate headroom."
+
+    accuracy_scores = [0.95, 0.90, 0.88, 0.92, 0.85]
+    confidence_scores = [0.92, 0.89, 0.85, 0.90, 0.82]
+
+    res = evaluator.evaluate_multi_state_system(
+        base_state_logs=base_state_logs,
+        adversarial_state_logs=adversarial_state_logs,
+        aggregator_summary=aggregator_summary,
+        base_state_outputs=base_state_outputs,
+        conflicting_inputs=conflicting_inputs,
+        reasoning_steps=reasoning_steps,
+        final_conclusion=final_conclusion,
+        accuracy_scores=accuracy_scores,
+        confidence_scores=confidence_scores,
+    )
+
+    print(json.dumps(res, indent=2))

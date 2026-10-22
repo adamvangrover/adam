@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-ADAM v30.1-R End-to-End Gate Clearance & LMT Contagion Orchestrator.
+ADAM v30.1-R End-to-End Gate Clearance & LMT Contagion Orchestrator
+-------------------------------------------------------------------
+Main entrypoint module for LMT Contagion Gate Clearance.
 
 Chains the following 5 workspace skills in strict sequence:
 1. `cache-search-recall` & `world-modeling` (Phase 1: Bitemporal Macro State & Telemetry Lock)
@@ -78,6 +80,63 @@ class TemporalEnvelope:
             t_decision=now,
             t_execution=now
         )
+
+
+@dataclass
+class LMTBranchOutcome:
+    branch_id: str
+    pro_forma_dscr: float
+    pro_forma_interest_coverage: float = 0.0
+    liquidity_cushion_added_m: float = 0.0
+    tranche_recoveries: Dict[str, Any] = field(default_factory=dict)
+    litigation_risk: str = "NONE"
+
+
+@dataclass
+class ContagionSpilloverMetrics:
+    counterparty: str
+    exposure_m: float
+    primed_exposure_m: float
+    tier1_capital_cushion_m: float
+    loss_absorption_pct: float
+    contagion_spillover_risk: str
+
+
+@dataclass
+class PDCalibrationMetrics:
+    pre_lmt_cumulative_3y_pd_pct: float
+    post_lmt_cumulative_3y_pd_pct: float
+    brier_score: float
+    crps: float
+    roc_auc: float
+    gini_coefficient: float
+    calibration_status: str
+    model_raw_1y_pd_pct: float
+    binding_floor_pct: float
+    final_calibrated_1y_pd_pct: float
+    override_floor_applied: bool
+
+
+@dataclass
+class GateRubricScore:
+    gate_id: str
+    gate_name: str
+    score: int
+    threshold: int
+    status: str
+    findings: str
+
+
+@dataclass
+class ReleaseGateAdjudication:
+    underwriter_agent_thesis: str
+    challenger_agent_thesis: str
+    gate_scores: List[Dict[str, Any]]
+    mean_rubric_score: float
+    tripwire_violations: List[str]
+    prior_disposition: str
+    binding_adjudication_disposition: str
+    conditions_for_production: List[str]
 
 
 # ============================================================================
@@ -190,9 +249,6 @@ class Phase2LMTContagion:
         uptier_interest_coverage = self.cs.ebitda_m / uptier_total_interest
 
         # Tranche recoveries under distressed EV = $1,400M
-        # In Uptier: Super-priority ($1,050M claim) gets 100% ($1,050M).
-        # Remaining EV = $350M. Primed Junior ($500M claim) gets $350M (70.0% recovery).
-        # Fixed Unsecured ($1,000M claim) gets $0M (0% recovery).
         uptier_recoveries = {
             "super_priority_tranche": {"claim_m": 1050.0, "recovery_m": 1050.0, "recovery_pct": 100.0},
             "primed_junior_tranche": {"claim_m": 500.0, "recovery_m": 350.0, "recovery_pct": 70.0},
@@ -200,8 +256,6 @@ class Phase2LMTContagion:
         }
 
         # Option (c): Straight Chapter 11 APR Waterfall Recovery
-        # EV = $1,400M. 1st Lien Senior Floating ($1,500M claim) gets $1,400M (93.33% recovery).
-        # Unsecured Fixed ($1,000M claim) gets $0M (0% recovery).
         ch11_recoveries = {
             "senior_floating_secured": {"claim_m": 1500.0, "recovery_m": 1400.0, "recovery_pct": 93.33},
             "senior_fixed_unsecured": {"claim_m": 1000.0, "recovery_m": 0.0, "recovery_pct": 0.0}
@@ -209,30 +263,30 @@ class Phase2LMTContagion:
 
         # Second-order GNN Syndicate Contagion Analysis
         syndicate_contagion = [
-            {
-                "counterparty": "Apex Capital Syndicate Bank A",
-                "exposure_m": 800.0,
-                "primed_exposure_m": 266.67,
-                "tier1_capital_cushion_m": 4200.0,
-                "loss_absorption_pct": 0.95,
-                "contagion_spillover_risk": "LOW"
-            },
-            {
-                "counterparty": "Horizon Credit Private Fund B",
-                "exposure_m": 450.0,
-                "primed_exposure_m": 150.00,
-                "tier1_capital_cushion_m": 320.0,
-                "loss_absorption_pct": 0.46,
-                "contagion_spillover_risk": "MODERATE"
-            },
-            {
-                "counterparty": "Sentinel Regional Trust C",
-                "exposure_m": 250.0,
-                "primed_exposure_m": 83.33,
-                "tier1_capital_cushion_m": 110.0,
-                "loss_absorption_pct": 0.23,
-                "contagion_spillover_risk": "ELEVATED_WATCHLIST"
-            }
+            asdict(ContagionSpilloverMetrics(
+                counterparty="Apex Capital Syndicate Bank A",
+                exposure_m=800.0,
+                primed_exposure_m=266.67,
+                tier1_capital_cushion_m=4200.0,
+                loss_absorption_pct=0.95,
+                contagion_spillover_risk="LOW"
+            )),
+            asdict(ContagionSpilloverMetrics(
+                counterparty="Horizon Credit Private Fund B",
+                exposure_m=450.0,
+                primed_exposure_m=150.00,
+                tier1_capital_cushion_m=320.0,
+                loss_absorption_pct=0.46,
+                contagion_spillover_risk="MODERATE"
+            )),
+            asdict(ContagionSpilloverMetrics(
+                counterparty="Sentinel Regional Trust C",
+                exposure_m=250.0,
+                primed_exposure_m=83.33,
+                tier1_capital_cushion_m=110.0,
+                loss_absorption_pct=0.23,
+                contagion_spillover_risk="ELEVATED_WATCHLIST"
+            ))
         ]
 
         return {
@@ -299,7 +353,6 @@ class Phase3PDCalibration:
         gini_coeff = (2.0 * roc_auc) - 1.0  # 0.7700
 
         # Enforce binding 2LoD Sovereign / Sector Override Floor
-        # Telecommunications & Distressed BSL Floor = 15.00% (1500 bps)
         model_raw_1y_pd_pct = post_hazard_rates[0] * 100.0  # 8.50%
         twolod_override_floor_pct = 15.00  # Sector model risk floor
 
@@ -369,64 +422,63 @@ class Phase4GateArbitration:
             "unsecured tranche haircuts (100% LGD)."
         )
 
-        # Rubric evaluation of the 7 v30.1-R Release Gates (0 - 100)
         gate_scores = [
-            {
-                "gate_id": "GATE_1_BITEMPORAL_FRESHNESS",
-                "gate_name": "Macro & Telemetry Bitemporal Monotonicity",
-                "score": 98,
-                "threshold": 80,
-                "status": "PASS",
-                "findings": "UTC monotonic envelope verified; macro vector locked without stale data drift."
-            },
-            {
-                "gate_id": "GATE_2_FLOATING_RATE_STRESS",
-                "gate_name": "Floating Rate Shock & Liquidity Runway",
-                "score": 82,
-                "threshold": 75,
-                "status": "PASS",
-                "findings": "Pro-forma DSCR under baseline is 1.12x; handles rate shock with conditional liquidity cushion."
-            },
-            {
-                "gate_id": "GATE_3_LMT_SOLVENCY_PRIMING",
-                "gate_name": "LMT Legal & Structural Priming Solvency",
-                "score": 78,
-                "threshold": 70,
-                "status": "PASS",
-                "findings": "Serta uptier exchange structure meets majority consent threshold (67%), with litigation buffer reserve requirement."
-            },
-            {
-                "gate_id": "GATE_4_SYNDICATE_CONTAGION",
-                "gate_name": "Syndicate GNN Counterparty Contagion",
-                "score": 85,
-                "threshold": 75,
-                "status": "PASS",
-                "findings": "Second-order contagion spillover contained; Sentinel Regional Trust placed on elevated watchlist."
-            },
-            {
-                "gate_id": "GATE_5_PD_CALIBRATION_2LOD",
-                "gate_name": "Out-of-Time PD Calibration & 2LoD Floor",
-                "score": 90,
-                "threshold": 80,
-                "status": "PASS",
-                "findings": "Brier Score 0.0842 and CRPS 0.0415 pass; 15.00% 2LoD sector floor strictly enforced."
-            },
-            {
-                "gate_id": "GATE_6_NEUROSYMBOLIC_INVARIANTS",
-                "gate_name": "Neuro-Symbolic Policy & Invariant Checks",
-                "score": 84,
-                "threshold": 80,
-                "status": "PASS",
-                "findings": "Zero non-finite numbers; no negative PDs; fail-closed JsonLogic rules satisfied."
-            },
-            {
-                "gate_id": "GATE_7_PROV_O_ARCHIVAL_SEAL",
-                "gate_name": "W3C PROV-O Lineage & Cryptographic Seal",
-                "score": 100,
-                "threshold": 90,
-                "status": "PASS",
-                "findings": "Complete W3C PROV-O provenance chain and SHA-256 fingerprint constructed."
-            }
+            asdict(GateRubricScore(
+                gate_id="GATE_1_BITEMPORAL_FRESHNESS",
+                gate_name="Macro & Telemetry Bitemporal Monotonicity",
+                score=98,
+                threshold=80,
+                status="PASS",
+                findings="UTC monotonic envelope verified; macro vector locked without stale data drift."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_2_FLOATING_RATE_STRESS",
+                gate_name="Floating Rate Shock & Liquidity Runway",
+                score=82,
+                threshold=75,
+                status="PASS",
+                findings="Pro-forma DSCR under baseline is 1.12x; handles rate shock with conditional liquidity cushion."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_3_LMT_SOLVENCY_PRIMING",
+                gate_name="LMT Legal & Structural Priming Solvency",
+                score=78,
+                threshold=70,
+                status="PASS",
+                findings="Serta uptier exchange structure meets majority consent threshold (67%), with litigation buffer reserve requirement."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_4_SYNDICATE_CONTAGION",
+                gate_name="Syndicate GNN Counterparty Contagion",
+                score=85,
+                threshold=75,
+                status="PASS",
+                findings="Second-order contagion spillover contained; Sentinel Regional Trust placed on elevated watchlist."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_5_PD_CALIBRATION_2LOD",
+                gate_name="Out-of-Time PD Calibration & 2LoD Floor",
+                score=90,
+                threshold=80,
+                status="PASS",
+                findings="Brier Score 0.0842 and CRPS 0.0415 pass; 15.00% 2LoD sector floor strictly enforced."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_6_NEUROSYMBOLIC_INVARIANTS",
+                gate_name="Neuro-Symbolic Policy & Invariant Checks",
+                score=84,
+                threshold=80,
+                status="PASS",
+                findings="Zero non-finite numbers; no negative PDs; fail-closed JsonLogic rules satisfied."
+            )),
+            asdict(GateRubricScore(
+                gate_id="GATE_7_PROV_O_ARCHIVAL_SEAL",
+                gate_name="W3C PROV-O Lineage & Cryptographic Seal",
+                score=100,
+                threshold=90,
+                status="PASS",
+                findings="Complete W3C PROV-O provenance chain and SHA-256 fingerprint constructed."
+            ))
         ]
 
         mean_score = sum(g["score"] for g in gate_scores) / len(gate_scores)
@@ -637,6 +689,10 @@ class LMTContagionGateOrchestrator:
         }
 
 
+# Backwards-compatible alias for `main` branch imports
+GateClearanceOrchestrator = LMTContagionGateOrchestrator
+
+
 # ============================================================================
 # CLI ENTRY POINT
 # ============================================================================
@@ -668,25 +724,45 @@ def main():
         print("          ADAM v30.1-R END-TO-END GATE CLEARANCE & LMT CONTAGION EXECUTIVE SUMMARY")
         print("================================================================================\n")
         print(f"Obligor Target      : {args.ticker} ({cap_struct.entity_name})")
-        print(f"Capital Structure   : ${cap_struct.total_debt_m:.1f}M Total Debt | ${cap_struct.ebitda_m:.1f}M EBITDA")
+        print(f"Capital Structure   : ${cap_struct.total_debt_m:.1f}M Total Debt \vert{}${cap_struct.ebitda_m:.1f}M EBITDA")
         print(f"Prior Disposition   : REJECT_FOR_PRODUCTION")
         print(f"Final Disposition   : {result['final_disposition']}")
         print(f"IAEH Audit Digest   : {result['iaeh_digest_sha256']}\n")
 
-        p4_data = result['phases']['phase_4']['data']
+        p4_data = result["phases"]["phase_4"]["data"]
         print("--- 7 V30.1-R RELEASE GATES CLEARANCE SCORES ---")
-        for gate in p4_data['gate_scores']:
+        for gate in p4_data["gate_scores"]:
             print(f"  [{gate['status']}] {gate['gate_id']:<32} : Score {gate['score']}/100 - {gate['findings']}")
         print(f"\nMean Rubric Score   : {p4_data['mean_rubric_score']}/100")
 
         print("\n--- CONDITIONS FOR PRODUCTION CLEARANCE ---")
-        for cond in p4_data['conditions_for_production']:
+        for cond in p4_data["conditions_for_production"]:
             print(f"  {cond}")
         print("================================================================================\n")
     elif args.format == "yaml" and HAS_YAML:
         print(yaml.dump(result, sort_keys=False))
     else:
         print(json.dumps(result, indent=2))
+
+
+__all__ = [
+    "GateClearanceOrchestrator",
+    "LMTContagionGateOrchestrator",
+    "MacroStateVector",
+    "CapitalStructureInput",
+    "TemporalEnvelope",
+    "LMTBranchOutcome",
+    "ContagionSpilloverMetrics",
+    "PDCalibrationMetrics",
+    "GateRubricScore",
+    "ReleaseGateAdjudication",
+    "Phase1MacroLock",
+    "Phase2LMTContagion",
+    "Phase3PDCalibration",
+    "Phase4GateArbitration",
+    "Phase5ArchivalSeal",
+    "main",
+]
 
 
 if __name__ == "__main__":

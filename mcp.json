@@ -105,6 +105,54 @@
       }
     },
     {
+      "name": "mcp_evaluate_pdil_gatekeeper",
+      "description": "Evaluates a probabilistic inference payload against PDIL gatekeeper rules and W3C PROV-O provenance constraints.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "inference_output": {
+            "type": "object",
+            "description": "The inference output dictionary containing data and provenance_trace."
+          },
+          "rules": {
+            "type": "object",
+            "description": "Optional jsonLogic ruleset constraint for rule-based validation."
+          }
+        },
+        "required": ["inference_output"]
+      }
+    },
+    {
+      "name": "mcp_score_t_plus_1_decision",
+      "description": "Evaluates state trace fidelity and T+1 forward decision quality using the Multi-State Reasoning Evaluator.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "predicted_trace": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ordered sequence of executed state steps."
+          },
+          "ground_truth_trace": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Expected sequence of state steps."
+          },
+          "confidences": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "Optional confidence scores per decision step."
+          },
+          "accuracies": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "Optional binary accuracy scores per decision step."
+          }
+        },
+        "required": ["predicted_trace", "ground_truth_trace"]
+      }
+    },
+    {
       "name": "audit_logger",
       "description": "Logs compliance audit trails and capital buffer allocations.",
       "parameters": {
@@ -136,6 +184,129 @@
           }
         },
         "required": ["agent_id", "action_taken", "confidence_score", "source_citations"]
+      }
+    },
+    {
+      "name": "eve_v2_underwriting_engine",
+      "description": "Executes the full EVE v2.0 Institutional Single-Name Underwriting Engine pipeline across 5 valuation clocks, 3 independent engines, Challenger disagreement map, 2LoD Adversarial red-team transmission chains, and multi-engine corridor convergence.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string", "default": "MSFT" },
+          "company_name": { "type": "string", "default": "Microsoft Corporation" },
+          "spot_price": { "type": "number", "default": 420.0 },
+          "revenue": { "type": "number", "default": 245000.0 },
+          "ebitda": { "type": "number", "default": 125000.0 },
+          "fcf": { "type": "number", "default": 74000.0 },
+          "net_debt": { "type": "number", "default": 10000.0 },
+          "shares_outstanding": { "type": "number", "default": 7430.0 }
+        }
+      }
+    },
+    {
+      "name": "run_quantum_simulation",
+      "description": "Runs a Quantum Monte Carlo simulation to estimate credit risk (Merton Model).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "asset_value": { "type": "number" },
+          "volatility": { "type": "number" },
+          "debt": { "type": "number" },
+          "horizon": { "type": "number", "default": 1.0 }
+        },
+        "required": ["asset_value", "volatility", "debt"]
+      }
+    },
+    {
+      "name": "generate_market_scenarios",
+      "description": "Generates synthetic market scenarios using the Generative Risk Engine (GAN).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "regime": { "type": "string", "default": "stress" },
+          "n_samples": { "type": "integer", "default": 5 }
+        }
+      }
+    },
+    {
+      "name": "analyze_snc_credit",
+      "description": "Performs a Shared National Credit (SNC) rating analysis.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "financials": { "type": "object" },
+          "capital_structure": { "type": "array", "items": { "type": "object" } },
+          "enterprise_value": { "type": "number" }
+        },
+        "required": ["financials", "capital_structure", "enterprise_value"]
+      }
+    },
+    {
+      "name": "analyze_covenants",
+      "description": "Analyzes risk of covenant breach.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "leverage": { "type": "number" },
+          "covenant_threshold": { "type": "number" }
+        },
+        "required": ["leverage", "covenant_threshold"]
+      }
+    },
+    {
+      "name": "compare_peers",
+      "description": "Compares company valuation multiples against peers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "company_id": { "type": "string" }
+        },
+        "required": ["company_id"]
+      }
+    },
+    {
+      "name": "plan_workflow",
+      "description": "Generates a Neuro-Symbolic Plan (Graph Traversal) from start concept to target concept.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "start_node": { "type": "string" },
+          "target_node": { "type": "string" }
+        },
+        "required": ["start_node", "target_node"]
+      }
+    },
+    {
+      "name": "ingest_file",
+      "description": "Ingests a file into the Gold Standard knowledge base.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filepath": { "type": "string" }
+        },
+        "required": ["filepath"]
+      }
+    },
+    {
+      "name": "retrieve_market_data",
+      "description": "Retrieves real-time market data for a ticker.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" }
+        },
+        "required": ["ticker"]
+      }
+    },
+    {
+      "name": "execute_python_sandbox",
+      "description": "Executes Python code in a secure, isolated sandbox.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" }
+        },
+        "required": ["code"]
       }
     }
   ]

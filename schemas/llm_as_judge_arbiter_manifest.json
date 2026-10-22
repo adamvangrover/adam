@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "skill_id": "llm_as_judge_arbiter",
+  "version": "1.0.0",
+  "entrypoint": "skills.llm_as_judge_arbiter:run",
+  "input_schema": "schemas/llm_as_judge_arbiter_input.json",
+  "output_schema": "schemas/llm_as_judge_arbiter_output.json",
+  "execution": {
+    "timeout_seconds": 30,
+    "max_attempts": 3,
+    "network_access": false,
+    "filesystem_scope": "repository_read_only"
+  },
+  "capabilities": [
+    "multi_criteria_evaluation",
+    "pairwise_adversarial_adjudication",
+    "neuro_symbolic_tripwire_gating",
+    "human_alignment_calibration"
+  ],
+  "side_effect_class": "append_only_audit",
+  "authority_level": "proposal_only"
+}

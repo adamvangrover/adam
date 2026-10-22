@@ -5,7 +5,10 @@ import os
 import hashlib
 import time
 import requests
-import defusedxml.ElementTree as ET
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 import threading
 from typing import List, Dict, Any, Tuple, Optional
 from pydantic import BaseModel

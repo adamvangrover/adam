@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adam://schemas/llm_as_judge_arbiter_output/v1",
+  "title": "LLM As Judge Arbiter Output Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill_id",
+    "status",
+    "correlation_id",
+    "outcome",
+    "rubric_scores",
+    "tripwire_status",
+    "reason_codes"
+  ],
+  "properties": {
+    "skill_id": {
+      "const": "llm_as_judge_arbiter"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASSED", "REJECTED", "QUARANTINED", "ESCALATE", "REVIEW_REQUIRED"]
+    },
+    "correlation_id": {
+      "type": "string"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["ADMIT_PROPOSAL", "REJECT", "QUARANTINED", "ESCALATE", "ABSTAIN"]
+    },
+    "rubric_scores": {
+      "type": "object",
+      "required": [
+        "empirical_groundedness",
+        "reasoning_rigor_downside",
+        "policy_regulatory_compliance",
+        "weighted_composite_score"
+      ],
+      "properties": {
+        "empirical_groundedness": { "type": "number" },
+        "reasoning_rigor_downside": { "type": "number" },
+        "policy_regulatory_compliance": { "type": "number" },
+        "weighted_composite_score": { "type": "number" }
+      }
+    },
+    "tripwire_status": {
+      "type": "object",
+      "required": ["passed", "triggered_tripwires"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "triggered_tripwires": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "pairwise_adjudication": {
+      "type": "object",
+      "properties": {
+        "winner": { "type": "string" },
+        "token_density": {
+          "type": "object",
+          "properties": {
+            "candidate_a": { "type": "number" },
+            "candidate_b": { "type": "number" }
+          }
+        },
+        "bias_mitigation_applied": {
+          "type": "object",
+          "properties": {
+            "position_swapped": { "type": "boolean" },
+            "position_bias_detected": { "type": "boolean" },
+            "verbosity_length_normalized": { "type": "boolean" },
+            "token_ratio": { "type": "number" }
+          }
+        },
+        "consensus_score": { "type": "number" }
+      }
+    },
+    "calibration_metrics": {
+      "type": "object",
+      "properties": {
+        "cohens_kappa": { "type": "number" },
+        "brier_score": { "type": "number" },
+        "calibrated_rubric_weights": {
+          "type": "object",
+          "properties": {
+            "empirical_groundedness": { "type": "number" },
+            "reasoning_rigor_downside": { "type": "number" },
+            "policy_regulatory_compliance": { "type": "number" }
+          }
+        }
+      }
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "prov_o_audit_trail": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}

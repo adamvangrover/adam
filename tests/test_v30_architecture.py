@@ -33,6 +33,8 @@ class TestV30Architecture(unittest.TestCase):
 
     def test_news_bot(self):
         bot = NewsBotAgent()
+        bot.is_mock = True
+        bot.live_feeds_active = False
         alerts = bot.run_cycle()
         # Should mock finding an alert for Tesla based on my implementation
         found = False

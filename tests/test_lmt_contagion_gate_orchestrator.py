@@ -1,5 +1,10 @@
+"""
+Pytest Verification Suite for ADAM v30.1-R End-to-End Gate Clearance & LMT Contagion Orchestrator.
+"""
+
 import os
 import sys
+import json
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -7,6 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from scripts.lmt_contagion_gate_orchestrator import (
     CapitalStructureInput,
     LMTContagionGateOrchestrator,
+    GateClearanceOrchestrator,
     MacroStateVector,
     Phase1MacroLock,
     Phase2LMTContagion,
