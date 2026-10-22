@@ -118,3 +118,35 @@ def test_llm_as_judge_arbiter_human_calibration():
     assert calib["cohens_kappa"] == 1.0
     assert calib["brier_score"] <= 0.05
     assert "calibrated_rubric_weights" in calib
+
+
+def test_llm_as_judge_arbiter_liquidity_runway_tripwire_and_warning():
+    input_data = {
+        "correlation_id": "test-corr-005",
+        "evaluation_type": "single_candidate_rubric",
+        "candidate_proposal": {
+            "id": "PROP-2026-005",
+            "financial_metrics": {
+                "dscr": 1.25,
+                "leverage_ratio": 4.0,
+                "liquidity_runway_days": 45,  # < 90 warning & < 60 policy min
+                "unauthorized_addbacks": False,
+                "refinancing_wall_modeled": True,
+                "margin_compression_modeled": True,
+                "non_linear_debt_service_decay": True,
+                "sr11_7_compliant": True
+            },
+            "evidence_mappings": [
+                {"assertion_id": "A1", "text": "Form 10-Q cash balance", "source_ref": "sec_filing_10q.pdf"}
+            ]
+        },
+        "tripwire_policy": {
+            "min_dscr": 1.05,
+            "min_liquidity_runway_days": 60
+        }
+    }
+
+    result = run_judge_arbiter(input_data)
+    assert result["status"] == "REJECTED"
+    assert result["tripwire_status"]["passed"] is False
+    assert any("TRIPWIRE_LIQUIDITY_RUNWAY_BREACH" in t for t in result["tripwire_status"]["triggered_tripwires"])
