@@ -105,6 +105,54 @@
       }
     },
     {
+      "name": "mcp_evaluate_pdil_gatekeeper",
+      "description": "Evaluates a probabilistic inference payload against PDIL gatekeeper rules and W3C PROV-O provenance constraints.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "inference_output": {
+            "type": "object",
+            "description": "The inference output dictionary containing data and provenance_trace."
+          },
+          "rules": {
+            "type": "object",
+            "description": "Optional jsonLogic ruleset constraint for rule-based validation."
+          }
+        },
+        "required": ["inference_output"]
+      }
+    },
+    {
+      "name": "mcp_score_t_plus_1_decision",
+      "description": "Evaluates state trace fidelity and T+1 forward decision quality using the Multi-State Reasoning Evaluator.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "predicted_trace": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ordered sequence of executed state steps."
+          },
+          "ground_truth_trace": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Expected sequence of state steps."
+          },
+          "confidences": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "Optional confidence scores per decision step."
+          },
+          "accuracies": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "Optional binary accuracy scores per decision step."
+          }
+        },
+        "required": ["predicted_trace", "ground_truth_trace"]
+      }
+    },
+    {
       "name": "audit_logger",
       "description": "Logs compliance audit trails and capital buffer allocations.",
       "parameters": {
@@ -136,6 +184,23 @@
           }
         },
         "required": ["agent_id", "action_taken", "confidence_score", "source_citations"]
+      }
+    },
+    {
+      "name": "eve_v2_underwriting_engine",
+      "description": "Executes the full EVE v2.0 Institutional Single-Name Underwriting Engine pipeline across 5 valuation clocks, 3 independent engines, Challenger disagreement map, 2LoD Adversarial red-team transmission chains, and multi-engine corridor convergence.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string", "default": "MSFT" },
+          "company_name": { "type": "string", "default": "Microsoft Corporation" },
+          "spot_price": { "type": "number", "default": 420.0 },
+          "revenue": { "type": "number", "default": 245000.0 },
+          "ebitda": { "type": "number", "default": 125000.0 },
+          "fcf": { "type": "number", "default": 74000.0 },
+          "net_debt": { "type": "number", "default": 10000.0 },
+          "shares_outstanding": { "type": "number", "default": 7430.0 }
+        }
       }
     },
     {
