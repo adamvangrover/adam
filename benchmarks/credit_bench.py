@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
     from adam_harness2 import ExecutionTrace, Harness2Controller, HarnessConfig
@@ -39,7 +39,7 @@ class CreditBenchAdapter:
     when no ground-truth answers exist.
     """
 
-    PRIMARY_EXHIBIT_KEYWORDS = [
+    PRIMARY_EXHIBIT_KEYWORDS: ClassVar[list[str]] = [
         r"\b10-[kk]\b",
         r"\bcredit agreement\b",
         r"\bsection 7\b",

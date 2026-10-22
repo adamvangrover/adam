@@ -1,14 +1,17 @@
-"""
-Stage Prompts for Harness² (Editor, Composer, Reflector)
-Tailored for 2nd-Line Corporate Credit, SEC Filing, and Covenant Risk Oversight.
-"""
+"""Stage Prompts for Harness² (Editor, Composer, Reflector) for Credit Risk Oversight."""
+
+from __future__ import annotations
+
+import json
 
 EDITOR_STAGE_PROMPT = """
 You are the Harness Editor operating in a Harness² runtime architecture for 2nd-Line Credit Risk Oversight.
-Your role is to analyze a reference execution trajectory (τ_0) on a credit analysis task and propose orthogonal harness patches to resolve failure modes.
+Your role is to analyze a reference execution trajectory (τ_0) on a credit analysis task and propose
+orthogonal harness patches to resolve failure modes.
 
 GOVERNANCE INVARIANTS:
-1. 'guardrails' IS IMMUTABLE. You MUST NOT modify guardrails under SR 11-7 Model Risk Management rules. Any patch attempting to alter guardrails will be rejected with a PermissionError.
+1. 'guardrails' IS IMMUTABLE. You MUST NOT modify guardrails under SR 11-7 Model Risk Management rules.
+   Any patch attempting to alter guardrails will be rejected with a PermissionError.
 2. 'plugins' IS APPEND-ONLY. You may add stricter validation middleware, but you cannot remove existing checks.
 
 INPUT DATA:
@@ -32,21 +35,26 @@ Generate {k} candidate patch pairs consisting of:
    - LME / Liability Management Exercise / J.Crew blocker checklists
 
 Respond in valid JSON format containing:
-{
-  "invariant_patches": [ { ...patch dict... } ],
-  "domain_patches": [ { ...patch dict... } ]
-}
+{{
+  "invariant_patches": [ {{ ...patch dict... }} ],
+  "domain_patches": [ {{ ...patch dict... }} ]
+}}
 """
 
 COMPOSER_STAGE_PROMPT = """
 You are the Harness Composer operating in a Harness² runtime architecture for 2nd-Line Credit Risk Oversight.
-Your role is to contrast probe trajectories (τ_inv, τ_dom) against the baseline reference trajectory (τ_0) and synthesize an optimal composed harness patch (H^*).
+Your role is to contrast probe trajectories (τ_inv, τ_dom) against the baseline reference trajectory (τ_0)
+and synthesize an optimal composed harness patch (H^*).
 
 NO-GROUND-TRUTH BEHAVIORAL SIGNALS TO EVALUATE:
-1. Tool & Script Determinism: Did the candidate write/invoke deterministic Python scripts in `scripts/` (e.g. Net Leverage = Total Debt / Adjusted EBITDA) rather than mental LLM arithmetic?
-2. Source Grounding Coverage: Did the candidate inspect primary exhibits (Credit Agreement Section 7, 10-K Footnotes, EBITDA add-back schedules) before synthesizing credit conclusions?
-3. Middleware Plugin Pass Rate: Did the trajectory pass all financial identity and schema validator plugins on the first attempt without errors?
-4. Trajectory Efficiency: Did the edit eliminate redundant search loops, tool thrashing, or unnecessary steps observed in τ_0?
+1. Tool & Script Determinism: Did the candidate write/invoke deterministic Python scripts in `scripts/`
+   (e.g. Net Leverage = Total Debt / Adjusted EBITDA) rather than mental LLM arithmetic?
+2. Source Grounding Coverage: Did the candidate inspect primary exhibits (Credit Agreement Section 7,
+   10-K Footnotes, EBITDA add-back schedules) before synthesizing credit conclusions?
+3. Middleware Plugin Pass Rate: Did the trajectory pass all financial identity and schema validator plugins
+   on the first attempt without errors?
+4. Trajectory Efficiency: Did the edit eliminate redundant search loops, tool thrashing, or unnecessary
+   steps observed in τ_0?
 
 INPUT DATA:
 - Task Prompt: {task_prompt}
@@ -55,15 +63,16 @@ INPUT DATA:
 - Prior Domain Lessons: {prior_lessons}
 
 OUTPUT REQUIREMENTS:
-Select and compose the most effective non-conflicting edits from τ_inv and τ_dom that demonstrated empirical trajectory improvements.
-Ensure that no edits weaken SR 11-7 regulatory guardrails.
+Select and compose the most effective non-conflicting edits from τ_inv and τ_dom that demonstrated empirical
+trajectory improvements. Ensure that no edits weaken SR 11-7 regulatory guardrails.
 
 Respond in valid JSON format containing the composed patch dict (H^*).
 """
 
 REFLECTOR_STAGE_PROMPT = """
 You are the Experience Reflector operating in a Harness² Level-2 Harnessing Recursion loop.
-Your role is to summarize what worked, what failed, and why into an EXPERIENCE.md note that will condition future credit underwriting tasks in this domain.
+Your role is to summarize what worked, what failed, and why into an EXPERIENCE.md note that will condition
+future credit underwriting tasks in this domain.
 
 INPUT DATA:
 - Task Prompt: {task_prompt}
@@ -85,3 +94,72 @@ Structure:
 ## 3. Reusable Domain Rule / Directive
 - Clear, actionable guidance for future credit risk analyses in this sector/domain.
 """
+
+
+def format_editor_prompt(
+    task_prompt: str,
+    ref_trace: object,
+    prior_lessons: str,
+    k: int = 1,
+) -> str:
+    """Formats the Editor Stage Prompt with task inputs."""
+    return EDITOR_STAGE_PROMPT.format(
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        prior_lessons=prior_lessons or "No prior domain lessons recorded.",
+        k=k,
+    )
+
+
+def format_composer_prompt(
+    task_prompt: str,
+    ref_trace: object,
+    probe_traces: list[object],
+    prior_lessons: str,
+) -> str:
+    """Formats the Composer Stage Prompt with baseline and probe trajectories."""
+    return COMPOSER_STAGE_PROMPT.format(
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        probe_traces=json.dumps([str(p) for p in probe_traces], indent=2),
+        prior_lessons=prior_lessons or "No prior domain lessons recorded.",
+    )
+
+
+def format_reflector_prompt(
+    domain: str,
+    task_id: str,
+    task_prompt: str,
+    ref_trace: object,
+    final_trace: object,
+    adopted_patch: dict[str, object],
+) -> str:
+    """Formats the Experience Reflector Stage Prompt."""
+    return REFLECTOR_STAGE_PROMPT.format(
+        domain=domain,
+        task_id=task_id,
+        task_prompt=task_prompt,
+        ref_trace=str(ref_trace),
+        final_trace=str(final_trace),
+        adopted_patch=json.dumps(adopted_patch, indent=2),
+    )
+
+
+def parse_editor_response(response_text: str) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    """Parses and validates JSON output from the Editor LLM response."""
+    try:
+        data = json.loads(response_text)
+        inv = data.get("invariant_patches", [])
+        dom = data.get("domain_patches", [])
+        return inv, dom
+    except Exception:
+        return [], []
+
+
+def parse_composer_response(response_text: str) -> dict[str, object]:
+    """Parses and validates JSON output from the Composer LLM response."""
+    try:
+        data = json.loads(response_text)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
