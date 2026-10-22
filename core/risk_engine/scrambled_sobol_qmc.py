@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -48,6 +48,19 @@ def norm_ppf(u: np.ndarray) -> np.ndarray:
     else:  # pragma: no cover
         # norm.ppf(u) = sqrt(2) * erfinv(2*u - 1)
         return math.sqrt(2.0) * _erfinv_numpy(2.0 * u_clipped - 1.0)
+
+
+def student_t_ppf(u: np.ndarray, df: float) -> np.ndarray:
+    """
+    Inverse cumulative distribution function for Student-t distribution with df degrees of freedom.
+    """
+    u_clipped = np.clip(u, 1e-12, 1.0 - 1e-12)
+    if HAS_SCIPY:
+        return stats.t.ppf(u_clipped, df=df)
+    else:  # pragma: no cover
+        # Approximation via normal ppf scaled by chi-square approximation
+        z = norm_ppf(u_clipped)
+        return z * np.sqrt(df / (df - 2.0)) if df > 2 else z
 
 
 class ScrambledSobolQMCEngine:
@@ -162,6 +175,380 @@ class ScrambledSobolQMCEngine:
 
         x = mean + z @ L.T
         return x
+
+    def generate_student_t_samples(
+        self,
+        n_samples: int,
+        df: float = 5.0,
+        mean: Optional[np.ndarray] = None,
+        cov: Optional[np.ndarray] = None,
+        dimension: Optional[int] = None,
+        scramble: Optional[bool] = None,
+        seed: Optional[int] = None,
+    ) -> np.ndarray:
+        """
+        Generates heavy-tailed multivariate Student-t factor draws using Scrambled Sobol QMC.
+
+        Args:
+            n_samples: Number of simulation paths.
+            df: Degrees of freedom (df > 2.0 for finite variance).
+            mean: Location vector. Defaults to zero vector.
+            cov: Covariance / scale matrix. Defaults to Identity.
+            dimension: Dimension d if mean/cov omitted.
+            scramble: Whether to apply Owen scrambling.
+            seed: Seed.
+
+        Returns:
+            np.ndarray of shape (n_samples, d) distributed as Multivariate Student-t.
+        """
+        if df <= 0:
+            raise ValueError(f"Degrees of freedom df must be positive, got {df}")
+
+        if mean is not None:
+            mean = np.asarray(mean, dtype=np.float64)
+            d = mean.shape[0]
+        elif cov is not None:
+            cov = np.asarray(cov, dtype=np.float64)
+            d = cov.shape[0]
+        elif dimension is not None:
+            d = dimension
+            mean = np.zeros(d, dtype=np.float64)
+            cov = np.eye(d, dtype=np.float64)
+        else:
+            raise ValueError("Must specify at least one of mean, cov, or dimension.")
+
+        if mean is None:
+            mean = np.zeros(d, dtype=np.float64)
+        if cov is None:
+            cov = np.eye(d, dtype=np.float64)
+
+        # Draw low-discrepancy uniforms
+        u = self.generate_uniform_samples(n_samples=n_samples, dimension=d, scramble=scramble, seed=seed)
+
+        # Inverse Student-t CDF mapping
+        t_draws = student_t_ppf(u, df=df)
+
+        # Apply scale matrix Cholesky factorization
+        try:
+            L = np.linalg.cholesky(cov)
+        except np.linalg.LinAlgError:  # pragma: no cover
+            eigvals, eigvecs = np.linalg.eigh(cov)
+            eigvals = np.maximum(eigvals, 1e-10)
+            L = eigvecs @ np.diag(np.sqrt(eigvals))
+
+        # Adjust for variance scaling if df > 2
+        scale_factor = math.sqrt((df - 2.0) / df) if df > 2.0 else 1.0
+        x = mean + (t_draws @ L.T) * scale_factor
+        return x
+
+    def compute_sobol_sensitivity_indices(
+        self,
+        model_func: Callable[[np.ndarray], np.ndarray],
+        dimension: int,
+        n_samples: int = 1024,
+        param_names: Optional[List[str]] = None,
+        scramble: bool = True,
+        seed: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Calculates First-Order (S_i) and Total-Order (ST_i) Sobol Sensitivity Indices
+        using low-discrepancy Scrambled Sobol Saltelli matrix sampling.
+
+        Args:
+            model_func: Target black-box or deterministic model mapping (N, D) -> (N,).
+            dimension: Input dimension D.
+            n_samples: Number of base sample points N (power of 2 recommended).
+            param_names: Names of parameters.
+            scramble: Whether to use scrambled Sobol.
+            seed: Seed.
+
+        Returns:
+            Dict containing first_order_indices, total_order_indices, parameter rankings,
+            model_variance, and convergence telemetry.
+        """
+        if dimension < 1:
+            raise ValueError("Dimension must be >= 1")
+        if n_samples < 16:
+            raise ValueError("n_samples must be >= 16 for Sobol sensitivity estimation")
+
+        if param_names is None:
+            param_names = [f"X_{i+1}" for i in range(dimension)]
+        elif len(param_names) != dimension:
+            raise ValueError(f"param_names length ({len(param_names)}) must match dimension ({dimension})")
+
+        base_seed = self.seed if seed is None else seed
+
+        # Generate a single (N, 2*D) low-discrepancy matrix in [0, 1)^(2*D) per Saltelli (2002)
+        # Columns 0..D-1 form matrix A; columns D..2D-1 form matrix B.
+        u_combined = self.generate_uniform_samples(
+            n_samples=n_samples,
+            dimension=2 * dimension,
+            scramble=scramble,
+            seed=base_seed,
+        )
+
+        A = u_combined[:, :dimension]
+        B = u_combined[:, dimension:]
+
+        y_A = np.asarray(model_func(A), dtype=np.float64).flatten()
+        y_B = np.asarray(model_func(B), dtype=np.float64).flatten()
+
+        var_y = np.var(y_A, ddof=1)
+        if var_y <= 1e-12:
+            s_dict = {name: 0.0 for name in param_names}
+            return {
+                "first_order_indices": s_dict,
+                "total_order_indices": s_dict,
+                "parameter_rankings": param_names,
+                "model_variance": 0.0,
+                "sample_size": n_samples,
+            }
+
+        s_i_dict = {}
+        st_i_dict = {}
+
+        for i in range(dimension):
+            A_B_i = A.copy()
+            A_B_i[:, i] = B[:, i]
+
+            y_A_B_i = np.asarray(model_func(A_B_i), dtype=np.float64).flatten()
+
+            s_i_val = 1.0 - (np.mean((y_B - y_A_B_i) ** 2) / (2.0 * var_y))
+            st_i_val = np.mean((y_A - y_A_B_i) ** 2) / (2.0 * var_y)
+
+            s_i_bounded = float(np.clip(s_i_val, 0.0, 1.0))
+            st_i_bounded = float(np.clip(st_i_val, s_i_bounded, 1.0))
+
+            s_i_dict[param_names[i]] = s_i_bounded
+            st_i_dict[param_names[i]] = st_i_bounded
+
+        rankings = sorted(param_names, key=lambda name: st_i_dict[name], reverse=True)
+
+        return {
+            "first_order_indices": s_i_dict,
+            "total_order_indices": st_i_dict,
+            "parameter_rankings": rankings,
+            "model_variance": float(var_y),
+            "sample_size": n_samples,
+            "scramble_enabled": scramble,
+        }
+
+    def simulate_covenant_headroom_stress(
+        self,
+        consolidated_ebitda: float,
+        total_funded_debt: float,
+        annual_interest_expense: float,
+        debt_service_due: float,
+        annual_capex: float = 0.0,
+        annual_tax: float = 0.0,
+        max_leverage_covenant: float = 4.5,
+        min_interest_coverage_covenant: float = 3.0,
+        min_dscr_covenant: float = 1.25,
+        ebitda_volatility: float = 0.20,
+        interest_rate_shock_std: float = 0.015,
+        n_simulations: int = 2048,
+        scramble: bool = True,
+        seed: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Simulates joint covenant and financial headroom breach probabilities under correlated multi-factor QMC shocks.
+
+        Args:
+            consolidated_ebitda: Base TTM EBITDA ($M).
+            total_funded_debt: Base Total Debt ($M).
+            annual_interest_expense: Base Interest Expense ($M).
+            debt_service_due: Debt principal + interest service due ($M).
+            annual_capex: Capex ($M).
+            annual_tax: Taxes ($M).
+            max_leverage_covenant: Max Leverage (Debt/EBITDA) threshold.
+            min_interest_coverage_covenant: Min Interest Coverage (EBITDA/Interest) threshold.
+            min_dscr_covenant: Min DSCR ((EBITDA-Capex-Tax)/DebtService) threshold.
+            ebitda_volatility: EBITDA relative shock std dev.
+            interest_rate_shock_std: Interest rate shock relative std dev.
+            n_simulations: QMC simulation paths.
+            scramble: Whether to apply Owen scrambling.
+            seed: Random seed.
+
+        Returns:
+            Dict with breach probabilities, headroom statistics, VaR, CVaR, and status.
+        """
+        if consolidated_ebitda <= 0 or total_funded_debt <= 0 or annual_interest_expense <= 0:
+            raise ValueError("Consolidated EBITDA, funded debt, and interest expense must be positive.")
+        if max_leverage_covenant <= 0 or min_interest_coverage_covenant <= 0 or min_dscr_covenant <= 0:
+            raise ValueError("Covenant thresholds must be positive.")
+
+        z = self.generate_gaussian_samples(
+            n_samples=n_simulations,
+            dimension=2,
+            scramble=scramble,
+            seed=seed,
+        )
+
+        ebitda_shocks = z[:, 0]
+        interest_shocks = z[:, 1]
+
+        stressed_ebitda = consolidated_ebitda * np.exp(
+            -0.5 * (ebitda_volatility**2) + ebitda_volatility * ebitda_shocks
+        )
+        stressed_interest = annual_interest_expense * np.exp(
+            -0.5 * (interest_rate_shock_std**2) + interest_rate_shock_std * interest_shocks
+        )
+        principal_due = max(0.0, debt_service_due - annual_interest_expense)
+        stressed_debt_service = principal_due + stressed_interest
+
+        leverage = total_funded_debt / np.maximum(1e-6, stressed_ebitda)
+        interest_coverage = stressed_ebitda / np.maximum(1e-6, stressed_interest)
+        available_cash_flow = np.maximum(0.0, stressed_ebitda - annual_capex - annual_tax)
+        dscr = available_cash_flow / np.maximum(1e-6, stressed_debt_service)
+
+        breach_leverage = leverage > max_leverage_covenant
+        breach_coverage = interest_coverage < min_interest_coverage_covenant
+        breach_dscr = dscr < min_dscr_covenant
+        joint_breach = breach_leverage | breach_coverage | breach_dscr
+
+        headroom_leverage = max_leverage_covenant - leverage
+        headroom_coverage = interest_coverage - min_interest_coverage_covenant
+        headroom_dscr = dscr - min_dscr_covenant
+
+        p95_leverage = float(np.percentile(leverage, 95))
+        p99_leverage = float(np.percentile(leverage, 99))
+        tail_leverage = leverage[leverage >= p95_leverage]
+        cvar_leverage = float(np.mean(tail_leverage)) if len(tail_leverage) > 0 else p95_leverage
+
+        return {
+            "baseline_metrics": {
+                "baseline_leverage": round(float(total_funded_debt / consolidated_ebitda), 4),
+                "baseline_interest_coverage": round(float(consolidated_ebitda / annual_interest_expense), 4),
+                "baseline_dscr": round(float((consolidated_ebitda - annual_capex - annual_tax) / debt_service_due), 4),
+            },
+            "covenant_thresholds": {
+                "max_leverage": max_leverage_covenant,
+                "min_interest_coverage": min_interest_coverage_covenant,
+                "min_dscr": min_dscr_covenant,
+            },
+            "breach_probabilities": {
+                "leverage_breach_probability": float(np.mean(breach_leverage)),
+                "interest_coverage_breach_probability": float(np.mean(breach_coverage)),
+                "dscr_breach_probability": float(np.mean(breach_dscr)),
+                "joint_covenant_breach_probability": float(np.mean(joint_breach)),
+            },
+            "mean_headroom": {
+                "mean_leverage_headroom": float(np.mean(headroom_leverage)),
+                "mean_interest_coverage_headroom": float(np.mean(headroom_coverage)),
+                "mean_dscr_headroom": float(np.mean(headroom_dscr)),
+            },
+            "tail_risk": {
+                "p95_stressed_leverage": p95_leverage,
+                "p99_stressed_leverage": p99_leverage,
+                "CVaR_95_leverage": cvar_leverage,
+            },
+            "simulation_status": "DETERMINISTIC_QMC_CONVERGED",
+            "n_simulations": n_simulations,
+        }
+
+    def simulate_multi_horizon_credit_stress(
+        self,
+        asset_value: float,
+        debt_face_value: float,
+        volatility: float,
+        risk_free_rate: float,
+        horizons: Optional[List[float]] = None,
+        n_simulations: int = 2048,
+        scramble: bool = True,
+        seed: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Simulates Merton Structural Credit Default Risk term structure across multiple time horizons (e.g. 1Y, 3Y, 5Y).
+
+        Args:
+            asset_value: V_0 (Current Asset Value).
+            debt_face_value: D (Debt Face Value).
+            volatility: Asset volatility sigma.
+            risk_free_rate: Risk-free rate r.
+            horizons: List of maturities T_k in years. Defaults to [1.0, 3.0, 5.0].
+            n_simulations: QMC simulation paths.
+            scramble: Whether to apply Owen scrambling.
+            seed: Random seed.
+
+        Returns:
+            Dict containing cumulative and marginal PD term structures, expected asset values, and risk metrics.
+        """
+        if asset_value <= 0 or debt_face_value <= 0 or volatility <= 0:
+            raise ValueError("Asset value, debt face value, and volatility must be positive.")
+
+        if horizons is None:
+            horizons = [1.0, 3.0, 5.0]
+
+        if len(horizons) == 0:
+            raise ValueError("At least one horizon must be specified.")
+
+        for idx in range(len(horizons)):
+            if idx > 0 and horizons[idx] <= horizons[idx - 1]:
+                raise ValueError(f"Time horizons must be strictly increasing, got {horizons}")
+            if horizons[idx] <= 0:
+                raise ValueError(f"Time horizons must be positive, got {horizons[idx]}")
+
+        k_dim = len(horizons)
+
+        z_increments = self.generate_gaussian_samples(
+            n_samples=n_simulations,
+            dimension=k_dim,
+            scramble=scramble,
+            seed=seed,
+        )
+
+        cumulative_pd = {}
+        marginal_pd = {}
+        expected_v_t = {}
+        var_95_term = {}
+        cvar_95_term = {}
+
+        w_t = np.zeros(n_simulations, dtype=np.float64)
+        prev_t = 0.0
+        prev_pd = 0.0
+
+        for idx, t in enumerate(horizons):
+            dt = t - prev_t
+            if dt <= 0:
+                raise ValueError(f"Time horizons must be strictly increasing, got {horizons}")
+
+            w_t = w_t + math.sqrt(dt) * z_increments[:, idx]
+            drift = (risk_free_rate - 0.5 * volatility**2) * t
+            v_t = asset_value * np.exp(drift + volatility * w_t)
+
+            defaults = (v_t < debt_face_value).astype(np.float64)
+            cum_pd = float(np.mean(defaults))
+
+            marg_pd = max(0.0, cum_pd - prev_pd)
+
+            losses = np.maximum(0.0, asset_value - v_t)
+            v95 = float(np.percentile(losses, 95))
+            tail = losses[losses >= v95]
+            cv95 = float(np.mean(tail)) if len(tail) > 0 else v95
+
+            horizon_key = f"{t:g}Y"
+            cumulative_pd[horizon_key] = cum_pd
+            marginal_pd[horizon_key] = marg_pd
+            expected_v_t[horizon_key] = float(np.mean(v_t))
+            var_95_term[horizon_key] = v95
+            cvar_95_term[horizon_key] = cv95
+
+            prev_t = t
+            prev_pd = cum_pd
+
+        return {
+            "horizons": horizons,
+            "cumulative_pd_term_structure": cumulative_pd,
+            "marginal_pd_term_structure": marginal_pd,
+            "expected_asset_value_term_structure": expected_v_t,
+            "VaR_95_term_structure": var_95_term,
+            "CVaR_95_term_structure": cvar_95_term,
+            "simulation_parameters": {
+                "n_simulations": n_simulations,
+                "dimension": k_dim,
+                "scramble_enabled": scramble,
+            },
+        }
 
     def simulate_merton_credit_stress(
         self,
