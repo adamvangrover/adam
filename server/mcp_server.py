@@ -49,6 +49,12 @@ except ImportError:
     QMC_AVAILABLE = False
 
 try:
+    from core.engine.eve_v2_engine import EVEUnderwritingEngine
+    EVE_ENGINE_AVAILABLE = True
+except ImportError:
+    EVE_ENGINE_AVAILABLE = False
+
+try:
     from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
     GEN_RISK_AVAILABLE = True
 except ImportError:
@@ -97,6 +103,22 @@ try:
 except ImportError:
     GOVERNANCE_AVAILABLE = False
     eaci = None
+
+try:
+    from src.pdil.middleware import (
+        JsonLogicGovernanceGatekeeper,
+        SecurityGovernanceGatekeeper,
+        GovernanceError as PDILGovernanceError,
+    )
+    PDIL_GATEKEEPER_AVAILABLE = True
+except ImportError:
+    PDIL_GATEKEEPER_AVAILABLE = False
+
+try:
+    from evals.graders.multi_state_reasoning_evaluator import MultiStateReasoningEvaluator
+    EVALUATOR_AVAILABLE = True
+except ImportError:
+    EVALUATOR_AVAILABLE = False
 
 # 6. External Libs
 try:
@@ -153,6 +175,53 @@ def get_documentation(filename: str) -> str:
 # --- Tools ---
 
 # 1. QUANTUM & RISK
+
+@mcp.tool()
+def eve_v2_underwriting_engine(
+    ticker: str = "MSFT",
+    company_name: str = "Microsoft Corporation",
+    spot_price: float = 420.0,
+    revenue: float = 245000.0,
+    ebitda: float = 125000.0,
+    fcf: float = 74000.0,
+    net_debt: float = 10000.0,
+    shares_outstanding: float = 7430.0
+) -> str:
+    """
+    Executes the full EVE v2.0 Institutional Single-Name Underwriting Engine pipeline across 5 valuation clocks, 3 independent engines, Challenger disagreement map, 2LoD Adversarial red-team transmission chains, and multi-engine corridor convergence.
+    """
+    if not EVE_ENGINE_AVAILABLE:
+        return json.dumps({"error": "EVE v2.0 Engine module not available."})
+    try:
+        engine = EVEUnderwritingEngine(ticker=ticker, company_name=company_name)
+        result = engine.execute_underwriting(
+            spot_price=spot_price,
+            revenue=revenue,
+            ebitda=ebitda,
+            fcf=fcf,
+            net_debt=net_debt,
+            shares_outstanding=shares_outstanding
+        )
+        return json.dumps({
+            "ticker": result.ticker,
+            "company_name": result.company_name,
+            "spot_market_price": result.spot_market_price,
+            "final_eve_corridor_price": result.final_eve_corridor_price,
+            "upside_downside_pct": result.upside_downside_pct,
+            "margin_of_safety_pct": result.margin_of_safety_pct,
+            "verdict": result.verdict,
+            "val_clocks": {
+                "point_in_time": result.clocks.point_in_time,
+                "one_year_target": result.clocks.one_year_target,
+                "five_year_value": result.clocks.five_year_value,
+                "through_cycle_value": result.clocks.through_cycle_value,
+                "terminal_value": result.clocks.terminal_value,
+            },
+            "data_confidence_grade": result.data_confidence.overall_grade,
+            "audit_trail_summary": result.audit_trail_summary
+        }, indent=2)
+    except Exception as e:
+        return json.dumps({"error": str(e)})
 
 @mcp.tool()
 def run_quantum_simulation(asset_value: float, volatility: float, debt: float, horizon: float = 1.0) -> str:
@@ -239,6 +308,59 @@ def covenant_headroom_calculator(ebitda: float, total_debt: float, interest_expe
         }]
     }
     return json.dumps(result, indent=2)
+
+@mcp.tool()
+def mcp_evaluate_pdil_gatekeeper(inference_output: dict[str, Any], rules: dict[str, Any] | None = None) -> str:
+    """
+    Evaluates a probabilistic inference payload against PDIL gatekeeper rules and W3C PROV-O provenance constraints.
+    """
+    if not PDIL_GATEKEEPER_AVAILABLE:
+        return json.dumps({"status": "REJECT", "error": "PDIL Gatekeeper middleware not available."})
+    try:
+        if rules:
+            gatekeeper = JsonLogicGovernanceGatekeeper(rules=rules)
+        else:
+            schema = {
+                "type": "object",
+                "required": ["ebitda", "total_debt"],
+                "properties": {
+                    "ebitda": {"type": "number"},
+                    "total_debt": {"type": "number"}
+                }
+            }
+            gatekeeper = SecurityGovernanceGatekeeper(schema=schema)
+
+        result = gatekeeper.validate_inference(inference_output)
+        return json.dumps({"status": "PASS", "validated_inference": result}, indent=2)
+    except Exception as e:
+        return json.dumps({"status": "REJECT", "error": str(e)}, indent=2)
+
+@mcp.tool()
+def mcp_score_t_plus_1_decision(
+    predicted_trace: list[str],
+    ground_truth_trace: list[str],
+    confidences: list[float] | None = None,
+    accuracies: list[int] | None = None
+) -> str:
+    """
+    Evaluates state trace fidelity and T+1 forward decision quality using the Multi-State Reasoning Evaluator.
+    """
+    if not EVALUATOR_AVAILABLE:
+        return json.dumps({"status": "ERROR", "error": "Multi-State Reasoning Evaluator not available."})
+    try:
+        evaluator = MultiStateReasoningEvaluator()
+        trace_score = evaluator.evaluate_trace_fidelity(predicted_trace, ground_truth_trace)
+        ece = 0.0
+        if confidences and accuracies:
+            ece = evaluator.calculate_expected_calibration_error(confidences, accuracies)
+
+        return json.dumps({
+            "trace_fidelity": trace_score,
+            "expected_calibration_error": ece,
+            "status": "PASS" if trace_score >= 0.7 else "WARN"
+        }, indent=2)
+    except Exception as e:
+        return json.dumps({"status": "ERROR", "error": str(e)}, indent=2)
 
 @mcp.tool()
 def prov_o_audit_logger(agent_id: str, action_taken: str, confidence_score: float, source_citations: list[str]) -> str:
