@@ -20,6 +20,7 @@ Human-centric role designations are deprecated. System state, underwriting decis
 * [6. Pheromones & Pre-Flight Checklist](#6-pheromones--pre-flight-checklist)
 * [7. Architectural Invariants & Permissions](#7-architectural-invariants--permissions)
 * [8. AFOS Agent System Instructions & Extended Persona Catalog](#8-afos-agent-system-instructions--extended-persona-catalog)
+* [9. v30.1-R Orchestrators & Specialized Gate Clearance Systems](#9-v301-r-orchestrators--specialized-gate-clearance-systems)
 
 ---
 
@@ -227,19 +228,6 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 * **INVARIANT I:** Policy is externalized from prompts into YAML/JSONLogic configurations.
 * **INVARIANT J:** Tests must validate both successful and adversarial execution paths.
 
-### Path-Specific Permissions
-
-| Path | Agent Capability |
-| :--- | :--- |
-| `docs/` | write |
-| `tests/` | write |
-| `evals/` | write |
-| `core/agents/` | write with tests |
-| `core/governance/` | restricted |
-| `schemas/` | restricted |
-| `rust_ext/` | restricted + native tests |
-| `generated artifacts` | prohibited |
-
 ---
 
 ## 8. AFOS Agent System Instructions & Extended Persona Catalog
@@ -438,3 +426,25 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 * **Authority:** Chief Institutional Archivist
 * **Description:** Maintains strongly typed asset ontology across 5 institutional domains with bitemporal lineage (valid_at, transaction_at), SHA-256 fingerprinting, cross-entity dependency mapping, point-in-time replay, and tiered lifecycle management.
 * **Expertise:** Unified asset ontology, W3C PROV-O bitemporal lineage, cross-entity dependency mapping, point-in-time portfolio replay, tiered memory lifecycle management.
+
+---
+
+## 9. v30.1-R Orchestrators & Specialized Gate Clearance Systems
+
+### A. ADAM v30.1-R Gate Clearance & LMT Contagion Orchestrator
+- **Module:** `scripts/lmt_contagion_gate_orchestrator.py` & `scripts/run_v30_1_r_gate_clearance_orchestrator.py`
+- **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/ADAM_v30_1_R_LMT_Contagion_Orchestrator_Prompt.md`
+- **Test Suite:** `tests/test_lmt_contagion_gate_orchestrator.py`
+- **Description:** Chains 5 workspace skills (`cache-search-recall` & `world-modeling`, `credit-risk-briefing` & `graph-credit-contagion`, `pd-backtesting-calibration`, `llm-as-judge-arbiter`, `librarian-archivist`) across 7 Release Gates, evaluating LMT restructuring trees (Serta uptier vs Unrestricted Sub drop-down vs Chapter 11) and counterparty spillover with SHA-256 W3C PROV-O sealing.
+
+### B. Market Mayhem v30.1-R — Frontier AI Capex & Credit Contagion
+- **Module:** `scripts/run_market_mayhem_v30_1_r.py`
+- **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/Market_Mayhem_v30_1_R_Frontier_AI_Capex_Prompt.md`
+- **Test Suite:** `tests/test_market_mayhem_v30_1_r.py`
+- **Description:** Chains macro ERP signals, frontier AI lab valuation discounts, neocloud GPU SPV contagion graphs, and barbell positioning playbooks with Z-score targets and CRPS prediction bounds.
+
+### C. IAEH & AFOS v30.1 Bitemporal Context & Policy Drift Audit
+- **Module:** `scripts/run_iaeh_afos_v30_1_bitemporal_audit.py`
+- **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/IAEH_AFOS_v30_1_Bitemporal_Audit_Prompt.md`
+- **Test Suite:** `tests/test_iaeh_afos_v30_1_bitemporal_audit.py`
+- **Description:** Zero-trust architecture linter inspecting cross-skill schema interfaces, bitemporal cache invalidation, and 7-Gate Release Matrix neuro-symbolic tripwires.
