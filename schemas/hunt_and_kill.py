@@ -4,9 +4,9 @@ Pydantic Data Contracts & Schemas for ADAM v30.1-R-Patch Extension.
 Enforces Lexicographic Control Barrier Functions (CBFs) & Safety Primacy (L0 > L1 > L2).
 """
 
-from typing import List, Optional, Literal, Dict, Any
-from pydantic import BaseModel, Field
+from typing import Literal
 
+from pydantic import BaseModel, Field
 
 EpistemicStatus = Literal[
     "[VERIFIED]",
@@ -89,7 +89,7 @@ class EmbeddedSafetyDefense(BaseModel):
     Embedded Safety Invariant Check enforcing Safety Primacy.
     Guarantees expected return / spread / PCS can NEVER override safety constraints.
     """
-    target_id: Optional[str] = Field(None, description="Target ID")
+    target_id: str | None = Field(None, description="Target ID")
     safety_primacy_enforced: bool = Field(
         default=True,
         description="True invariant: Safety constraints strictly take precedence over return/PCS"
@@ -163,7 +163,7 @@ class OrderRoutingSpec(BaseModel):
     air_gapped_sanitization_verified: bool = Field(default=True, description="True if unstructured strings stripped prior to execution")
     liquidity_masking_venue: str = Field(default="Dark pools / midpoint pegs (IEX D-Limit)", description="Routing venue")
     execution_algorithm: str = Field(default="Implementation Shortfall (IS) with randomized child order arrival", description="Execution algorithm")
-    credit_derivative_legging_sequence: List[str] = Field(
+    credit_derivative_legging_sequence: list[str] = Field(
         default_factory=lambda: [
             "1. Execute physical leg (TRACE / 1L BSL assignment / basket) first",
             "2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
@@ -179,7 +179,7 @@ class CounterPredationCheck(BaseModel):
     short_squeeze_utilization_pct: float = Field(..., description="Short borrow utilization percentage")
     stock_loan_borrow_cost_bps: float = Field(..., description="Annual stock-loan borrow cost in bps")
     borrow_recall_ceiling_pass: bool = Field(..., description="True if utilization <= 85% and borrow cost <= 450 bps")
-    coop_steering_position_pct: Optional[float] = Field(None, description="Steering group creditor holding percentage")
+    coop_steering_position_pct: float | None = Field(None, description="Steering group creditor holding percentage")
     coop_majority_verified: bool = Field(..., description="True if blocking position (>33.4% or >50.1%) or signed coop agreement verified")
     overall_pass: bool = Field(..., description="True if all counter-predation checks pass")
 
@@ -219,11 +219,11 @@ class ExtinguishTelemetry(BaseModel):
 
 class HuntAndKillInput(BaseModel):
     """Input contract for the Hunt & Kill execution skill."""
-    correlation_id: Optional[str] = Field(None, description="Unique correlation ID")
+    correlation_id: str | None = Field(None, description="Unique correlation ID")
     sofr_base_rate_pct: float = Field(default=3.88, description="SOFR benchmark rate (%) [VERIFIED NY Fed Oct 2026]")
     hurdle_rate_bps: float = Field(default=150.0, description="Annualized hurdle rate over financing (bps)")
-    targets: List[DislocationTarget] = Field(..., description="List of target dislocation candidates")
-    counter_predation_inputs: List[CounterPredationCheck] = Field(..., description="Counter-predation inputs per target")
+    targets: list[DislocationTarget] = Field(..., description="List of target dislocation candidates")
+    counter_predation_inputs: list[CounterPredationCheck] = Field(..., description="Counter-predation inputs per target")
 
 
 class HuntAndKillOutput(BaseModel):
@@ -231,14 +231,14 @@ class HuntAndKillOutput(BaseModel):
     correlation_id: str
     timestamp: str
     safety_header: Layer0SafetyHeader = Field(..., description="Layer 0 Safety & Materiality Assurance Header")
-    triage_metrics: List[ForcedFlowTriageMetrics] = Field(default_factory=list, description="Quantitative forced-flow triage metrics")
-    basis_ledger: List[BasisLedgerEntry] = Field(..., description="Structural Dislocation & Basis Ledger")
-    pcs_calculations: List[PCSCalculation] = Field(..., description="PCS Score breakdown per target")
-    market_impacts: List[MarketImpactSlippage] = Field(default_factory=list, description="ADV-based market impact calculations")
-    order_routing_specs: List[OrderRoutingSpec] = Field(..., description="Order routing microstructure specs")
-    counter_predation_audit: List[CounterPredationCheck] = Field(..., description="Counter-predation verification ledger")
-    safety_defenses: List[EmbeddedSafetyDefense] = Field(..., description="Embedded Safety Primacy Invariant audit ledger")
-    extinguish_telemetry: List[ExtinguishTelemetry] = Field(..., description="Basis convergence & Kill-switch telemetry")
+    triage_metrics: list[ForcedFlowTriageMetrics] = Field(default_factory=list, description="Quantitative forced-flow triage metrics")
+    basis_ledger: list[BasisLedgerEntry] = Field(..., description="Structural Dislocation & Basis Ledger")
+    pcs_calculations: list[PCSCalculation] = Field(..., description="PCS Score breakdown per target")
+    market_impacts: list[MarketImpactSlippage] = Field(default_factory=list, description="ADV-based market impact calculations")
+    order_routing_specs: list[OrderRoutingSpec] = Field(..., description="Order routing microstructure specs")
+    counter_predation_audit: list[CounterPredationCheck] = Field(..., description="Counter-predation verification ledger")
+    safety_defenses: list[EmbeddedSafetyDefense] = Field(..., description="Embedded Safety Primacy Invariant audit ledger")
+    extinguish_telemetry: list[ExtinguishTelemetry] = Field(..., description="Basis convergence & Kill-switch telemetry")
     total_authorized_deployments: int
     total_quarantined_deployments: int
     capital_swept_to_fortress_ballast_pct: float = Field(default=100.0, description="Profits swept back to Sovereign Bill Fortress Ballast")

@@ -6,13 +6,13 @@ Renders Layer 0 Safety Header, forced-flow triage & VPIN metrics, ADV market imp
 """
 
 import argparse
+from datetime import datetime, timezone
+import hashlib
 import json
 import os
 import sys
+from typing import Any
 import uuid
-import hashlib
-from datetime import datetime, timezone
-from typing import Dict, Any, List
 
 # Ensure repo root is in path
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -22,7 +22,7 @@ if repo_root not in sys.path:
 from skills.hunt_and_kill import run as run_hunt_and_kill_skill
 
 
-def generate_sample_input() -> Dict[str, Any]:
+def generate_sample_input() -> dict[str, Any]:
     """Generates baseline institutional targets representing Module 8's 5 vectors."""
     return {
         "correlation_id": f"corr-hk-{uuid.uuid4().hex[:8]}",
@@ -48,7 +48,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "position_size_usd": 25_000_000.0,
                 "adv_usd": 100_000_000.0,
                 "vpin": 0.22,
-                "sner": 1.1
+                "sner": 1.1,
             },
             {
                 "target_id": "HK-02",
@@ -69,7 +69,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "position_size_usd": 15_000_000.0,
                 "adv_usd": 20_000_000.0,
                 "vpin": 0.35,
-                "sner": 2.4
+                "sner": 2.4,
             },
             {
                 "target_id": "HK-03",
@@ -90,7 +90,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "position_size_usd": 10_000_000.0,
                 "adv_usd": 150_000_000.0,
                 "vpin": 0.18,
-                "sner": 0.8
+                "sner": 0.8,
             },
             {
                 "target_id": "HK-05",
@@ -99,7 +99,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "dislocation_vector": "Vector 5: Counter-Swarm Liquidity Ambush",
                 "long_leg_instrument": "HYG ETF (-185 bps NAV Discount)",
                 "long_leg_price": 72.20,
-                "short_leg_instrument": "Physical HY Basket Creation/Redemption + CDX",
+                "short_leg_instrument": "Physical Basket Creation/Redemption + CDX",
                 "short_leg_price": 74.05,
                 "implied_pricing": 0.7405,
                 "spot_pricing": 0.7220,
@@ -111,8 +111,8 @@ def generate_sample_input() -> Dict[str, Any]:
                 "position_size_usd": 30_000_000.0,
                 "adv_usd": 250_000_000.0,
                 "vpin": 0.28,
-                "sner": 1.4
-            }
+                "sner": 1.4,
+            },
         ],
         "counter_predation_inputs": [
             {
@@ -122,7 +122,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "borrow_recall_ceiling_pass": True,
                 "coop_steering_position_pct": None,
                 "coop_majority_verified": True,
-                "overall_pass": True
+                "overall_pass": True,
             },
             {
                 "target_id": "HK-02",
@@ -131,7 +131,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "borrow_recall_ceiling_pass": True,
                 "coop_steering_position_pct": 54.2,
                 "coop_majority_verified": True,
-                "overall_pass": True
+                "overall_pass": True,
             },
             {
                 "target_id": "HK-03",
@@ -140,7 +140,7 @@ def generate_sample_input() -> Dict[str, Any]:
                 "borrow_recall_ceiling_pass": True,
                 "coop_steering_position_pct": None,
                 "coop_majority_verified": True,
-                "overall_pass": True
+                "overall_pass": True,
             },
             {
                 "target_id": "HK-05",
@@ -149,13 +149,13 @@ def generate_sample_input() -> Dict[str, Any]:
                 "borrow_recall_ceiling_pass": True,
                 "coop_steering_position_pct": None,
                 "coop_majority_verified": True,
-                "overall_pass": True
-            }
-        ]
+                "overall_pass": True,
+            },
+        ],
     }
 
 
-def generate_prov_o_bundle(input_data: Dict[str, Any], output_data: Dict[str, Any]) -> Dict[str, Any]:
+def generate_prov_o_bundle(input_data: dict[str, Any], output_data: dict[str, Any]) -> dict[str, Any]:
     """Creates a W3C PROV-O audit bundle for the Hunt & Kill execution session."""
     input_hash = hashlib.sha256(json.dumps(input_data, sort_keys=True).encode("utf-8")).hexdigest()
     output_hash = hashlib.sha256(json.dumps(output_data, sort_keys=True).encode("utf-8")).hexdigest()
@@ -165,44 +165,55 @@ def generate_prov_o_bundle(input_data: Dict[str, Any], output_data: Dict[str, An
         "prov_bundle_id": bundle_id,
         "prefix": {
             "prov": "http://www.w3.org/ns/prov#",
-            "adam": "https://adam.financial/ontology/v30.1#"
+            "adam": "https://adam.financial/ontology/v30.1#",
         },
         "entity": {
             "adam:HuntAndKillInput": {
                 "prov:type": "adam:ExecutionInput",
-                "adam:sha256": input_hash
+                "adam:sha256": input_hash,
             },
             "adam:HuntAndKillOutput": {
                 "prov:type": "adam:ExecutionOutput",
                 "adam:sha256": output_hash,
-                "adam:authorized_deployments": output_data.get("total_authorized_deployments", 0)
-            }
+                "adam:authorized_deployments": output_data.get("total_authorized_deployments", 0),
+            },
         },
         "activity": {
             "adam:Module8Execution": {
                 "prov:type": "adam:HuntAndKillOrchestration",
                 "prov:startedAtTime": datetime.now(timezone.utc).isoformat(),
-                "prov:endedAtTime": datetime.now(timezone.utc).isoformat()
+                "prov:endedAtTime": datetime.now(timezone.utc).isoformat(),
             }
         },
         "wasGeneratedBy": {
             "_:wgb1": {
                 "prov:entity": "adam:HuntAndKillOutput",
-                "prov:activity": "adam:Module8Execution"
+                "prov:activity": "adam:Module8Execution",
             }
         },
         "used": {
             "_:u1": {
                 "prov:activity": "adam:Module8Execution",
-                "prov:entity": "adam:HuntAndKillInput"
+                "prov:entity": "adam:HuntAndKillInput",
             }
-        }
+        },
     }
 
 
-def render_markdown_report(output_data: Dict[str, Any], prov_bundle: Dict[str, Any]) -> str:
+def render_markdown_report(output_data: dict[str, Any], prov_bundle: dict[str, Any]) -> str:
     """Renders standardized institutional Markdown report for Module 8."""
     sh = output_data.get("safety_header", {})
+    header_gate = f"**{sh.get('layer_0_gate', 0)}**"
+    h1_pass = 'PASS' if sh.get('h1_vpin_toxicity_pass') else 'FAIL'
+    h2_pass = 'PASS' if sh.get('h2_short_utilization_pass') else 'FAIL'
+    h3_pass = 'PASS' if sh.get('h3_borrow_fee_pass') else 'FAIL'
+    h4_pass = 'PASS' if sh.get('h4_sacred_rights_coop_pass') else 'FAIL'
+    feed_pass = 'VERIFIED' if sh.get('sha256_feed_integrity_verified') else 'UNVERIFIED'
+    conf_score = f"**{sh.get('epistemic_confidence_score', 0.0)}**"
+    hitl_req = 'YES' if sh.get('hitl_escalation_required') else 'NO'
+    assured_score = f"**{sh.get('final_assured_score', 0.0):.2f}**"
+    market_pass = 'COMPLIANT' if sh.get('market_integrity_compliance_pass') else 'NON_COMPLIANT'
+
     lines = [
         "# ADAM v30.1-R-Patch Module 8: Hunt & Kill Execution Report (Hardened Spec)",
         f"**Correlation ID**: `{output_data['correlation_id']}` | **Executed At**: `{output_data['timestamp']}` | **Status**: `{output_data['status']}`",
@@ -210,30 +221,33 @@ def render_markdown_report(output_data: Dict[str, Any], prov_bundle: Dict[str, A
         "## 0. Layer 0 Safety & Materiality Assurance Header",
         "| Layer 0 Gate | h1 (VPIN <= 0.65) | h2 (Util <= 85%) | h3 (Borrow <= 450bps) | h4 (Co-Op Sacred Rights) | SHA-256 Feed Integrity | Epistemic Confidence | HITL Required | Final Assured Score | Market Integrity |",
         "|---|---|---|---|---|---|---|---|---|---|",
-        f"| **{sh.get('layer_0_gate', 0)}** | {'PASS' if sh.get('h1_vpin_toxicity_pass') else 'FAIL'} | {'PASS' if sh.get('h2_short_utilization_pass') else 'FAIL'} | "
-        f"{'PASS' if sh.get('h3_borrow_fee_pass') else 'FAIL'} | {'PASS' if sh.get('h4_sacred_rights_coop_pass') else 'FAIL'} | "
-        f"{'VERIFIED' if sh.get('sha256_feed_integrity_verified') else 'UNVERIFIED'} | **{sh.get('epistemic_confidence_score', 0.0)}** | "
-        f"{'YES' if sh.get('hitl_escalation_required') else 'NO'} | **{sh.get('final_assured_score', 0.0):.2f}** | {'COMPLIANT' if sh.get('market_integrity_compliance_pass') else 'NON_COMPLIANT'} |",
+        f"| {header_gate} | {h1_pass} | {h2_pass} | {h3_pass} | {h4_pass} | {feed_pass} | {conf_score} | {hitl_req} | {assured_score} | {market_pass} |",
         "",
         "## 1. Stage 1 (Locate): Forced-Flow Triage & VPIN Swarm Trap Metrics",
         "| Downgrade Prob (%) | Realized Vol 10D | VIX Anchor Ratio | Selling Pressure ($M) | LTM Int Coverage | LTM FCCR | Covenant Trap | VPIN | SNER | Swarm Trap | Position ($M) | ADV ($M) | Impact Slippage |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
 
     for idx, tm in enumerate(output_data.get("triage_metrics", [])):
         mi = output_data.get("market_impacts", [])[idx] if idx < len(output_data.get("market_impacts", [])) else {}
+        cov_trap = 'ACTIVE' if tm['covenant_trap_active'] else 'INACTIVE'
+        swarm_trap = 'DETECTED' if tm['swarm_trap_detected'] else 'CLEAR'
+        pos_size = mi.get('position_size_dollars', 0) / 1e6
+        adv_size = mi.get('average_daily_volume_dollars', 0) / 1e6
+        impact_slip = mi.get('calculated_slippage_bps', 0)
+
         lines.append(
             f"| {tm['downgrade_probability_pct']}% | {tm['realized_vol_10d']} | {tm['vix_anchor_ratio']} | ${tm['forced_de_grossing_selling_pressure_mm']}M | "
-            f"{tm['ltm_interest_coverage']}x | {tm['ltm_fccr']}x | {'ACTIVE' if tm['covenant_trap_active'] else 'INACTIVE'} | "
-            f"**{tm['vpin']:.2f}** | **{tm['sner']:.1f}x** | {'DETECTED' if tm['swarm_trap_detected'] else 'CLEAR'} | "
-            f"${mi.get('position_size_dollars', 0)/1e6:.1f}M | ${mi.get('average_daily_volume_dollars', 0)/1e6:.1f}M | {mi.get('calculated_slippage_bps', 0)} bps |"
+            f"{tm['ltm_interest_coverage']}x | {tm['ltm_fccr']}x | {cov_trap} | "
+            f"**{tm['vpin']:.2f}** | **{tm['sner']:.1f}x** | {swarm_trap} | "
+            f"${pos_size:.1f}M | ${adv_size:.1f}M | {impact_slip} bps |"
         )
 
     lines.extend([
         "",
         "## 2. Structural Dislocation & Basis Ledger",
         "| Kill ID | Target / Pair | Dislocation Vector | Long Leg | Short / Hedge Leg | Gross Dislocation | Funding, Slippage & Penalty | Net Spread (Spread_Net) | VPIN / SNER | PCS Ratio | Epistemic Status | Lifecycle State | Catalyst & T_max |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---| "
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---| ",
     ])
 
     for entry in output_data["basis_ledger"]:
@@ -247,33 +261,37 @@ def render_markdown_report(output_data: Dict[str, Any], prov_bundle: Dict[str, A
         "",
         "## 3. Zero-Trust Order Routing & Microstructure Spec",
         "| Target ID | Air-Gapped Sanitization | Liquidity Masking Venue | Execution Algorithm | Legging Sequence |",
-        "|---|---|---|---|---|"
+        "|---|---|---|---|---|",
     ])
 
     for spec in output_data["order_routing_specs"]:
         seq_str = "<br>".join(spec["credit_derivative_legging_sequence"])
-        lines.append(f"| {spec['target_id']} | {'VERIFIED' if spec.get('air_gapped_sanitization_verified') else 'UNVERIFIED'} | {spec['liquidity_masking_venue']} | {spec['execution_algorithm']} | {seq_str} |")
+        sanitized = 'VERIFIED' if spec.get('air_gapped_sanitization_verified') else 'UNVERIFIED'
+        lines.append(f"| {spec['target_id']} | {sanitized} | {spec['liquidity_masking_venue']} | {spec['execution_algorithm']} | {seq_str} |")
 
     lines.extend([
         "",
         "## 4. Kill-Switch & Counter-Predation Audit Ledger",
         "| Target ID | Short Util (%) | Borrow Cost (bps) | Borrow Ceiling Pass | Co-Op Steering (%) | Co-Op Majority Verified | Overall Pass |",
-        "|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|",
     ])
 
     for audit in output_data["counter_predation_audit"]:
         steer_str = f"{audit['coop_steering_position_pct']}%" if audit.get('coop_steering_position_pct') is not None else "N/A"
+        borrow_pass = 'PASS' if audit['borrow_recall_ceiling_pass'] else 'FAIL'
+        majority_ver = 'VERIFIED' if audit['coop_majority_verified'] else 'UNVERIFIED'
+        overall_pass = 'PASS' if audit['overall_pass'] else 'FAIL'
         lines.append(
             f"| {audit['target_id']} | {audit['short_squeeze_utilization_pct']}% | {audit['stock_loan_borrow_cost_bps']} bps | "
-            f"{'PASS' if audit['borrow_recall_ceiling_pass'] else 'FAIL'} | {steer_str} | {'VERIFIED' if audit['coop_majority_verified'] else 'UNVERIFIED'} | "
-            f"**{'PASS' if audit['overall_pass'] else 'FAIL'}** |"
+            f"{borrow_pass} | {steer_str} | {majority_ver} | "
+            f"**{overall_pass}** |"
         )
 
     lines.extend([
         "",
         "## 5. Embedded Safety Defense & Primacy Invariant Ledger",
         "| Target ID | Safety Primacy Enforced | Short Squeeze Breach | Co-Op Legality Breach | VPIN Toxicity Quarantine | Unbounded Loss Risk | Reward Override Attempted | Safety Verdict |",
-        "|---|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|---|",
     ])
 
     for sd in output_data.get("safety_defenses", []):
@@ -287,13 +305,14 @@ def render_markdown_report(output_data: Dict[str, Any], prov_bundle: Dict[str, A
         "",
         "## 6. Basis Convergence & Extinguish Telemetry",
         "| Target ID | Initial Spread | Current Spread | Compression (%) | 50% Scale-Out | Extinguish Triggered | Multi-Oracle 180s Consensus | Hard Kill-Switch Active | Fortress Sweep (%) |",
-        "|---|---|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|---|---|",
     ])
 
     for ext in output_data["extinguish_telemetry"]:
+        oracle_ver = 'VERIFIED' if ext.get('multi_oracle_180s_consensus_verified') else 'UNVERIFIED'
         lines.append(
             f"| {ext['target_id']} | {ext['initial_spread_bps']} bps | {ext['current_spread_bps']} bps | {ext['compression_pct']}% | "
-            f"{ext['scale_out_50_triggered']} | {ext['full_extinguish_triggered']} | {'VERIFIED' if ext.get('multi_oracle_180s_consensus_verified') else 'UNVERIFIED'} | "
+            f"{ext['scale_out_50_triggered']} | {ext['full_extinguish_triggered']} | {oracle_ver} | "
             f"{ext['hard_kill_switch_active']} | {output_data['capital_swept_to_fortress_ballast_pct']}% |"
         )
 
@@ -302,7 +321,7 @@ def render_markdown_report(output_data: Dict[str, Any], prov_bundle: Dict[str, A
         "## 7. W3C PROV-O SHA-256 Audit Seal",
         "```json",
         json.dumps(prov_bundle, indent=2),
-        "```"
+        "```",
     ])
 
     return "\n".join(lines)
@@ -337,7 +356,7 @@ def main() -> None:
     with open(json_file, "w", encoding="utf-8") as f:
         f.write(json.dumps({"input": input_data, "output": output_data, "prov_bundle": prov_bundle}, indent=2))
 
-    print(f"Module 8 Hunt & Kill Orchestration Complete.")
+    print("Module 8 Hunt & Kill Orchestration Complete.")
     print(f"Report saved to: {report_file}")
     print(f"JSON data saved to: {json_file}")
 

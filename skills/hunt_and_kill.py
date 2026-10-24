@@ -6,24 +6,24 @@ Features Lexicographic Control Barrier Functions (CBFs: h1-h4), VPIN/SNER toxici
 """
 
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Tuple
 import math
+from typing import Any
 
 from schemas.hunt_and_kill import (
+    BasisLedgerEntry,
+    CounterPredationCheck,
+    DislocationTarget,
+    EmbeddedSafetyDefense,
+    EpistemicStatus,
+    ExtinguishTelemetry,
+    ForcedFlowTriageMetrics,
     HuntAndKillInput,
     HuntAndKillOutput,
-    DislocationTarget,
-    BasisLedgerEntry,
-    PCSCalculation,
-    OrderRoutingSpec,
-    CounterPredationCheck,
-    ExtinguishTelemetry,
-    EpistemicStatus,
-    EmbeddedSafetyDefense,
-    ForcedFlowTriageMetrics,
+    Layer0SafetyHeader,
     MarketImpactSlippage,
+    OrderRoutingSpec,
+    PCSCalculation,
     TargetLifecycleState,
-    Layer0SafetyHeader
 )
 
 
@@ -74,7 +74,7 @@ def calculate_forced_flow_triage(target: DislocationTarget) -> ForcedFlowTriageM
         covenant_trap_active=covenant_trap,
         vpin=vpin,
         sner=sner,
-        swarm_trap_detected=swarm_trap
+        swarm_trap_detected=swarm_trap,
     )
 
 
@@ -82,7 +82,7 @@ def calculate_square_root_market_impact(
     position_size_usd: float,
     adv_usd: float,
     vpin: float = 0.25,
-    gamma: float = 0.75
+    gamma: float = 0.75,
 ) -> MarketImpactSlippage:
     """
     Computes square-root market impact algorithm slippage in bps, adding Penalty_Swarm if VPIN > 0.40.
@@ -103,7 +103,7 @@ def calculate_square_root_market_impact(
         participation_rate_pct=round(participation_rate, 2),
         participation_gamma=gamma,
         calculated_slippage_bps=max(5.0, slippage_bps),
-        swarm_penalty_bps=swarm_penalty_bps
+        swarm_penalty_bps=swarm_penalty_bps,
     )
 
 
@@ -113,8 +113,8 @@ def calculate_net_spread(
     cost_repo_sofr_bps: float,
     bid_ask_slippage_bps: float,
     carry_theta_div_bps: float,
-    swarm_penalty_bps: float = 0.0
-) -> Tuple[float, float]:
+    swarm_penalty_bps: float = 0.0,
+) -> tuple[float, float]:
     """
     Computes exact gross dislocation and net arbitrage spread (Spread_Net) in bps:
     Gross = |Pricing_Implied - Pricing_Spot| * 10000
@@ -132,7 +132,7 @@ def calculate_pcs(
     vpin: float,
     max_adverse_excursion_bps: float,
     illiquidity_haircut: float,
-    decay_lambda: float = 0.025
+    decay_lambda: float = 0.025,
 ) -> PCSCalculation:
     """
     Computes Toxicity-Adjusted Predatory Conviction Score (PCS):
@@ -155,11 +155,11 @@ def calculate_pcs(
         max_adverse_excursion_bps=max_adverse_excursion_bps,
         illiquidity_haircut=illiquidity_haircut,
         pcs_score=round(pcs_score, 4),
-        authorized=authorized
+        authorized=authorized,
     )
 
 
-def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
+def run_hunt_and_kill(input_data: dict[str, Any]) -> dict[str, Any]:
     """
     Executes the 4-step Hunt & Kill operational protocol (Locate -> Isolate -> Exploit -> Extinguish).
     Enforces Lexicographic Control Barrier Functions (h1-h4) & Multiplicative Layer 0 Safety Gate.
@@ -169,14 +169,14 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
 
     counter_pred_map = {cp.target_id: cp for cp in parsed_input.counter_predation_inputs}
 
-    triage_metrics_list: List[ForcedFlowTriageMetrics] = []
-    market_impacts_list: List[MarketImpactSlippage] = []
-    basis_ledger: List[BasisLedgerEntry] = []
-    pcs_calcs: List[PCSCalculation] = []
-    order_specs: List[OrderRoutingSpec] = []
-    counter_pred_audits: List[CounterPredationCheck] = []
-    safety_defenses: List[EmbeddedSafetyDefense] = []
-    extinguish_telemetries: List[ExtinguishTelemetry] = []
+    triage_metrics_list: list[ForcedFlowTriageMetrics] = []
+    market_impacts_list: list[MarketImpactSlippage] = []
+    basis_ledger: list[BasisLedgerEntry] = []
+    pcs_calcs: list[PCSCalculation] = []
+    order_specs: list[OrderRoutingSpec] = []
+    counter_pred_audits: list[CounterPredationCheck] = []
+    safety_defenses: list[EmbeddedSafetyDefense] = []
+    extinguish_telemetries: list[ExtinguishTelemetry] = []
 
     authorized_count = 0
     quarantined_count = 0
@@ -195,7 +195,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
         market_impact = calculate_square_root_market_impact(
             position_size_usd=target.position_size_usd,
             adv_usd=target.adv_usd,
-            vpin=target.vpin
+            vpin=target.vpin,
         )
         market_impacts_list.append(market_impact)
 
@@ -207,7 +207,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             cost_repo_sofr_bps=target.cost_repo_sofr_bps,
             bid_ask_slippage_bps=total_slippage_bps,
             carry_theta_div_bps=target.carry_theta_div_bps,
-            swarm_penalty_bps=market_impact.swarm_penalty_bps
+            swarm_penalty_bps=market_impact.swarm_penalty_bps,
         )
 
         mae_bps = max(10.0, gross_bps * 0.20)
@@ -218,7 +218,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             t_max_days=target.t_max_days,
             vpin=target.vpin,
             max_adverse_excursion_bps=mae_bps,
-            illiquidity_haircut=illiquidity_haircut
+            illiquidity_haircut=illiquidity_haircut,
         )
         pcs_calcs.append(pcs_calc)
 
@@ -232,28 +232,28 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
                 borrow_recall_ceiling_pass=True,
                 coop_steering_position_pct=51.0 if "Vector 1" in target.dislocation_vector else None,
                 coop_majority_verified=True,
-                overall_pass=True
+                overall_pass=True,
             )
         counter_pred_audits.append(cp_check)
 
         # Hard Control Barrier Function (CBF) Evaluations (h1-h4 >= 0)
-        # h1: VPIN <= 0.65 (and SNER <= 10.0)
         h1_vpin_pass = (target.vpin <= 0.65) and (target.sner < 10.0)
-        # h2: Short utilization <= 85.0%
         h2_util_pass = cp_check.short_squeeze_utilization_pct <= 85.0 and cp_check.borrow_recall_ceiling_pass
-        # h3: Borrow cost <= 450 bps
         h3_fee_pass = cp_check.stock_loan_borrow_cost_bps <= 450.0
-        # h4: Sacred Rights Co-Op check (Vector 1 requires >33.4% or >50.1% blocking position)
         h4_coop_pass = True
         if "Vector 1" in target.dislocation_vector:
             h4_coop_pass = cp_check.coop_majority_verified and (
                 cp_check.coop_steering_position_pct is not None and cp_check.coop_steering_position_pct >= 33.4
             )
 
-        if not h1_vpin_pass: all_h1_pass = False
-        if not h2_util_pass: all_h2_pass = False
-        if not h3_fee_pass: all_h3_pass = False
-        if not h4_coop_pass: all_h4_pass = False
+        if not h1_vpin_pass:
+            all_h1_pass = False
+        if not h2_util_pass:
+            all_h2_pass = False
+        if not h3_fee_pass:
+            all_h3_pass = False
+        if not h4_coop_pass:
+            all_h4_pass = False
 
         short_squeeze_breach = not (h2_util_pass and h3_fee_pass)
         coop_legality_breach = not h4_coop_pass
@@ -277,7 +277,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             vpin_toxicity_quarantine_triggered=vpin_quarantine,
             unbounded_loss_risk_detected=unbounded_loss_risk,
             reward_override_attempted=reward_override_attempted,
-            safety_verdict="HARD_ABORT" if safety_verdict_failed else "PASS"
+            safety_verdict="HARD_ABORT" if safety_verdict_failed else "PASS",
         )
         safety_defenses.append(safety_defense)
 
@@ -289,7 +289,9 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             lifecycle_state: TargetLifecycleState = "SWEPT_TO_FORTRESS"
         else:
             quarantined_count += 1
-            lifecycle_state: TargetLifecycleState = "KILL_SWITCH_FLATTENED" if safety_verdict_failed else "ISOLATED_QUARANTINED"
+            lifecycle_state: TargetLifecycleState = (
+                "KILL_SWITCH_FLATTENED" if safety_verdict_failed else "ISOLATED_QUARANTINED"
+            )
 
         # Epistemic Status Tag (6 Tiers)
         epistemic_status: EpistemicStatus = "[MODEL_EST]"
@@ -302,6 +304,13 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
         elif "Vector 5" in target.dislocation_vector:
             epistemic_status = "[VERIFIED]"
 
+        total_friction = (
+            target.cost_repo_sofr_bps +
+            total_slippage_bps +
+            target.carry_theta_div_bps +
+            market_impact.swarm_penalty_bps
+        )
+
         # Ledger Entry
         ledger_entry = BasisLedgerEntry(
             kill_id=target.target_id,
@@ -310,32 +319,38 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             long_leg=f"{target.long_leg_instrument} @ {target.long_leg_price}",
             short_leg=f"{target.short_leg_instrument} @ {target.short_leg_price}",
             gross_dislocation_bps=round(gross_bps, 2),
-            funding_slippage_cost_bps=round(target.cost_repo_sofr_bps + total_slippage_bps + target.carry_theta_div_bps + market_impact.swarm_penalty_bps, 2),
+            funding_slippage_cost_bps=round(total_friction, 2),
             net_exploitable_edge_bps=round(net_spread_bps, 2),
             vpin_sner=f"{target.vpin:.2f} / {target.sner:.1f}x",
             pcs_score=pcs_calc.pcs_score,
             epistemic_status=epistemic_status,
             lifecycle_state=lifecycle_state,
-            convergence_catalyst_and_tmax=f"{target.catalyst_description} ({target.t_max_days} Days)"
+            convergence_catalyst_and_tmax=f"{target.catalyst_description} ({target.t_max_days} Days)",
         )
         basis_ledger.append(ledger_entry)
+
+        masking_venue = (
+            "Dark pools / midpoint pegs (IEX D-Limit)"
+            if "Vector 3" in target.dislocation_vector or "Vector 4" in target.dislocation_vector
+            else "Conditional block venues / Midpoint cross"
+        )
 
         # Step 3: Exploit (Order Routing Microstructure Spec)
         order_spec = OrderRoutingSpec(
             target_id=target.target_id,
             air_gapped_sanitization_verified=True,
-            liquidity_masking_venue="Dark pools / midpoint pegs (IEX D-Limit)" if "Vector 3" in target.dislocation_vector or "Vector 4" in target.dislocation_vector else "Conditional block venues / Midpoint cross",
+            liquidity_masking_venue=masking_venue,
             execution_algorithm="Implementation Shortfall (IS) with randomized child order arrival (Exponential decay)",
             credit_derivative_legging_sequence=[
                 f"1. Execute less liquid physical leg ({target.long_leg_instrument}) on TRACE / BSL assignment first",
-                f"2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
-                f"3. Lift synthetic leg ({target.short_leg_instrument}) to eliminate legging risk"
-            ]
+                "2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
+                f"3. Lift synthetic leg ({target.short_leg_instrument}) to eliminate legging risk",
+            ],
         )
         order_specs.append(order_spec)
 
         # Step 4: Extinguish (Multi-Oracle 180s Consensus & Kill-Switch)
-        current_spread = gross_bps * 0.25 # 75% compressed in baseline simulation
+        current_spread = gross_bps * 0.25
         compression_pct = ((gross_bps - current_spread) / gross_bps) * 100.0 if gross_bps > 0 else 100.0
         marginal_sofr_cost_bps = target.cost_repo_sofr_bps
 
@@ -351,7 +366,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
             repo_haircut_expanded_gt_150bps=False,
             z_score_excursion_gt_2=False,
             hard_kill_switch_active=safety_verdict_failed,
-            capital_sweep_to_sovereign_fortress=is_authorized
+            capital_sweep_to_sovereign_fortress=is_authorized,
         )
         extinguish_telemetries.append(extinguish)
 
@@ -359,7 +374,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
     layer_0_gate = 1 if (all_h1_pass and all_h2_pass and all_h3_pass and all_h4_pass) else 0
     epistemic_confidence = 0.92 if layer_0_gate == 1 else 0.65
     hitl_required = (epistemic_confidence < 0.85) or (layer_0_gate == 0)
-    layer_1_rubric = 4.81 # Standard Layer 1 Quality Rubric score
+    layer_1_rubric = 4.81
     final_assured_score = layer_0_gate * layer_1_rubric
 
     safety_header = Layer0SafetyHeader(
@@ -372,7 +387,7 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
         epistemic_confidence_score=epistemic_confidence,
         hitl_escalation_required=hitl_required,
         final_assured_score=final_assured_score,
-        market_integrity_compliance_pass=True
+        market_integrity_compliance_pass=True,
     )
 
     output_obj = HuntAndKillOutput(
@@ -390,12 +405,12 @@ def run_hunt_and_kill(input_data: Dict[str, Any]) -> Dict[str, Any]:
         total_authorized_deployments=authorized_count,
         total_quarantined_deployments=quarantined_count,
         capital_swept_to_fortress_ballast_pct=100.0 if authorized_count > 0 else 0.0,
-        status="COMPLETED"
+        status="COMPLETED",
     )
 
     return output_obj.model_dump()
 
 
-def run(input_data: Dict[str, Any]) -> Dict[str, Any]:
+def run(input_data: dict[str, Any]) -> dict[str, Any]:
     """Standard skill entrypoint for ADAM skill bootstrap runner."""
     return run_hunt_and_kill(input_data)
