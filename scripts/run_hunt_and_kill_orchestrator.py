@@ -6,13 +6,13 @@ Renders Layer 0 Safety Header, forced-flow triage & VPIN metrics, ADV market imp
 """
 
 import argparse
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
 import sys
-from typing import Any
 import uuid
+from datetime import UTC, datetime
+from typing import Any
 
 # Ensure repo root is in path
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -181,8 +181,8 @@ def generate_prov_o_bundle(input_data: dict[str, Any], output_data: dict[str, An
         "activity": {
             "adam:Module8Execution": {
                 "prov:type": "adam:HuntAndKillOrchestration",
-                "prov:startedAtTime": datetime.now(timezone.utc).isoformat(),
-                "prov:endedAtTime": datetime.now(timezone.utc).isoformat(),
+                "prov:startedAtTime": datetime.now(UTC).isoformat(),
+                "prov:endedAtTime": datetime.now(UTC).isoformat(),
             }
         },
         "wasGeneratedBy": {
@@ -216,15 +216,21 @@ def render_markdown_report(output_data: dict[str, Any], prov_bundle: dict[str, A
 
     lines = [
         "# ADAM v30.1-R-Patch Module 8: Hunt & Kill Execution Report (Hardened Spec)",
-        f"**Correlation ID**: `{output_data['correlation_id']}` | **Executed At**: `{output_data['timestamp']}` | **Status**: `{output_data['status']}`",
+        f"**Correlation ID**: `{output_data['correlation_id']}` | "
+        f"**Executed At**: `{output_data['timestamp']}` | **Status**: `{output_data['status']}`",
         "",
         "## 0. Layer 0 Safety & Materiality Assurance Header",
-        "| Layer 0 Gate | h1 (VPIN <= 0.65) | h2 (Util <= 85%) | h3 (Borrow <= 450bps) | h4 (Co-Op Sacred Rights) | SHA-256 Feed Integrity | Epistemic Confidence | HITL Required | Final Assured Score | Market Integrity |",
+        "| Layer 0 Gate | h1 (VPIN <= 0.65) | h2 (Util <= 85%) | h3 (Borrow <= 450bps) | "
+        "h4 (Co-Op Sacred Rights) | SHA-256 Feed Integrity | Epistemic Confidence | "
+        "HITL Required | Final Assured Score | Market Integrity |",
         "|---|---|---|---|---|---|---|---|---|---|",
-        f"| {header_gate} | {h1_pass} | {h2_pass} | {h3_pass} | {h4_pass} | {feed_pass} | {conf_score} | {hitl_req} | {assured_score} | {market_pass} |",
+        f"| {header_gate} | {h1_pass} | {h2_pass} | {h3_pass} | {h4_pass} | {feed_pass} | "
+        f"{conf_score} | {hitl_req} | {assured_score} | {market_pass} |",
         "",
         "## 1. Stage 1 (Locate): Forced-Flow Triage & VPIN Swarm Trap Metrics",
-        "| Downgrade Prob (%) | Realized Vol 10D | VIX Anchor Ratio | Selling Pressure ($M) | LTM Int Coverage | LTM FCCR | Covenant Trap | VPIN | SNER | Swarm Trap | Position ($M) | ADV ($M) | Impact Slippage |",
+        "| Downgrade Prob (%) | Realized Vol 10D | VIX Anchor Ratio | Selling Pressure ($M) | "
+        "LTM Int Coverage | LTM FCCR | Covenant Trap | VPIN | SNER | Swarm Trap | Position ($M) | "
+        "ADV ($M) | Impact Slippage |",
         "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
 
@@ -237,7 +243,8 @@ def render_markdown_report(output_data: dict[str, Any], prov_bundle: dict[str, A
         impact_slip = mi.get('calculated_slippage_bps', 0)
 
         lines.append(
-            f"| {tm['downgrade_probability_pct']}% | {tm['realized_vol_10d']} | {tm['vix_anchor_ratio']} | ${tm['forced_de_grossing_selling_pressure_mm']}M | "
+            f"| {tm['downgrade_probability_pct']}% | {tm['realized_vol_10d']} | "
+            f"{tm['vix_anchor_ratio']} | ${tm['forced_de_grossing_selling_pressure_mm']}M | "
             f"{tm['ltm_interest_coverage']}x | {tm['ltm_fccr']}x | {cov_trap} | "
             f"**{tm['vpin']:.2f}** | **{tm['sner']:.1f}x** | {swarm_trap} | "
             f"${pos_size:.1f}M | ${adv_size:.1f}M | {impact_slip} bps |"
@@ -246,15 +253,20 @@ def render_markdown_report(output_data: dict[str, Any], prov_bundle: dict[str, A
     lines.extend([
         "",
         "## 2. Structural Dislocation & Basis Ledger",
-        "| Kill ID | Target / Pair | Dislocation Vector | Long Leg | Short / Hedge Leg | Gross Dislocation | Funding, Slippage & Penalty | Net Spread (Spread_Net) | VPIN / SNER | PCS Ratio | Epistemic Status | Lifecycle State | Catalyst & T_max |",
+        "| Kill ID | Target / Pair | Dislocation Vector | Long Leg | Short / Hedge Leg | "
+        "Gross Dislocation | Funding, Slippage & Penalty | Net Spread (Spread_Net) | "
+        "VPIN / SNER | PCS Ratio | Epistemic Status | Lifecycle State | Catalyst & T_max |",
         "|---|---|---|---|---|---|---|---|---|---|---|---|---| ",
     ])
 
     for entry in output_data["basis_ledger"]:
         lines.append(
-            f"| {entry['kill_id']} | {entry['target_pair']} | {entry['dislocation_vector']} | {entry['long_leg']} | "
-            f"{entry['short_leg']} | {entry['gross_dislocation_bps']} bps | {entry['funding_slippage_cost_bps']} bps | "
-            f"**{entry['net_exploitable_edge_bps']} bps** | {entry.get('vpin_sner', 'N/A')} | **{entry['pcs_score']}** | `{entry['epistemic_status']}` | `{entry['lifecycle_state']}` | {entry['convergence_catalyst_and_tmax']} |"
+            f"| {entry['kill_id']} | {entry['target_pair']} | {entry['dislocation_vector']} | "
+            f"{entry['long_leg']} | {entry['short_leg']} | {entry['gross_dislocation_bps']} bps | "
+            f"{entry['funding_slippage_cost_bps']} bps | **{entry['net_exploitable_edge_bps']} bps** | "
+            f"{entry.get('vpin_sner', 'N/A')} | **{entry['pcs_score']}** | "
+            f"`{entry['epistemic_status']}` | `{entry['lifecycle_state']}` | "
+            f"{entry['convergence_catalyst_and_tmax']} |"
         )
 
     lines.extend([
@@ -267,52 +279,61 @@ def render_markdown_report(output_data: dict[str, Any], prov_bundle: dict[str, A
     for spec in output_data["order_routing_specs"]:
         seq_str = "<br>".join(spec["credit_derivative_legging_sequence"])
         sanitized = 'VERIFIED' if spec.get('air_gapped_sanitization_verified') else 'UNVERIFIED'
-        lines.append(f"| {spec['target_id']} | {sanitized} | {spec['liquidity_masking_venue']} | {spec['execution_algorithm']} | {seq_str} |")
+        lines.append(
+            f"| {spec['target_id']} | {sanitized} | {spec['liquidity_masking_venue']} | "
+            f"{spec['execution_algorithm']} | {seq_str} |"
+        )
 
     lines.extend([
         "",
         "## 4. Kill-Switch & Counter-Predation Audit Ledger",
-        "| Target ID | Short Util (%) | Borrow Cost (bps) | Borrow Ceiling Pass | Co-Op Steering (%) | Co-Op Majority Verified | Overall Pass |",
+        "| Target ID | Short Util (%) | Borrow Cost (bps) | Borrow Ceiling Pass | "
+        "Co-Op Steering (%) | Co-Op Majority Verified | Overall Pass |",
         "|---|---|---|---|---|---|---|",
     ])
 
     for audit in output_data["counter_predation_audit"]:
-        steer_str = f"{audit['coop_steering_position_pct']}%" if audit.get('coop_steering_position_pct') is not None else "N/A"
+        pct = audit.get('coop_steering_position_pct')
+        steer_str = f"{pct}%" if pct is not None else "N/A"
         borrow_pass = 'PASS' if audit['borrow_recall_ceiling_pass'] else 'FAIL'
         majority_ver = 'VERIFIED' if audit['coop_majority_verified'] else 'UNVERIFIED'
         overall_pass = 'PASS' if audit['overall_pass'] else 'FAIL'
         lines.append(
-            f"| {audit['target_id']} | {audit['short_squeeze_utilization_pct']}% | {audit['stock_loan_borrow_cost_bps']} bps | "
-            f"{borrow_pass} | {steer_str} | {majority_ver} | "
-            f"**{overall_pass}** |"
+            f"| {audit['target_id']} | {audit['short_squeeze_utilization_pct']}% | "
+            f"{audit['stock_loan_borrow_cost_bps']} bps | {borrow_pass} | {steer_str} | "
+            f"{majority_ver} | **{overall_pass}** |"
         )
 
     lines.extend([
         "",
         "## 5. Embedded Safety Defense & Primacy Invariant Ledger",
-        "| Target ID | Safety Primacy Enforced | Short Squeeze Breach | Co-Op Legality Breach | VPIN Toxicity Quarantine | Unbounded Loss Risk | Reward Override Attempted | Safety Verdict |",
+        "| Target ID | Safety Primacy Enforced | Short Squeeze Breach | Co-Op Legality Breach | "
+        "VPIN Toxicity Quarantine | Unbounded Loss Risk | Reward Override Attempted | Safety Verdict |",
         "|---|---|---|---|---|---|---|---|",
     ])
 
     for sd in output_data.get("safety_defenses", []):
         lines.append(
-            f"| {sd.get('target_id', 'N/A')} | {sd['safety_primacy_enforced']} | {sd['short_squeeze_ceiling_breached']} | "
-            f"{sd['coop_legality_breached']} | {sd.get('vpin_toxicity_quarantine_triggered', False)} | {sd['unbounded_loss_risk_detected']} | "
+            f"| {sd.get('target_id', 'N/A')} | {sd['safety_primacy_enforced']} | "
+            f"{sd['short_squeeze_ceiling_breached']} | {sd['coop_legality_breached']} | "
+            f"{sd.get('vpin_toxicity_quarantine_triggered', False)} | {sd['unbounded_loss_risk_detected']} | "
             f"**{sd['reward_override_attempted']}** | **`{sd['safety_verdict']}`** |"
         )
 
     lines.extend([
         "",
         "## 6. Basis Convergence & Extinguish Telemetry",
-        "| Target ID | Initial Spread | Current Spread | Compression (%) | 50% Scale-Out | Extinguish Triggered | Multi-Oracle 180s Consensus | Hard Kill-Switch Active | Fortress Sweep (%) |",
+        "| Target ID | Initial Spread | Current Spread | Compression (%) | 50% Scale-Out | "
+        "Extinguish Triggered | Multi-Oracle 180s Consensus | Hard Kill-Switch Active | Fortress Sweep (%) |",
         "|---|---|---|---|---|---|---|---|---|",
     ])
 
     for ext in output_data["extinguish_telemetry"]:
         oracle_ver = 'VERIFIED' if ext.get('multi_oracle_180s_consensus_verified') else 'UNVERIFIED'
         lines.append(
-            f"| {ext['target_id']} | {ext['initial_spread_bps']} bps | {ext['current_spread_bps']} bps | {ext['compression_pct']}% | "
-            f"{ext['scale_out_50_triggered']} | {ext['full_extinguish_triggered']} | {oracle_ver} | "
+            f"| {ext['target_id']} | {ext['initial_spread_bps']} bps | {ext['current_spread_bps']} bps | "
+            f"{ext['compression_pct']}% | {ext['scale_out_50_triggered']} | "
+            f"{ext['full_extinguish_triggered']} | {oracle_ver} | "
             f"{ext['hard_kill_switch_active']} | {output_data['capital_swept_to_fortress_ballast_pct']}% |"
         )
 
@@ -334,7 +355,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.input and os.path.exists(args.input):
-        with open(args.input, "r", encoding="utf-8") as f:
+        with open(args.input, encoding="utf-8") as f:
             input_data = json.load(f)
     else:
         input_data = generate_sample_input()

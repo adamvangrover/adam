@@ -5,8 +5,8 @@ Features Lexicographic Control Barrier Functions (CBFs: h1-h4), VPIN/SNER toxici
 6-tier epistemic taxonomy, Vector 5 Counter-Swarm Ambush, and Layer 0 Multiplicative Safety Gating.
 """
 
-from datetime import datetime, timezone
 import math
+from datetime import UTC, datetime
 from typing import Any
 
 from schemas.hunt_and_kill import (
@@ -392,7 +392,7 @@ def run_hunt_and_kill(input_data: dict[str, Any]) -> dict[str, Any]:
 
     output_obj = HuntAndKillOutput(
         correlation_id=correlation_id,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         safety_header=safety_header,
         triage_metrics=triage_metrics_list,
         basis_ledger=basis_ledger,
