@@ -169,3 +169,11 @@ ADAM v30.1-R End-to-End Gate Clearance & LMT Contagion Orchestrator Agent.
 
 #### `prov_o_archival_seal`
 - **Description**: Generates W3C PROV-O bitemporal lineage record and SHA-256 digest.
+
+---
+## AFOSV301R2ExpandedOrchestratorAgent
+AFOS v30.1-R2-Expanded Orchestrator Agent (Hardened II Spec).
+
+### Skills
+#### `evaluate_exploits_and_defenses`
+- **Description**: Evaluates exploits, defenses, and market-moving intelligence across 5 execution vectors while enforcing Lexicographic Safety Primacy (L0 > L1 > L2) and W3C PROV-O SHA-256 sealing.

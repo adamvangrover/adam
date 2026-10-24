@@ -448,3 +448,9 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 - **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/IAEH_AFOS_v30_1_Bitemporal_Audit_Prompt.md`
 - **Test Suite:** `tests/test_iaeh_afos_v30_1_bitemporal_audit.py`
 - **Description:** Zero-trust architecture linter inspecting cross-skill schema interfaces, bitemporal cache invalidation, and 7-Gate Release Matrix neuro-symbolic tripwires.
+
+### D. AFOS v30.1-R2-Expanded Orchestrator
+- **Module:** `scripts/run_afos_v30_1_r2_expanded_orchestrator.py`
+- **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/AFOS_v30_1_R2_Expanded_Orchestrator_Prompt.md`
+- **Test Suite:** `tests/test_afos_v30_1_r2_expanded_orchestrator.py`
+- **Description:** Evaluates exploits, defenses, and market-moving intelligence across 5 execution vectors, enforcing Lexicographic Safety Primacy (L0 > L1 > L2), VPIN order-flow toxicity filtering, zero-trust order routing, multi-oracle consensus kill-switches, and W3C PROV-O SHA-256 audit bundles.

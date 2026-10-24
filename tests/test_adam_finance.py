@@ -1,13 +1,14 @@
-import pytest
 from adam_finance.math import calculate_leverage, check_covenant_compliance
 
-def test_calculate_leverage():
+
+def test_calculate_leverage() -> None:
     # Normal case
     assert calculate_leverage(500.0, 100.0) == 5.0
     # Zero EBITDA case
     assert calculate_leverage(500.0, 0.0) == 999.9
 
-def test_check_covenant_compliance():
+
+def test_check_covenant_compliance() -> None:
     # Max covenant pass
     assert check_covenant_compliance(4.0, 5.0, "max") is True
     # Max covenant fail
