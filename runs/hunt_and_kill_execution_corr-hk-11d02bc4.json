@@ -1,0 +1,356 @@
+{
+  "input": {
+    "correlation_id": "corr-hk-11d02bc4",
+    "sofr_base_rate_pct": 5.25,
+    "hurdle_rate_bps": 150.0,
+    "targets": [
+      {
+        "target_id": "HK-01",
+        "target_name": "Cash HY vs. CDX Basis",
+        "triage_category": "Rating-Cliff Fallen Angels",
+        "dislocation_vector": "Vector 2: Cash vs. Synthetic Credit Basis Compression",
+        "long_leg_instrument": "Physical Senior Notes (BB Basket)",
+        "long_leg_price": 92.5,
+        "short_leg_instrument": "CDX NA HY 5Y Protection + Repo",
+        "short_leg_price": 95.8,
+        "implied_pricing": 0.958,
+        "spot_pricing": 0.925,
+        "cost_repo_sofr_bps": 560.0,
+        "bid_ask_slippage_bps": 25.0,
+        "carry_theta_div_bps": 15.0,
+        "catalyst_description": "Dealer inventory rebalance & index rollover",
+        "t_max_days": 15
+      },
+      {
+        "target_id": "HK-02",
+        "target_name": "Co-Op / LMT Priming Target",
+        "triage_category": "Maturity Wall & Covenant Traps",
+        "dislocation_vector": "Vector 1: Capital Structure & LMT Priming Arbitrage",
+        "long_leg_instrument": "1L Term Loan B (>50.1% Steering Group)",
+        "long_leg_price": 68.0,
+        "short_leg_instrument": "Unsecured Senior Notes / Common Equity",
+        "short_leg_price": 88.0,
+        "implied_pricing": 0.88,
+        "spot_pricing": 0.68,
+        "cost_repo_sofr_bps": 600.0,
+        "bid_ask_slippage_bps": 50.0,
+        "carry_theta_div_bps": 30.0,
+        "catalyst_description": "8-K Item 1.01 Drop-Down / Uptier Exchange",
+        "t_max_days": 45
+      },
+      {
+        "target_id": "HK-03",
+        "target_name": "Index vs. Single-Name Vol",
+        "triage_category": "Vol-Target & Risk-Parity De-Grossing",
+        "dislocation_vector": "Vector 3: Dispersion & Correlation Arbitrage",
+        "long_leg_instrument": "Single-Name 30D ATM Straddles",
+        "long_leg_price": 14.5,
+        "short_leg_instrument": "Short SPX 30D ATM Straddle (Vega-Neutral)",
+        "short_leg_price": 18.2,
+        "implied_pricing": 0.182,
+        "spot_pricing": 0.145,
+        "cost_repo_sofr_bps": 120.0,
+        "bid_ask_slippage_bps": 10.0,
+        "carry_theta_div_bps": 5.0,
+        "catalyst_description": "Earnings dispersion realization",
+        "t_max_days": 20
+      }
+    ],
+    "counter_predation_inputs": [
+      {
+        "target_id": "HK-01",
+        "short_squeeze_utilization_pct": 42.0,
+        "stock_loan_borrow_cost_bps": 85.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-02",
+        "short_squeeze_utilization_pct": 65.0,
+        "stock_loan_borrow_cost_bps": 220.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": 54.2,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-03",
+        "short_squeeze_utilization_pct": 30.0,
+        "stock_loan_borrow_cost_bps": 45.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      }
+    ]
+  },
+  "output": {
+    "correlation_id": "corr-hk-11d02bc4",
+    "timestamp": "2026-10-22T00:55:27.885377+00:00",
+    "basis_ledger": [
+      {
+        "kill_id": "HK-01",
+        "target_pair": "Cash HY vs. CDX Basis",
+        "dislocation_vector": "Vector 2: Cash vs. Synthetic Credit Basis Compression",
+        "long_leg": "Physical Senior Notes (BB Basket) @ 92.5",
+        "short_leg": "CDX NA HY 5Y Protection + Repo @ 95.8",
+        "gross_dislocation_bps": 330.0,
+        "funding_slippage_cost_bps": 600.0,
+        "net_exploitable_edge_bps": -270.0,
+        "pcs_score": 3.4,
+        "epistemic_status": "[CALCULATED]",
+        "convergence_catalyst_and_tmax": "Dealer inventory rebalance & index rollover (15 Days)"
+      },
+      {
+        "kill_id": "HK-02",
+        "target_pair": "Co-Op / LMT Priming Target",
+        "dislocation_vector": "Vector 1: Capital Structure & LMT Priming Arbitrage",
+        "long_leg": "1L Term Loan B (>50.1% Steering Group) @ 68.0",
+        "short_leg": "Unsecured Senior Notes / Common Equity @ 88.0",
+        "gross_dislocation_bps": 2000.0,
+        "funding_slippage_cost_bps": 680.0,
+        "net_exploitable_edge_bps": 1320.0,
+        "pcs_score": 2.2,
+        "epistemic_status": "[SURVEILLANCE_RULE_SPEC]",
+        "convergence_catalyst_and_tmax": "8-K Item 1.01 Drop-Down / Uptier Exchange (45 Days)"
+      },
+      {
+        "kill_id": "HK-03",
+        "target_pair": "Index vs. Single-Name Vol",
+        "dislocation_vector": "Vector 3: Dispersion & Correlation Arbitrage",
+        "long_leg": "Single-Name 30D ATM Straddles @ 14.5",
+        "short_leg": "Short SPX 30D ATM Straddle (Vega-Neutral) @ 18.2",
+        "gross_dislocation_bps": 370.0,
+        "funding_slippage_cost_bps": 135.0,
+        "net_exploitable_edge_bps": 235.0,
+        "pcs_score": 3.2,
+        "epistemic_status": "[CALCULATED]",
+        "convergence_catalyst_and_tmax": "Earnings dispersion realization (20 Days)"
+      }
+    ],
+    "pcs_calculations": [
+      {
+        "expected_convergence_bps": 330.0,
+        "probability_catalyst_le_t": 0.85,
+        "max_adverse_excursion_bps": 66.0,
+        "illiquidity_haircut": 1.25,
+        "pcs_score": 3.4,
+        "authorized": true
+      },
+      {
+        "expected_convergence_bps": 2000.0,
+        "probability_catalyst_le_t": 0.55,
+        "max_adverse_excursion_bps": 400.0,
+        "illiquidity_haircut": 1.25,
+        "pcs_score": 2.2,
+        "authorized": false
+      },
+      {
+        "expected_convergence_bps": 370.0,
+        "probability_catalyst_le_t": 0.8,
+        "max_adverse_excursion_bps": 74.0,
+        "illiquidity_haircut": 1.25,
+        "pcs_score": 3.2,
+        "authorized": true
+      }
+    ],
+    "order_routing_specs": [
+      {
+        "target_id": "HK-01",
+        "liquidity_masking_venue": "Conditional block venues / Midpoint cross",
+        "execution_algorithm": "Implementation Shortfall (IS) weighted toward close auction imbalances",
+        "credit_derivative_legging_sequence": [
+          "1. Execute physical leg (Physical Senior Notes (BB Basket)) on TRACE / BSL assignment",
+          "2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
+          "3. Lift synthetic leg (CDX NA HY 5Y Protection + Repo) to eliminate legging risk"
+        ]
+      },
+      {
+        "target_id": "HK-02",
+        "liquidity_masking_venue": "Conditional block venues / Midpoint cross",
+        "execution_algorithm": "Implementation Shortfall (IS) weighted toward close auction imbalances",
+        "credit_derivative_legging_sequence": [
+          "1. Execute physical leg (1L Term Loan B (>50.1% Steering Group)) on TRACE / BSL assignment",
+          "2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
+          "3. Lift synthetic leg (Unsecured Senior Notes / Common Equity) to eliminate legging risk"
+        ]
+      },
+      {
+        "target_id": "HK-03",
+        "liquidity_masking_venue": "Dark pools / midpoint pegs (IEX D-Limit)",
+        "execution_algorithm": "Implementation Shortfall (IS) weighted toward close auction imbalances",
+        "credit_derivative_legging_sequence": [
+          "1. Execute physical leg (Single-Name 30D ATM Straddles) on TRACE / BSL assignment",
+          "2. Deploy contingent delta-hedge in liquid futures / CDX NA HY",
+          "3. Lift synthetic leg (Short SPX 30D ATM Straddle (Vega-Neutral)) to eliminate legging risk"
+        ]
+      }
+    ],
+    "counter_predation_audit": [
+      {
+        "target_id": "HK-01",
+        "short_squeeze_utilization_pct": 42.0,
+        "stock_loan_borrow_cost_bps": 85.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-01",
+        "short_squeeze_utilization_pct": 42.0,
+        "stock_loan_borrow_cost_bps": 85.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-02",
+        "short_squeeze_utilization_pct": 65.0,
+        "stock_loan_borrow_cost_bps": 220.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": 54.2,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-02",
+        "short_squeeze_utilization_pct": 65.0,
+        "stock_loan_borrow_cost_bps": 220.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": 54.2,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-03",
+        "short_squeeze_utilization_pct": 30.0,
+        "stock_loan_borrow_cost_bps": 45.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      },
+      {
+        "target_id": "HK-03",
+        "short_squeeze_utilization_pct": 30.0,
+        "stock_loan_borrow_cost_bps": 45.0,
+        "borrow_recall_ceiling_pass": true,
+        "coop_steering_position_pct": null,
+        "coop_majority_verified": true,
+        "overall_pass": true
+      }
+    ],
+    "safety_defenses": [
+      {
+        "safety_primacy_enforced": true,
+        "short_squeeze_ceiling_breached": false,
+        "coop_legality_breached": false,
+        "unbounded_loss_risk_detected": false,
+        "reward_override_attempted": false,
+        "safety_verdict": "PASS"
+      },
+      {
+        "safety_primacy_enforced": true,
+        "short_squeeze_ceiling_breached": false,
+        "coop_legality_breached": false,
+        "unbounded_loss_risk_detected": false,
+        "reward_override_attempted": false,
+        "safety_verdict": "PASS"
+      },
+      {
+        "safety_primacy_enforced": true,
+        "short_squeeze_ceiling_breached": false,
+        "coop_legality_breached": false,
+        "unbounded_loss_risk_detected": false,
+        "reward_override_attempted": false,
+        "safety_verdict": "PASS"
+      }
+    ],
+    "extinguish_telemetry": [
+      {
+        "target_id": "HK-01",
+        "initial_spread_bps": 330.0,
+        "current_spread_bps": 82.5,
+        "compression_pct": 75.0,
+        "scale_out_50_triggered": true,
+        "full_extinguish_triggered": true,
+        "t_max_expired": false,
+        "repo_haircut_expanded_gt_150bps": false,
+        "z_score_excursion_gt_2": false,
+        "hard_kill_switch_active": false,
+        "capital_sweep_to_sovereign_fortress": true
+      },
+      {
+        "target_id": "HK-02",
+        "initial_spread_bps": 2000.0,
+        "current_spread_bps": 500.0,
+        "compression_pct": 75.0,
+        "scale_out_50_triggered": true,
+        "full_extinguish_triggered": true,
+        "t_max_expired": false,
+        "repo_haircut_expanded_gt_150bps": false,
+        "z_score_excursion_gt_2": false,
+        "hard_kill_switch_active": false,
+        "capital_sweep_to_sovereign_fortress": true
+      },
+      {
+        "target_id": "HK-03",
+        "initial_spread_bps": 370.0,
+        "current_spread_bps": 92.5,
+        "compression_pct": 75.0,
+        "scale_out_50_triggered": true,
+        "full_extinguish_triggered": true,
+        "t_max_expired": false,
+        "repo_haircut_expanded_gt_150bps": false,
+        "z_score_excursion_gt_2": false,
+        "hard_kill_switch_active": false,
+        "capital_sweep_to_sovereign_fortress": true
+      }
+    ],
+    "total_authorized_deployments": 1,
+    "total_quarantined_deployments": 2,
+    "capital_swept_to_fortress_ballast_pct": 100.0,
+    "status": "COMPLETED"
+  },
+  "prov_bundle": {
+    "prov_bundle_id": "prov-hk-ab5b090764dc",
+    "prefix": {
+      "prov": "http://www.w3.org/ns/prov#",
+      "adam": "https://adam.financial/ontology/v30.1#"
+    },
+    "entity": {
+      "adam:HuntAndKillInput": {
+        "prov:type": "adam:ExecutionInput",
+        "adam:sha256": "69aeb41358545f4de198214b4fbb4de88d5c805f4d427655ae000a49f60aa8ef"
+      },
+      "adam:HuntAndKillOutput": {
+        "prov:type": "adam:ExecutionOutput",
+        "adam:sha256": "31a49958d325f6b0e0dc4d0bba667f833e1f92cdb6851d19a4e155a1a9d91e4c",
+        "adam:authorized_deployments": 1
+      }
+    },
+    "activity": {
+      "adam:Module8Execution": {
+        "prov:type": "adam:HuntAndKillOrchestration",
+        "prov:startedAtTime": "2026-10-22T00:55:27.885979+00:00",
+        "prov:endedAtTime": "2026-10-22T00:55:27.885990+00:00"
+      }
+    },
+    "wasGeneratedBy": {
+      "_:wgb1": {
+        "prov:entity": "adam:HuntAndKillOutput",
+        "prov:activity": "adam:Module8Execution"
+      }
+    },
+    "used": {
+      "_:u1": {
+        "prov:activity": "adam:Module8Execution",
+        "prov:entity": "adam:HuntAndKillInput"
+      }
+    }
+  }
+}
