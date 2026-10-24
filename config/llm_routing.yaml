@@ -1,0 +1,125 @@
+version: "2026.10-gov.1"
+enforcement_mode: "STRICT_FAIL_CLOSED"
+default_timeout_seconds: 30.0
+max_retries: 2
+backoff_factor: 1.5
+
+model_registry:
+  anthropic/claude-3-5-sonnet-20241022:
+    provider: "anthropic"
+    display_name: "Claude 3.5 Sonnet"
+    verification_status: "VERIFIED"
+    capabilities:
+      context_window: 200000
+      max_output_tokens: 8192
+      prompt_caching: true
+      structured_output: true
+      reasoning_tier: "system_2_advanced"
+    rate_limits:
+      rpm: 1000
+      tpm: 80000
+    cost_per_million_tokens:
+      input_base: 3.00
+      input_cached: 0.30
+      output: 15.00
+    allowed_environments: ["development", "staging", "production"]
+    quarantined: false
+
+  openai/gpt-4o-2024-08-06:
+    provider: "openai"
+    display_name: "GPT-4o (Structured Outputs)"
+    verification_status: "VERIFIED"
+    capabilities:
+      context_window: 128000
+      max_output_tokens: 16384
+      prompt_caching: true
+      structured_output: true
+      reasoning_tier: "system_2_intermediate"
+    rate_limits:
+      rpm: 1500
+      tpm: 120000
+    cost_per_million_tokens:
+      input_base: 2.50
+      input_cached: 1.25
+      output: 10.00
+    allowed_environments: ["development", "staging", "production"]
+    quarantined: false
+
+  google/gemini-1.5-pro-002:
+    provider: "google"
+    display_name: "Gemini 1.5 Pro"
+    verification_status: "VERIFIED"
+    capabilities:
+      context_window: 2000000
+      max_output_tokens: 8192
+      prompt_caching: true
+      structured_output: true
+      reasoning_tier: "system_2_advanced"
+    rate_limits:
+      rpm: 360
+      tpm: 4000000
+    cost_per_million_tokens:
+      input_base: 1.25
+      input_cached: 0.3125
+      output: 5.00
+    allowed_environments: ["development", "staging", "production"]
+    quarantined: false
+
+  adam/eval-qmc-scenario-v1:
+    provider: "synthetic-benchmark"
+    display_name: "Deal-Room Scenario Benchmark"
+    verification_status: "PROPOSED"
+    capabilities:
+      context_window: 1000000
+      max_output_tokens: 8192
+      prompt_caching: true
+      structured_output: true
+      reasoning_tier: "analytical_benchmark"
+    cost_per_million_tokens:
+      input_base: 2.00
+      input_cached: 0.10
+      output: 10.00
+    allowed_environments: ["sandbox", "simulation"]
+    quarantined: false
+
+  deprecated/legacy-credit-llm-v0:
+    provider: "internal"
+    display_name: "Legacy Credit Extractor"
+    verification_status: "REJECTED"
+    quarantined: true
+    quarantine_reason: "High hallucination rate on negative covenants; non-deterministic output format"
+    allowed_environments: []
+
+routing_table:
+  dealroom_synthesis_primary:
+    primary_model: "anthropic/claude-3-5-sonnet-20241022"
+    verification_model: "openai/gpt-4o-2024-08-06"
+    fallback_model: "google/gemini-1.5-pro-002"
+    requires_cross_verification: true
+    min_confidence_threshold: 0.85
+    enforce_schema: "credit_facility_fibo"
+
+  covenant_extraction:
+    primary_model: "anthropic/claude-3-5-sonnet-20241022"
+    verification_model: "google/gemini-1.5-pro-002"
+    fallback_model: "openai/gpt-4o-2024-08-06"
+    requires_cross_verification: true
+    min_confidence_threshold: 0.90
+    enforce_schema: "covenant_terms"
+
+  financial_statement_extraction:
+    primary_model: "openai/gpt-4o-2024-08-06"
+    verification_model: "anthropic/claude-3-5-sonnet-20241022"
+    fallback_model: "google/gemini-1.5-pro-002"
+    requires_cross_verification: true
+    min_confidence_threshold: 0.95
+    enforce_schema: "financial_assertions"
+
+denylist:
+  forbidden_model_prefixes:
+    - "unverified/"
+    - "experimental/"
+    - "external-public/"
+  disallowed_capabilities:
+    - "unrestricted_code_execution"
+    - "fiduciary_sanctioning"
