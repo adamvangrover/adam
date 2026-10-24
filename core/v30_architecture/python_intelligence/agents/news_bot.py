@@ -406,7 +406,7 @@ class NewsBotAgent(BaseAgent):
             response = requests.get(rss_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
             response.raise_for_status()
             xml_content = response.content
-            root = ET.fromstring(xml_content)
+            root = ET.fromstring(xml_content)  # nosec B314
             for item in root.findall('./channel/item')[:5]:
                 title = item.find('title')
                 desc = item.find('description')

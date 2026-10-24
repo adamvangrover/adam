@@ -10,7 +10,7 @@ Enforces:
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 
 class ModelAuthorizationError(PermissionError):
@@ -32,7 +32,7 @@ class ModelQuarantineState(str, Enum):
 
 @dataclass
 class ModelPolicyRegistry:
-    allowed_models: Set[str] = field(
+    allowed_models: set[str] = field(
         default_factory=lambda: {
             "gpt-4o",
             "claude-3-5-sonnet",
@@ -42,7 +42,7 @@ class ModelPolicyRegistry:
             "claude-sonnet-5-5",
         }
     )
-    denied_models: Set[str] = field(
+    denied_models: set[str] = field(
         default_factory=lambda: {
             "deprecated-untrusted-v1",
             "unverified-experimental-v2",
@@ -50,7 +50,7 @@ class ModelPolicyRegistry:
             "shadow-routing-alias",
         }
     )
-    aliases: Dict[str, str] = field(
+    aliases: dict[str, str] = field(
         default_factory=lambda: {
             "default-fallback": "gpt-4o",
             "experimental-alias": "unverified-experimental-v2",
@@ -63,7 +63,7 @@ class AuthoritativeAuthorizationRouter:
     Central routing and tool execution quarantine gatekeeper.
     """
 
-    def __init__(self, policy: Optional[ModelPolicyRegistry] = None):
+    def __init__(self, policy: ModelPolicyRegistry | None = None) -> None:
         self.policy = policy or ModelPolicyRegistry()
 
     def resolve_model_identifier(self, model_identifier: str) -> str:
@@ -95,9 +95,9 @@ class AuthoritativeAuthorizationRouter:
         self,
         model_identifier: str,
         tool_name: str,
-        tool_args: Dict[str, Any],
-        fallback_models: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        tool_args: dict[str, Any],
+        fallback_models: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Executes a tool call after verifying authorization across primary and all fallback models.
         """

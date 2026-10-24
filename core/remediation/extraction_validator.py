@@ -5,10 +5,10 @@ Enforces strict source-grounded telemetry parsing, cryptographic document hash m
 source text span citation, and fail-closed validation for quantitative risk inputs.
 """
 
+import re
 from dataclasses import dataclass
 from enum import Enum
-import re
-from typing import Optional, Any, Dict
+from typing import Any
 
 
 class EvidenceStatus(str, Enum):
@@ -26,9 +26,9 @@ class SR117UnverifiedTelemetryError(ValueError):
 @dataclass
 class EvidenceSpan:
     text: str
-    page_number: Optional[int] = None
-    start_char: Optional[int] = None
-    end_char: Optional[int] = None
+    page_number: int | None = None
+    start_char: int | None = None
+    end_char: int | None = None
 
 
 @dataclass
@@ -42,9 +42,9 @@ class EvidenceBoundExtractionRecord:
     timestamp: str
     confidence: float
     reconciliation_state: str = "RECONCILED"
-    source_span: Optional[EvidenceSpan] = None
+    source_span: EvidenceSpan | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "metric_name": self.metric_name,
             "value": self.value,
@@ -60,7 +60,7 @@ class EvidenceBoundExtractionRecord:
                 "page_number": self.source_span.page_number,
                 "start_char": self.source_span.start_char,
                 "end_char": self.source_span.end_char,
-            } if self.source_span else None
+            } if self.source_span else None,
         }
 
 
@@ -90,14 +90,13 @@ def validate_extraction_record(record: EvidenceBoundExtractionRecord) -> bool:
         )
 
     if record.reconciliation_state != "RECONCILED":
-        raise SR117UnverifiedTelemetryError(
-            f"Extraction record for '{record.metric_name}' reconciliation state is '{record.reconciliation_state}', not 'RECONCILED'."
-        )
+        msg = f"Extraction record for '{record.metric_name}' reconciliation state is '{record.reconciliation_state}'."
+        raise SR117UnverifiedTelemetryError(msg)
 
     return True
 
 
-def validate_telemetry_payload(payload: Dict[str, Any]) -> bool:
+def validate_telemetry_payload(payload: dict[str, Any]) -> bool:
     """
     Validates a raw telemetry payload dictionary for SR 11-7 evidence completeness.
     """

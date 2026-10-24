@@ -9,10 +9,10 @@ Implements bounded context cache lifecycle management:
 - Reconciliation of estimated pricing vs. observed provider telemetry
 """
 
+import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
-import time
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 
 @dataclass
@@ -45,20 +45,20 @@ class DealRoomContextCache:
         self,
         max_capacity_entries: int = 100,
         ttl_seconds: float = 3600.0,
-        pricing_model: Optional[CachePricingModel] = None,
-    ):
+        pricing_model: CachePricingModel | None = None,
+    ) -> None:
         self.max_capacity = max_capacity_entries
         self.ttl_seconds = ttl_seconds
         self.pricing = pricing_model or CachePricingModel()
         # Storage: deal_room_id -> OrderedDict[context_version, DealRoomCacheEntry]
-        self._store: Dict[str, OrderedDict[str, DealRoomCacheEntry]] = {}
+        self._store: dict[str, OrderedDict[str, DealRoomCacheEntry]] = {}
         # Observed telemetry metrics
         self.total_cache_hits = 0
         self.total_cache_misses = 0
         self.total_evictions = 0
         self.total_expirations = 0
 
-    def get(self, deal_room_id: str, context_version: str) -> Optional[DealRoomCacheEntry]:
+    def get(self, deal_room_id: str, context_version: str) -> DealRoomCacheEntry | None:
         """
         Retrieves an active, unexpired entry from the cache for a specific deal room and version.
         """
@@ -85,7 +85,13 @@ class DealRoomContextCache:
         self.total_cache_hits += 1
         return entry
 
-    def put(self, deal_room_id: str, context_version: str, token_count: int, data: Any) -> DealRoomCacheEntry:
+    def put(
+        self,
+        deal_room_id: str,
+        context_version: str,
+        token_count: int,
+        data: object,
+    ) -> DealRoomCacheEntry:
         """
         Stores an entry in the cache with tenant isolation and LRU capacity enforcement.
         """
@@ -113,7 +119,7 @@ class DealRoomContextCache:
 
     def _evict_lru(self) -> None:
         """Evicts the least recently accessed entry across all deal rooms."""
-        oldest_entry: Optional[Tuple[str, str, float]] = None
+        oldest_entry: tuple[str, str, float] | None = None
 
         for room_id, versions in self._store.items():
             for v_id, entry in versions.items():
@@ -132,7 +138,7 @@ class DealRoomContextCache:
         input_tokens_per_pass: int = 850_000,
         passes: int = 12,
         output_tokens: int = 48_000,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Reproduces and calculates deal room economics for context caching scenario.
         """

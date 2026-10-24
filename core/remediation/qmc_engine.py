@@ -13,8 +13,9 @@ Enforces:
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 import numpy as np
-from typing import Any, Dict, List, Optional, Tuple
 
 
 class QMCStatus(str, Enum):
@@ -41,14 +42,14 @@ class ValidatedQMCEngine:
     QMC simulation and convergence validator for corporate credit risk.
     """
 
-    def __init__(self, params: Optional[JointStressParameters] = None):
+    def __init__(self, params: JointStressParameters | None = None) -> None:
         self.params = params or JointStressParameters()
 
     def run_simulation(
         self,
         num_samples: int = 4096,
         seed: int = 42,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Runs a single QMC / Quasi-Monte Carlo joint factor simulation pass.
         """
@@ -90,7 +91,9 @@ class ValidatedQMCEngine:
             "p99_threshold_leverage": float(p99_threshold),
             "mean_p99_tail_leverage": mean_p99_tail_leverage,
             "status": QMCStatus.SIMULATION_COMPLETED.value,
-            "tail_statistic_note": "Reported value is mean tail leverage under simulation, NOT regulatory capital or ECL.",
+            "tail_statistic_note": (
+                "Reported value is mean tail leverage under simulation, NOT regulatory capital or ECL."
+            ),
         }
 
     def verify_reproducibility(
@@ -113,16 +116,17 @@ class ValidatedQMCEngine:
 
     def validate_convergence(
         self,
-        sample_sizes: List[int] = [1024, 2048, 4096, 8192],
+        sample_sizes: list[int] | None = None,
         seed: int = 42,
         max_relative_error: float = 0.02,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Tests statistical numerical convergence across increasing sample sizes.
         Assigns CONVERGENCE_VALIDATED only if relative error across sample steps is within max_relative_error.
         """
+        sample_sizes_list = sample_sizes if sample_sizes is not None else [1024, 2048, 4096, 8192]
         results = []
-        for n in sample_sizes:
+        for n in sample_sizes_list:
             res = self.run_simulation(num_samples=n, seed=seed)
             results.append(res)
 
@@ -136,7 +140,7 @@ class ValidatedQMCEngine:
         status = QMCStatus.CONVERGENCE_VALIDATED.value if converged else QMCStatus.CONVERGENCE_FAILED.value
 
         return {
-            "sample_sizes_tested": sample_sizes,
+            "sample_sizes_tested": sample_sizes_list,
             "breach_frequencies": breach_freqs,
             "final_breach_frequency": final_freq,
             "relative_error": float(relative_error),

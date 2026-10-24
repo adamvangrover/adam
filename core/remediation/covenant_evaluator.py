@@ -8,7 +8,6 @@ Enforces:
 """
 
 import math
-from typing import Any, Dict, List, Set, Union
 
 
 class CovenantValidationError(ValueError):
@@ -24,7 +23,7 @@ class JsonLogicASTError(ValueError):
 ALLOWED_JSONLOGIC_OPERATORS = {"<=", "<", ">=", ">", "==", "!=", "/", "*", "+", "-", "var"}
 
 
-def validate_jsonlogic_ast(expr: Any, valid_vars: Set[str]) -> bool:
+def validate_jsonlogic_ast(expr: object, valid_vars: set[str]) -> bool:  # noqa: C901
     """
     Validates a jsonLogic rule AST for allowed operators, correct arity, and variable names.
     """
@@ -33,19 +32,23 @@ def validate_jsonlogic_ast(expr: Any, valid_vars: Set[str]) -> bool:
             raise JsonLogicASTError(f"Numeric literal '{expr}' is non-finite (NaN or Inf).")
         return True
 
-    if isinstance(expr, str) or isinstance(expr, bool):
+    if isinstance(expr, (str, bool)):
         return True
 
     if isinstance(expr, dict):
         if len(expr) != 1:
             raise JsonLogicASTError("jsonLogic expression node must contain exactly one operator key.")
 
-        op, args = list(expr.items())[0]
+        op, args = next(iter(expr.items()))
         if op not in ALLOWED_JSONLOGIC_OPERATORS:
             raise JsonLogicASTError(f"Unsupported or dangerous jsonLogic operator: '{op}'")
 
         if op == "var":
-            if not isinstance(args, str) and not (isinstance(args, list) and len(args) == 1 and isinstance(args[0], str)):
+            is_valid_var_arg = (
+                isinstance(args, str)
+                or (isinstance(args, list) and len(args) == 1 and isinstance(args[0], str))
+            )
+            if not is_valid_var_arg:
                 raise JsonLogicASTError(f"Invalid var operator argument: {args}")
             var_name = args if isinstance(args, str) else args[0]
             if var_name not in valid_vars:
@@ -67,7 +70,7 @@ def validate_jsonlogic_ast(expr: Any, valid_vars: Set[str]) -> bool:
     raise JsonLogicASTError(f"Invalid jsonLogic AST node type: {type(expr)}")
 
 
-def evaluate_covenant_leverage(inputs: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_covenant_leverage(inputs: dict[str, object]) -> dict[str, object]:  # noqa: C901
     """
     Evaluates total leverage and secured leverage covenants with strict fail-closed validation.
 
@@ -102,11 +105,11 @@ def evaluate_covenant_leverage(inputs: Dict[str, Any]) -> Dict[str, Any]:
         if math.isnan(val) or math.isinf(val):
             raise CovenantValidationError(f"Field '{field}' contains non-finite value '{val}'.")
 
-    total_debt = float(inputs["total_debt"])
-    senior_secured_debt = float(inputs["senior_secured_debt"])
-    ebitda = float(inputs["ebitda"])
-    max_total = float(inputs["max_total_leverage_covenant"])
-    max_secured = float(inputs["max_secured_leverage_covenant"])
+    total_debt = float(inputs["total_debt"])  # type: ignore[arg-type]
+    senior_secured_debt = float(inputs["senior_secured_debt"])  # type: ignore[arg-type]
+    ebitda = float(inputs["ebitda"])  # type: ignore[arg-type]
+    max_total = float(inputs["max_total_leverage_covenant"])  # type: ignore[arg-type]
+    max_secured = float(inputs["max_secured_leverage_covenant"])  # type: ignore[arg-type]
 
     if total_debt < 0:
         raise CovenantValidationError(f"Negative total_debt '{total_debt}' is invalid.")
