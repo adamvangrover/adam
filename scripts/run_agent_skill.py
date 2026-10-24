@@ -46,6 +46,12 @@ SKILL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "entrypoint": "skills.librarian_archivist:run",
         "input_schema": "schemas/librarian_archivist_input.json",
         "output_schema": "schemas/librarian_archivist_output.json"
+    },
+    "hunt_and_kill": {
+        "manifest_path": "schemas/hunt_and_kill_manifest.json",
+        "entrypoint": "skills.hunt_and_kill:run",
+        "input_schema": "schemas/hunt_and_kill_input.json",
+        "output_schema": "schemas/hunt_and_kill_output.json"
     }
 }
 
