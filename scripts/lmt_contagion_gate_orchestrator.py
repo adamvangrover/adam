@@ -724,7 +724,7 @@ def main():
         print("          ADAM v30.1-R END-TO-END GATE CLEARANCE & LMT CONTAGION EXECUTIVE SUMMARY")
         print("================================================================================\n")
         print(f"Obligor Target      : {args.ticker} ({cap_struct.entity_name})")
-        print(f"Capital Structure   : ${cap_struct.total_debt_m:.1f}M Total Debt \vert{}${cap_struct.ebitda_m:.1f}M EBITDA")
+        print(f"Capital Structure   : ${cap_struct.total_debt_m:.1f}M Total Debt | ${cap_struct.ebitda_m:.1f}M EBITDA")
         print(f"Prior Disposition   : REJECT_FOR_PRODUCTION")
         print(f"Final Disposition   : {result['final_disposition']}")
         print(f"IAEH Audit Digest   : {result['iaeh_digest_sha256']}\n")
