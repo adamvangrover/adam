@@ -279,7 +279,7 @@ tabs = [
     {"title": "Provenance", "content": markdown.markdown(provenance_md, extensions=['tables', 'fenced_code'])}
 ]
 
-env = Environment(loader=FileSystemLoader('.'))
+env = Environment(loader=FileSystemLoader('.'), autoescape=True)
 template = env.get_template('template.html.j2')
 
 html_content = template.render(
