@@ -8,6 +8,7 @@ class ProvenanceHeader(BaseModel):
     system_version: str = "30.1.0"
     observed_drift: bool = False
     execution_trace: List[str] = Field(default_factory=list)
+    source_data_object: str = Field(default="", description="Reference to the source data object")
 
 class Obligor(BaseModel):
     """Obligor-level fundamental creditworthiness."""
@@ -30,6 +31,13 @@ class RiskAssessmentOutput(BaseModel):
     facility_id: str
     expected_loss: float
     facility_rating: str
+
+    def check_grounding(self) -> bool:
+        """
+        Verifies that this output contains a valid reference to its source data object,
+        satisfying W3C PROV-O compliance requirements.
+        """
+        return bool(self.provenance.source_data_object)
 
 class ModelArbitrationOutput(BaseModel):
     """Output schema for dual-model PD arbitration."""

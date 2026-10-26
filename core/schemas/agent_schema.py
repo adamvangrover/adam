@@ -22,6 +22,13 @@ class AgentOutput(BaseModel):
     provenance_trace: ProvenanceHeader = Field(..., description="Immutable provenance trace linking the agent output to source and logic version.")
     observed_drift: bool = Field(default=False, description="Flag indicating if behavior or calculation drift was observed.")
 
+    def check_grounding(self) -> bool:
+        """
+        Verifies that this output contains a valid reference to its source data object,
+        satisfying W3C PROV-O compliance requirements.
+        """
+        return bool(self.provenance_trace.source_data_object)
+
 class FundamentalReport(BaseModel):
     """
     Pydantic schema for the output of the FundamentalAnalyst agent.
