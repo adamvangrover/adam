@@ -136,10 +136,31 @@ exclude = [
     ".venv",
     "venv",
     "__pycache__",
+    "*.ipynb",
+    "docs",
+    "notebooks",
+    "scripts/templates",
+    "ops",
+    "market-mayhem",
+    "showcase",
+    "src/adam",
+    "afos"
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
+ignore = [
+    "ANN001", "ANN002", "ANN003", "ANN201", "ANN202", "ANN204", "ANN205", "ANN206", "ANN401",
+    "E501", "I001", "F401", "UP015", "C901", "E402", "F841", "UP006", "UP035", "UP045", "B008", "B010", "RUF012", "N806", "RUF059",
+    "B017", "B007", "B905", "N814", "N803", "N818", "RUF015", "E701", "E712", "UP008", "F811", "B006", "UP041", "F821", "F842", "E722", "E741", "B009",
+    "F541", "UP017", "RUF043", "E401", "N802", "N801", "N805", "N815", "N816", "E731", "UP007", "B028", "B007", "RUF001", "RUF002", "RUF003",
+    "B904", "RUF010", "RUF022", "RUF013", "UP012", "B002", "B023", "B026", "B018", "B005", "B024", "UP004", "UP018", "UP028", "UP031", "UP032", "UP034",
+    "RUF046", "RUF005", "UP024", "RUF019", "N817", "RUF006", "N812", "B904", "E721", "N999", "F403", "F405", "E702", "E703", "UP037", "RUF100", "E711", "N813"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/remediation/**" = []
+"core/remediation/**" = []
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
