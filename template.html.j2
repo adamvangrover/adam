@@ -66,7 +66,7 @@
         {% for tab in tabs %}
         <section id="tab-{{ loop.index }}" class="tab-content {{ 'active' if loop.first else '' }}">
             <div class="prose prose-invert prose-slate max-w-none prose-headings:display-font prose-headings:text-white prose-a:text-amber-500 prose-code:text-amber-400 prose-code:bg-black/30 prose-pre:bg-[#0a0f1c] prose-pre:border prose-pre:border-white/10 prose-th:text-slate-300">
-                {{ tab.content }}
+                {{ tab.content | safe }}
             </div>
         </section>
         {% endfor %}
