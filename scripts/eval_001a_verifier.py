@@ -16,13 +16,18 @@ def verify_jsonl_schema():
     item_schema = schema["properties"]["data_points"]["items"]
 
     print("Validating JSONL entries...")
+
+    # ⚡ Bolt Optimization: Pre-compile jsonschema validator
+    ValidatorClass = jsonschema.validators.validator_for(item_schema)
+    validator = ValidatorClass(item_schema)
+
     with open(data_path, "r") as f:
         for i, line in enumerate(f):
             if not line.strip():
                 continue
             entry = json.loads(line)
             try:
-                jsonschema.validate(instance=entry, schema=item_schema)
+                validator.validate(instance=entry)
                 print(f"Line {i+1}: Valid")
             except jsonschema.exceptions.ValidationError as e:
                 print(f"Line {i+1}: Invalid - {e.message}")
