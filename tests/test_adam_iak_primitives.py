@@ -177,3 +177,75 @@ def test_deterministic_policy_epistemic_gate_valid_and_rejection():
     assert env3["status"] == "PENDING"
     assert env3["slots"]["action_decision"] == "HUMAN_IN_THE_LOOP_REQUIRED"
     assert "HITL_REVIEW_REQUIRED" in env3["validation"]["pending"]
+
+
+def test_entmax15_large_dimension():
+    """Verify 1.5-entmax threshold root finding with large dimension D=1000."""
+    logits = torch.randn(2, 1000)
+    probs = bisect_threshold_entmax15(logits, alpha=1.5)
+
+    assert probs.shape == (2, 1000)
+    assert not torch.isnan(probs).any()
+    assert (probs >= 0.0).all()
+    assert torch.allclose(probs.sum(dim=-1), torch.ones(2), atol=1e-4)
+
+
+def test_masked_entmax_softmax_single_element_and_temperature():
+    """Verify single element sequence dimension std scaling and temperature scaling."""
+    # Single element dimension
+    pooling_single = DtypeSafeMaskedEntmaxSoftmax(mode="softmax", normalize_scale=True)
+    logits_single = torch.tensor([[3.5]], dtype=torch.float32)
+    probs_single = pooling_single(logits_single)
+    assert not torch.isnan(probs_single).any()
+    assert abs(probs_single.item() - 1.0) < 1e-4
+
+    # Temperature scaling
+    pooling_temp = DtypeSafeMaskedEntmaxSoftmax(mode="softmax", normalize_scale=False, temperature=2.0)
+    logits = torch.tensor([[0.0, 2.0]], dtype=torch.float32)
+    probs_temp = pooling_temp(logits)
+    expected_temp = torch.softmax(logits / 2.0, dim=-1)
+    assert torch.allclose(probs_temp, expected_temp, atol=1e-4)
+
+
+def test_crf_decoder_path_scores():
+    """Verify UncertaintyGatedCRFSlotDecoder returns valid best_scores along with best_paths."""
+    decoder = UncertaintyGatedCRFSlotDecoder(
+        num_slots=4,
+        intent_dim=8,
+        slot_hidden_dim=16,
+        energy_threshold=100.0
+    )
+    slot_hidden = torch.randn(2, 5, 16)
+    intent_logits = torch.tensor([[10.0, 0.0], [8.0, 1.0]])
+    intent_embed = torch.randn(2, 8)
+
+    output = decoder(slot_hidden, intent_logits, intent_embed)
+
+    assert "best_scores" in output
+    assert len(output["best_scores"]) == 2
+    assert isinstance(output["best_scores"][0], float)
+    assert isinstance(output["best_scores"][1], float)
+
+
+def test_epistemic_gate_negative_financial_inputs():
+    """Verify DeterministicPolicyEpistemicGate rejects negative financial values when constrained."""
+    gate = DeterministicPolicyEpistemicGate()
+    slots = {"revenue": -500.0, "leverage_ratio": 2.0}
+    intent_pred = {
+        "intents": ["underwriting"],
+        "confidence": 0.95,
+        "epistemic_status": "MODEL_EST",
+        "is_ood": False
+    }
+
+    env = gate.evaluate(
+        extracted_slots=slots,
+        intent_prediction=intent_pred,
+        policy_rules={},
+        required_financial_inputs=["leverage_ratio"],
+        non_negative_financial_inputs=["revenue"]
+    )
+
+    assert env["status"] == "REJECTED"
+    assert env["slots"]["action_decision"] == "HARD_ABORT"
+    assert "NEGATIVE_FINANCIAL_INPUT_REVENUE" in env["validation"]["failed"]
