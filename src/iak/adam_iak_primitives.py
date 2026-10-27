@@ -34,7 +34,8 @@ def bisect_threshold_entmax15(
     d = logits.size(-1)
     # Upper bound for tau: max logit
     tau_max, _ = torch.max(logits, dim=-1, keepdim=True)
-    # Lower bound for tau: max logit - 2.0 (since max prob is 1.0 -> 0.5*(z - tau)^2 <= 1 -> z - tau <= sqrt(2) ~ 1.414)
+    # Lower bound for tau: max logit - 2.0
+    # Proof: p_max = [0.5*(z_max - tau)]^2 <= 1 -> z_max - tau <= 2 -> tau >= z_max - 2.0
     tau_min = tau_max - 2.0
 
     tau = (tau_min + tau_max) / 2.0
@@ -86,7 +87,8 @@ class DtypeSafeMaskedEntmaxSoftmax(nn.Module):
         self,
         mode: str = "softmax",
         normalize_scale: bool = True,
-        top_k: Optional[int] = None
+        top_k: Optional[int] = None,
+        temperature: float = 1.0
     ):
         super().__init__()
         valid_modes = {"softmax", "sparsemax", "1.5-entmax", "1.5-relu"}
@@ -95,6 +97,7 @@ class DtypeSafeMaskedEntmaxSoftmax(nn.Module):
         self.mode = mode
         self.normalize_scale = normalize_scale
         self.top_k = top_k
+        self.temperature = max(temperature, 1e-6)
 
     def forward(
         self,
@@ -111,9 +114,15 @@ class DtypeSafeMaskedEntmaxSoftmax(nn.Module):
         orig_dtype = logits.dtype
         scores = logits.clone()
 
+        if self.temperature != 1.0:
+            scores = scores / self.temperature
+
         # Logit scale normalization to combat threshold drift
         if self.normalize_scale:
-            std = torch.std(scores, dim=-1, keepdim=True) + 1e-6
+            if scores.size(-1) > 1:
+                std = torch.std(scores, dim=-1, keepdim=True, correction=0) + 1e-6
+            else:
+                std = torch.ones_like(scores)
             scores = scores / std
 
         # Fully masked row detection
@@ -259,11 +268,12 @@ class UncertaintyGatedCRFSlotDecoder(nn.Module):
         constrained_transitions.masked_fill_(self.illegal_mask, min_val)
 
         # Perform Viterbi decoding
-        best_paths = self._viterbi_decode(emissions, constrained_transitions, mask)
+        best_paths, best_scores = self._viterbi_decode(emissions, constrained_transitions, mask)
 
         return {
             "emissions": emissions,
             "best_paths": best_paths,
+            "best_scores": best_scores,
             "energy": energy,
             "is_ood": is_ood,
             "gated_intent_used": is_ood
@@ -274,12 +284,13 @@ class UncertaintyGatedCRFSlotDecoder(nn.Module):
         emissions: torch.Tensor,
         transitions: torch.Tensor,
         mask: Optional[torch.Tensor]
-    ) -> List[List[int]]:
+    ) -> Tuple[List[List[int]], List[float]]:
         """
-        Linear-chain Viterbi decoding over sequence batch.
+        Linear-chain Viterbi decoding over sequence batch, returning optimal paths and max score per batch item.
         """
         batch_size, seq_len, num_slots = emissions.shape
         best_paths = []
+        best_scores = []
 
         for b in range(batch_size):
             if mask is not None:
@@ -289,6 +300,7 @@ class UncertaintyGatedCRFSlotDecoder(nn.Module):
 
             if seq_l == 0:
                 best_paths.append([])
+                best_scores.append(0.0)
                 continue
 
             # viterbi_vars: [NumSlots]
@@ -305,7 +317,8 @@ class UncertaintyGatedCRFSlotDecoder(nn.Module):
                 backpointers.append(bptrs)
 
             # Follow backpointer path
-            best_tag_id = torch.argmax(viterbi_vars).item()
+            max_score, best_tag_id_tensor = torch.max(viterbi_vars, dim=0)
+            best_tag_id = best_tag_id_tensor.item()
             best_path = [best_tag_id]
 
             for bptr in reversed(backpointers):
@@ -314,8 +327,9 @@ class UncertaintyGatedCRFSlotDecoder(nn.Module):
 
             best_path.reverse()
             best_paths.append(best_path)
+            best_scores.append(max_score.item())
 
-        return best_paths
+        return best_paths, best_scores
 
 
 class DeterministicPolicyEpistemicGate:
@@ -352,7 +366,8 @@ class DeterministicPolicyEpistemicGate:
         extracted_slots: Dict[str, Any],
         intent_prediction: Dict[str, Any],
         policy_rules: Dict[str, Any],
-        required_financial_inputs: Optional[List[str]] = None
+        required_financial_inputs: Optional[List[str]] = None,
+        non_negative_financial_inputs: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Evaluates extracted slots and predicted intents against deterministic policy rules.
@@ -371,7 +386,7 @@ class DeterministicPolicyEpistemicGate:
         else:
             validation_passed.append("VALID_EPISTEMIC_STATUS")
 
-        # 2. Financial Parameter Rejection (Zero-Default Prohibition)
+        # 2. Financial Parameter Rejection (Zero-Default Prohibition & Range Enforcement)
         if required_financial_inputs:
             for fin_param in required_financial_inputs:
                 val = extracted_slots.get(fin_param)
@@ -379,6 +394,14 @@ class DeterministicPolicyEpistemicGate:
                     validation_failed.append(f"MISSING_FINANCIAL_INPUT_{fin_param.upper()}")
                 else:
                     validation_passed.append(f"VERIFIED_FINANCIAL_INPUT_{fin_param.upper()}")
+
+        if non_negative_financial_inputs:
+            for fin_param in non_negative_financial_inputs:
+                val = extracted_slots.get(fin_param)
+                if isinstance(val, (int, float)) and val < 0:
+                    validation_failed.append(f"NEGATIVE_FINANCIAL_INPUT_{fin_param.upper()}")
+                elif val is not None and not (isinstance(val, float) and math.isnan(val)):
+                    validation_passed.append(f"NON_NEGATIVE_FINANCIAL_INPUT_{fin_param.upper()}")
 
         # 3. Conviction & Authorization Assessment
         confidence = intent_prediction.get("confidence", 0.0)
