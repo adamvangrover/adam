@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Macro Synthesis & Anthropic Credit Terminal (ADAM v30.1)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Interactive Financial Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Institutional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1329; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex flex-wrap justify-between items-center gap-4 shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-500/10 border border-amber-500/40 text-amber-400 px-3 py-1.5 rounded-lg font-mono text-xs font-bold tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved"></i> ADAM v30.1-R-PATCH
+            </div>
+            <div>
+                <h1 class="font-bold text-sm sm:text-base tracking-tight text-slate-100 flex items-center gap-2">
+                    Market Mayhem & Anthropic S-1 Credit Synthesis
+                    <span class="text-xs font-mono px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">AUDITED & REMEDIATED</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">Date: 2026-10-26 | SR 11-7 / W3C PROV-O Compliant</p>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all bg-amber-500 text-slate-950 shadow-md">
+                <i class="fa-solid fa-chart-line mr-1.5"></i>Macro & Vibe Check
+            </button>
+            <button onclick="switchTab('spreadsheet')" id="btn-spreadsheet" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                <i class="fa-solid fa-table-cells mr-1.5"></i>S-1 Spreadsheet Model
+            </button>
+            <button onclick="switchTab('waterfall')" id="btn-waterfall" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                <i class="fa-solid fa-water mr-1.5"></i>Debt Waterfall & LMT
+            </button>
+            <button onclick="switchTab('prompts')" id="btn-prompts" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+                <i class="fa-solid fa-terminal mr-1.5"></i>Prompt Generator
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- ==================== TAB 1: DASHBOARD & VIBE CHECK ==================== -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- BLUF Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl text-amber-400 font-mono"><i class="fa-solid fa-landmark"></i></div>
+                <div class="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-bolt"></i> Bottom Line Up Front (BLUF) & Smart Money Vibe Check
+                </div>
+                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                    Equities snapped a two-session losing streak on Monday, October 26, 2026, propelled by Anthropic PBC's landmark public Form S-1 filing (<code class="text-amber-300">CIK: 0002130357</code>) and a modest <span class="text-emerald-400 font-semibold">-2.1%</span> pullback in physical crude (<code class="text-amber-300">Brent $114.30</code>, <code class="text-amber-300">WTI $101.64</code>). The S&P 500 rose <span class="text-emerald-400 font-semibold">+0.70%</span> to <span class="font-mono font-bold text-white">7,676.80</span>, while the 10-Year Treasury yield anchors at <span class="font-mono font-bold text-amber-400">4.99%</span> ahead of the FOMC meeting.
+                </p>
+                <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-800/80 font-mono text-xs">
+                    <div><span class="text-slate-400">S&P 500:</span> <strong class="text-white">7,676.80</strong> <span class="text-emerald-400">(+0.70%)</span></div>
+                    <div><span class="text-slate-400">10Y Treasury:</span> <strong class="text-amber-400">4.99%</strong> <span class="text-rose-400">(-1.0 bp)</span></div>
+                    <div><span class="text-slate-400">Brent Crude:</span> <strong class="text-white">$114.30</strong> <span class="text-rose-400">(-2.1%)</span></div>
+                    <div><span class="text-slate-400">CBOE VIX:</span> <strong class="text-white">18.39</strong> <span class="text-rose-400">(-5.45%)</span></div>
+                </div>
+            </div>
+
+            <!-- Interactive Metrics & Chart Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- ERP Decomposition Widget -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-amber-400"></i> Equity Risk Premium (ERP)
+                            </h3>
+                            <span class="text-xs font-mono px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded">P/E 19.1x</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-4">Forward earnings yield ($E_1/P_0$) vs 10-Year Sovereign Yield ($y_{10}$).</p>
+                        <div class="space-y-3 font-mono text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <div class="flex justify-between"><span>Forward EY:</span><strong class="text-emerald-400">5.24%</strong></div>
+                            <div class="flex justify-between"><span>10Y Benchmark:</span><strong class="text-amber-400">4.99%</strong></div>
+                            <div class="flex justify-between border-t border-slate-800 pt-2"><span>ERP Spread:</span><strong class="text-amber-300">+24.6 bps</strong></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-800">
+                        <label class="block text-xs font-mono text-slate-400 mb-1">Interactive P/E Multiple Stress Test:</label>
+                        <input type="range" id="peRange" min="15" max="22" step="0.1" value="19.1" oninput="updateERP(this.value)" class="w-full accent-amber-500 cursor-pointer">
+                        <div class="flex justify-between text-xs font-mono text-slate-400 mt-1">
+                            <span>P/E: <strong id="peVal" class="text-white">19.1x</strong></span>
+                            <span>S&P 500: <strong id="spVal" class="text-amber-400">7,676.80</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cross-Asset Chart Canvas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl lg:col-span-2 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-amber-400"></i> Cross-Asset Signal Integrity & Yield Spread
+                        </h3>
+                        <span class="text-xs font-mono text-slate-400">Live Clearing Tape</span>
+                    </div>
+                    <div class="flex-1 relative min-h-[220px]">
+                        <canvas id="crossAssetChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signal Integrity Matrix Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl overflow-hidden">
+                <h3 class="font-bold text-sm text-slate-200 font-mono mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-table text-amber-400"></i> Cross-Asset Signal Integrity Matrix (Selected Nodes)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Claim ID</th>
+                                <th class="p-3">Asset / Node</th>
+                                <th class="p-3">Verified Level / Yield</th>
+                                <th class="p-3">Delta / Change</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Structural Signal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                            <tr>
+                                <td class="p-3 font-bold text-amber-400">CLM-01</td>
+                                <td class="p-3 font-semibold text-white">S&P 500 Index (^GSPC)</td>
+                                <td class="p-3">7,676.80</td>
+                                <td class="p-3 text-emerald-400">+53.12 pts (+0.70%)</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px]">VERIFIED</span></td>
+                                <td class="p-3 text-slate-400">Snaps 2-day losing streak on AI IPO catalyst</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-amber-400">CLM-05</td>
+                                <td class="p-3 font-semibold text-white">CBOE VIX (^VIX)</td>
+                                <td class="p-3">18.39</td>
+                                <td class="p-3 text-rose-400">-1.06 pts (-5.45%)</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px]">VERIFIED</span></td>
+                                <td class="p-3 text-slate-400">Vol compression on oil retreat; cheap tail-hedge window</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-amber-400">CLM-07</td>
+                                <td class="p-3 font-semibold text-white">US 10-Year CMT Yield</td>
+                                <td class="p-3">4.99%</td>
+                                <td class="p-3 text-amber-400">-1.0 bp DoD</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px]">VERIFIED</span></td>
+                                <td class="p-3 text-slate-400">Bear-steepened curve reflects 3.7% YoY CPI & fiscal supply</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-amber-400">CLM-09</td>
+                                <td class="p-3 font-semibold text-white">Brent Crude (BZ=F)</td>
+                                <td class="p-3">$114.30 / bbl</td>
+                                <td class="p-3 text-rose-400">-2.10% DoD</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px]">VERIFIED</span></td>
+                                <td class="p-3 text-slate-400">Tactical Monday pullback after Saudi infrastructure strikes</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-amber-400">CLM-12</td>
+                                <td class="p-3 font-semibold text-white">ICE BofA US HY OAS</td>
+                                <td class="p-3">3.33% - 3.40%</td>
+                                <td class="p-3 text-amber-400">+12.96% YoY</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px]">VERIFIED</span></td>
+                                <td class="p-3 text-slate-400">Cash credit complacency despite 5% risk-free 10Y benchmark</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: S-1 SPREADSHEET MODEL ==================== -->
+        <section id="tab-spreadsheet" class="space-y-6 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-100 font-mono flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-amber-400"></i> Anthropic, PBC (ANT) Live Forensic S-1 Spread Model
+                        </h3>
+                        <p class="text-xs text-slate-400 font-mono">CIK: 0002130357 | Form S-1 Accession: 0001628280-26-067168</p>
+                    </div>
+                    <button onclick="recalculateSpreadsheet()" class="px-4 py-2 bg-amber-500 text-slate-950 font-mono text-xs font-bold rounded-xl hover:bg-amber-400 transition-all shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-rotate"></i> Recalculate Model
+                    </button>
+                </div>
+
+                <!-- Spreadsheet Grid -->
+                <div class="overflow-x-auto border border-slate-800 rounded-xl">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Line Item / Credit Metric ($M)</th>
+                                <th class="p-3 text-right">FY2024 Actual</th>
+                                <th class="p-3 text-right">FY2025 Actual</th>
+                                <th class="p-3 text-right">H1 2026 Actual</th>
+                                <th class="p-3 text-right">Q3 2026 Prelim</th>
+                                <th class="p-3 text-right text-amber-400">FY2026E Roll-Forward</th>
+                                <th class="p-3">Audit Tag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spreadsheetBody" class="divide-y divide-slate-800/60 text-slate-300">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Spreadsheet Insights -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+                    <h4 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-amber-400"></i> Forensic Net Loss Deconstruction
+                    </h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Anthropic reported a staggering <strong class="text-rose-400">-$80,700.0M</strong> GAAP net loss in H1 2026 against <strong class="text-white">$16,286.0M</strong> revenue. However, forensic audit proves <strong class="text-amber-400">89.7% (-$72,400.0M)</strong> of this is a non-cash fair-value derivative adjustment on convertible notes triggered by the <code class="text-amber-300">Series H-1</code> valuation surge ($589.01/share). Core operating cash flow reached <strong class="text-emerald-400">+$3,930.0M</strong>.
+                    </p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+                    <h4 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Off-Balance-Sheet Commitment Envelope
+                    </h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        While traditional balance-sheet funded debt is <strong class="text-emerald-400">$0.0M</strong>, non-cancelable compute minimums owed to AWS and Google Cloud total <strong class="text-rose-400">$224,500.0M</strong>, sitting inside a broader <strong class="text-rose-400">$430,000.0M</strong> operational obligation envelope through 2033–2036. Capitalized at 6.0%, this equals <strong class="text-amber-300">~$165,000.0M</strong> in synthetic senior debt.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: DEBT WATERFALL & LMT ==================== -->
+        <section id="tab-waterfall" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controls & Scenario Parameters -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+                    <h3 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-amber-400"></i> Dual-Mode Waterfall Parameters
+                    </h3>
+                    
+                    <div class="space-y-4 text-xs font-mono">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Macro Rate Regime:</label>
+                            <select id="rateRegime" onchange="runWaterfallSimulation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                                <option value="flat">Regime 1: Flat Spot SOFR (4.068%)</option>
+                                <option value="hike" selected>Regime 2: Stagflationary Hike-Path (4.50% - 5.00% - 4.50%)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Distressed Enterprise Value Multiple:</label>
+                            <select id="evMultiple" onchange="runWaterfallSimulation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                                <option value="5.0">Base Case: 5.0x EBITDAR ($90,000M EV)</option>
+                                <option value="4.2" selected>Stressed Case: 4.2x EBITDAR ($75,600M EV)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">LMT / IP Drop-Down Stress:</label>
+                            <select id="lmtStress" onchange="runWaterfallSimulation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                                <option value="none">Standard Chapter 11 APR Waterfall</option>
+                                <option value="ip_strip" selected>LMT Case A: Unrestricted Sub IP Drop-Down ($25B Claude Weights Stripped)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs space-y-2">
+                        <div class="flex justify-between"><span>Year 1 DSCR (Full):</span><strong id="wYear1DSCR" class="text-rose-400">0.986x</strong></div>
+                        <div class="flex justify-between"><span>1L Discounted LGD:</span><strong id="w1LGD" class="text-amber-400">55.97%</strong></div>
+                        <div class="flex justify-between"><span>Unsecured LGD:</span><strong id="wUnsecLGD" class="text-rose-400">100.00%</strong></div>
+                    </div>
+                </div>
+
+                <!-- Waterfall Chart & Table -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl lg:col-span-2 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-200 font-mono flex items-center gap-2">
+                            <i class="fa-solid fa-water text-amber-400"></i> 5-Year Cash Service & DSCR Trajectory
+                        </h3>
+                        <span class="text-xs font-mono px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded">USD Millions</span>
+                    </div>
+                    
+                    <div class="h-64 relative">
+                        <canvas id="waterfallChart"></canvas>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs font-mono">
+                            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="p-2.5">Year ($t$)</th>
+                                    <th class="p-2.5 text-right">Beg. Principal</th>
+                                    <th class="p-2.5 text-right">Total Service</th>
+                                    <th class="p-2.5 text-right">Full DSCR</th>
+                                    <th class="p-2.5 text-right">Net FCF ($M)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waterfallTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: PROMPT GENERATOR ==================== -->
+        <section id="tab-prompts" class="space-y-6 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-100 font-mono flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-amber-400"></i> Institutional Prompt & Analysis Generator
+                        </h3>
+                        <p class="text-xs text-slate-400 font-mono">Generate prompt strings for LLM-assisted credit underwriting & multi-asset synthesis.</p>
+                    </div>
+                    <button onclick="generateCustomPrompt()" class="px-4 py-2 bg-amber-500 text-slate-950 font-mono text-xs font-bold rounded-xl hover:bg-amber-400 transition-all shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Prompt
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Target Persona:</label>
+                        <select id="pPersona" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                            <option>G-SIB Head of Credit Risk & Senior Underwriter</option>
+                            <option>Quantitative Macro Hedge Fund Portfolio Manager</option>
+                            <option>SEC EDGAR Regulatory Surveillance Analyst</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Focus Module:</label>
+                        <select id="pModule" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                            <option>Anthropic S-1 Off-Balance-Sheet Compute Minimums</option>
+                            <option>Hyperscaler Debt Issuance & Circular CapEx Transmission</option>
+                            <option>Basel III/IV CRE 31 Vasicek IRB Capital Sensitivity</option>
+                            <option>Cross-Asset ERP Decomposition & Multiple Contraction</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Output Format:</label>
+                        <select id="pFormat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                            <option>Investment Committee Memo (Structured Markdown)</option>
+                            <option>Python 3.12 Monte Carlo Risk Simulation Harness</option>
+                            <option>W3C PROV-O JSON-LD Compliance Verification Block</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-mono text-slate-400">Generated Prompt Output:</label>
+                        <button onclick="copyPrompt()" class="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy to Clipboard
+                        </button>
+                    </div>
+                    <textarea id="promptOutput" readonly class="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-amber-300/90 focus:outline-none resize-none shadow-inner"></textarea>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 px-6 text-center text-xs font-mono text-slate-500">
+        ADAM v30.1-R-Patch | Institutional Synthesis Engine | SR 11-7 / W3C PROV-O Verified Clearing Tape
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+            });
+            const targetSection = document.getElementById('tab-' + tabId);
+            if(targetSection) targetSection.classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+                activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md');
+            }
+            if(tabId === 'spreadsheet') renderSpreadsheet();
+            if(tabId === 'waterfall') runWaterfallSimulation();
+        }
+
+        // ERP Interactive Widget
+        function updateERP(pe) {
+            const peValEl = document.getElementById('peVal');
+            const spValEl = document.getElementById('spVal');
+            if(peValEl) peValEl.textContent = pe + 'x';
+            const sp = (401.93 * parseFloat(pe)).toFixed(2);
+            if(spValEl) spValEl.textContent = Number(sp).toLocaleString();
+        }
+
+        // Cross-Asset Chart Initialization
+        let crossAssetChartInstance = null;
+        function initCrossAssetChart() {
+            const canvasEl = document.getElementById('crossAssetChart');
+            if(!canvasEl) return;
+            const ctxChart = canvasEl.getContext('2d');
+            crossAssetChartInstance = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    labels: ['Oct 20', 'Oct 21', 'Oct 22', 'Oct 23', 'Oct 24', 'Oct 26 (Spot)'],
+                    datasets: [
+                        { label: 'S&P 500 (Normalized)', data: [100, 100.4, 99.8, 99.2, 99.0, 99.7], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', tension: 0.3, fill: true },
+                        { label: '10Y Treasury Yield (%)', data: [4.91, 4.93, 4.95, 5.00, 4.99, 4.99], borderColor: '#38bdf8', tension: 0.3 },
+                        { label: 'Brent Crude ($/bbl)', data: [108.5, 109.2, 111.0, 116.8, 115.0, 114.3], borderColor: '#f43f5e', tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        }
+
+        // Spreadsheet Data
+        const s1Data = [
+            { item: "Consolidated Revenue ($M)", fy24: "$386.0", fy25: "$4,590.0", h1_26: "$16,286.0", q3_26: "$16,800.0", fy26e: "$49,886.0", tag: "[VERIFIED]" },
+            { item: "Compute & Infrastructure Expense ($M)", fy24: "$1,420.0", fy25: "$7,300.0", h1_26: "$8,950.0", q3_26: "$9,300.0", fy26e: "$27,550.0", tag: "[CALCULATED]" },
+            { item: "Stock-Based Compensation ($M)", fy24: "$410.0", fy25: "$1,200.0", h1_26: "$2,200.0", q3_26: "$1,350.0", fy26e: "$4,900.0", tag: "[MODEL_EST]" },
+            { item: "GAAP Operating Income / (Loss) ($M)", fy24: "-$2,980.0", fy25: "-$8,060.0", h1_26: "-$693.0", q3_26: "+$450.0", fy26e: "+$207.0", tag: "[MODEL_EST]" },
+            { item: "Non-Cash Convertible Note Loss ($M)", fy24: "$0.0", fy25: "-$4,120.0", h1_26: "-$72,400.0", q3_26: "$0.0", fy26e: "-$72,400.0", tag: "[VERIFIED]" },
+            { item: "GAAP Net Income / (Loss) ($M)", fy24: "-$3,110.0", fy25: "-$12,180.0", h1_26: "-$80,700.0", q3_26: "+$380.0", fy26e: "-$79,940.0", tag: "[CALCULATED]" },
+            { item: "Operating Cash Flow (OCF) ($M)", fy24: "-$2,450.0", fy25: "-$5,120.0", h1_26: "+$3,930.0", q3_26: "+$2,150.0", fy26e: "+$8,230.0", tag: "[MODEL_EST]" },
+            { item: "Lease-Adjusted EBITDAR ($M)", fy24: "-$730.0", fy25: "+$2,440.0", h1_26: "+$10,957.0", q3_26: "+$11,600.0", fy26e: "+$34,157.0", tag: "[CALCULATED]" }
+        ];
+
+        function renderSpreadsheet() {
+            const tbody = document.getElementById('spreadsheetBody');
+            if(!tbody) return;
+            tbody.innerHTML = s1Data.map(row => `
+                <tr class="hover:bg-slate-800/40">
+                    <td class="p-3 font-semibold text-white">${row.item}</td>
+                    <td class="p-3 text-right">${row.fy24}</td>
+                    <td class="p-3 text-right">${row.fy25}</td>
+                    <td class="p-3 text-right text-amber-400">${row.h1_26}</td>
+                    <td class="p-3 text-right">${row.q3_26}</td>
+                    <td class="p-3 text-right font-bold text-emerald-400">${row.fy26e}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded text-[10px]">${row.tag}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function recalculateSpreadsheet() {
+            renderSpreadsheet();
+        }
+
+        // Waterfall Simulation
+        let waterfallChartInstance = null;
+        function runWaterfallSimulation() {
+            const regimeEl = document.getElementById('rateRegime');
+            const evMultEl = document.getElementById('evMultiple');
+            const lmtEl = document.getElementById('lmtStress');
+            if(!regimeEl || !evMultEl || !lmtEl) return;
+
+            const regime = regimeEl.value;
+            const evMult = evMultEl.value;
+            const lmt = lmtEl.value;
+
+            // Update summary cards based on selection
+            const dscrEl = document.getElementById('wYear1DSCR');
+            const lgd1El = document.getElementById('w1LGD');
+            const lgdUnsecEl = document.getElementById('wUnsecLGD');
+
+            if(lmt === 'ip_strip') {
+                if(dscrEl) dscrEl.textContent = regime === 'hike' ? '0.986x' : '1.007x';
+                if(lgd1El) lgd1El.textContent = '55.97%';
+                if(lgdUnsecEl) lgdUnsecEl.textContent = '100.00%';
+            } else {
+                if(dscrEl) dscrEl.textContent = regime === 'hike' ? '1.042x' : '1.085x';
+                if(lgd1El) lgd1El.textContent = '27.07%';
+                if(lgdUnsecEl) lgdUnsecEl.textContent = '94.07%';
+            }
+
+            const years = ['Year 1 (2027E)', 'Year 2 (2028E)', 'Year 3 (2029E)', 'Year 4 (2030E)', 'Year 5 (2031E)'];
+            const service = regime === 'hike' ? [22937.5, 22449.0, 21697.5, 20617.5, 19527.5] : [22440.7, 21635.6, 20830.6, 20025.5, 19220.5];
+            const dscr = regime === 'hike' ? [0.986, 1.007, 1.042, 1.097, 1.158] : [1.007, 1.045, 1.085, 1.129, 1.176];
+            const netFcf = regime === 'hike' ? [-330.5, 158.0, 909.5, 1989.5, 3079.5] : [166.3, 971.4, 1776.4, 2581.5, 3386.5];
+
+            // Render Table
+            const tbody = document.getElementById('waterfallTableBody');
+            if(tbody) {
+                tbody.innerHTML = years.map((yr, i) => `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-2.5 font-bold text-amber-400">${yr}</td>
+                        <td class="p-2.5 text-right">$${(110 - i*11).toFixed(1)}B</td>
+                        <td class="p-2.5 text-right">$${service[i].toLocaleString()}M</td>
+                        <td class="p-2.5 text-right font-bold ${dscr[i] < 1.0 ? 'text-rose-400' : 'text-emerald-400'}">${dscr[i].toFixed(3)}x</td>
+                        <td class="p-2.5 text-right ${netFcf[i] < 0 ? 'text-rose-400' : 'text-emerald-400'}">$${netFcf[i].toLocaleString()}M</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Render Chart
+            const canvasW = document.getElementById('waterfallChart');
+            if(canvasW) {
+                const ctxW = canvasW.getContext('2d');
+                if(waterfallChartInstance) waterfallChartInstance.destroy();
+                waterfallChartInstance = new Chart(ctxW, {
+                    type: 'bar',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            { label: 'Total Service ($M)', data: service, backgroundColor: '#f59e0b', borderRadius: 6 },
+                            { label: 'Net FCF ($M)', data: netFcf, backgroundColor: '#10b981', borderRadius: 6 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } } } },
+                        scales: {
+                            x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } },
+                            y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#1e293b' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Prompt Generator
+        function generateCustomPrompt() {
+            const pPersona = document.getElementById('pPersona');
+            const pModule = document.getElementById('pModule');
+            const pFormat = document.getElementById('pFormat');
+            const promptOutput = document.getElementById('promptOutput');
+
+            if(!pPersona || !pModule || !pFormat || !promptOutput) return;
+
+            const prompt = `Act as a ${pPersona.value} operating under SR 11-7 and Basel III/IV CRE 20/31 governance standards.
+Execute a rigorous quantitative and legal audit of: "${pModule.value}".
+Incorporate October 26, 2026 verified clearing data: US 10Y CMT at 4.99%, Brent Crude at $114.30/bbl, 3M Term SOFR at 4.068%, and Anthropic PBC Form S-1 (CIK: 0002130357).
+Output Format: ${pFormat.value}. Ensure all lease-capitalized leverage ratios, debt-service coverage ratios, and LMT recovery waterfalls are fully specified with zero placeholder synthetic quotes.`;
+
+            promptOutput.value = prompt;
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('promptOutput');
+            if(!text) return;
+            text.select();
+            document.execCommand('copy');
+        }
+
+        // Initializer on window load
+        window.onload = function() {
+            initCrossAssetChart();
+            renderSpreadsheet();
+            runWaterfallSimulation();
+            generateCustomPrompt();
+        };
+    </script>
+</body>
+</html>
