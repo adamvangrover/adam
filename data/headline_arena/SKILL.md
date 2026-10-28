@@ -52,5 +52,4 @@ Never use `dispatch --dispatch-confirmed` for live sends: it regenerates forecas
 - Dispatch no longer stages fake `challenge-*-prospective` IDs when 0 challenges are open (opt in: `HA_PROSPECTIVE=1`). Never submit those.
 - Rationale template is now grounded (SIGNAL / METHOD / RISKS). It cites only computed values (last-3 path, flow, vol, dyn20 neutral prior, dead zone, median move) and states that no live order-flow, filing or rates data are used. 210-212 words.
 - Backtest v2 (749 calls) adopted: rev0.8 + dyn20 + nmargin 0. Shadow (24 calls): all top variants 37.5% hit; calibrated beats fixed on Brier.
-- Workspace is outside the sandbox when no active workspace is set, so commands need bypass approval.
 - R 2026-10-27 submitted 12/12 (`round_20261027_live_dispatch_results.json`); 288 shadow rows logged.
