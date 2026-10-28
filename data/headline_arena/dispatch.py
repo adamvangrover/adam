@@ -75,20 +75,23 @@ def get_fresh_token(creds: Dict[str, Any]) -> Optional[str]:
 
 def fetch_open_challenges(token: Optional[str]) -> List[Dict[str, Any]]:
     """
-    Queries Headline Arena active and open challenges endpoints.
+    Queries Headline Arena active and open challenges endpoints, unpacking nested objects.
     """
     challenges = []
-    headers = {"Authorization": f"Bearer {token}"} if token else {}
+    headers = {"Accept-Encoding": "gzip, deflate"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     
     # 1. Active challenges endpoint
     try:
         resp = requests.get(f"{BASE_URL}/api/v1/eval/challenges/active", headers=headers, timeout=15)
         if resp.status_code == 200:
             data = resp.json()
-            if isinstance(data, dict):
-                challenges.extend(data.get("challenges", []))
-            elif isinstance(data, list):
-                challenges.extend(data)
+            raw_list = data.get("challenges", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+            for it in raw_list:
+                ch = it.get("challenge", it) if isinstance(it, dict) else it
+                if ch and isinstance(ch, dict) and ch.get("id"):
+                    challenges.append(ch)
     except Exception as e:
         print(f"  [WARN] Querying active challenges: {e}", file=sys.stderr)
 
@@ -100,8 +103,9 @@ def fetch_open_challenges(token: Optional[str]) -> List[Dict[str, Any]]:
             items = data_open.get("items", [])
             existing_ids = {c.get("id") for c in challenges}
             for it in items:
-                if it.get("id") not in existing_ids:
-                    challenges.append(it)
+                ch = it.get("challenge", it) if isinstance(it, dict) else it
+                if ch and isinstance(ch, dict) and ch.get("id") and ch.get("id") not in existing_ids:
+                    challenges.append(ch)
     except Exception as e:
         print(f"  [WARN] Querying open challenges: {e}", file=sys.stderr)
 
@@ -155,22 +159,71 @@ def run_harness(
     # stage full evaluation across the prospective Headline Arena core universe
     active_work_items = []
     if raw_challenges:
+        # Backtested flow rule (2026-10-14): reversion x0.8 on mean of last 3 settlements
+        from .backtest import fetch_history, series, flow_for, pct, neutral_prior_for
+        PROD_FLOW = ("rev", 0.8)
+        try:
+            hist = series(fetch_history(refresh=True))
+            print(f"  ✓ Settlement history loaded for flow rule {PROD_FLOW} ({sum(len(v) for v in hist.values())} rows)")
+        except Exception as e:
+            hist = {}
+            print(f"  [WARN] History unavailable ({e}); falling back to SESSION_UPDATE flows", file=sys.stderr)
         for c in raw_challenges:
             cid = c.get("id")
-            asset = c.get("asset") or c.get("event_id", "").split("-")[1] if "-" in c.get("event_id", "") else "UNKNOWN"
-            profile = ASSET_UNIVERSE.get(asset)
-            if not profile:
+            asset = c.get("asset") or (c.get("event_id", "").split("-")[1] if "-" in c.get("event_id", "") else "UNKNOWN")
+            base_profile = ASSET_UNIVERSE.get(asset)
+            dz = float(c.get("dead_zone_pct")) if c.get("dead_zone_pct") is not None else (base_profile.dead_zone_pct if base_profile else 0.30)
+            op = float(c["open_price"]) if c.get("open_price") is not None else (base_profile.current_indicated_price if base_profile else 100.0)
+
+            if base_profile:
+                profile = AssetMacroProfile(
+                    ticker=base_profile.ticker,
+                    name=base_profile.name,
+                    exchange=base_profile.exchange,
+                    last_settlement_price=op,
+                    current_indicated_price=op,
+                    annualized_vol_pct=base_profile.annualized_vol_pct,
+                    dead_zone_pct=dz,
+                    prior_settlement_trend=base_profile.prior_settlement_trend,
+                    order_flow_imbalance=base_profile.order_flow_imbalance,
+                    edgar_triage_signal=base_profile.edgar_triage_signal,
+                    primary_catalyst=base_profile.primary_catalyst,
+                    indicator_divergence=base_profile.indicator_divergence,
+                    thesis_risks=base_profile.thesis_risks,
+                )
+            else:
                 profile = AssetMacroProfile(
                     ticker=asset,
                     name=c.get("title", f"{asset} Futures"),
-                    exchange="EXCHANGE",
-                    last_settlement_price=float(c.get("open_price", 100.0)),
-                    current_indicated_price=float(c.get("open_price", 100.0)),
+                    exchange=c.get("exchange", "EXCHANGE"),
+                    last_settlement_price=op,
+                    current_indicated_price=op,
                     annualized_vol_pct=25.0,
-                    dead_zone_pct=float(c.get("dead_zone_pct", 0.30)),
+                    dead_zone_pct=dz,
                 )
-            active_work_items.append((cid, profile, c.get("deadline", "2026-10-05T14:00:00Z"), c.get("resolution_criteria", "Dead Zone ±0.30%")))
+            prior = hist.get(profile.ticker, [])
+            if len(prior) >= 3:
+                flow = flow_for(prior, PROD_FLOW)
+                path = ", ".join(f"{pct(x):+.2f}%" if x.get("open_price") else x["result"] for x in prior[-3:])
+                profile.order_flow_imbalance = flow
+                profile.neutral_prior = neutral_prior_for(prior)  # backtest v2: dyn20
+                profile.prior_settlement_trend = prior[-1]["result"]
+                profile.primary_catalyst = (
+                    f"the last three settlements ({path}, latest {prior[-1]['event_id'][-8:]}) feeding a "
+                    f"backtested mean-reversion flow of {flow:+.2f}."
+                )
+                profile.indicator_divergence = (
+                    f"walk-forward testing over 749 resolved calls favoured fading the recent move over extending it, "
+                    f"though the edge is small and the latest session settled {prior[-1]['result']}."
+                )
+            deadline = c.get("deadline", "2026-10-06T14:00:00Z")
+            criteria = c.get("resolution_criteria") or f"Exchange Session Change vs Open (Dead Zone ±{dz:.2f}%)"
+            active_work_items.append((cid, profile, deadline, criteria))
     else:
+        import os
+        if os.environ.get("HA_PROSPECTIVE") != "1":
+            print("  ℹ No open challenges. Staged file left untouched (set HA_PROSPECTIVE=1 for a prospective preview).")
+            return
         print("  ℹ Arena Schedule Notice: All prior 1,048 challenges resolved. Next market batch opens Sunday 21:00 UTC.")
         print("  ℹ Staging full pre-session evaluation across the 14-asset Headline Arena universe...")
         today_str = start_time.strftime("%Y%m%d")
@@ -179,7 +232,7 @@ def run_harness(
             active_work_items.append((
                 prospective_id,
                 profile,
-                "2026-10-05T14:00:00Z (Next Session Settlement)",
+                "2026-10-06T14:00:00Z (Next Session Settlement)",
                 f"Exchange Session Change vs Open (Dead Zone ±{profile.dead_zone_pct:.2f}%)"
             ))
 
@@ -233,6 +286,7 @@ def run_harness(
 
     if not dry_run and dispatch_confirmed:
         print("\n[OPERATOR CONFIRMATION DETECTED: EXECUTING LIVE DISPATCH]")
+        token = get_fresh_token(creds)
         live_challenges = fetch_open_challenges(token)
         
         # If no challenges currently open, check if watch mode is requested or wait
@@ -243,8 +297,11 @@ def run_harness(
             for poll_idx in range(max_polls):
                 time.sleep(poll_interval)
                 curr_utc = datetime.now(timezone.utc).strftime("%H:%M:%S UTC")
+                if poll_idx % 30 == 0:
+                    token = get_fresh_token(creds)
                 live_challenges = fetch_open_challenges(token)
                 if live_challenges:
+                    token = get_fresh_token(creds)
                     print(f"\n  ✓ [{curr_utc}] NEW BATCH DETECTED! Found {len(live_challenges)} active challenge(s). Initiating auto-dispatch...")
                     break
                 else:
@@ -311,7 +368,7 @@ def run_harness(
                 res = requests.post(
                     f"{BASE_URL}/api/v1/eval/challenges/{cid}/predict",
                     json=payload,
-                    headers={"Authorization": f"Bearer {token}"},
+                    headers={"Authorization": f"Bearer {token}", "Accept-Encoding": "gzip, deflate"},
                     timeout=20,
                 )
                 
@@ -343,7 +400,7 @@ def run_harness(
                 "success_count": success_count,
                 "results": results,
             }
-            results_path = STAGED_DIR / "round5_live_dispatch_results.json"
+            results_path = STAGED_DIR / "round6_live_dispatch_results.json"
             results_path.write_text(json.dumps(dispatch_record, indent=2))
             print(f"\n  ✓ Dispatched {success_count}/{len(results)} forecasts to Headline Arena.")
             print(f"  ✓ Recorded dispatch audit log in: {results_path}")
