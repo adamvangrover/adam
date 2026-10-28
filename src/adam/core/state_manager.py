@@ -29,13 +29,19 @@ logger = logging.getLogger(__name__)
 
 class StateManager:
     """
-    Manages persistence of optimizer states (momentum, variance, step count).
+    Manages persistence of optimizer states (momentum, variance, step count)
+    and system status allocations (e.g. 75% Fortress / 25% Convex Hunt routing).
     Uses Redis for production, falls back to in-memory for testing/local dev.
     """
     def __init__(self, redis_url: str = "redis://localhost:6379/0"):
         self.redis = None
         self.local_store = {}
         self.using_redis = False
+        self.system_status = "NORMAL"
+        self.allocations = {
+            "fortress": 0.75,   # 75% Sovereign paper
+            "convex_hunt": 0.25  # 25% Convex Hunt
+        }
 
         if REDIS_AVAILABLE:
             try:
@@ -85,3 +91,39 @@ class StateManager:
                 return self.local_store.get(key)
 
         return self.local_store.get(key)
+
+    def trigger_circuit_breaker(self, reason: str = "Consensus failure or spoofing detected"):
+        """
+        Circuit Breaker: Overrides system state to LOCKDOWN.
+        Halts 25% Convex Hunt executions and enforces 75% Fortress allocation (sub-90-day sovereign paper).
+        Requires manual meatspace authorization to reset.
+        """
+        self.system_status = "LOCKDOWN"
+        self.allocations = {
+            "fortress": 0.75,
+            "convex_hunt": 0.00
+        }
+        logger.critical(f"AUTOMATED CIRCUIT BREAKER TRIGGERED! SYSTEM_STATUS = LOCKDOWN. Reason: {reason}")
+        return {
+            "system_status": self.system_status,
+            "allocations": self.allocations,
+            "reason": reason
+        }
+
+    def reset_lockdown(self, meatspace_auth_token: str):
+        """
+        Resets LOCKDOWN state back to NORMAL following verified meatspace authorization.
+        """
+        if meatspace_auth_token != "MEATSPACE_AUTH_APPROVED_V3":
+            raise ValueError("Unauthorized attempt to reset LOCKDOWN state without valid meatspace token.")
+
+        self.system_status = "NORMAL"
+        self.allocations = {
+            "fortress": 0.75,
+            "convex_hunt": 0.25
+        }
+        logger.info("LOCKDOWN reset by authorized operator. Normal 75% Fortress / 25% Convex Hunt routing restored.")
+        return {
+            "system_status": self.system_status,
+            "allocations": self.allocations
+        }
