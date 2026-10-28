@@ -154,7 +154,7 @@ class SecurityGovernanceGatekeeper:
                     source,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                context = ssl._create_unverified_context()  # nosec B323
+                context = ssl.create_default_context()
                 opener = urllib.request.build_opener(
                     NoRedirectHandler(),
                     urllib.request.HTTPSHandler(context=context)

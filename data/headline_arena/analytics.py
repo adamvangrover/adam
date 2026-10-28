@@ -42,52 +42,54 @@ class AssetMacroProfile:
     primary_catalyst: str = ""
     indicator_divergence: str = ""
     thesis_risks: str = ""
+    neutral_prior: Optional[float] = None   # if set, overrides ticker prior table (empirical DZ rate)
 
 
+# Baseline universe data grounded in October 2026 live settlement telemetry
 # Baseline universe data grounded in October 2026 live settlement telemetry
 ASSET_UNIVERSE: Dict[str, AssetMacroProfile] = {
     "GC": AssetMacroProfile(
         ticker="GC",
         name="Gold Futures",
         exchange="COMEX",
-        last_settlement_price=4172.10,
-        current_indicated_price=4185.50,
-        annualized_vol_pct=17.8,
+        last_settlement_price=4167.60,
+        current_indicated_price=4169.20,
+        annualized_vol_pct=17.2,
         dead_zone_pct=0.30,
-        prior_settlement_trend="bearish",
-        order_flow_imbalance=0.18,
+        prior_settlement_trend="neutral",
+        order_flow_imbalance=0.03,
         edgar_triage_signal="institutional_safehaven_bid",
-        primary_catalyst="Middle East geopolitical tail-risk reassertion vs terminal Fed hawkish rate hold at 5.75%.",
-        indicator_divergence="Gold physical delivery demand and central bank bullion reserve accumulation diverging from rising real 10Y Treasury yields (2.25%).",
-        thesis_risks="Diplomatic ceasefire de-escalation in Middle East or hawkish forward-guidance surge pushing real yields above 2.50%."
+        primary_catalyst="Consolidation between Middle East safe-haven support and elevated US real 10Y yields (2.25%).",
+        indicator_divergence="Gold physical delivery demand balanced against rising dollar yield, pinning price tightly within the ±0.30% dead zone (-0.04% in trailing session).",
+        thesis_risks="Diplomatic breakthrough in Middle East or hawkish forward-guidance surge pushing real yields above 2.50%."
     ),
     "SI": AssetMacroProfile(
         ticker="SI",
         name="Silver Futures",
         exchange="COMEX",
-        last_settlement_price=60.71,
-        current_indicated_price=61.15,
+        last_settlement_price=61.400,
+        current_indicated_price=61.395,
         annualized_vol_pct=26.4,
         dead_zone_pct=0.30,
-        prior_settlement_trend="bearish",
-        order_flow_imbalance=0.08,
+        prior_settlement_trend="bullish",
+        order_flow_imbalance=0.20,
         edgar_triage_signal="industrial_hedging",
-        primary_catalyst="High-beta precious metals tracking gold with industrial demand friction from slowing global manufacturing PMI (48.4).",
-        indicator_divergence="Gold/Silver ratio stretching to 68.4 as monetary premium outpaces physical photovoltaic industrial demand.",
+        primary_catalyst="Precious metals upside momentum continuing post +1.15% settlement breakout with photovoltaic industrial demand floor.",
+        indicator_divergence="Silver outperforming gold as industrial photovoltaic restocking converges with safe-haven monetary bid.",
         thesis_risks="Sharp industrial contraction in Asian manufacturing centers or aggressive liquidation in leveraged precious metal futures."
     ),
     "CL": AssetMacroProfile(
         ticker="CL",
         name="WTI Crude Oil Futures",
         exchange="NYMEX",
-        last_settlement_price=91.26,
-        current_indicated_price=90.80,
+        last_settlement_price=89.30,
+        current_indicated_price=89.27,
         annualized_vol_pct=34.2,
         dead_zone_pct=0.30,
         prior_settlement_trend="bearish",
-        order_flow_imbalance=-0.22,
+        order_flow_imbalance=-0.26,
         edgar_triage_signal="commercial_producer_hedging",
-        primary_catalyst="Saudi supply routing via Oman offset by persistent US inventory accumulation and global demand destruction narrative.",
+        primary_catalyst="Persistent downside momentum following -2.69% collapse below $90 psychological support on rising US crude inventories.",
         indicator_divergence="Physical prompt Brent-WTI spreads holding near $4.20 while paper speculative net-longs undergo aggressive margin reduction.",
         thesis_risks="Direct naval escalation closing the Strait of Hormuz or retaliatory infrastructure strike triggering an immediate $15 supply spike."
     ),
@@ -95,120 +97,120 @@ ASSET_UNIVERSE: Dict[str, AssetMacroProfile] = {
         ticker="RB",
         name="RBOB Gasoline Futures",
         exchange="NYMEX",
-        last_settlement_price=3.3121,
-        current_indicated_price=3.2980,
-        annualized_vol_pct=31.5,
+        last_settlement_price=3.0600,
+        current_indicated_price=3.1115,
+        annualized_vol_pct=32.0,
         dead_zone_pct=0.30,
         prior_settlement_trend="bearish",
-        order_flow_imbalance=-0.19,
+        order_flow_imbalance=-0.24,
         edgar_triage_signal="distributor_drawdown",
-        primary_catalyst="Direct crack-spread passthrough from declining crude feedstock alongside seasonal post-summer driving demand decline.",
-        indicator_divergence="Gulf Coast refinery utilization staying above 91% creating regional product surplus despite Middle East headline tension.",
+        primary_catalyst="Downside momentum following -7.62% crash in prompt crack spreads and high Gulf Coast refinery runs (91%).",
+        indicator_divergence="Severe product surplus along the Atlantic coast outpacing crude declines, crushing refinery crack margins.",
         thesis_risks="Unplanned domestic refinery outage along the US Gulf Coast or spike in component alkylate import tariffs."
     ),
     "NG": AssetMacroProfile(
         ticker="NG",
         name="Natural Gas Futures",
         exchange="NYMEX",
-        last_settlement_price=3.039,
-        current_indicated_price=3.065,
+        last_settlement_price=3.080,
+        current_indicated_price=3.078,
         annualized_vol_pct=42.0,
         dead_zone_pct=0.30,
         prior_settlement_trend="bullish",
-        order_flow_imbalance=0.24,
+        order_flow_imbalance=0.28,
         edgar_triage_signal="utility_winter_hedging",
-        primary_catalyst="Early heating degree day (HDD) anomalies in the Upper Midwest and accelerating European LNG export terminal feedgas demand.",
-        indicator_divergence="Working gas in underground storage sitting 5.8% above the 5-year average while dry-gas production plateaued at 102.5 Bcf/d.",
+        primary_catalyst="Bullish continuation holding above $3.00 milestone (+2.02% trailing gain) supported by Midwestern cold weather anomalies.",
+        indicator_divergence="Early heating degree days accelerating storage withdrawals alongside high European LNG export terminal feedgas intake.",
         thesis_risks="Mild weather revisions across mid-October forecast models or rapid resumption of constrained Permian associated gas takeaway capacity."
     ),
     "HG": AssetMacroProfile(
         ticker="HG",
         name="Copper Futures",
         exchange="COMEX",
-        last_settlement_price=6.579,
-        current_indicated_price=6.582,
+        last_settlement_price=6.6325,
+        current_indicated_price=6.6300,
         annualized_vol_pct=21.0,
         dead_zone_pct=0.30,
-        prior_settlement_trend="neutral",
-        order_flow_imbalance=-0.02,
+        prior_settlement_trend="bullish",
+        order_flow_imbalance=0.15,
         edgar_triage_signal="mining_conglomerate_hedging",
-        primary_catalyst="Tug-of-war between Chinese property stabilization credit measures and sluggish global ex-China capex spending.",
-        indicator_divergence="LME warehouse canceled warrants rising to 28% while domestic bonded warehouse copper premiums in Shanghai remain subdued.",
+        primary_catalyst="Following risk-on equity advance (+0.91% in trailing session) and Chinese infrastructure credit stabilization.",
+        indicator_divergence="LME canceled warrants rising to 29% as refined cathode stocks draw down in Asian transit hubs.",
         thesis_risks="Major supply disruption at Chilean/Peruvian open-pit mines or abrupt rollout of large-scale Chinese grid infrastructure stimulus."
     ),
     "ES": AssetMacroProfile(
         ticker="ES",
         name="E-mini S&P 500 Futures",
         exchange="CME",
-        last_settlement_price=7776.50,
-        current_indicated_price=7762.00,
-        annualized_vol_pct=15.2,
+        last_settlement_price=7830.00,
+        current_indicated_price=7831.75,
+        annualized_vol_pct=14.8,
         dead_zone_pct=0.30,
         prior_settlement_trend="bullish",
-        order_flow_imbalance=-0.12,
-        edgar_triage_signal="corporate_buyback_blackout",
-        primary_catalyst="Equities digesting terminal rate re-pricing and high corporate debt refinancing hurdles against resilient AI enterprise spend.",
-        indicator_divergence="Market breadth narrowing with S&P equal-weight index underperforming cap-weighted benchmark by 180 bps over trailing 10 sessions.",
-        thesis_risks="Disinflationary surprise in forthcoming core CPI print or dovish pivot commentary in scheduled Fed governor speeches."
+        order_flow_imbalance=0.20,
+        edgar_triage_signal="corporate_buyback_execution",
+        primary_catalyst="Disinflationary tailwind from plunging energy costs (Crude -2.7%, Gasoline -7.6%) driving corporate margin relief and equity rally (+0.62% in trailing session).",
+        indicator_divergence="Market breadth expanding across cyclicals as lower fuel input costs alleviate consumer discretionary balance sheet friction.",
+        thesis_risks="Spike in long-term Treasury yields above 4.75% or surprise hawkish rhetoric from Fed governors."
     ),
     "ZN": AssetMacroProfile(
         ticker="ZN",
         name="10-Year Treasury Note Futures",
         exchange="CBOT",
-        last_settlement_price=104.375,
-        current_indicated_price=104.281,
+        last_settlement_price=104.250,
+        current_indicated_price=104.265625,
         annualized_vol_pct=8.4,
-        dead_zone_pct=0.30,
+        dead_zone_pct=0.05,
         prior_settlement_trend="bearish",
-        order_flow_imbalance=-0.15,
+        order_flow_imbalance=-0.20,
         edgar_triage_signal="foreign_central_bank_liquidation",
-        primary_catalyst="Treasury refunding auction indigestion and persistent term premium expansion driven by expanding US sovereign fiscal deficits.",
-        indicator_divergence="10Y real yields pushing to cycle highs while headline 5Y5Y forward inflation expectation swaps remain well-anchored at 2.38%.",
+        primary_catalyst="Persistent sovereign Treasury auction supply pressure and term premium expansion keeping downward pressure on 10Y note prices.",
+        indicator_divergence="Narrow 0.05% dead band makes downward continuation easily breach settlement threshold (-0.10% in trailing session).",
         thesis_risks="Sudden safe-haven flight-to-quality bid triggered by geopolitical escalation in the Middle East flattening the long end."
     ),
     "ZS": AssetMacroProfile(
         ticker="ZS",
         name="Soybean Futures",
         exchange="CBOT",
-        last_settlement_price=1277.25,
-        current_indicated_price=1274.50,
+        last_settlement_price=1281.00,
+        current_indicated_price=1280.50,
         annualized_vol_pct=19.5,
         dead_zone_pct=0.30,
-        prior_settlement_trend="bearish",
-        order_flow_imbalance=-0.21,
+        prior_settlement_trend="neutral",
+        order_flow_imbalance=-0.04,
         edgar_triage_signal="grain_elevator_forward_sales",
-        primary_catalyst="US Midwest harvest completion pace running ahead of 5-year average alongside expanding South American planting acreage projections.",
-        indicator_divergence="US export inspections lagging USDA seasonal targets by 12% while Brazilian FOB export basis maintains substantial discount.",
+        primary_catalyst="Midwest harvest pressure balanced by export inspection pace, pinning prices tightly in dead-zone corridor (+0.23% trailing move).",
+        indicator_divergence="Brazilian export discounts offsetting US harvest speed, maintaining neutral price equilibrium inside the ±0.30% dead zone.",
         thesis_risks="Sudden Chinese state buying spree for strategic reserves or adverse late-season frost warnings across northern crop belts."
     ),
     "DXY": AssetMacroProfile(
         ticker="DXY",
         name="US Dollar Index",
         exchange="ICE",
-        last_settlement_price=101.695,
-        current_indicated_price=101.780,
+        last_settlement_price=101.910,
+        current_indicated_price=101.910,
         annualized_vol_pct=7.2,
-        dead_zone_pct=0.30,
-        prior_settlement_trend="neutral",
-        order_flow_imbalance=0.14,
+        dead_zone_pct=0.15,
+        prior_settlement_trend="bullish",
+        order_flow_imbalance=0.18,
         edgar_triage_signal="custody_bank_fx_rebalancing",
-        primary_catalyst="Rate divergence premium favoring USD as ECB prepares for dovish ease on Oct 29 while Fed remains in restrictive posture.",
-        indicator_divergence="US-German 2-year sovereign yield differential widening to 215 bps while EUR/USD struggles to sustain bids above 1.0850.",
+        primary_catalyst="Rate differential momentum (US-DE 2Y spread > 215 bps) lifting Dollar Index above 101.90, breaching narrow 0.15% dead band.",
+        indicator_divergence="ECB dovish ease anticipation weakening EUR/USD while US macro resilience supports the greenback.",
         thesis_risks="Coordinated verbal intervention by Bank of Japan supporting JPY or unexpected de-escalation reducing reserve currency safe-haven bid."
     ),
     "VIX": AssetMacroProfile(
         ticker="VIX",
         name="CBOE Volatility Index Futures",
         exchange="CFE",
-        last_settlement_price=17.70,
-        current_indicated_price=17.85,
-        annualized_vol_pct=55.0,
-        dead_zone_pct=0.30,
+        last_settlement_price=17.45,
+        current_indicated_price=17.45,
+        annualized_vol_pct=52.0,
+        dead_zone_pct=0.80,
         prior_settlement_trend="neutral",
-        order_flow_imbalance=0.04,
+        order_flow_imbalance=0.00,
         edgar_triage_signal="systematic_vol_selling",
-        primary_catalyst="Sticky vol-compression regime driven by dealer short-gamma positioning and systematic overwriting ETFs pinning index options.",
-        indicator_divergence="Cross-asset MOVE rates vol holding high at 118.5 while equity VIX remains anchored in the 17.5-18.2 dead-zone corridor.",
+        primary_catalyst="Systematic volatility suppression and wide 0.80% dead-zone parameter anchoring settlement to neutral.",
+        indicator_divergence="Dealer short-gamma positioning pins index options while headline challenges resolve neutral across all consecutive rounds.",
         thesis_risks="Severe liquidity air pocket or sudden geopolitical headline triggering mechanical CTA deleveraging and VIX spike above 25.0."
     ),
     "PALM": AssetMacroProfile(
@@ -259,6 +261,49 @@ ASSET_UNIVERSE: Dict[str, AssetMacroProfile] = {
 }
 
 
+# ─── SESSION UPDATE: 2026-10-13 (Tue) ─────────────────────────────────────
+# Source: Headline Arena resolved daily challenges, event dates 20261006-20261011
+# (last 4 sessions, % = close vs session open). Flow = hand-set weak tilt toward
+# the latest settlement; it is an operator-reviewable guess, not a market feed.
+SESSION_TAG = "2026-10-13"
+SESSION_UPDATE: Dict[str, Dict[str, Any]] = {
+    "CL":   dict(flow=+0.15, trend="bullish", path="-1.13%, +2.45%, +0.41%, +1.45%",
+                 note="three straight bullish settlements; R5 sell-off fully retraced (open $93.21 vs $89.30 on Oct 5)"),
+    "RB":   dict(flow=+0.05, trend="bullish", path="-1.54%, +2.12%, -0.56%, +0.39%",
+                 note="alternating signs each session; no persistent trend"),
+    "NG":   dict(flow=0.00, trend="neutral", path="+3.24%, -4.74%, +2.40%, +0.22%",
+                 note="very high day-to-day reversal; last session inside the dead zone"),
+    "SI":   dict(flow=-0.10, trend="bearish", path="-2.81%, -1.26%, +2.77%, -1.17%",
+                 note="three of four sessions bearish; open $60.555 below the Oct 5 level"),
+    "GC":   dict(flow=-0.08, trend="bearish", path="-1.39%, +0.44%, +1.46%, -0.59%",
+                 note="four of four sessions settled outside the dead zone; latest bearish"),
+    "HG":   dict(flow=+0.12, trend="bullish", path="-0.28%, -1.36%, +2.50%, +0.78%",
+                 note="two consecutive bullish settlements; open $6.757 at a multi-session high"),
+    "ES":   dict(flow=-0.03, trend="neutral", path="-0.40%, -0.36%, +0.58%, -0.20%",
+                 note="small moves near the band edge; latest session neutral"),
+    "ZN":   dict(flow=0.00, trend="neutral", path="-0.01%, +0.27%, -0.10%, -0.03%",
+                 note="two of four sessions neutral even with the 0.05% band"),
+    "ZS":   dict(flow=-0.03, trend="neutral", path="-0.61%, -0.71%, +0.45%, -0.27%",
+                 note="latest session neutral at -0.27%, just inside the band"),
+    "DXY":  dict(flow=+0.10, trend="bullish", path="+0.36%, neutral, +0.08%, +0.33%",
+                 note="two bullish breaks of the 0.15% band in four sessions; open 102.33"),
+    "VIX":  dict(flow=0.00, trend="neutral", path="neutral x4 (open price unpublished)",
+                 note="every VIX challenge since R3 has resolved neutral under the 0.80% band"),
+    "PALM": dict(flow=+0.15, trend="bullish", path="+0.35%, +0.64%, +0.89%",
+                 note="three straight bullish settlements with widening gains"),
+}
+for _t, _u in SESSION_UPDATE.items():
+    _p = ASSET_UNIVERSE.get(_t)
+    if _p:
+        _p.order_flow_imbalance = _u["flow"]
+        _p.prior_settlement_trend = _u["trend"]
+        _p.primary_catalyst = f"recent settlement path ({_u['path']}): {_u['note']}."
+        _p.indicator_divergence = (
+            f"the latest settled trend is {_u['trend']}, but sign changes across recent sessions "
+            f"argue against extrapolating momentum."
+        )
+
+
 class AnalyticalUpgradePipeline:
     """
     Executes the analytical layer upgrades:
@@ -296,23 +341,18 @@ class AnalyticalUpgradePipeline:
         else:
             sigma_adj = base_sigma_daily * (0.7 + 0.3 * credit_factor)
 
-        # Skew: directional asymmetric bias from macro regime
-        # Equities, high-yield cyclicals have negative skew in tightening
-        if profile.ticker in ("ES", "ZS", "HG"):
-            skew = -0.45
-            kurtosis = 4.8
-        elif profile.ticker in ("GC", "CL", "NG"):
-            skew = 0.35  # Upside tail risk from supply/geopolitical disruption
-            kurtosis = 5.2
-        elif profile.ticker in ("DXY",):
-            skew = 0.15
-            kurtosis = 3.6
-        elif profile.ticker in ("VIX",):
-            skew = 0.85
-            kurtosis = 6.5
+        # Skew: Oct 6-11 settlements showed no persistent directional asymmetry
+        # (sign flips day to day), so directional skew is neutralized. VIX keeps
+        # a mild upside tail (vol spikes are one-sided).
+        if profile.ticker in ("VIX",):
+            skew = 0.10
+            kurtosis = 5.0
+        elif profile.ticker in ("CL", "RB", "NG"):
+            skew = 0.0
+            kurtosis = 5.0
         else:
-            skew = -0.10
-            kurtosis = 4.0
+            skew = 0.0
+            kurtosis = 3.8
 
         return sigma_adj, skew, kurtosis
 
@@ -323,23 +363,29 @@ class AnalyticalUpgradePipeline:
         Combines historical empirical base rates with high-frequency flow updates
         and order flow triage to compute posterior probabilities for [Bear, Base, Bull].
 
-        Empirical settlement base rate from our audit:
-        - Low-vol / tightly contested assets: 35-45% Neutral Dead-Zone
-        - High-beta momentum assets: 35-40% Trend Continuation
+        Empirical settlement base rate grounded in Headline Arena dead zones:
+        - VIX: 0.80% dead band & flat pricing -> ~84% Neutral
+        - GC / ZS: Trapped inside 0.30% dead band -> ~50% Neutral
+        - ZN: 0.05% dead band -> ~12% Neutral, 60% Bearish continuation
+        - DXY: 0.15% dead band -> ~25% Neutral, 55% Bullish rate divergence
+        - CL / RB: High-vol downside momentum -> ~60% Bearish
+        - NG / SI / ES / HG: High-conviction upside momentum -> ~58% Bullish
         """
-        # Base prior distribution [Bear, Neutral, Bull]
-        if profile.ticker in ("VIX", "DXY", "HG"):
-            # High propensity to settle in dead zone
-            prior = {"bear": 0.25, "neutral": 0.50, "bull": 0.25}
+        # Base prior [Bear, Neutral, Bull]: symmetric directional mass; neutral
+        # weight = observed dead-zone frequency (Oct 5-11 settlements).
+        if profile.ticker in ("VIX",):
+            prior = {"bear": 0.08, "neutral": 0.84, "bull": 0.08}   # 100% neutral R3-R7
+        elif profile.ticker in ("ZN", "ZS", "DXY"):
+            prior = {"bear": 0.35, "neutral": 0.30, "bull": 0.35}   # ~2/5 neutral recently
+        elif profile.ticker in ("GC", "ES", "HG", "SI", "PALM"):
+            prior = {"bear": 0.40, "neutral": 0.20, "bull": 0.40}
         elif profile.ticker in ("CL", "RB", "NG"):
-            # Volatile, low neutrality probability
-            prior = {"bear": 0.38, "neutral": 0.24, "bull": 0.38}
-        elif profile.ticker in ("GC", "SI"):
-            prior = {"bear": 0.32, "neutral": 0.30, "bull": 0.38}
-        elif profile.ticker in ("ES", "ZN", "ZS"):
-            prior = {"bear": 0.40, "neutral": 0.35, "bull": 0.25}
+            prior = {"bear": 0.42, "neutral": 0.16, "bull": 0.42}
         else:
             prior = {"bear": 0.33, "neutral": 0.34, "bull": 0.33}
+        if profile.neutral_prior is not None:
+            npi = min(0.85, max(0.05, float(profile.neutral_prior)))
+            prior = {"bear": (1 - npi) / 2, "neutral": npi, "bull": (1 - npi) / 2}
 
         # High-frequency signal adjustment (Log-Odds update)
         flow = profile.order_flow_imbalance  # [-1.0, 1.0]
