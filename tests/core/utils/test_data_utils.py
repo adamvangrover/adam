@@ -43,36 +43,36 @@ def temp_text_file(tmp_path):
     file_path.write_text("This is unstructured text.")
     return file_path
 
-def test_load_json(temp_json_file):
+def test_load_json(temp_json_file) -> None:
     loader = DataLoader()
     data = loader.load({"type": "json", "path": str(temp_json_file)})
     assert data == {"key": "value"}
 
-def test_load_json_invalid(tmp_path):
+def test_load_json_invalid(tmp_path) -> None:
     file_path = tmp_path / "invalid.json"
     file_path.write_text("{invalid json")
     loader = DataLoader()
     with pytest.raises(FileReadError):
         loader.load({"type": "json", "path": str(file_path)})
 
-def test_load_csv(temp_csv_file):
+def test_load_csv(temp_csv_file) -> None:
     loader = DataLoader()
     data = loader.load({"type": "csv", "path": str(temp_csv_file)})
     assert data == [{"col1": "val1", "col2": "val2"}]
 
-def test_load_csv_empty(tmp_path):
+def test_load_csv_empty(tmp_path) -> None:
     file_path = tmp_path / "empty.csv"
     file_path.write_text("")
     loader = DataLoader()
     data = loader.load({"type": "csv", "path": str(file_path)})
     assert data == []
 
-def test_load_yaml(temp_yaml_file):
+def test_load_yaml(temp_yaml_file) -> None:
     loader = DataLoader()
     data = loader.load({"type": "yaml", "path": str(temp_yaml_file)})
     assert data == {"key": "value"}
 
-def test_load_smart_text(temp_text_file):
+def test_load_smart_text(temp_text_file) -> None:
     loader = DataLoader()
     data = loader.load({"type": "smart_text", "path": str(temp_text_file)})
     assert "source_file" in data
@@ -84,46 +84,46 @@ def test_load_smart_text(temp_text_file):
     assert data["rag_context"]["confidence_score"] == 0.92
     assert "finance" in data["rag_context"]["keywords"]
 
-def test_load_yaml_invalid(tmp_path):
+def test_load_yaml_invalid(tmp_path) -> None:
     file_path = tmp_path / "invalid.yaml"
     file_path.write_text("invalid: [yaml: string")
     loader = DataLoader()
     with pytest.raises(FileReadError):
         loader.load({"type": "yaml", "path": str(file_path)})
 
-def test_load_api_financial():
+def test_load_api_financial() -> None:
     loader = DataLoader()
     data = loader.load({"type": "api", "provider": "example_financial_data_api"})
     assert "income_statement" in data
     assert "revenue" in data["income_statement"]
 
-def test_load_api_market():
+def test_load_api_market() -> None:
     loader = DataLoader()
     data = loader.load({"type": "api", "provider": "example_market_data_api"})
     assert "market_trends" in data
     assert len(data["market_trends"]) == 2
 
-def test_load_api_unknown():
+def test_load_api_unknown() -> None:
     loader = DataLoader()
     with pytest.raises(InvalidInputError, match="is not whitelisted"):
         loader.load({"type": "api", "provider": "unknown_provider"})
 
-def test_missing_path():
+def test_missing_path() -> None:
     loader = DataLoader()
     with pytest.raises(InvalidInputError, match="Missing 'path'"):
         loader.load({"type": "json"})
 
-def test_unsupported_type(temp_json_file):
+def test_unsupported_type(temp_json_file) -> None:
     loader = DataLoader()
     with pytest.raises(InvalidInputError, match="Unsupported data type"):
         loader.load({"type": "unsupported", "path": str(temp_json_file)})
 
-def test_file_not_found():
+def test_file_not_found() -> None:
     loader = DataLoader()
     with pytest.raises(FileReadError, match="File not found"):
         loader.load({"type": "json", "path": "nonexistent_file.json"})
 
-def test_max_file_size(tmp_path):
+def test_max_file_size(tmp_path) -> None:
     loader = DataLoader()
     file_path = tmp_path / "large_file.json"
     # Write a file that is larger than the 50MB limit (mock this by patching the size)
@@ -132,7 +132,7 @@ def test_max_file_size(tmp_path):
 
     class MockStat:
         @property
-        def st_size(self):
+        def st_size(self) -> int:
             return 51 * 1024 * 1024
 
     # Mocking the stat() return object to trick the size check
@@ -142,7 +142,7 @@ def test_max_file_size(tmp_path):
         with pytest.raises(FileReadError, match="File exceeds maximum size limit"):
             loader.load({"type": "json", "path": str(file_path)})
 
-def test_caching(temp_json_file):
+def test_caching(temp_json_file) -> None:
     loader = DataLoader(use_cache=True)
     # First load reads from file
     data1 = loader.load({"type": "json", "path": str(temp_json_file)})
@@ -156,7 +156,7 @@ def test_caching(temp_json_file):
     data2 = loader.load({"type": "json", "path": str(temp_json_file)})
     assert data2 == {"key": "value"}
 
-def test_no_caching(temp_json_file):
+def test_no_caching(temp_json_file) -> None:
     loader = DataLoader(use_cache=False)
     # First load reads from file
     data1 = loader.load({"type": "json", "path": str(temp_json_file)})
@@ -170,6 +170,6 @@ def test_no_caching(temp_json_file):
     data2 = loader.load({"type": "json", "path": str(temp_json_file)})
     assert data2 == {"key": "new_value"}
 
-def test_load_data_wrapper(temp_json_file):
+def test_load_data_wrapper(temp_json_file) -> None:
     data = load_data({"type": "json", "path": str(temp_json_file)})
     assert data == {"key": "value"}

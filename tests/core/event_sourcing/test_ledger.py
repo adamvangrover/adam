@@ -3,13 +3,15 @@ Tests for the Event Sourcing Core Ledger.
 """
 
 import pytest
+
 from src.core.event_sourcing.ledger import EventLedger, FinancialEvent
 
+
 @pytest.fixture
-def ledger():
+def ledger() -> EventLedger:
     return EventLedger()
 
-def test_financial_event_hash_generation():
+def test_financial_event_hash_generation() -> None:
     """Test that a hash is generated deterministically upon event creation."""
     event = FinancialEvent(
         event_id="evt_01",
@@ -21,7 +23,7 @@ def test_financial_event_hash_generation():
     assert event.event_hash != ""
     assert isinstance(event.event_hash, str)
 
-def test_ledger_append_and_retrieve(ledger):
+def test_ledger_append_and_retrieve(ledger: EventLedger) -> None:
     """Test appending an event and retrieving it by aggregate_id."""
     event1 = FinancialEvent(
         event_id="evt_01",
@@ -46,7 +48,7 @@ def test_ledger_append_and_retrieve(ledger):
     assert portfolio_1_events[0].event_id == event1.event_id
     assert portfolio_1_events[0].payload["amount_usd"] == 10000.0
 
-def test_ledger_tampering_prevention(ledger):
+def test_ledger_tampering_prevention(ledger: EventLedger) -> None:
     """Test that appending a tampered event raises an error."""
     event = FinancialEvent(
         event_id="evt_01",
@@ -62,7 +64,7 @@ def test_ledger_tampering_prevention(ledger):
     with pytest.raises(ValueError, match="failed integrity check"):
         ledger.append_event(event)
 
-def test_ledger_replay_aggregate(ledger):
+def test_ledger_replay_aggregate(ledger: EventLedger) -> None:
     """Test reconstructing state from a series of events."""
 
     # Generate a series of events

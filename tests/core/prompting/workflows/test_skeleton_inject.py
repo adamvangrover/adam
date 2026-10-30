@@ -1,33 +1,34 @@
-import sys
-import os
-import unittest
 import json
-from unittest.mock import MagicMock
+import os
+import sys
+import unittest
+from typing import Any
 
 # Ensure repo root is in python path
 sys.path.append(os.getcwd())
 
-from core.prompting.workflows.skeleton_inject import SkeletonInjectWorkflow, JSONFileFetcher
+from core.prompting.workflows.skeleton_inject import JSONFileFetcher, SkeletonInjectWorkflow
+
 
 class MockLLMClient:
-    def generate(self, messages):
-        content = ""
+    def generate(self, messages: list[dict[str, Any]]) -> str:
         user_content = ""
         for m in messages:
             if m["role"] == "user":
                 user_content += m["content"]
 
-        # Debugging
-        # print(f"DEBUG: User Content: {user_content}")
-
         if "We are drafting the \"Financial Performance & Outlook\"" in user_content:
-            return """
-Top-line performance was {{REVENUE_DIRECTION}} year-over-year, settling at {{REVENUE_CURRENT}}. This variance of {{REVENUE_YOY_VAR}} was primarily driven by strategic pricing actions. EBITDA margins {{MARGIN_DIRECTION}} to {{EBITDA_MARGIN}}.
-            """
+            return (
+                "Top-line performance was {{REVENUE_DIRECTION}} year-over-year, settling at {{REVENUE_CURRENT}}. "
+                "This variance of {{REVENUE_YOY_VAR}} was primarily driven by strategic pricing actions. "
+                "EBITDA margins {{MARGIN_DIRECTION}} to {{EBITDA_MARGIN}}."
+            )
         elif "You are the \"Editor\" validating a draft Credit Memo" in user_content:
-            return """
-Top-line performance was grew modestly year-over-year, settling at $12.4B. This variance of +5% was primarily driven by strategic pricing actions. EBITDA margins expanded to 25.8%.
-            """
+            return (
+                "Top-line performance was grew modestly year-over-year, settling at $12.4B. "
+                "This variance of +5% was primarily driven by strategic pricing actions. "
+                "EBITDA margins expanded to 25.8%."
+            )
         elif "A junior analyst has submitted the following" in user_content: # Phase 3
             return json.dumps({
                 "status": "APPROVED",
@@ -39,7 +40,7 @@ Top-line performance was grew modestly year-over-year, settling at $12.4B. This 
         return "Unknown Prompt"
 
 class TestSkeletonInjectWorkflow(unittest.TestCase):
-    def test_workflow_execution_with_critique(self):
+    def test_workflow_execution_with_critique(self) -> None:
         print("Initializing Skeleton & Inject Workflow Test (Full Flow)...")
 
         mock_llm = MockLLMClient()

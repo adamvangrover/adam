@@ -1,7 +1,9 @@
 import pytest
+
 from scripts.eval_epistemic_hierarchy import run_eval
 
-def test_epistemic_eval_harness():
+
+def test_epistemic_eval_harness() -> None:
     try:
         run_eval()
     except RuntimeError:

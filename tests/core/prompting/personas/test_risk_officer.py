@@ -1,9 +1,11 @@
-import unittest
 import json
+import unittest
+
 from core.prompting.personas.risk_officer import RiskOfficerPersona
 
+
 class TestRiskOfficerPersona(unittest.TestCase):
-    def test_rendering_without_optional_fields(self):
+    def test_rendering_without_optional_fields(self) -> None:
         persona = RiskOfficerPersona.default()
         inputs = {"draft_analysis": "Revenue grew but we have High Insolvency Risk.", "ticker": "AAPL", "iteration": 1}
         messages = persona.render_messages(inputs)
@@ -19,7 +21,7 @@ class TestRiskOfficerPersona(unittest.TestCase):
         self.assertNotIn("FINANCIAL CONTEXT", messages[1]["content"])
         self.assertNotIn("POLICY CONSTRAINTS", messages[1]["content"])
 
-    def test_rendering_with_optional_fields(self):
+    def test_rendering_with_optional_fields(self) -> None:
         persona = RiskOfficerPersona.default()
         inputs = {
             "draft_analysis": "Revenue is up.",
@@ -37,7 +39,7 @@ class TestRiskOfficerPersona(unittest.TestCase):
         self.assertIn("POLICY CONSTRAINTS", messages[1]["content"])
         self.assertIn("DSCR > 1.25x", messages[1]["content"])
 
-    def test_parsing(self):
+    def test_parsing(self) -> None:
         persona = RiskOfficerPersona.default()
         mock_response = json.dumps({
             "status": "FAIL",
