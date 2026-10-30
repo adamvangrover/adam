@@ -2,8 +2,10 @@
 Configuration objects for Antigravity SDK agents.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
+
 from .types import McpStdioServer
 
 
@@ -19,16 +21,16 @@ class CapabilitiesConfig:
 @dataclass
 class LocalAgentConfig:
     """Configuration for local or remote API-backed Antigravity agents."""
-    system_instructions: Optional[str] = None
-    api_key: Optional[str] = None
+    system_instructions: str | None = None
+    api_key: str | None = None
     vertex: bool = False
-    project: Optional[str] = None
-    location: Optional[str] = None
-    tools: List[Callable[..., Any]] = field(default_factory=list)
-    mcp_servers: List[McpStdioServer] = field(default_factory=list)
+    project: str | None = None
+    location: str | None = None
+    tools: list[Callable[..., Any]] = field(default_factory=list)
+    mcp_servers: list[McpStdioServer] = field(default_factory=list)
     capabilities: CapabilitiesConfig = field(default_factory=CapabilitiesConfig)
-    policies: List[Any] = field(default_factory=list)
-    triggers: List[Any] = field(default_factory=list)
+    policies: list[Any] = field(default_factory=list)
+    triggers: list[Any] = field(default_factory=list)
     model_name: str = "gemini-2.5-pro"
 
 
@@ -36,8 +38,8 @@ class LocalAgentConfig:
 class LiteRTAgentConfig:
     """Configuration for offline, local GPU/CPU LiteRT-LM models (e.g. Gemma 4)."""
     model_path: str
-    system_instructions: Optional[str] = None
-    tools: List[Callable[..., Any]] = field(default_factory=list)
+    system_instructions: str | None = None
+    tools: list[Callable[..., Any]] = field(default_factory=list)
     capabilities: CapabilitiesConfig = field(default_factory=CapabilitiesConfig)
     context_size: int = 65536
 

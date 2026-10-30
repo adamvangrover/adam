@@ -4,8 +4,9 @@ Policy hooks and execution guardrails for Antigravity SDK.
 
 import fnmatch
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,8 @@ class PolicyAction:
 class PolicyRule:
     pattern: str
     action: str
-    handler: Optional[Callable[..., Any]] = None
-    enforce_kwargs: Optional[Dict[str, Any]] = None
+    handler: Callable[..., Any] | None = None
+    enforce_kwargs: dict[str, Any] | None = None
 
 
 def allow(pattern: str) -> PolicyRule:
@@ -35,7 +36,7 @@ def deny(pattern: str) -> PolicyRule:
     return PolicyRule(pattern=pattern, action=PolicyAction.DENY)
 
 
-def ask_user(pattern: str, handler: Optional[Callable[..., Any]] = None) -> PolicyRule:
+def ask_user(pattern: str, handler: Callable[..., Any] | None = None) -> PolicyRule:
     """Policy rule requiring user confirmation before tool invocation."""
     return PolicyRule(pattern=pattern, action=PolicyAction.ASK_USER, handler=handler)
 
@@ -50,10 +51,10 @@ class HookRunner:
     Evaluates policy rules against tool call attempts before execution.
     """
 
-    def __init__(self, policies: Optional[List[PolicyRule]] = None) -> None:
-        self.policies: List[PolicyRule] = policies or []
+    def __init__(self, policies: list[PolicyRule] | None = None) -> None:
+        self.policies: list[PolicyRule] = policies or []
 
-    def evaluate_tool_call(self, tool_name: str, arguments: Dict[str, Any]) -> PolicyRule:
+    def evaluate_tool_call(self, tool_name: str, arguments: dict[str, Any]) -> PolicyRule:
         """
         Evaluates policies in reverse order (last rule takes precedence).
         Defaults to ALLOW if no policies match.

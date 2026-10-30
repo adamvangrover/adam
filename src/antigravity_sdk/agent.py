@@ -2,8 +2,9 @@
 High-level Agent entry point and async context manager for Antigravity SDK.
 """
 
-from typing import Any, Optional, Union
-from .config import LocalAgentConfig, LiteRTAgentConfig
+from typing import Any
+
+from .config import LiteRTAgentConfig, LocalAgentConfig
 from .conversation import ChatResponse, Conversation
 from .hooks import HookRunner
 from .tools import ToolRunner
@@ -15,7 +16,7 @@ class Agent:
     High-level, batteries-included agent manager interface.
     """
 
-    def __init__(self, config: Optional[Union[LocalAgentConfig, LiteRTAgentConfig]] = None) -> None:
+    def __init__(self, config: LocalAgentConfig | LiteRTAgentConfig | None = None) -> None:
         self.config = config or LocalAgentConfig()
         tools = getattr(self.config, "tools", [])
         policies = getattr(self.config, "policies", [])

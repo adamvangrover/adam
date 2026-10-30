@@ -4,33 +4,37 @@ Core data types and multimodal content abstractions for Antigravity SDK.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 
 @dataclass
 class Content:
     """Base class for multimodal prompt content attachments."""
-    description: Optional[str] = None
+    description: str | None = None
 
 
 @dataclass
 class Image(Content):
     """Image attachment wrapper for in-memory bytes or file references."""
-    data: Optional[bytes] = None
+    data: bytes | None = None
     mime_type: str = "image/png"
-    uri: Optional[str] = None
+    uri: str | None = None
 
 
 @dataclass
 class Document(Content):
     """Document attachment wrapper (PDF, text, markdown, etc.)."""
-    data: Optional[bytes] = None
+    data: bytes | None = None
     mime_type: str = "application/pdf"
-    uri: Optional[str] = None
-    file_path: Optional[str] = None
+    uri: str | None = None
+    file_path: str | None = None
 
 
-def from_file(file_path: Union[str, Path], mime_type: Optional[str] = None, description: Optional[str] = None) -> Content:
+def from_file(
+    file_path: str | Path,
+    mime_type: str | None = None,
+    description: str | None = None,
+) -> Content:
     """
     Convenience helper to auto-detect and resolve a file from disk into a Document or Image.
     """
@@ -55,7 +59,13 @@ def from_file(file_path: Union[str, Path], mime_type: Optional[str] = None, desc
     if mime_type.startswith("image/"):
         return Image(data=content_bytes, mime_type=mime_type, uri=str(path.resolve()), description=description)
     else:
-        return Document(data=content_bytes, mime_type=mime_type, uri=str(path.resolve()), file_path=str(path), description=description)
+        return Document(
+            data=content_bytes,
+            mime_type=mime_type,
+            uri=str(path.resolve()),
+            file_path=str(path),
+            description=description,
+        )
 
 
 @dataclass
@@ -63,8 +73,8 @@ class McpStdioServer:
     """Configuration for an MCP (Model Context Protocol) STDIO server connection."""
     name: str
     command: str
-    args: List[str] = field(default_factory=list)
-    env: Dict[str, str] = field(default_factory=dict)
+    args: list[str] = field(default_factory=list)
+    env: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -72,7 +82,7 @@ class ToolCall:
     """Strongly typed tool call dispatch event."""
     id: str
     name: str
-    arguments: Dict[str, Any] = field(default_factory=dict)
+    arguments: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -82,6 +92,6 @@ class Step:
     content: str
     role: str = "assistant"
     is_complete_response: bool = True
-    tool_calls: List[ToolCall] = field(default_factory=list)
-    thoughts: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tool_calls: list[ToolCall] = field(default_factory=list)
+    thoughts: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)

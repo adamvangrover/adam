@@ -4,7 +4,9 @@ Tool registration and in-process execution engine for Antigravity SDK.
 
 import inspect
 import logging
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
+
 from .types import ToolCall
 
 logger = logging.getLogger(__name__)
@@ -15,23 +17,23 @@ class ToolRunner:
     Manages in-process tool registration, schema extraction, and invocation dispatch.
     """
 
-    def __init__(self, tools: Optional[List[Callable[..., Any]]] = None) -> None:
-        self._registry: Dict[str, Callable[..., Any]] = {}
+    def __init__(self, tools: list[Callable[..., Any]] | None = None) -> None:
+        self._registry: dict[str, Callable[..., Any]] = {}
         if tools:
             for tool in tools:
                 self.register_tool(tool)
 
-    def register_tool(self, fn: Callable[..., Any], name: Optional[str] = None) -> None:
+    def register_tool(self, fn: Callable[..., Any], name: str | None = None) -> None:
         """Registers a Python function as an executable tool."""
         tool_name = name or fn.__name__
         self._registry[tool_name] = fn
         logger.debug("Registered tool: %s", tool_name)
 
-    def get_tool_names(self) -> List[str]:
+    def get_tool_names(self) -> list[str]:
         """Returns the list of registered tool names."""
         return list(self._registry.keys())
 
-    def get_tool_schemas(self) -> List[Dict[str, Any]]:
+    def get_tool_schemas(self) -> list[dict[str, Any]]:
         """Generates JSON schema descriptions for all registered tools."""
         schemas = []
         for name, fn in self._registry.items():
@@ -44,15 +46,15 @@ class ToolRunner:
                 if param_name in ("self", "cls"):
                     continue
                 param_type = "string"
-                if param.annotation == int:
+                if param.annotation is int:
                     param_type = "integer"
-                elif param.annotation == float:
+                elif param.annotation is float:
                     param_type = "number"
-                elif param.annotation == bool:
+                elif param.annotation is bool:
                     param_type = "boolean"
-                elif param.annotation == dict:
+                elif param.annotation is dict:
                     param_type = "object"
-                elif param.annotation == list:
+                elif param.annotation is list:
                     param_type = "array"
 
                 properties[param_name] = {"type": param_type}
@@ -66,7 +68,7 @@ class ToolRunner:
                     "type": "object",
                     "properties": properties,
                     "required": required,
-                }
+                },
             })
         return schemas
 

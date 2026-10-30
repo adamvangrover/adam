@@ -4,8 +4,9 @@ Background task triggers and event scheduling primitives for Antigravity SDK.
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +26,11 @@ class TriggerContext:
 class Trigger:
     interval_seconds: float
     callback: Callable[[TriggerContext], Any]
-    _task: Optional[asyncio.Task] = None
+    _task: asyncio.Task | None = None
 
     async def start(self, ctx: TriggerContext) -> None:
         """Starts the periodic background execution loop."""
-        async def _loop():
+        async def _loop() -> None:
             while True:
                 try:
                     await asyncio.sleep(self.interval_seconds)
@@ -57,8 +58,8 @@ def every(seconds: float, callback: Callable[[TriggerContext], Any]) -> Trigger:
 class TriggerRunner:
     """Manages active background triggers during agent session lifecycles."""
 
-    def __init__(self, triggers: Optional[List[Trigger]] = None) -> None:
-        self.triggers: List[Trigger] = triggers or []
+    def __init__(self, triggers: list[Trigger] | None = None) -> None:
+        self.triggers: list[Trigger] = triggers or []
 
     async def start_all(self, agent: Any) -> None:
         """Starts all registered background triggers."""

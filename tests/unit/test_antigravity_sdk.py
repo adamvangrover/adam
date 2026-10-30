@@ -2,31 +2,25 @@
 Unit tests for Antigravity SDK and Jules Replacement Agent.
 """
 
-import asyncio
-import pytest
 from pathlib import Path
+
+import pytest
 
 from src.antigravity_sdk import (
     Agent,
-    CapabilitiesConfig,
-    Conversation,
     Document,
     HookRunner,
-    Image,
     JulesAgent,
-    LiteRTAgentConfig,
     LocalAgentConfig,
-    McpStdioServer,
     ToolRunner,
     allow,
     deny,
-    every,
     from_file,
 )
 
 
 @pytest.mark.asyncio
-async def test_agent_async_context_manager_and_chat():
+async def test_agent_async_context_manager_and_chat() -> None:
     config = LocalAgentConfig(system_instructions="Test agent instructions")
     async with Agent(config) as agent:
         response = await agent.chat("What files are in the repository?")
@@ -36,7 +30,7 @@ async def test_agent_async_context_manager_and_chat():
 
 
 @pytest.mark.asyncio
-async def test_streaming_tokens_and_thoughts():
+async def test_streaming_tokens_and_thoughts() -> None:
     config = LocalAgentConfig()
     async with Agent(config) as agent:
         response = await agent.chat("Generate code snippet")
@@ -53,7 +47,7 @@ async def test_streaming_tokens_and_thoughts():
 
 
 @pytest.mark.asyncio
-async def test_tool_runner_registration_and_execution():
+async def test_tool_runner_registration_and_execution() -> None:
     def get_weather(city: str) -> str:
         """Returns the weather for a city."""
         return f"Sunny in {city}"
@@ -73,7 +67,7 @@ async def test_tool_runner_registration_and_execution():
 
 
 @pytest.mark.asyncio
-async def test_policy_hooks_enforcement():
+async def test_policy_hooks_enforcement() -> None:
     def execute_cmd(cmd: str) -> str:
         return f"Executed: {cmd}"
 
@@ -87,7 +81,7 @@ async def test_policy_hooks_enforcement():
 
 
 @pytest.mark.asyncio
-async def test_multimodal_file_helpers(tmp_path: Path):
+async def test_multimodal_file_helpers(tmp_path: Path) -> None:
     test_file = tmp_path / "spec.pdf"
     test_file.write_bytes(b"PDF header content")
 
@@ -97,7 +91,7 @@ async def test_multimodal_file_helpers(tmp_path: Path):
 
 
 @pytest.mark.asyncio
-async def test_jules_agent_replacement_workflow():
+async def test_jules_agent_replacement_workflow() -> None:
     jules = JulesAgent()
     res = await jules.execute_task("Perform repository integrity check")
 

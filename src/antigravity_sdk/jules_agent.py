@@ -2,18 +2,17 @@
 Jules Replacement Agent built on top of Antigravity SDK for autonomous software engineering and repository refactoring.
 """
 
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-import os
 import subprocess
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
 
 from .agent import Agent
-from .config import LocalAgentConfig, CapabilitiesConfig
+from .config import CapabilitiesConfig, LocalAgentConfig
 from .hooks import allow, deny
 
 
-def list_directory(path: str = ".") -> List[str]:
+def list_directory(path: str = ".") -> list[str]:
     """Lists files in the specified repository directory."""
     p = Path(path)
     if not p.exists():
@@ -43,7 +42,7 @@ def run_unit_tests(test_path: str = "tests/unit/") -> str:
         res = subprocess.run(["uv", "run", "pytest", test_path], capture_output=True, text=True, timeout=60)
         return f"STDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}"
     except Exception as e:
-        return f"Failed to execute tests: {str(e)}"
+        return f"Failed to execute tests: {e!s}"
 
 
 class JulesAgent:
@@ -51,7 +50,7 @@ class JulesAgent:
     Autonomous Jules replacement agent for codebase maintenance, refactoring, and W3C PROV-O audit trailing.
     """
 
-    def __init__(self, system_instructions: Optional[str] = None) -> None:
+    def __init__(self, system_instructions: str | None = None) -> None:
         instructions = system_instructions or (
             "You are Jules, an autonomous software engineering agent. "
             "Your objective is to inspect, refactor, and maintain code bases while preserving W3C PROV-O "
@@ -79,18 +78,18 @@ class JulesAgent:
         )
 
         self.agent = Agent(config=config)
-        self.prov_log: List[Dict[str, Any]] = []
+        self.prov_log: list[dict[str, Any]] = []
 
-    def _record_telemetry(self, activity: str, details: Dict[str, Any]) -> None:
+    def _record_telemetry(self, activity: str, details: dict[str, Any]) -> None:
         """Records a W3C PROV-O compliant telemetry log."""
         self.prov_log.append({
             "prov:Activity": activity,
             "prov:Agent": "JulesAgentReplacement",
-            "prov:generatedAtTime": datetime.now(timezone.utc).isoformat(),
+            "prov:generatedAtTime": datetime.now(UTC).isoformat(),
             "details": details,
         })
 
-    async def execute_task(self, prompt: str) -> Dict[str, Any]:
+    async def execute_task(self, prompt: str) -> dict[str, Any]:
         """
         Executes a software engineering task autonomously.
         """

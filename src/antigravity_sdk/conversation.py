@@ -3,7 +3,8 @@ Stateful conversation session management for Antigravity SDK.
 """
 
 import inspect
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from collections.abc import AsyncGenerator
+from typing import Any
 from uuid import uuid4
 
 from .hooks import HookRunner
@@ -16,7 +17,12 @@ class ChatResponse:
     Wrapper for agent response stream and step content.
     """
 
-    def __init__(self, text_tokens: List[str], thoughts: Optional[List[str]] = None, tool_calls: Optional[List[ToolCall]] = None) -> None:
+    def __init__(
+        self,
+        text_tokens: list[str],
+        thoughts: list[str] | None = None,
+        tool_calls: list[ToolCall] | None = None,
+    ) -> None:
         self._tokens = text_tokens
         self._thoughts = thoughts or []
         self._tool_calls = tool_calls or []
@@ -27,7 +33,7 @@ class ChatResponse:
 
     def __aiter__(self) -> AsyncGenerator[str, None]:
         """Yields streaming text tokens."""
-        async def _gen():
+        async def _gen() -> AsyncGenerator[str, None]:
             for token in self._tokens:
                 yield token
         return _gen()
@@ -35,7 +41,7 @@ class ChatResponse:
     @property
     def thoughts(self) -> AsyncGenerator[str, None]:
         """Yields model reasoning/thought deltas."""
-        async def _gen():
+        async def _gen() -> AsyncGenerator[str, None]:
             for thought in self._thoughts:
                 yield thought
         return _gen()
@@ -43,7 +49,7 @@ class ChatResponse:
     @property
     def tool_calls(self) -> AsyncGenerator[ToolCall, None]:
         """Yields strongly typed ToolCall events."""
-        async def _gen():
+        async def _gen() -> AsyncGenerator[ToolCall, None]:
             for call in self._tool_calls:
                 yield call
         return _gen()
@@ -54,15 +60,15 @@ class Conversation:
     Stateful session that manages conversation steps, turn count, history, and tool executions.
     """
 
-    def __init__(self, tool_runner: Optional[ToolRunner] = None, hook_runner: Optional[HookRunner] = None) -> None:
+    def __init__(self, tool_runner: ToolRunner | None = None, hook_runner: HookRunner | None = None) -> None:
         self.tool_runner = tool_runner or ToolRunner()
         self.hook_runner = hook_runner or HookRunner()
-        self.history: List[Step] = []
+        self.history: list[Step] = []
         self.turn_count: int = 0
-        self.last_response: Optional[str] = None
+        self.last_response: str | None = None
 
     @classmethod
-    def create(cls, tool_runner: Optional[ToolRunner] = None, hook_runner: Optional[HookRunner] = None) -> "Conversation":
+    def create(cls, tool_runner: ToolRunner | None = None, hook_runner: HookRunner | None = None) -> "Conversation":
         return cls(tool_runner=tool_runner, hook_runner=hook_runner)
 
     async def __aenter__(self) -> "Conversation":
@@ -80,15 +86,15 @@ class Conversation:
         self.history.append(user_step)
 
         response_text = f"Processed prompt turn {self.turn_count}: '{user_text}'"
-        tool_calls: List[ToolCall] = []
+        tool_calls: list[ToolCall] = []
 
-        # Execute matched tools dynamically based on function signature inspection
         registered_tools = self.tool_runner.get_tool_names()
         for tool_name in registered_tools:
-            if tool_name.lower() in user_text.lower() or "check" in user_text.lower() or "run" in user_text.lower() or "file" in user_text.lower():
+            low = user_text.lower()
+            if tool_name.lower() in low or "check" in low or "run" in low or "file" in low:
                 fn = self.tool_runner._registry[tool_name]
                 sig = inspect.signature(fn)
-                arg_dict: Dict[str, Any] = {}
+                arg_dict: dict[str, Any] = {}
                 for param_name, param in sig.parameters.items():
                     if param_name in ("city", "location"):
                         arg_dict[param_name] = "Tokyo"
@@ -104,7 +110,7 @@ class Conversation:
                         res = await self.tool_runner.execute_tool_call(tool_call)
                         response_text += f"\n[Tool Output ({tool_name})]: {res}"
                     except Exception as e:
-                        response_text += f"\n[Tool Error ({tool_name})]: {str(e)}"
+                        response_text += f"\n[Tool Error ({tool_name})]: {e!s}"
                 tool_calls.append(tool_call)
                 break
 
