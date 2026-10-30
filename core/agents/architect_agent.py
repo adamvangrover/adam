@@ -21,13 +21,12 @@ import re
 import shlex
 import shutil
 import subprocess
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Literal, Optional, Sequence
+from datetime import UTC, datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 from src.pdil.models import ProvenanceHeader
-
 
 ALLOWED_THEMES = ("dark", "light")
 ALLOWED_SHELLS = ("bash", "zsh", "fish", "powershell")
@@ -57,7 +56,7 @@ class ArchitectJulesState(BaseModel):
         default="v30.1-HEAD",
         description="Git commit or state checkpoint hash.",
     )
-    prov_o_audit_trail: List[Dict[str, Any]] = Field(
+    prov_o_audit_trail: list[dict[str, Any]] = Field(
         default_factory=list,
         description="W3C PROV-O audit trail entries.",
     )
@@ -78,38 +77,39 @@ class JulesSessionRequest(BaseModel):
         "remote_list_session",
         "remote_new",
         "remote_pull",
+        "remote_status",
         "completion",
     ] = Field(default="remote_new", description="Jules CLI operation to execute.")
-    repo: Optional[str] = Field(
+    repo: str | None = Field(
         default="adamvangrover/adam",
         description="Target repository (e.g., 'adamvangrover/adam', 'torvalds/linux', or '.').",
     )
-    session_prompt: Optional[str] = Field(
+    session_prompt: str | None = Field(
         default=None,
         description="Task prompt passed to `--session` for `jules remote new`.",
     )
-    session_id: Optional[str] = Field(
+    session_id: str | None = Field(
         default=None,
         description="Session identifier passed to `--session` for `jules remote pull`.",
     )
-    parallel: Optional[int] = Field(
+    parallel: int | None = Field(
         default=None,
         ge=1,
         le=32,
         description="Number of parallel sessions to launch (`--parallel <number>`).",
     )
-    theme: Optional[Literal["dark", "light"]] = Field(
+    theme: Literal["dark", "light"] | None = Field(
         default=None,
         description="Optional global TUI theme flag (`--theme dark|light`).",
     )
-    shell: Optional[Literal["bash", "zsh", "fish", "powershell"]] = Field(
+    shell: Literal["bash", "zsh", "fish", "powershell"] | None = Field(
         default="zsh",
         description="Target shell for `jules completion <shell>`.",
     )
 
     @field_validator("repo")
     @classmethod
-    def validate_repo(cls, value: Optional[str]) -> Optional[str]:
+    def validate_repo(cls, value: str | None) -> str | None:
         if value is None:
             return None
         cleaned = value.strip()
@@ -121,7 +121,7 @@ class JulesSessionRequest(BaseModel):
 
     @field_validator("session_id")
     @classmethod
-    def validate_session_id(cls, value: Optional[str]) -> Optional[str]:
+    def validate_session_id(cls, value: str | None) -> str | None:
         if value is None:
             return None
         cleaned = value.strip()
@@ -133,7 +133,7 @@ class JulesSessionRequest(BaseModel):
 
     @field_validator("session_prompt")
     @classmethod
-    def validate_session_prompt(cls, value: Optional[str]) -> Optional[str]:
+    def validate_session_prompt(cls, value: str | None) -> str | None:
         if value is None:
             return None
         cleaned = value.strip()
@@ -151,8 +151,8 @@ class JulesCommandBuilder:
     BINARY = "jules"
 
     @classmethod
-    def build_args(cls, request: JulesSessionRequest) -> List[str]:
-        args: List[str] = [cls.BINARY]
+    def build_args(cls, request: JulesSessionRequest) -> list[str]:
+        args: list[str] = [cls.BINARY]
 
         if request.theme is not None:
             if request.theme not in ALLOWED_THEMES:
@@ -177,7 +177,7 @@ class JulesCommandBuilder:
         if sub == "remote_list_repo":
             args.extend(["remote", "list", "--repo"])
             return args
-        if sub == "remote_list_session":
+        if sub == "remote_list_session" or sub == "remote_status":
             args.extend(["remote", "list", "--session"])
             return args
         if sub == "remote_new":
@@ -234,14 +234,14 @@ class ArchitectAgent:
             last_checkpoint_hash=last_checkpoint_hash,
         )
 
-    def audit_code_snippet(self, code: str, module_path: str = "core/agents/example.py") -> Dict[str, Any]:
+    def audit_code_snippet(self, code: str, module_path: str = "core/agents/example.py") -> dict[str, Any]:
         """
         Statically checks a code snippet against AFOS v30.1 Path A architectural invariants:
         - UI isolation (no streamlit/react in core/ or adam_*/)
         - Path A/B bifurcation (no experimental/ imports in core/)
         - P0 Security mandates (no pickle.load, eval, exec)
         """
-        violations: List[str] = []
+        violations: list[str] = []
         is_path_a = module_path.startswith(("core/", "adam_", "src/"))
 
         if is_path_a:
@@ -278,17 +278,17 @@ class ArchitectAgent:
         request: JulesSessionRequest,
         execute: bool = False,
         timeout_seconds: int = 30,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Prepares (and optionally executes) a `@google/jules` CLI command with full
         W3C PROV-O telemetry and state tracking.
         """
-        now_utc = datetime.now(timezone.utc).isoformat()
+        now_utc = datetime.now(UTC).isoformat()
         args = JulesCommandBuilder.build_args(request)
         cli_string = JulesCommandBuilder.format_cli_string(request)
         jules_installed = shutil.which(JulesCommandBuilder.BINARY) is not None
 
-        execution_result: Dict[str, Any] = {
+        execution_result: dict[str, Any] = {
             "executed": False,
             "jules_binary_detected": jules_installed,
             "returncode": None,
@@ -349,7 +349,7 @@ class ArchitectAgent:
 
         return {
             "answer": f"Prepared Jules CLI command: `{cli_string}`",
-            "sources": ["docs/jules_tools_reference.md", "AGENTS.md", "AGENT_CATALOG.md"],
+            "sources": ["docs/reference/jules_tools.md", "AGENTS.md", "AGENT_CATALOG.md"],
             "confidence": confidence,
             "metadata": payload,
             "prov_o_audit_trail": list(self.state.prov_o_audit_trail),

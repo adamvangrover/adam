@@ -16,7 +16,7 @@ from core.agents.architect_agent import (
 )
 
 
-def test_jules_remote_new_command_builder():
+def test_jules_remote_new_command_builder() -> None:
     req = JulesSessionRequest(
         subcommand="remote_new",
         repo="torvalds/linux",
@@ -39,7 +39,7 @@ def test_jules_remote_new_command_builder():
     assert "jules remote new --repo torvalds/linux --session 'write unit tests' --parallel 3" == cli_str
 
 
-def test_jules_remote_pull_and_list_commands():
+def test_jules_remote_pull_and_list_commands() -> None:
     pull_req = JulesSessionRequest(subcommand="remote_pull", session_id="123456")
     assert JulesCommandBuilder.build_args(pull_req) == [
         "jules",
@@ -65,8 +65,16 @@ def test_jules_remote_pull_and_list_commands():
         "--session",
     ]
 
+    status_req = JulesSessionRequest(subcommand="remote_status")
+    assert JulesCommandBuilder.build_args(status_req) == [
+        "jules",
+        "remote",
+        "list",
+        "--session",
+    ]
 
-def test_jules_global_theme_and_completion_commands():
+
+def test_jules_global_theme_and_completion_commands() -> None:
     tui_req = JulesSessionRequest(subcommand="tui", theme="light")
     assert JulesCommandBuilder.build_args(tui_req) == ["jules", "--theme", "light"]
 
@@ -74,7 +82,7 @@ def test_jules_global_theme_and_completion_commands():
     assert JulesCommandBuilder.build_args(comp_req) == ["jules", "completion", "bash"]
 
 
-def test_adversarial_repo_and_session_id_rejected():
+def test_adversarial_repo_and_session_id_rejected() -> None:
     with pytest.raises(ValidationError):
         JulesSessionRequest(
             subcommand="remote_new",
@@ -96,7 +104,7 @@ def test_adversarial_repo_and_session_id_rejected():
         )
 
 
-def test_architect_agent_code_audit_and_prov_o_trace():
+def test_architect_agent_code_audit_and_prov_o_trace() -> None:
     agent = ArchitectAgent()
 
     clean_code = "from pydantic import BaseModel\nclass RiskSchema(BaseModel):\n    pd: float\n"
@@ -124,6 +132,7 @@ def test_architect_agent_code_audit_and_prov_o_trace():
     )
     out = agent_clean.prepare_jules_session(req, execute=False)
     assert out["confidence"] >= 0.85
+    assert "docs/reference/jules_tools.md" in out["sources"]
     assert len(out["prov_o_audit_trail"]) == 1
     assert out["provenance_trace"]["jsonLogic_version"] == "2.0.0"
     assert len(out["provenance_trace"]["content_hash"]) == 64
