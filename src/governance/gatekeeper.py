@@ -6,7 +6,7 @@ This module acts as the Entry and Exit point for all agentic workflows,
 satisfying regulatory and audit requirements.
 """
 
-from src.pdil.models import ProvenanceHeader
+from src.pdil.models import ProvenanceHeader, build_provenance_header
 from src.pdil.middleware import (
     GovernanceError,
     SecurityGovernanceGatekeeper,
@@ -45,4 +45,9 @@ class GovernanceGatekeeper(SecurityGovernanceGatekeeper):
         layer = DriftIntelligenceLayer(self)
         return layer.heal_drift(inference_output)
 
-__all__ = ["GovernanceGatekeeper"]
+    @staticmethod
+    def create_provenance_header(data, **kwargs):
+        """Helper method to construct a valid ProvenanceHeader dictionary for dynamic data payloads."""
+        return build_provenance_header(data, **kwargs)
+
+__all__ = ["GovernanceGatekeeper", "build_provenance_header"]
