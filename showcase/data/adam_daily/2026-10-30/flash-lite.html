@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jules ADAM Daily Market Brief UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1329; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex flex-wrap justify-between items-center gap-4 shadow-xl">
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-500/10 border border-amber-500/40 text-amber-400 px-3 py-1.5 rounded-lg font-mono text-xs font-bold tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved"></i> ADAM v30.1-R-PATCH
+            </div>
+            <div>
+                <h1 class="font-bold text-sm sm:text-base tracking-tight text-slate-100 flex items-center gap-2">
+                    Jules - ADAM Daily Market Brief UI
+                    <span class="text-xs font-mono px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">AUDITED & REMEDIATED</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">Date: 2026-10-30 | SR 11-7 / W3C PROV-O Compliant</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 lg:p-8 space-y-6 max-w-[1600px] mx-auto w-full">
+        <!-- Market Overview -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+            <h2 class="text-lg font-bold border-b border-slate-700/50 pb-3 mb-5 flex items-center gap-2 text-slate-100">
+                <i class="fa-solid fa-earth-americas text-blue-400"></i> Market Overview
+            </h2>
+            <p class="text-sm text-slate-300 leading-relaxed">
+                The divergence between high-multiple AI infrastructure names and traditional macro safe havens highlights an acute transition in cross-asset risk positioning.
+            </p>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <div class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">S&P 500</div>
+                    <div class="text-xl font-mono text-slate-100">7720.39</div>
+                </div>
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <div class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Nasdaq</div>
+                    <div class="text-xl font-mono text-slate-100">26184.72</div>
+                </div>
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <div class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">10-year US Treasury</div>
+                    <div class="text-xl font-mono text-slate-100">4.99%</div>
+                </div>
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <div class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Bitcoin</div>
+                    <div class="text-xl font-mono text-slate-100">77401.80</div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=800" alt="Stock Market Chart" class="rounded-lg w-full h-48 object-cover opacity-80 hover:opacity-100 transition-opacity">
+                    <p class="text-xs text-slate-400 mt-2 italic text-center">Global Equities Volatility Tracker</p>
+                </div>
+                <div class="bg-slate-850 p-4 rounded-lg border border-slate-700">
+                    <img src="https://images.unsplash.com/photo-1621839673705-6617adf9e890?auto=format&fit=crop&q=80&w=800" alt="Tech Infrastructure" class="rounded-lg w-full h-48 object-cover opacity-80 hover:opacity-100 transition-opacity">
+                    <p class="text-xs text-slate-400 mt-2 italic text-center">AI Data Center Capex Expansion</p>
+                </div>
+            </div>
+
+
+        </section>
+
+        <!-- Macro & Cross-Asset Analysis -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl">
+             <h2 class="text-lg font-bold border-b border-slate-700/50 pb-3 mb-5 flex items-center gap-2 text-slate-100">
+                <i class="fa-solid fa-chart-line text-emerald-400"></i> Macro & Cross-Asset Analysis
+            </h2>
+            <ul class="space-y-3 text-sm text-slate-300">
+                <li><strong class="text-slate-100">AI Capex & Hardware Re-rating:</strong> The double-digit drawdown across semiconductor and AI infrastructure leaders reflects immediate compression in hardware spend elasticity. While lower-cost inference paradigms (such as DeepSeek architectures) may expand net compute adoption long term, markets are front-running short-to-medium-term margin compression and lower hardware unit ASPs across hyperscaler supply chains.</li>
+                <li><strong class="text-slate-100">Yield Curve & Rate Volatility:</strong> With the 10-year Treasury testing <strong>4.99%</strong> against a 13-week bill at <strong>4.00%</strong>, the curve is actively bearing the weight of term premium expansion and fiscal supply friction. Elevated long yields remove multiple support from high-duration growth equities, reinforcing the rotation out of crowded megacap momentum.</li>
+                <li><strong class="text-slate-100">Commodity Divergence:</strong> Crude at <strong>$103.42</strong> paired with Gold touching <strong>$4,003.80</strong> signals persistent geopolitical premia and stagflationary undercurrents. Concurrently, supply shocks in agricultural softs (e.g., Arabica coffee spiking on Latin American trade policy friction) underline broader trade-channel fragilities.</li>
+                <li><strong class="text-slate-100">Asset Flow Dynamics:</strong> The simultaneous pullback in precious metals despite broader risk-off equity action points to tactical liquidity demand or margin-call coverage rather than an orderly flight-to-safety, keeping volatility elevated across risk assets.</li>
+            </ul>
+        </section>
+
+        <!-- Cross-Asset Positioning Matrix -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl">
+             <h2 class="text-lg font-bold border-b border-slate-700/50 pb-3 mb-5 flex items-center gap-2 text-slate-100">
+                <i class="fa-solid fa-table-list text-indigo-400"></i> Cross-Asset Positioning Matrix
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-300">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-800">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 rounded-tl-lg">Asset Class</th>
+                            <th scope="col" class="px-6 py-3">Immediate Pressure Point</th>
+                            <th scope="col" class="px-6 py-3">Strategic Transmission</th>
+                            <th scope="col" class="px-6 py-3 rounded-tr-lg">Focus Metric</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr class="bg-slate-850 hover:bg-slate-800 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-100">Large-Cap Tech / Semi</td>
+                            <td class="px-6 py-4">Capex multiple compression & hardware de-rating</td>
+                            <td class="px-6 py-4">Rotation into cash-generative, low-capex value</td>
+                            <td class="px-6 py-4 font-mono text-xs">Hyperscaler free-cash-flow yield vs. WACC</td>
+                        </tr>
+                        <tr class="bg-slate-850 hover:bg-slate-800 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-100">Rates (10Y UST)</td>
+                            <td class="px-6 py-4">Yield persistence around 5.00% ceiling</td>
+                            <td class="px-6 py-4">Sustained equity discount rate headwinds</td>
+                            <td class="px-6 py-4 font-mono text-xs">2Y/10Y spread steepening trajectory</td>
+                        </tr>
+                        <tr class="bg-slate-850 hover:bg-slate-800 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-100">Energy & Softs</td>
+                            <td class="px-6 py-4">Supply bottlenecks & tariff/embargo headlines</td>
+                            <td class="px-6 py-4">Headline-driven cost-push inflation</td>
+                            <td class="px-6 py-4 font-mono text-xs">Refined product crack spreads & trade flows</td>
+                        </tr>
+                        <tr class="bg-slate-850 hover:bg-slate-800 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-100">Digital Assets</td>
+                            <td class="px-6 py-4">Correlated beta drawdown with speculative tech</td>
+                            <td class="px-6 py-4">Leverage washouts across perpetual swap venues</td>
+                            <td class="px-6 py-4 font-mono text-xs">Funding rates & basis to spot</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </section>
+
+        <!-- W3C PROV-O JSON-LD Compliance -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 shadow-2xl">
+            <h2 class="text-lg font-bold border-b border-slate-700/50 pb-3 mb-5 flex items-center gap-2 text-slate-100">
+                <i class="fa-solid fa-code text-pink-400"></i> W3C PROV-O Audit Lineage
+            </h2>
+            <pre class="bg-[#0f172a] text-xs font-mono p-4 rounded border border-slate-800 text-slate-400 overflow-x-auto">
+{
+  "@context": "http://www.w3.org/ns/prov",
+  "wasGeneratedBy": {
+    "activity": "ADAM_JULES_DAILY_MARKET_BRIEF",
+    "agent": "JULES_AGENT_V30.1",
+    "startedAtTime": "2026-10-30T00:00:00Z"
+  },
+  "entity": {
+    "id": "showcase/data/adam_daily/2026-10-30/daily_brief.md",
+    "type": "MarketMayhemLedger"
+  }
+}
+            </pre>
+            <div class="mt-4 text-right">
+                <span class="text-sm italic text-slate-500">Signed off, Jules - ADAM Daily Market Brief Agent</span>
+            </div>
+
+
+        </section>
+    </main>
+</body>
+</html>
