@@ -5,4 +5,7 @@ This directory contains technical reference material, APIs, schemas, and configu
 ## Schemas and APIs
 
 *   [Agent Schema Reference](agent-schema.md)
+
+## Tools and CLI
+
 *   [Jules Tools Reference](jules_tools.md)

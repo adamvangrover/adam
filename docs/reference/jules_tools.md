@@ -15,8 +15,16 @@ It allows you to manage coding sessions, inspect progress, and integrate Jules i
 - [Usage](#usage)
   - [Global Flags](#global-flags)
   - [Available Commands](#available-commands)
+    - [version](#version)
+    - [remote](#remote)
+      - [remote list](#remote-list)
+      - [remote new](#remote-new)
+      - [remote pull](#remote-pull)
+    - [completion](#completion)
 - [Interactive Dashboard (TUI)](#interactive-dashboard-tui)
 - [AFOS v30.1 Architect Agent (`architect_jules`) Workflows](#afos-v301-architect-agent-architect_jules-workflows)
+  - [Architectural Guardrails for Jules Sessions](#architectural-guardrails-for-jules-sessions)
+  - [Running Automated AFOS Jules Workflows](#running-automated-afos-jules-workflows)
 
 ---
 
@@ -200,4 +208,3 @@ uv run python scripts/run_jules_workflows.py --preset p0_security_hardening --pa
 # Dispatch a custom Jules session (dry-run by default; pass --execute to invoke CLI)
 uv run python scripts/run_jules_workflows.py --repo adamvangrover/adam --session "Write unit tests for PDIL gatekeeper" --parallel 1
 ```
-
