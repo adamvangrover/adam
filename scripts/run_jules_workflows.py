@@ -18,7 +18,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure repository root is in python path
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -30,8 +30,7 @@ from core.agents.architect_agent import (
     JulesSessionRequest,
 )
 
-
-AFOS_JULES_PRESETS: Dict[str, Dict[str, Any]] = {
+AFOS_JULES_PRESETS: dict[str, dict[str, Any]] = {
     "p0_security_hardening": {
         "bounded_context": "v30.1_p0_security_hardening",
         "repo": "adamvangrover/adam",
@@ -69,6 +68,14 @@ AFOS_JULES_PRESETS: Dict[str, Dict[str, Any]] = {
         ),
         "default_parallel": 1,
     },
+    "p0_remote_status_audit": {
+        "bounded_context": "v30.1_remote_status_telemetry",
+        "repo": "adamvangrover/adam",
+        "session_prompt": (
+            "Query active remote sessions status and construct W3C PROV-O audit bundle for session tracking."
+        ),
+        "default_parallel": 1,
+    },
 }
 
 
@@ -99,6 +106,7 @@ def build_parser() -> argparse.ArgumentParser:
             "remote_list_session",
             "remote_new",
             "remote_pull",
+            "remote_status",
             "completion",
         ],
         default="remote_new",
