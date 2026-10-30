@@ -17,7 +17,7 @@ spec:
       containers:
       - name: sentinel-nexus-agent
         image: adam-swarm:latest
-        command: ["python", "core/engine/swarm/entrypoint.py"]
+        command: ["python", "-m", "src.mcp_server"]
         ports:
         - containerPort: 5001
         env:
@@ -27,13 +27,45 @@ spec:
           value: "1"
         - name: PYTHONPATH
           value: "/app"
+        - name: ADAM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: adam-secrets
+              key: ADAM_API_KEY
+        - name: STS_AUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: adam-secrets
+              key: STS_AUTH_SECRET
+        livenessProbe:
+          tcpSocket:
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          tcpSocket:
+            port: 5001
+          initialDelaySeconds: 5
+          periodSeconds: 10
         volumeMounts:
         - name: config-volume
           mountPath: /etc/config
+        - name: public-keys-volume
+          mountPath: /etc/pki/afos
+          readOnly: true
+        - name: sidecar-data-volume
+          mountPath: /var/data/sidecar
       volumes:
       - name: config-volume
         configMap:
           name: adam-sidecar-config
+      - name: public-keys-volume
+        configMap:
+          name: adam-public-keys
+          optional: true
+      - name: sidecar-data-volume
+        persistentVolumeClaim:
+          claimName: adam-sidecar-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -54,3 +86,15 @@ metadata:
 data:
   sidecar.yaml: |
     agent_mode: swarm
+    log_level: info
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: adam-sidecar-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
