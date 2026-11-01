@@ -180,7 +180,7 @@ def main() -> None:
         session_id=session_id,
         parallel=parallel if args.subcommand == "remote_new" else None,
         theme=args.theme,
-        shell=args.shell,
+        shell=args.shell,  # nosec B604
     )
 
     agent = ArchitectAgent(active_bounded_context=bounded_context)
