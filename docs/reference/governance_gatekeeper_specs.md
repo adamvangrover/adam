@@ -18,5 +18,25 @@ Every output from a probabilistic agent **must** include a `provenance_trace`. T
 - **Circuit Breakers**: When implementing `aiobreaker` around critical async state updates, `CircuitBreakerError` must not be silently swallowed. It must be logged, and fallback persistence mechanisms must be engaged.
 - **SSRF Prevention**: All network calls executed for W3C governance validation must restrict destinations to HTTPS. Private IPs (`10.0.0.0/8`, `127.0.0.1`) are blocked. Test URLs should utilize `https://example.com/`.
 
+## Dynamic Provenance Trace Generation
+To construct compliant `ProvenanceHeader` traces dynamically, agents can utilize `build_provenance_header` from `src/pdil/models.py` or `GovernanceGatekeeper.create_provenance_header(data, **kwargs)`:
+
+```python
+from src.governance.gatekeeper import GovernanceGatekeeper
+
+payload = {"covenant_name": "Max Leverage", "ltv": 0.45}
+provenance_header = GovernanceGatekeeper.create_provenance_header(
+    data=payload,
+    confidence_score=0.95,
+    source_data_object="https://example.com/sec/filing"
+)
+inference_output = {
+    "provenance_trace": provenance_header,
+    "data": payload
+}
+```
+
+This helper computes the reproducible SHA-256 `content_hash` from canonical JSON serialization and injects standard W3C PROV-O properties (`wasGeneratedBy`, `generatedAtTime`, `value`, `hadPrimarySource`).
+
 ## W3C PROV-O Compliance
 To satisfy PROV-O compliance, use the `check_grounding` helper. This verifies that outputs from the probabilistic layer contain a valid reference to their source data object, strictly enforcing the Vertical engineering data flow: Data Source -> Odyssey -> Adam -> Deterministic Action.
