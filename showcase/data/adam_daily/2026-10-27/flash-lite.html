@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.1 | Market Mayhem & Fortress and Hunt (Oct 27, 2026)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' },
+                        rose: { 500: '#f43f5e', 600: '#e11d48' },
+                        emerald: { 500: '#10b981', 400: '#34d399' },
+                        cyan: { 500: '#06b6d4', 400: '#22d3ee' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Interactive Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1329; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="bg-rose-600 text-white p-2 rounded-lg font-mono font-bold text-lg leading-none shadow-lg shadow-rose-900/40">
+                ADAM
+            </div>
+            <div>
+                <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                    MARKET MAYHEM & FORTRESS AND HUNT
+                    <span class="bg-rose-500/10 text-rose-400 text-xs px-2 py-0.5 rounded border border-rose-500/20 font-mono">v30.1 CRITICAL</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">
+                    US Market Close & Global Macro Synthesis | Tuesday, Oct 27, 2026 @ 17:35 EDT
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4 text-xs font-mono">
+            <div class="bg-slate-800/80 px-3 py-1.5 rounded-md border border-slate-700/60">
+                <span class="text-slate-400">SOFR Spot:</span> <span class="text-rose-400 font-bold">3.930%</span>
+            </div>
+            <div class="bg-slate-800/80 px-3 py-1.5 rounded-md border border-slate-700/60">
+                <span class="text-slate-400">Brent:</span> <span class="text-amber-400 font-bold">$114.17</span>
+            </div>
+            <div class="bg-slate-800/80 px-3 py-1.5 rounded-md border border-slate-700/60">
+                <span class="text-slate-400">BSL Hurdle:</span> <span class="text-rose-400 font-bold">8.430%</span>
+            </div>
+            <div class="bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-md border border-emerald-500/30 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>W3C PROV-O SEALED</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 p-6 space-y-6 max-w-[1800px] mx-auto w-full">
+
+        <!-- Executive Banner / BLUF Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 relative overflow-hidden">
+                <div class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">S&P 500 Index</div>
+                <div class="text-2xl font-bold font-mono text-white flex items-baseline gap-2">
+                    7,722.60
+                    <span class="text-sm font-semibold text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.60%</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-2 font-mono">
+                    Forward ERP: <span class="text-rose-400 font-semibold">-32 bps</span> (21.4x P/E)
+                </div>
+                <div class="absolute right-3 bottom-3 opacity-10 text-4xl text-slate-100">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 relative overflow-hidden">
+                <div class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">ICE Brent Crude</div>
+                <div class="text-2xl font-bold font-mono text-amber-400 flex items-baseline gap-2">
+                    $114.17
+                    <span class="text-sm font-semibold text-rose-400"><i class="fa-solid fa-caret-down"></i> -1.42%</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-2 font-mono">
+                    Brent-WTI Arb: <span class="text-emerald-400 font-semibold">$13.37/bbl</span>
+                </div>
+                <div class="absolute right-3 bottom-3 opacity-10 text-4xl text-amber-400">
+                    <i class="fa-solid fa-oil-well"></i>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 relative overflow-hidden">
+                <div class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">US 10Y Benchmark</div>
+                <div class="text-2xl font-bold font-mono text-cyan-400 flex items-baseline gap-2">
+                    4.992%
+                    <span class="text-sm font-semibold text-rose-400">+0.4 bps</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-2 font-mono">
+                    2s10s Curve: <span class="text-emerald-400 font-semibold">+30.2 bps</span>
+                </div>
+                <div class="absolute right-3 bottom-3 opacity-10 text-4xl text-cyan-400">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 relative overflow-hidden">
+                <div class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">Overnight SOFR Spot</div>
+                <div class="text-2xl font-bold font-mono text-rose-400 flex items-baseline gap-2">
+                    3.930%
+                    <span class="text-sm font-semibold text-rose-400">+1.0 bps</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-2 font-mono">
+                    30D Avg: 3.89253% | 90D: 3.75301%
+                </div>
+                <div class="absolute right-3 bottom-3 opacity-10 text-4xl text-rose-400">
+                    <i class="fa-solid fa-scale-unbalanced"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Charts & Signal Integrity -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Chart 1: Cross-Asset Performance Delta -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-cyan-400"></i>
+                        24h Cross-Asset Delta (%)
+                    </h3>
+                    <span class="text-xs font-mono text-slate-400">Oct 27, 2026 Close</span>
+                </div>
+                <div class="flex-1 min-h-[260px] relative">
+                    <canvas id="crossAssetChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: BLTC Debt Service & Cash Flow Bleed -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-rose-400"></i>
+                        BLTC Debt Service & CADS Waterfall
+                    </h3>
+                    <span class="text-xs font-mono text-rose-400 font-semibold">DSCR: 0.992x</span>
+                </div>
+                <div class="flex-1 min-h-[260px] relative">
+                    <canvas id="dscrChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Priority Liquidation Recovery & LGD -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-amber-400"></i>
+                        Distressed Enterprise EV Recovery
+                    </h3>
+                    <span class="text-xs font-mono text-amber-400">Base 5.0x vs Stressed 4.2x</span>
+                </div>
+                <div class="flex-1 min-h-[260px] relative">
+                    <canvas id="recoveryChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section: Key Strategy Deep Dives & Matrices -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Deep Dive 1: Fortress & Hunt Asymmetric Alpha -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-crosshairs text-emerald-400"></i>
+                        Fortress & Hunt Asymmetric Alpha Sleeve (25% Sleeve)
+                    </h3>
+                    <span class="text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded">
+                        Direction Score: +0.94 / -0.94
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Long VLO -->
+                    <div class="bg-slate-950/80 border border-emerald-500/30 rounded-lg p-4 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-400 font-mono text-base">VLO (Valero)</span>
+                            <span class="text-xs font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">STRUCTURAL LONG</span>
+                        </div>
+                        <div class="text-xs text-slate-300 space-y-1">
+                            <p><strong class="text-slate-400">Price:</strong> $198.50 (+2.30%)</p>
+                            <p><strong class="text-slate-400">Catalyst:</strong> $13.37 Brent-WTI spread & global distillate tightness.</p>
+                            <p><strong class="text-slate-400">Valuation:</strong> 7.9x Fwd P/E | 15.2% FCF Yield | 96% Fixed Debt.</p>
+                        </div>
+                    </div>
+
+                    <!-- Short ATUS -->
+                    <div class="bg-slate-950/80 border border-rose-500/30 rounded-lg p-4 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-rose-400 font-mono text-base">ATUS (Altice USA)</span>
+                            <span class="text-xs font-mono bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded">STRUCTURAL SHORT</span>
+                        </div>
+                        <div class="text-xs text-slate-300 space-y-1">
+                            <p><strong class="text-slate-400">Price:</strong> $1.62 (-2.40%)</p>
+                            <p><strong class="text-slate-400">Catalyst:</strong> 8.43% BSL borrowing floor vs 7.4x leverage.</p>
+                            <p><strong class="text-slate-400">Maturity Reset:</strong> $1.9B 2026/27 resets from 5.10% to 8.75%+.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barbell Allocation Summary -->
+                <div class="bg-slate-800/50 p-3.5 rounded-lg border border-slate-700/50 text-xs font-mono flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400">75% Fortress Ballast:</span>
+                        <span class="text-white font-semibold ml-1">50% T-Bills (4.50%) + 25% AAA CLOs (SOFR+135)</span>
+                    </div>
+                    <div class="text-amber-400 font-bold">
+                        Zero Duration Risk
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Dive 2: Headline Arena 5-Day Forecast Matrix -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-amber-400"></i>
+                        Headline Arena Point Forecasts (t+5d Calibration)
+                    </h3>
+                    <span class="text-xs font-mono text-slate-400">SR 11-7 Brier Calibrated</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left font-mono">
+                        <thead class="text-slate-400 bg-slate-950 uppercase border-b border-slate-800">
+                            <tr>
+                                <th class="py-2 px-3">Target Asset</th>
+                                <th class="py-2 px-3">Spot</th>
+                                <th class="py-2 px-3 text-amber-400">Point Forecast</th>
+                                <th class="py-2 px-3">68% CI Interval</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-slate-200">
+                            <tr>
+                                <td class="py-2 px-3 font-semibold text-white">US 10Y Yield</td>
+                                <td class="py-2 px-3">4.992%</td>
+                                <td class="py-2 px-3 font-bold text-amber-400">5.080%</td>
+                                <td class="py-2 px-3 text-slate-400">[4.95%, 5.18%]</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 font-semibold text-white">Brent Crude</td>
+                                <td class="py-2 px-3">$114.17</td>
+                                <td class="py-2 px-3 font-bold text-amber-400">$118.50</td>
+                                <td class="py-2 px-3 text-slate-400">[$112.00, $123.50]</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 font-semibold text-white">Brent-WTI Spread</td>
+                                <td class="py-2 px-3">$13.37</td>
+                                <td class="py-2 px-3 font-bold text-amber-400">$14.20</td>
+                                <td class="py-2 px-3 text-slate-400">[$11.50, $16.00]</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 font-semibold text-white">S&P 500 Index</td>
+                                <td class="py-2 px-3">7,722.60</td>
+                                <td class="py-2 px-3 font-bold text-rose-400">7,540.00</td>
+                                <td class="py-2 px-3 text-slate-400">[7,460, 7,620]</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 font-semibold text-white">CDX NA HY Spread</td>
+                                <td class="py-2 px-3">410.0 bps</td>
+                                <td class="py-2 px-3 font-bold text-rose-400">435.0 bps</td>
+                                <td class="py-2 px-3 text-slate-400">[418.0, 450.0]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section: W3C PROV-O & Code Replication Tab -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-terminal text-cyan-400"></i>
+                    W3C PROV-O Lineage & Replication Code Snippet
+                </h3>
+                <div class="flex items-center gap-2 text-xs font-mono">
+                    <span class="text-slate-400">Ledger ID:</span>
+                    <span class="text-emerald-400 font-semibold">MM-V30.1-20261027-SYSCORE</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-950 p-4 rounded-lg font-mono text-xs text-slate-300 overflow-x-auto border border-slate-800/80">
+<pre class="text-emerald-400"># ADAM v30.1 Quantitative Credit Stress & QMC Tail Engine Summary
+{
+  "wasGeneratedBy": "ADAM-v30.1-NeuroSymbolic-Core",
+  "generatedAtTime": "2026-10-27T17:35:00-04:00",
+  "clearing_metrics": {
+    "spx_close": 7722.60, "dow_close": 52377.57, "nasdaq_close": 26477.81,
+    "sofr_spot_pct": 3.930, "us10y_yield": 4.992, "brent_usd": 114.17
+  },
+  "quantitative_credit_stress": {
+    "total_debt_m": 2500.0, "gross_leverage_x": 8.93,
+    "y1_cash_fcf_dscr_x": 0.992, "net_fcf_bleed_m": -1.45,
+    "cumulative_3y_pd_base_pct": 54.32, "qmc_99th_pd_pct": 68.40
+  }
+}</pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/60 px-6 py-4 text-xs font-mono text-slate-500 flex flex-wrap justify-between items-center gap-2">
+        <div>
+            © 2026 ADAM OS v30.1 | Neuro-Symbolic Risk Engine | W3C PROV-O & SR 11-7 Calibrated
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> System Operational</span>
+            <span>Security Governance: Active</span>
+        </div>
+    </footer>
+
+    <!-- Interactive Charts Initialization Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Chart 1: Cross-Asset Performance Delta
+            const ctx1 = document.getElementById('crossAssetChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['IXIC', 'RUT', 'SPX', 'BTC', 'Gold', 'DJI', 'WTI', 'Brent'],
+                    datasets: [{
+                        label: '24h % Delta',
+                        data: [1.18, 1.16, 0.60, 0.33, 0.30, 0.03, -0.80, -1.42],
+                        backgroundColor: [
+                            '#10b981', '#10b981', '#34d399', '#22d3ee', '#fbbf24', '#94a3b8', '#f43f5e', '#e11d48'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Debt Service Coverage Waterfall
+            const ctx2 = document.getElementById('dscrChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['CADS', 'Floating Int', 'Fixed Int', 'Amort', 'Year 1 DS', 'Net Bleed'],
+                    datasets: [{
+                        label: 'USD ($M)',
+                        data: [190.0, 126.45, 50.0, 15.0, 191.45, -1.45],
+                        backgroundColor: ['#10b981', '#38bdf8', '#818cf8', '#a78bfa', '#f59e0b', '#f43f5e'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Enterprise EV Recovery
+            const ctx3 = document.getElementById('recoveryChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Senior Term Loan B ($1,400M)', 'Senior Notes Impairment ($1,000M)', 'Equity Wipeout'],
+                    datasets: [{
+                        data: [1400, 1000, 100],
+                        backgroundColor: ['#10b981', '#f43f5e', '#334155'],
+                        borderWidth: 2,
+                        borderColor: '#0b1329'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
