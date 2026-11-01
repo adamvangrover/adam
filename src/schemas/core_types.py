@@ -1,9 +1,9 @@
-import json
 import hashlib
-from typing import Any, Dict
+import json
+from typing import Any
+
 from pydantic import BaseModel, Field
-import hashlib
-import json
+
 from src.pdil.models import ProvenanceHeader
 
 
@@ -19,7 +19,7 @@ def compute_deterministic_hash(data: dict) -> str:
 
 class AgentInput(BaseModel):
     """Deterministic input data and context for agent execution."""
-    data: Dict[str, Any] = Field(..., description='Deterministic input data')
+    data: dict[str, Any] = Field(..., description='Deterministic input data')
     context: str = Field('', description='Additional context for the agent')
 
 
@@ -29,7 +29,7 @@ class AgentOutput(BaseModel):
     Provides strict type checking across all agents (Nexus/Sentinel) for horizontal scaling.
     """
     provenance_trace: ProvenanceHeader
-    data: Dict[str, Any] = Field(..., description=
+    data: dict[str, Any] = Field(..., description=
         'Deterministic output payload')
     observed_drift: bool = Field(False, description=
         'Flag indicating if logic shifted from existing implementation, triggers self-healing'
