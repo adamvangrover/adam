@@ -141,6 +141,20 @@ exclude = [
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "ANN", "C90", "N", "UP", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# Path B / Test suites: Relax strict annotations, line lengths, and assertion checks
+"tests/**/*" = ["ANN", "E501", "B011", "RUF012"]
+"**/tests/**/*" = ["ANN", "E501", "B011", "RUF012"]
+# Automation & CLI maintenance scripts: Allow procedural scripting and long lines
+"scripts/**/*" = ["ANN", "E501", "C901"]
+"ops/**/*" = ["ANN", "E501", "C901"]
+# Web mockups, showcases, and research verticals
+"showcase/**/*" = ["ANN", "E501", "C901", "F401"]
+"verticals/**/*" = ["ANN", "E501", "C901", "F401"]
+"mockups/**/*" = ["ANN", "E501", "C901", "F401"]
+# Package init exports: Allow clean re-exports
+"**/__init__.py" = ["F401", "F403"]
+
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
