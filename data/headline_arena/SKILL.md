@@ -52,4 +52,12 @@ Never use `dispatch --dispatch-confirmed` for live sends: it regenerates forecas
 - Dispatch no longer stages fake `challenge-*-prospective` IDs when 0 challenges are open (opt in: `HA_PROSPECTIVE=1`). Never submit those.
 - Rationale template is now grounded (SIGNAL / METHOD / RISKS). It cites only computed values (last-3 path, flow, vol, dyn20 neutral prior, dead zone, median move) and states that no live order-flow, filing or rates data are used. 210-212 words.
 - Backtest v2 (749 calls) adopted: rev0.8 + dyn20 + nmargin 0. Shadow (24 calls): all top variants 37.5% hit; calibrated beats fixed on Brier.
+- Workspace is outside the sandbox when no active workspace is set, so commands need bypass approval.
 - R 2026-10-27 submitted 12/12 (`round_20261027_live_dispatch_results.json`); 288 shadow rows logged.
+
+## Updates 2026-11-03
+- PROD_FLOW switched rev0.8 -> mom0.4 (shadow, 35 calls: 48.6% / Brier 0.626 vs 34.3% / 0.709). The 749-call backtest leaned toward reversion, so keep shadowing; revert if mom underperforms over the next ~36 calls.
+- Sunday opens: CME challenges reject with HTTP 400 "Baseline price unavailable" until open_price is set (after 23:00 UTC). Stage only after the open_price fields are non-null, otherwise forecasts use stale fallback prices.
+- `submit_staged --skip-done <audit.json>` retries only rejected challenges. Retry immediately in-session; timers can fire hours late.
+- `learn` with no args ingests every *_dispatch_results.json (idempotent).
+- Since DST ended, CME challenges close at 15:00 UTC (10:00 ET); PALM still closes at 02:00 UTC.
