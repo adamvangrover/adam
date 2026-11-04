@@ -22,26 +22,30 @@ Adam v30.1-R is architected as a **Unified Financial Operating System**, fusing 
 
 Directly sourced from the collective Agent Knowledge Base (`docs/AGENTS_KNOWLEDGE_BASE.md`).
 
-### P0: Security Hardening (Sentinel)
-- [ ] **Audit `importlib` Usage:** Grep for dynamic imports and restrict them.
-- [ ] **Fix SQL Injection:** Replace all `f"SELECT ... {var}"` with parameterized queries.
-- [ ] **Secure `pickle`:** Verify no other `pickle.load` exist outside `technical_analysis.py`.
-- [ ] **API Auth:** Implement Middleware for `/api/agents` and `/api/simulations`.
+### P0: Security & Zero-Trust Enforcement (Sentinel)
+- [x] **AFOS V3 Zero-Trust Ingestion Gateway:** Implemented mTLS (TLSv1.3), 15-min ECDSA STS tokens, W3C PROV-O SHA-256 bit-mismatch quarantine, and 3-feed 0.5sigma consensus with 75/25 Barbell LOCKDOWN circuit breaker.
+- [x] **Audit `importlib` & Secure `pickle`:** Replaced `pickle.load` / `pickle.loads` with `core.security.safe_unpickler` and restricted dynamic imports.
+- [x] **Fix SQL Injection:** Replaced `f"SELECT ... {var}"` with parameterized queries, tokenizer SELECT validation, and `sqlite3.set_authorizer`.
+- [x] **SSRF Redirect & Jinja2 XSS Prevention:** Disabled automatic redirects in `SecurityGovernanceGatekeeper` and enabled `autoescape=True` in `build_dashboard.py`.
+- [x] **API Auth & Adaptive JWT Fallback:** Enforced `X-API-Key` and Adaptive JWT fallback across command endpoints.
+- [ ] **Continuous `importlib` & `pickle` CI Gate:** Enforce automated CI gate blocking any new `pickle.load` or unwhitelisted `importlib.import_module` across `core/` and `src/`.
 
-### P1: Architectural Refactoring (Bolt)
-- [ ] **Merge Graph Classes:** Consolidate `core/engine` and `core/v23_graph_engine` versions of `UnifiedKnowledgeGraph`.
-- [x] **Deduplicate Scrubbers:** Unified `GoldStandardArtifact` and `GoldStandardScrubber` in `core/data_processing/utils.py`.
-- [x] **Multi-State Reasoning Grader:** Added `evals/graders/multi_state_reasoning_evaluator.py` evaluating trace fidelity, fact insertion F1, reasoning rubrics, and Expected Calibration Error.
-- [x] **Archive Graph PoCs:** Moved `experimental/v23_prototypes/v23_graph_engine` to `archive/v23_prototypes/` (superseded by `core/engine/cyclical_reasoning_graph.py`).
-- [ ] **Deduplicate Scrubbers:** Merge `utils.py` and `universal_ingestor.py` logic.
-- [ ] **Fix Async Loggers:** Ensure all Swarm agents use append mode.
+### P1: Kernel, Architecture & Performance (Bolt)
+- [x] **ADAM-IAK-CORE Primitives (`src/iak/`):** Remediated `DtypeSafeMaskedEntmaxSoftmax`, `UncertaintyGatedCRFSlotDecoder`, and `DeterministicPolicyEpistemicGate`.
+- [x] **Pre-Compiled JSONSchema & Vectorized DataFrames:** Eliminated `df.iterrows()` in `WhaleScanner`/`DataFetcher` and pre-compiled `jsonschema` validators in `eval_001a_verifier.py`.
+- [x] **Deduplicate Scrubbers & Archive Graph PoCs:** Unified `GoldStandardArtifact` and `GoldStandardScrubber` in `core/data_processing/utils.py`; moved `experimental/v23_prototypes/v23_graph_engine` to `archive/v23_prototypes/`.
+- [x] **Multi-State Reasoning Grader:** Added `evals/graders/multi_state_reasoning_evaluator.py` evaluating trace fidelity, fact insertion F1, reasoning rubrics, and ECE.
+- [x] **Fix Async & Append-Only Loggers:** Ensured all Swarm and Jules agents use append mode (`open(..., 'a')`).
+- [ ] **Consolidate Legacy Graph Imports:** Complete migration of remaining `core/v23_graph_engine` references into `core/engine/unified_knowledge_graph.py`.
+- [ ] **Complete Scrubber Consolidation:** Merge any remaining duplicate text-cleaning logic in `universal_ingestor.py` into `core/data_processing/utils.py`.
 
-### P2: UX Improvements (Palette)
-- [ ] **Accessibility Audit:** Run a linter/audit on `services/webapp/client` for `aria-` attributes.
-- [ ] **Debounce Inputs:** Check all `onChange` handlers for range sliders/search inputs.
+### P2: UX & Accessibility (Palette)
+- [x] **Debounce Inputs & Split Fuse.js Memoization:** Debounced simulation range sliders and separated Fuse.js index instantiation from search execution.
+- [x] **Daily Hub Index Synchronization:** Updated `showcase/adam_daily_hub_index.html` and provenance checks in `ops/checks/check_provenance.py`.
+- [ ] **ARIA Live & Roving TabIndex Audit:** Run a full accessibility audit across `services/webapp/client` to verify `role="log"`, `aria-live="polite"`, keyboard roving `tabIndex`, and stable UUID keys across all streaming widgets.
 
-### P3: Documentation & Housekeeping
-- [ ] **Update Tutorials:** Ensure `docs/tutorials/` reflect these new mandates.
+### P3: Documentation & Governance Housekeeping
+- [x] **Update Tutorials & PDIL Mapping:** Added `docs/architecture/PDIL_MAPPING.md`, `docs/jules_tools_reference.md`, and `docs/how-to/using_jules_cli_ide_sdk.md`.
 
 ## 🤖 Async Tasks, Agents, & Swarms
 
