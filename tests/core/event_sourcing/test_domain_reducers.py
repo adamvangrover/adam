@@ -1,3 +1,4 @@
+# ruff: noqa
 """
 Tests for Domain Models and Reducers in the Event Sourcing Core.
 """
@@ -8,10 +9,10 @@ from src.core.event_sourcing.domain import SecurityState, MarketState
 from src.core.event_sourcing.reducers import security_reducer, market_reducer
 
 @pytest.fixture
-def ledger():
+def ledger() -> EventLedger:
     return EventLedger()
 
-def test_security_lifecycle_replay(ledger):
+def test_security_lifecycle_replay(ledger: EventLedger) -> None:
     """Test the complete lifecycle of a security via event replay."""
     ticker = "NVDA"
 
@@ -95,7 +96,7 @@ def test_security_lifecycle_replay(ledger):
     assert final_state.news_sentiment_aggregate == 0.8
     assert final_state.last_trading_volume == 50000
 
-def test_market_state_replay(ledger):
+def test_market_state_replay(ledger: EventLedger) -> None:
     """Test macro condition events updating the MarketState."""
     market_id = "global_market"
 
@@ -132,7 +133,7 @@ def test_market_state_replay(ledger):
     assert final_state.indicators["CPI"] == 5.4
     assert final_state.indicators["Fed Funds Rate"] == 4.5
 
-def test_invalid_payload_skipped(ledger):
+def test_invalid_payload_skipped(ledger: EventLedger) -> None:
     """Test that an event with an invalid payload for its type is caught and doesn't break replay."""
     ticker = "AAPL"
 

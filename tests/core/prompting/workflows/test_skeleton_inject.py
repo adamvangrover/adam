@@ -1,3 +1,4 @@
+# ruff: noqa
 import sys
 import os
 import unittest
@@ -10,8 +11,8 @@ sys.path.append(os.getcwd())
 from core.prompting.workflows.skeleton_inject import SkeletonInjectWorkflow, JSONFileFetcher
 
 class MockLLMClient:
-    def generate(self, messages):
-        content = ""
+    def generate(self, messages: list[dict]) -> str:
+
         user_content = ""
         for m in messages:
             if m["role"] == "user":
@@ -39,7 +40,7 @@ Top-line performance was grew modestly year-over-year, settling at $12.4B. This 
         return "Unknown Prompt"
 
 class TestSkeletonInjectWorkflow(unittest.TestCase):
-    def test_workflow_execution_with_critique(self):
+    def test_workflow_execution_with_critique(self) -> None:
         print("Initializing Skeleton & Inject Workflow Test (Full Flow)...")
 
         mock_llm = MockLLMClient()
