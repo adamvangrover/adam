@@ -1,5 +1,5 @@
-import pathlib
 # ruff: noqa
+import pathlib
 import csv
 import json
 

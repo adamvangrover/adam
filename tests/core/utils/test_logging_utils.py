@@ -1,5 +1,5 @@
-# ruff: noqa
 import typing
+# ruff: noqa
 import pytest
 import os
 import json
