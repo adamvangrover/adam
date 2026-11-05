@@ -61,3 +61,8 @@ Never use `dispatch --dispatch-confirmed` for live sends: it regenerates forecas
 - `submit_staged --skip-done <audit.json>` retries only rejected challenges. Retry immediately in-session; timers can fire hours late.
 - `learn` with no args ingests every *_dispatch_results.json (idempotent).
 - Since DST ended, CME challenges close at 15:00 UTC (10:00 ET); PALM still closes at 02:00 UTC.
+
+## Updates 2026-11-04 (backtest v3, 870 calls)
+- Momentum (mom0.4) is the WORST flow over full history (39.2% hit, Brier 0.688, last-240 33.8%). Its 47-call shadow lead was noise. Lesson: do not switch production on fewer than ~100 shadow calls when it contradicts the long walk-forward test.
+- Production is now `("assetw", 0.8, 40)`: per asset, follow the momentum or reversion rule, whichever hit more over that asset's last 40 settlements, with scale shrunk by the size of that edge. 43.9% hit, Brier 0.662 (rev0.8: 43.0%, Brier 0.661 – effectively tied).
+- v3 grid (12 variants, dyn20, nm0) is now the shadow set. Backups: backtest_v2_backup.py, dispatch_mom_backup.py.
