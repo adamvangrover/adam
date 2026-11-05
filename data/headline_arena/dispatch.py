@@ -160,8 +160,8 @@ def run_harness(
     active_work_items = []
     if raw_challenges:
         # Backtested flow rule (2026-10-14): reversion x0.8 on mean of last 3 settlements
-        from .backtest import fetch_history, series, flow_for, pct, neutral_prior_for
-        PROD_FLOW = ("rev", 0.8)
+        from .backtest import fetch_history, series, flow_for, pct, neutral_prior_for, rule_score
+        PROD_FLOW = ("assetw", 0.8, 40)  # 2026-11-04 v3 backtest (870 calls): per-asset mom/rev selection; 43.9% hit, Brier 0.662
         try:
             hist = series(fetch_history(refresh=True))
             print(f"  ✓ Settlement history loaded for flow rule {PROD_FLOW} ({sum(len(v) for v in hist.values())} rows)")
@@ -204,17 +204,18 @@ def run_harness(
             prior = hist.get(profile.ticker, [])
             if len(prior) >= 3:
                 flow = flow_for(prior, PROD_FLOW)
+                _m, _r = rule_score(prior, PROD_FLOW[2])
                 path = ", ".join(f"{pct(x):+.2f}%" if x.get("open_price") else x["result"] for x in prior[-3:])
                 profile.order_flow_imbalance = flow
                 profile.neutral_prior = neutral_prior_for(prior)  # backtest v2: dyn20
                 profile.prior_settlement_trend = prior[-1]["result"]
                 profile.primary_catalyst = (
                     f"the last three settlements ({path}, latest {prior[-1]['event_id'][-8:]}) feeding a "
-                    f"backtested mean-reversion flow of {flow:+.2f}."
+                    f"per-asset {'momentum' if _m > _r else 'reversion' if _r > _m else 'neutral (tied)'} flow of {flow:+.2f}."
                 )
                 profile.indicator_divergence = (
-                    f"walk-forward testing over 749 resolved calls favoured fading the recent move over extending it, "
-                    f"though the edge is small and the latest session settled {prior[-1]['result']}."
+                    f"over its last 40 settlements a follow-the-trend rule hit {_m} times and a fade-the-trend rule {_r} times, so the flow follows the better rule, "
+                    f"scaled by the size of that edge (870-call walk-forward test: 43.9% hit); the latest session settled {prior[-1]['result']}."
                 )
             deadline = c.get("deadline", "2026-10-06T14:00:00Z")
             criteria = c.get("resolution_criteria") or f"Exchange Session Change vs Open (Dead Zone ±{dz:.2f}%)"
