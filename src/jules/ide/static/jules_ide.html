@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jules Agent Workbench & Web IDE - ADAM OS</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --border-color: #334155;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --success-color: #22c55e;
+            --code-bg: #090d16;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; background: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; }
+
+        header { background: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.2rem; font-weight: bold; color: var(--accent-color); display: flex; align-items: center; gap: 8px; }
+        .badge { background: #0284c7; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+
+        .controls { display: flex; gap: 12px; align-items: center; }
+        select, input, button { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; }
+        button { background: var(--accent-color); color: #000; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: var(--accent-hover); color: white; }
+
+        .container { flex: 1; display: flex; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 10px 15px; font-weight: bold; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); color: var(--text-muted); text-transform: uppercase; }
+        .file-tree { flex: 1; overflow-y: auto; padding: 10px; font-size: 0.85rem; }
+        .file-item { padding: 4px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-item:hover { background: var(--border-color); }
+
+        /* Main Workspace */
+        .workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .nav-tabs { display: flex; background: var(--panel-bg); border-bottom: 1px solid var(--border-color); }
+        .tab-btn { padding: 10px 20px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); border-radius: 0; font-weight: normal; }
+        .tab-btn.active { color: var(--accent-color); border-bottom-color: var(--accent-color); font-weight: bold; }
+
+        .tab-content { flex: 1; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .tab-content.active { display: flex; }
+
+        /* Console & Chat */
+        .chat-box { flex: 1; background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; overflow-y: auto; margin-bottom: 15px; font-family: monospace; }
+        .message { margin-bottom: 12px; }
+        .message.user { color: var(--accent-color); }
+        .message.assistant { color: #e2e8f0; }
+
+        .input-row { display: flex; gap: 10px; }
+        .input-row input { flex: 1; font-size: 1rem; }
+
+        /* Plan & Audit Cards */
+        .plan-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .plan-card h3 { font-size: 1rem; color: var(--accent-color); margin-bottom: 10px; }
+
+        /* Code Editor */
+        textarea.editor { width: 100%; flex: 1; background: var(--code-bg); color: #e2e8f0; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; font-family: monospace; font-size: 0.95rem; resize: none; }
+
+        .audit-entry { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 0.85rem; font-family: monospace; }
+        .status-ok { color: var(--success-color); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            🤖 Jules Agent Workbench <span class="badge">ADAM OS v30.1</span>
+        </div>
+        <div class="controls">
+            <label for="provider-select" style="font-size: 0.85rem; color: var(--text-muted);">Provider:</label>
+            <select id="provider-select">
+                <option value="mock">Mock Offline Engine</option>
+                <option value="ollama">Ollama (Local)</option>
+                <option value="openai">OpenAI API</option>
+                <option value="anthropic">Anthropic API</option>
+            </select>
+            <button onclick="refreshStatus()">System Status</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar File Explorer -->
+        <div class="sidebar">
+            <div class="sidebar-header">Workspace Files</div>
+            <div class="file-tree" id="file-tree">
+                <div class="file-item" onclick="loadFile('.')">📁 . (Root)</div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('chat-tab')">Agent Workbench & Chat</button>
+                <button class="tab-btn" onclick="switchTab('editor-tab')">Code Editor</button>
+                <button class="tab-btn" onclick="switchTab('audit-tab')">W3C PROV-O Audit Stream</button>
+            </div>
+
+            <!-- Tab 1: Chat & Task Console -->
+            <div id="chat-tab" class="tab-content active">
+                <div class="plan-card" id="plan-container">
+                    <h3>Current Plan</h3>
+                    <div id="plan-list" style="color: var(--text-muted); font-size: 0.9rem;">No active task plan. Enter a request below.</div>
+                </div>
+
+                <div class="chat-box" id="chat-box">
+                    <div class="message assistant">🤖 Jules: Hello! I am your self-contained AI assistant inside ADAM OS. How can I help you today?</div>
+                </div>
+
+                <div class="input-row">
+                    <input type="text" id="user-input" placeholder="Enter task prompt or message for Jules..." onkeydown="if(event.key==='Enter') sendTask()">
+                    <button onclick="sendTask()">Run Task</button>
+                    <button onclick="sendChat()" style="background: var(--border-color); color: white;">Chat Only</button>
+                </div>
+            </div>
+
+            <!-- Tab 2: Editor -->
+            <div id="editor-tab" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span id="editing-filename" style="font-weight: bold; font-family: monospace;">No file opened</span>
+                    <button onclick="saveCurrentFile()">Save File</button>
+                </div>
+                <textarea id="file-editor" class="editor" placeholder="Select a file from the left sidebar to edit..."></textarea>
+            </div>
+
+            <!-- Tab 3: Audit Stream -->
+            <div id="audit-tab" class="tab-content">
+                <h3 style="margin-bottom: 15px; color: var(--accent-color);">W3C PROV-O Tool Execution Audit Stream</h3>
+                <div id="audit-stream" style="flex: 1; overflow-y: auto;">
+                    <div class="audit-entry">No tool calls logged yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "";
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function refreshStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/api/status`);
+                const data = await res.json();
+                alert(`Jules Status: ${data.status}\nProvider: ${data.provider}\nModel: ${data.model}\nRegistered Tools: ${data.tools.length}`);
+            } catch (e) {
+                alert("Server error: " + e.message);
+            }
+        }
+
+        async function loadFileList(path = ".") {
+            try {
+                const res = await fetch(`${API_BASE}/api/files?path=${encodeURIComponent(path)}`);
+                const data = await res.json();
+                const tree = document.getElementById('file-tree');
+                if (data.status === 'success' && Array.isArray(data.result)) {
+                    tree.innerHTML = data.result.map(f => `<div class="file-item" onclick="loadFile('${f}')">📄 ${f}</div>`).join('');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadFile(filepath) {
+            try {
+                const res = await fetch(`${API_BASE}/api/file?filepath=${encodeURIComponent(filepath)}`);
+                const data = await res.json();
+                if (data.status === 'success') {
+                    document.getElementById('file-editor').value = data.result;
+                    document.getElementById('editing-filename').innerText = filepath;
+                    switchTab('editor-tab');
+                }
+            } catch (e) {
+                alert("Error loading file: " + e.message);
+            }
+        }
+
+        async function saveCurrentFile() {
+            const filepath = document.getElementById('editing-filename').innerText;
+            const content = document.getElementById('file-editor').value;
+            if (!filepath || filepath === 'No file opened') return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/file`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({filepath, content})
+                });
+                const data = await res.json();
+                alert("File saved successfully!");
+            } catch (e) {
+                alert("Error saving file: " + e.message);
+            }
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMessage('user', `User: ${msg}`);
+            input.value = '';
+            const provider = document.getElementById('provider-select').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg, provider})
+                });
+                const data = await res.json();
+                appendMessage('assistant', `🤖 Jules: ${data.reply}`);
+            } catch (e) {
+                appendMessage('assistant', `⚠️ Error: ${e.message}`);
+            }
+        }
+
+        async function sendTask() {
+            const input = document.getElementById('user-input');
+            const prompt = input.value.trim();
+            if (!prompt) return;
+
+            appendMessage('user', `🚀 Task Request: ${prompt}`);
+            input.value = '';
+            const provider = document.getElementById('provider-select').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/run`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt, provider})
+                });
+                const data = await res.json();
+
+                // Update Plan
+                const planList = document.getElementById('plan-list');
+                if (data.plan && data.plan.length > 0) {
+                    planList.innerHTML = data.plan.map(step => `<div style="margin-bottom: 4px;">✅ ${step}</div>`).join('');
+                }
+
+                appendMessage('assistant', `🤖 Task Completed!\nStatus: ${data.status}\nSteps Executed: ${data.plan ? data.plan.length : 0}`);
+
+                // Update Audit stream
+                if (data.audit_log) {
+                    const auditStream = document.getElementById('audit-stream');
+                    auditStream.innerHTML = data.audit_log.map(entry => `
+                        <div class="audit-entry">
+                            <span class="status-ok">[PROV-O AUDIT]</span> ${entry.timestamp} | Tool: <b>${entry.tool_name}</b> | Status: ${entry.result_status}
+                            <br><small style="color: var(--text-muted);">${entry.context_provenance}</small>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                appendMessage('assistant', `⚠️ Execution Error: ${e.message}`);
+            }
+        }
+
+        function appendMessage(role, text) {
+            const chatBox = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Initialize on load
+        loadFileList();
+    </script>
+</body>
+</html>

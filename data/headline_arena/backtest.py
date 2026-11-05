@@ -28,7 +28,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .analytics import ASSET_UNIVERSE, AnalyticalUpgradePipeline
-from .confidence import map_confidence
+from .confidence import choose_direction, map_confidence
 from .deliberation import MultiAgentDeliberationEngine
 from .learn import brier
 
@@ -41,13 +41,34 @@ S.mount("https://", HTTPAdapter(max_retries=Retry(total=4, backoff_factor=2,
         status_forcelist=(429, 500, 502, 503, 504), allowed_methods=frozenset(["GET"]))))
 
 LOOKBACK = 3
-FLOWS = [("zero", 0.0)] + [(m, s) for m in ("mom", "rev") for s in (0.15, 0.4, 0.8)]
-BANDS = ["absolute", "relative"]
-TRACKS = {"fixed": None, "cal_K4_r1.2": (4, 1.2), "cal_K10_r1.0": (10, 1.0)}
-VARIANTS = [dict(flow=f, band=b, track=t) for f, b, t in itertools.product(FLOWS, BANDS, TRACKS)]
+FLOWS = [("zero", 0.0), ("mom", 0.4), ("rev", 0.4), ("rev", 0.8)]
+BANDS = ["absolute"]                       # v1: abs vs rel showed no material difference
+TRACKS = {"cal_K10_r1.0": (10, 1.0)}       # v1 winner
+NPRIORS = ["static", "dyn20"]               # ticker table vs empirical neutral rate (last 20)
+NMARGINS = [0.0, 0.05, 0.10]                # call neutral if within margin of top outcome
+# v3 (2026-11-04): blends + per-asset rule selection. nprior/nmargin fixed at v2 winners (dyn20, 0).
+#   mom1/rev1  = last settlement only;  tdiff = last-1 trend minus last-5 trend (short vs long)
+#   asset,s,w  = per asset, pick mom or rev by which naive rule hit more over its last w settlements
+#   assetw     = as asset, but scale shrinks with the size of that per-asset edge
+FLOWS = [("zero", 0.0), ("mom", 0.4), ("rev", 0.8), ("mom1", 0.4), ("rev1", 0.8), ("tdiff", 0.6),
+         ("asset", 0.4, 10), ("asset", 0.4, 20), ("asset", 0.8, 20), ("asset", 0.8, 40),
+         ("assetw", 0.8, 20), ("assetw", 0.8, 40)]
+NPRIORS, NMARGINS = ["dyn20"], [0.0]
+VARIANTS = [dict(flow=f, band=b, track=t, nprior=n, nmargin=m)
+            for f, b, t, n, m in itertools.product(FLOWS, BANDS, TRACKS, NPRIORS, NMARGINS)]
 
 
-def vname(v):  return f"{v['flow'][0]}{v['flow'][1]:g}|{v['band'][:3]}|{v['track']}"
+def vname(v):
+    return (f"{v['flow'][0]}{v['flow'][1]:g}{'w%d' % v['flow'][2] if len(v['flow']) > 2 else ''}|{v['band'][:3]}|{v['track']}"
+            f"|{v.get('nprior', 'static')}|nm{v.get('nmargin', 0.0):g}")
+
+
+def neutral_prior_for(prior: list[dict], n: int = 20):
+    """Smoothed empirical neutral rate over the last n settlements (walk-forward safe)."""
+    rs = prior[-n:]
+    if len(rs) < 5:
+        return None
+    return round((sum(c["result"] == "neutral" for c in rs) + 1) / (len(rs) + 3), 3)
 
 
 # ── data ────────────────────────────────────────────────────────────────
@@ -77,36 +98,66 @@ def pct(c):
 
 
 def series(rows):
+    """Per-asset chronological series. Skips non-dated event_ids (legacy UUID-format
+    challenges sort incorrectly and carry stale prices)."""
     s = defaultdict(list)
     for c in rows:
-        s[c["asset"]].append(c)
+        if (c.get("event_id") or "")[-8:].isdigit():
+            s[c["asset"]].append(c)
     return s
 
 
+def _sig(prior, lb):
+    xs = prior[-lb:]
+    return math.tanh(sum(pct(c) for c in xs) / len(xs)) if xs else 0.0
+
+
+def rule_score(prior, window, lb=LOOKBACK):
+    """Walk-forward safe: (mom-rule hits, rev-rule hits) over this asset's last `window` settlements."""
+    m = r = 0
+    for j in range(max(lb, len(prior) - window), len(prior)):
+        s = sum(pct(c) for c in prior[j - lb:j])
+        if not s:
+            continue
+        res, up = prior[j]["result"], s > 0
+        m += res == ("bullish" if up else "bearish")
+        r += res == ("bearish" if up else "bullish")
+    return m, r
+
+
 def flow_for(prior: list[dict], cfg) -> float:
-    mode, scale = cfg
+    mode, scale = cfg[0], cfg[1]
     if mode == "zero" or not prior:
         return 0.0
-    sig = math.tanh(sum(pct(c) for c in prior[-LOOKBACK:]) / len(prior[-LOOKBACK:]))
-    return round((1 if mode == "mom" else -1) * scale * sig, 4)
+    if mode in ("mom1", "rev1"):
+        sign, sig = (1 if mode == "mom1" else -1), _sig(prior, 1)
+    elif mode == "tdiff":
+        sign, sig = 1, _sig(prior, 1) - _sig(prior, 5)
+    elif mode in ("asset", "assetw"):
+        m, r = rule_score(prior, cfg[2])
+        if m + r == 0 or m == r:
+            return 0.0
+        edge = (m - r) / (m + r)
+        sign, sig = (1 if edge > 0 else -1), _sig(prior, LOOKBACK)
+        if mode == "assetw":
+            scale *= min(1.0, 2 * abs(edge))
+    else:
+        sign, sig = (1 if mode == "mom" else -1), _sig(prior, LOOKBACK)
+    return round(sign * scale * sig, 4)
 
 
 # ── core ────────────────────────────────────────────────────────────────
 ENGINE = MultiAgentDeliberationEngine(AnalyticalUpgradePipeline())
 
 
-def probs_for(cid, asset, open_px, dz, flow):
+def probs_for(cid, asset, open_px, dz, flow, npi=None):
     base = ASSET_UNIVERSE[asset]
     prof = dataclasses.replace(base, current_indicated_price=open_px or base.current_indicated_price,
                                last_settlement_price=open_px or base.last_settlement_price,
-                               dead_zone_pct=dz, order_flow_imbalance=flow)
+                               dead_zone_pct=dz, order_flow_imbalance=flow, neutral_prior=npi)
     core = ENGINE.simulate_probabilities(cid, prof)
     p = {k: core[k] for k in ("bull", "neutral", "bear")}
-    if p["neutral"] >= p["bull"] and p["neutral"] >= p["bear"]:
-        d = "neutral"
-    else:
-        d = "bullish" if p["bull"] > p["bear"] else "bearish"
-    return d, p, core["median_move"]
+    return p, core["median_move"]
 
 
 class Track:
@@ -130,17 +181,24 @@ class Track:
         self.rows[asset].append((hit, conf))
 
 
-def predict(v, c, prior, track, pcache):
+def predict(v, c, prior, track, pcache, use_file=False):
     flow = flow_for(prior, v["flow"])
-    key = (c["id"], flow)
+    npi = neutral_prior_for(prior) if v.get("nprior") == "dyn20" else None
+    key = (c["id"], flow, npi)
     if key not in pcache:
-        pcache[key] = probs_for(c["id"], c["asset"], c.get("open_price"), c["dead_zone_pct"] or 0.3, flow)
-    d, p, mm = pcache[key]
-    cal = track.calib(c["asset"]) if track else None
-    dec = map_confidence(c["asset"], d, p, mm, c["dead_zone_pct"] or 0.3,
-                         mode="fixed" if track is None else "auto",
-                         params={"band_rule": v["band"], "rel_max": TRACKS[v["track"]][1] if track else 1.2},
-                         calib_override=cal if track else None)
+        pcache[key] = probs_for(c["id"], c["asset"], c.get("open_price"), c["dead_zone_pct"] or 0.3, flow, npi)
+    p, mm = pcache[key]
+    d = choose_direction(p, v.get("nmargin", 0.0))
+    K = TRACKS[v["track"]]
+    if K is None:
+        mode, override = "fixed", None
+    elif use_file:
+        mode, override = "auto", None               # live calibration.json (shadow)
+    else:
+        mode, override = "auto", (track.calib(c["asset"]) or {})  # walk-forward only
+    dec = map_confidence(c["asset"], d, p, mm, c["dead_zone_pct"] or 0.3, mode=mode,
+                         params={"band_rule": v["band"], "rel_max": K[1] if K else 1.2},
+                         calib_override=override)
     return d, dec.confidence, dec.tier, flow
 
 
@@ -157,8 +215,8 @@ def backtest(rows):
         for d8 in dates:
             day = []
             for c in (x for x in rows if x["event_id"][-8:] == d8 and x["asset"] in ASSET_UNIVERSE):
-                i = idx[c["id"]]
-                if i < LOOKBACK:
+                i = idx.get(c["id"])
+                if i is None or i < LOOKBACK:
                     continue
                 dirn, conf, tier, flow = predict(v, c, ser[c["asset"]][:i], track, pcache)
                 day.append((c, dirn, conf, tier))
@@ -195,6 +253,7 @@ def metrics(preds):
         "selective_share": round(len(sel) / n, 3),
         "hit_selective": round(mean([p[0] for p in sel]), 3) if sel else None,
         "neutral_calls": round(sum(p[3] == "neutral" for p in preds) / n, 3),
+        "hit_recent": round(mean([p[0] for p in preds[-240:]]), 3),  # last ~20 sessions
         "tier_hit": {t: [len(v), round(mean(v), 3)] for t, v in sorted(tiers.items())},
     }
 
@@ -211,11 +270,7 @@ def shadow(rows):
                 continue
             prior = ser.get(c["asset"], [])
             for v in VARIANTS:
-                K = TRACKS[v["track"]]
-                track = None
-                if K:  # seed walk-forward track from this variant's backtest-style history is costly;
-                    track = Track(K[0])  # shadow uses live calibration.json via auto mode instead
-                dirn, conf, tier, flow = predict(v, c, prior, None if not K else track, {})
+                dirn, conf, tier, flow = predict(v, c, prior, None, {}, use_file=True)
                 f.write(json.dumps({"tag": tag, "variant": vname(v), "challenge_id": c["id"],
                                     "asset": c["asset"], "direction": dirn, "confidence": conf,
                                     "tier": tier, "flow": flow}) + "\n")
@@ -237,11 +292,11 @@ def score_shadow(rows):
 
 def table(res, title, top=None):
     print(f"\n{title}  (sorted by Brier, lower=better)")
-    print(f"{'variant':28} {'n':>4} {'hit':>6} {'brier':>7} {'conf':>5} {'discrim':>8} {'sel%':>5} {'hit_sel':>7} {'neu%':>5}")
+    print(f"{'variant':34} {'n':>4} {'hit':>6} {'brier':>7} {'conf':>5} {'discrim':>8} {'sel%':>5} {'hit_sel':>7} {'neu%':>5} {'rec240':>6}")
     for k, m in sorted(res.items(), key=lambda kv: kv[1].get("brier", 9))[:top]:
         hs = f"{m['hit_selective']:.1%}" if m.get("hit_selective") is not None else "-"
-        print(f"{k:28} {m['n']:4} {m['hit']:6.1%} {m['brier']:7.4f} {m['avg_conf']:5.2f} "
-              f"{m['discrim']:+8.4f} {m['selective_share']:5.0%} {hs:>7} {m['neutral_calls']:5.0%}")
+        print(f"{k:34} {m['n']:4} {m['hit']:6.1%} {m['brier']:7.4f} {m['avg_conf']:5.2f} "
+              f"{m['discrim']:+8.4f} {m['selective_share']:5.0%} {hs:>7} {m['neutral_calls']:5.0%} {m.get('hit_recent', 0):6.1%}")
 
 
 def main():

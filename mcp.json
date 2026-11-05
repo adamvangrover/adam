@@ -308,6 +308,55 @@
         },
         "required": ["code"]
       }
+    },
+    {
+      "name": "jules_remote_session",
+      "description": "Manages and dispatches remote coding sessions via the @google/jules CLI for the Architect Agent (architect_jules) with W3C PROV-O telemetry.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "subcommand": {
+            "type": "string",
+            "enum": [
+              "version",
+              "help",
+              "login",
+              "logout",
+              "tui",
+              "remote_list_repo",
+              "remote_list_session",
+              "remote_new",
+              "remote_pull",
+              "completion"
+            ],
+            "default": "remote_new"
+          },
+          "repo": {
+            "type": "string",
+            "default": "adamvangrover/adam",
+            "description": "Target repository (e.g., adamvangrover/adam or .)"
+          },
+          "session_prompt": {
+            "type": "string",
+            "description": "Task description passed to --session for remote new."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Session ID passed to --session for remote pull."
+          },
+          "parallel": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 32,
+            "description": "Number of parallel remote sessions to launch."
+          },
+          "theme": {
+            "type": "string",
+            "enum": ["dark", "light"]
+          }
+        },
+        "required": ["subcommand"]
+      }
     }
   ]
 }

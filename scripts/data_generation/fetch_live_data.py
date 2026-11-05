@@ -6,7 +6,7 @@ import ssl
 # Coingecko is reliable and public.
 url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25&page=1"
 req = urllib.request.Request(url, headers={'User-Agent': 'adam-framework/1.0'})
-context = ssl._create_unverified_context()  # nosec B323
+context = ssl.create_default_context()
 
 parsed_entities = []
 try:

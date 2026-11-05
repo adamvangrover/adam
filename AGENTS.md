@@ -427,6 +427,11 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 * **Description:** Maintains strongly typed asset ontology across 5 institutional domains with bitemporal lineage (valid_at, transaction_at), SHA-256 fingerprinting, cross-entity dependency mapping, point-in-time replay, and tiered lifecycle management.
 * **Expertise:** Unified asset ontology, W3C PROV-O bitemporal lineage, cross-entity dependency mapping, point-in-time portfolio replay, tiered memory lifecycle management.
 
+### Role: `JulesAgent`
+* **Authority:** Self-Contained Local Helper & Automation Agent
+* **Description:** Local-first, offline-capable AI software engineering assistant, helper CLI, web IDE server, and Python SDK.
+* **Expertise:** Autonomous task execution, plan setting, code refactoring, local tool execution, W3C PROV-O audit sealing.
+
 ---
 
 ## 9. v30.1-R Orchestrators & Specialized Gate Clearance Systems

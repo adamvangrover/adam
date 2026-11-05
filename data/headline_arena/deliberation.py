@@ -7,10 +7,25 @@ from __future__ import annotations
 import math
 import zlib
 import numpy as np
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+_CALIB_PATH = Path(__file__).parent.parent / "data" / "memory" / "calibration.json"
+_DEFAULT_CAP = 0.60  # used for assets with no settlement history
+
+
+def _conf_cap(ticker: str) -> float:
+    """Per-asset confidence cap from learn.py output (performance-linked)."""
+    try:
+        a = json.loads(_CALIB_PATH.read_text()).get("assets", {}).get(ticker)
+        return float(a["suggested_conf_cap"]) if a else _DEFAULT_CAP
+    except (OSError, ValueError, KeyError):
+        return _DEFAULT_CAP
+
 from .analytics import AssetMacroProfile, MacroRegimeState, AnalyticalUpgradePipeline
+from .confidence import choose_direction, map_confidence
 from .schema import (
     Direction,
     DistributionQuantiles,
@@ -35,6 +50,29 @@ class MultiAgentDeliberationEngine:
     def __init__(self, pipeline: Optional[AnalyticalUpgradePipeline] = None):
         self.pipeline = pipeline or AnalyticalUpgradePipeline()
 
+    def simulate_probabilities(self, challenge_id: str, profile: AssetMacroProfile) -> Dict[str, Any]:
+        """Production probability core; reused verbatim by backtest/shadow runs."""
+        sigma_daily, skew, kurt = self.pipeline.calibrate_volatility_and_tail_risk(profile)
+        posteriors = self.pipeline.evaluate_bayesian_posterior(profile)
+
+        np.random.seed(zlib.crc32(challenge_id.encode()))  # deterministic across processes
+        drift = profile.order_flow_imbalance * sigma_daily * 0.5
+        # Skew-normal: Z = delta*|U0| + sqrt(1-delta^2)*U1, delta = skew/sqrt(1+skew^2)
+        delta_skew = skew / math.sqrt(1.0 + skew**2)
+        u0 = np.abs(np.random.normal(0, 1, 10000))
+        u1 = np.random.normal(0, 1, 10000)
+        rets = (drift + sigma_daily * (delta_skew * u0 + math.sqrt(1.0 - delta_skew**2) * u1)) * 100.0
+
+        dz = profile.dead_zone_pct
+        mc = {"bull": float(np.mean(rets > dz)), "bear": float(np.mean(rets < -dz)),
+              "neutral": float(np.mean(np.abs(rets) <= dz))}
+        blend = {k: 0.5 * mc[k] + 0.5 * posteriors[k] for k in mc}
+        tot = sum(blend.values())
+        out = {k: v / tot for k, v in blend.items()}
+        out.update(sigma=sigma_daily, skew=skew, kurt=kurt, returns=rets,
+                   median_move=float(np.median(rets)))
+        return out
+
     def deliberate_and_simulate(
         self,
         challenge_id: str,
@@ -42,51 +80,15 @@ class MultiAgentDeliberationEngine:
         resolution_horizon: str = "2026-10-05T14:00:00Z",
         resolution_metric: str = "Percentage change vs Exchange Open (Dead Zone ±0.30%)",
     ) -> ChallengeForecast:
-        # 1. Analytical upgrades: calibrated volatility and Bayesian posteriors
-        sigma_daily, skew, kurt = self.pipeline.calibrate_volatility_and_tail_risk(profile)
-        posteriors = self.pipeline.evaluate_bayesian_posterior(profile)
-
-        # 2. Monte Carlo simulation across 10,000 runs
-        np.random.seed(zlib.crc32(challenge_id.encode()))  # deterministic across processes
-        
-        # Drift parameter based on order flow & prior trend
-        drift = profile.order_flow_imbalance * sigma_daily * 0.5
-        
-        # Generate paths using skew-normal approximation
-        # Z = delta * |U0| + sqrt(1 - delta^2) * U1 where delta = skew / sqrt(1 + skew^2)
-        delta_skew = skew / math.sqrt(1.0 + skew**2)
-        u0 = np.abs(np.random.normal(0, 1, 10000))
-        u1 = np.random.normal(0, 1, 10000)
-        simulated_returns = drift + sigma_daily * (delta_skew * u0 + math.sqrt(1.0 - delta_skew**2) * u1)
-        simulated_returns = simulated_returns * 100.0  # In percent
-
-        # Empirical settlement probabilities
-        dead_zone = profile.dead_zone_pct # 0.30%
-        p_bull = float(np.mean(simulated_returns > dead_zone))
-        p_bear = float(np.mean(simulated_returns < -dead_zone))
-        p_neutral = float(np.mean(np.abs(simulated_returns) <= dead_zone))
-
-        # Blending with Bayesian posteriors
-        final_p_bull = 0.5 * p_bull + 0.5 * posteriors["bull"]
-        final_p_bear = 0.5 * p_bear + 0.5 * posteriors["bear"]
-        final_p_neutral = 0.5 * p_neutral + 0.5 * posteriors["neutral"]
-
-        # Normalize
-        tot = final_p_bull + final_p_bear + final_p_neutral
-        final_p_bull /= tot
-        final_p_bear /= tot
-        final_p_neutral /= tot
+        core = self.simulate_probabilities(challenge_id, profile)
+        sigma_daily, skew, kurt = core["sigma"], core["skew"], core["kurt"]
+        simulated_returns = core["returns"]
+        dead_zone = profile.dead_zone_pct
+        final_p_bull, final_p_neutral, final_p_bear = core["bull"], core["neutral"], core["bear"]
 
         # Determine discrete direction
-        if final_p_neutral >= final_p_bull and final_p_neutral >= final_p_bear:
-            direction = Direction.NEUTRAL
-            model_confidence = max(0.52, min(0.68, final_p_neutral + 0.15))
-        elif final_p_bull > final_p_bear:
-            direction = Direction.BULLISH
-            model_confidence = max(0.55, min(0.72, final_p_bull + 0.15))
-        else:
-            direction = Direction.BEARISH
-            model_confidence = max(0.55, min(0.72, final_p_bear + 0.15))
+        direction = Direction(choose_direction(
+            {"bull": final_p_bull, "neutral": final_p_neutral, "bear": final_p_bear}))
 
         # Calculate price quantiles (P10, P50, P90)
         curr = profile.current_indicated_price
@@ -103,6 +105,16 @@ class MultiAgentDeliberationEngine:
             p10_price = round(p50_price * 0.995, 3)
         if p90_price <= p50_price:
             p90_price = round(p50_price * 1.005, 3)
+
+        # Confidence: tiered classifier (no uplift), fixed-table fallback
+        conf_decision = map_confidence(
+            ticker=profile.ticker,
+            direction=direction.value,
+            probs={"bull": final_p_bull, "neutral": final_p_neutral, "bear": final_p_bear},
+            exp_move_pct=(p50_price / curr - 1.0) * 100.0 if curr else 0.0,
+            dead_zone_pct=dead_zone,
+        )
+        model_confidence = conf_decision.confidence
 
         # Build Scenario Breakdown
         bull_pct = round(final_p_bull * 100.0, 1)
@@ -159,6 +171,8 @@ class MultiAgentDeliberationEngine:
             tail_flags = "Elevated Historical Volatility Alert (>35% annualized)"
         elif abs(skew) > 0.40:
             tail_flags = "Significant Skew Asymmetry Detected"
+
+        tail_flags = f"{tail_flags} | CONFIDENCE {conf_decision.summary()}"
 
         # PROV-O Lineage Generation
         trace_key, prov_doc = ProvOGraphGenerator.generate(
@@ -241,19 +255,25 @@ class MultiAgentDeliberationEngine:
         bias = direction.value.upper()
         conf_pct = int(confidence * 100)
 
+        # Grounded template (2026-10-27): only states quantities the pipeline actually computes.
+        exp_move = (p50_price / profile.current_indicated_price - 1.0) * 100.0 if profile.current_indicated_price else 0.0
+        inside = abs(exp_move) <= dead_zone
+        np_ = getattr(profile, "neutral_prior", None)
+        np_text = f" (currently {np_:.0%})" if isinstance(np_, (int, float)) else ""
         rationale = (
-            f"MACRO REGIME & CATALYST TIMING: Institutional positioning in {profile.name} ({profile.ticker}) supports a {bias} "
-            f"conviction rating calibrated at {conf_pct}%, targeting terminal settlement at ${p50_price:,.2f}. The primary transmission mechanism "
-            f"is governed by {profile.primary_catalyst.lower()} Against a macro backdrop defined by persistent Fed quantitative tightening "
-            f"and an inverted 10Y swap spread (-28.5 bps), capital velocity is constrained, making directional follow-through contingent on high-conviction "
-            f"liquidity flows rather than speculative momentum.\n\n"
-            f"INDICATOR DIVERGENCE & TRANSMISSION: We detect pronounced cross-asset divergence where {profile.indicator_divergence.lower()} "
-            f"High-frequency order-flow triage indicates an imbalance of {profile.order_flow_imbalance:+.2f}, while SEC filing telemetry signals "
-            f"{profile.edgar_triage_signal.replace('_', ' ')}. Because Headline Arena enforces an empirical settlement dead zone of ±{dead_zone:.2f}%, "
-            f"historical distribution fits confirm that minor intraday fluctuations are absorbed within neutral bounds unless sustained institutional order "
-            f"absorption breaches key technical pivot thresholds.\n\n"
-            f"INVALIDATION CRITERIA & TAIL RISKS: This {bias.lower()} thesis is immediately falsified if {profile.thesis_risks.lower()} "
-            f"A breach of the trailing session support/resistance boundary prior to the 14:00 UTC evaluation window mandates immediate risk reduction."
+            f"SIGNAL: {profile.name} ({profile.ticker}) is staged {bias} at {conf_pct}% confidence, with a median simulated "
+            f"settlement of ${p50_price:,.2f}. The directional input is {profile.primary_catalyst.lower()} "
+            f"This is a statistical rule, not a fundamental view: {profile.indicator_divergence.lower()}\n\n"
+            f"METHOD: Outcome probabilities come from a seeded Monte Carlo simulation around the challenge open price, using an "
+            f"annualized volatility assumption of {profile.annualized_vol_pct:.0f}% and a neutral prior estimated from the trailing "
+            f"20 settlements{np_text}. The flow input of {profile.order_flow_imbalance:+.2f} shifts simulated drift. Confidence is "
+            f"mapped from the margin between the leading outcome and the runner-up, then capped by this asset's realized track "
+            f"record on the platform, so it can sit near 50% even when the margin looks wide. Settlement applies a "
+            f"±{dead_zone:.2f}% dead zone, and moves inside the band resolve neutral.\n\n"
+            f"RISKS: The median simulated move is {exp_move:+.2f}%, "
+            f"{'inside the band, so neutral settlement risk is material' if inside else 'outside the band, so a directional settlement is favoured'}. "
+            f"Unscheduled data releases, headline shocks or a sharp move at the session open can overwhelm a short-horizon "
+            f"statistical signal. No live order-flow, regulatory filing or rates-curve data were used in this forecast."
         )
 
         # Word count safety check

@@ -248,3 +248,8 @@
 **Vulnerability:** In `build_dashboard.py`, Jinja2 `Environment` was instantiated without `autoescape=True`, leading to potential XSS vulnerabilities when rendering HTML templates with untrusted data.
 **Learning:** By default, Jinja2 does not escape variables, which can lead to Cross-Site Scripting (XSS) if user input or external data is included in the template without explicit escaping.
 **Prevention:** Always set `autoescape=True` when instantiating a Jinja2 `Environment` for HTML rendering, or use `select_autoescape` to automatically enable escaping for specific file extensions (e.g., `.html`, `.xml`). Use tools like Bandit to scan for `B701:jinja2_autoescape_false` issues.
+
+## 2026-11-20 - Prevent unverified SSL context creation
+**Vulnerability:** The code was using `ssl._create_unverified_context()` which disables SSL verification, making requests susceptible to man-in-the-middle attacks.
+**Learning:** Hardcoding `ssl._create_unverified_context()` when fetching live market data bypasses security checks.
+**Prevention:** Always use `ssl.create_default_context()` to enforce SSL verification when using `urllib.request`.

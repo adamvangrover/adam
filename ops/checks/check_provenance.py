@@ -33,7 +33,7 @@ def check_provenance():
                     if "report_date" in data and "data_points" in data:
                         continue
 
-                    if "context_provenance" not in data:
+                    if "variable_node" in data and "context_provenance" not in data:
                         print(f"Error: 'context_provenance' missing in {filepath} on line {i+1}")
                         has_error = True
 

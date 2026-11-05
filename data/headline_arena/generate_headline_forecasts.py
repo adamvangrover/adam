@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 
 def fetch_and_forecast():
-    ctx = ssl._create_unverified_context() # nosec B323
+    ctx = ssl.create_default_context()
     
     # 1. Register agent to get token, as public endpoint doesn't return open challenges
     name = f"Adam_v30_{int(time.time())}"

@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from typing import Dict, Any
 import asyncio
 
-from src.governance.gatekeeper import GovernanceGatekeeper, GovernanceError, ProvenanceHeader
+from src.governance.gatekeeper import GovernanceGatekeeper, GovernanceError, ProvenanceHeader, build_provenance_header
 
 # Sample schema for testing
 TEST_SCHEMA = {
@@ -295,3 +295,47 @@ def test_exit_gate(mock_open, valid_provenance):
     }
     result = gatekeeper.exit_gate(valid_input)
     assert result == valid_input
+
+@patch('urllib.request.OpenerDirector.open')
+def test_build_provenance_header_integration(mock_open):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_open.return_value.__enter__.return_value = mock_response
+
+    payload = {"status": "ok", "value": 42}
+    header_dict = build_provenance_header(
+        data=payload,
+        source_data_object="https://example.com/source"
+    )
+
+    valid_input = {
+        "provenance_trace": header_dict,
+        "data": payload
+    }
+
+    gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
+    validated = gatekeeper.validate_inference(valid_input)
+    assert validated == valid_input
+    assert check_grounding(validated)
+
+@patch('urllib.request.OpenerDirector.open')
+def test_gatekeeper_create_provenance_header(mock_open):
+    mock_response = MagicMock()
+    mock_response.getcode.return_value = 200
+    mock_open.return_value.__enter__.return_value = mock_response
+
+    payload = {"status": "ok", "value": 100}
+    header_dict = GovernanceGatekeeper.create_provenance_header(
+        data=payload,
+        confidence_score=0.9,
+        source_data_object="https://example.com/dataset"
+    )
+
+    valid_input = {
+        "provenance_trace": header_dict,
+        "data": payload
+    }
+
+    gatekeeper = GovernanceGatekeeper(schema=TEST_SCHEMA)
+    validated = gatekeeper.validate_inference(valid_input)
+    assert validated == valid_input
