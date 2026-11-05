@@ -46,12 +46,20 @@ BANDS = ["absolute"]                       # v1: abs vs rel showed no material d
 TRACKS = {"cal_K10_r1.0": (10, 1.0)}       # v1 winner
 NPRIORS = ["static", "dyn20"]               # ticker table vs empirical neutral rate (last 20)
 NMARGINS = [0.0, 0.05, 0.10]                # call neutral if within margin of top outcome
+# v3 (2026-11-04): blends + per-asset rule selection. nprior/nmargin fixed at v2 winners (dyn20, 0).
+#   mom1/rev1  = last settlement only;  tdiff = last-1 trend minus last-5 trend (short vs long)
+#   asset,s,w  = per asset, pick mom or rev by which naive rule hit more over its last w settlements
+#   assetw     = as asset, but scale shrinks with the size of that per-asset edge
+FLOWS = [("zero", 0.0), ("mom", 0.4), ("rev", 0.8), ("mom1", 0.4), ("rev1", 0.8), ("tdiff", 0.6),
+         ("asset", 0.4, 10), ("asset", 0.4, 20), ("asset", 0.8, 20), ("asset", 0.8, 40),
+         ("assetw", 0.8, 20), ("assetw", 0.8, 40)]
+NPRIORS, NMARGINS = ["dyn20"], [0.0]
 VARIANTS = [dict(flow=f, band=b, track=t, nprior=n, nmargin=m)
             for f, b, t, n, m in itertools.product(FLOWS, BANDS, TRACKS, NPRIORS, NMARGINS)]
 
 
 def vname(v):
-    return (f"{v['flow'][0]}{v['flow'][1]:g}|{v['band'][:3]}|{v['track']}"
+    return (f"{v['flow'][0]}{v['flow'][1]:g}{'w%d' % v['flow'][2] if len(v['flow']) > 2 else ''}|{v['band'][:3]}|{v['track']}"
             f"|{v.get('nprior', 'static')}|nm{v.get('nmargin', 0.0):g}")
 
 
@@ -99,12 +107,43 @@ def series(rows):
     return s
 
 
+def _sig(prior, lb):
+    xs = prior[-lb:]
+    return math.tanh(sum(pct(c) for c in xs) / len(xs)) if xs else 0.0
+
+
+def rule_score(prior, window, lb=LOOKBACK):
+    """Walk-forward safe: (mom-rule hits, rev-rule hits) over this asset's last `window` settlements."""
+    m = r = 0
+    for j in range(max(lb, len(prior) - window), len(prior)):
+        s = sum(pct(c) for c in prior[j - lb:j])
+        if not s:
+            continue
+        res, up = prior[j]["result"], s > 0
+        m += res == ("bullish" if up else "bearish")
+        r += res == ("bearish" if up else "bullish")
+    return m, r
+
+
 def flow_for(prior: list[dict], cfg) -> float:
-    mode, scale = cfg
+    mode, scale = cfg[0], cfg[1]
     if mode == "zero" or not prior:
         return 0.0
-    sig = math.tanh(sum(pct(c) for c in prior[-LOOKBACK:]) / len(prior[-LOOKBACK:]))
-    return round((1 if mode == "mom" else -1) * scale * sig, 4)
+    if mode in ("mom1", "rev1"):
+        sign, sig = (1 if mode == "mom1" else -1), _sig(prior, 1)
+    elif mode == "tdiff":
+        sign, sig = 1, _sig(prior, 1) - _sig(prior, 5)
+    elif mode in ("asset", "assetw"):
+        m, r = rule_score(prior, cfg[2])
+        if m + r == 0 or m == r:
+            return 0.0
+        edge = (m - r) / (m + r)
+        sign, sig = (1 if edge > 0 else -1), _sig(prior, LOOKBACK)
+        if mode == "assetw":
+            scale *= min(1.0, 2 * abs(edge))
+    else:
+        sign, sig = (1 if mode == "mom" else -1), _sig(prior, LOOKBACK)
+    return round(sign * scale * sig, 4)
 
 
 # ── core ────────────────────────────────────────────────────────────────
@@ -214,6 +253,7 @@ def metrics(preds):
         "selective_share": round(len(sel) / n, 3),
         "hit_selective": round(mean([p[0] for p in sel]), 3) if sel else None,
         "neutral_calls": round(sum(p[3] == "neutral" for p in preds) / n, 3),
+        "hit_recent": round(mean([p[0] for p in preds[-240:]]), 3),  # last ~20 sessions
         "tier_hit": {t: [len(v), round(mean(v), 3)] for t, v in sorted(tiers.items())},
     }
 
@@ -252,11 +292,11 @@ def score_shadow(rows):
 
 def table(res, title, top=None):
     print(f"\n{title}  (sorted by Brier, lower=better)")
-    print(f"{'variant':28} {'n':>4} {'hit':>6} {'brier':>7} {'conf':>5} {'discrim':>8} {'sel%':>5} {'hit_sel':>7} {'neu%':>5}")
+    print(f"{'variant':34} {'n':>4} {'hit':>6} {'brier':>7} {'conf':>5} {'discrim':>8} {'sel%':>5} {'hit_sel':>7} {'neu%':>5} {'rec240':>6}")
     for k, m in sorted(res.items(), key=lambda kv: kv[1].get("brier", 9))[:top]:
         hs = f"{m['hit_selective']:.1%}" if m.get("hit_selective") is not None else "-"
-        print(f"{k:28} {m['n']:4} {m['hit']:6.1%} {m['brier']:7.4f} {m['avg_conf']:5.2f} "
-              f"{m['discrim']:+8.4f} {m['selective_share']:5.0%} {hs:>7} {m['neutral_calls']:5.0%}")
+        print(f"{k:34} {m['n']:4} {m['hit']:6.1%} {m['brier']:7.4f} {m['avg_conf']:5.2f} "
+              f"{m['discrim']:+8.4f} {m['selective_share']:5.0%} {hs:>7} {m['neutral_calls']:5.0%} {m.get('hit_recent', 0):6.1%}")
 
 
 def main():
