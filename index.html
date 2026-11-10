@@ -687,7 +687,7 @@
             </div>
 
             <div class="stat-panel">
-                <div class="stat-panel-title">SYSTEM TELEMETRY</div>
+                <div class="stat-panel-title">SYSTEM TELEMETRY & CREDIT REGIME</div>
                 <div class="stat-row">
                     <span>Swarm Latency</span>
                     <span class="stat-value" style="color: var(--green);" id="stat-latency">—</span>
@@ -699,6 +699,18 @@
                 <div class="stat-row">
                     <span>Vector DB Load</span>
                     <span class="stat-value" style="color: var(--amber);" id="stat-db">—</span>
+                </div>
+                <div class="stat-row">
+                    <span>BSL Secondary Index</span>
+                    <span class="stat-value" style="color: var(--cyan);" id="stat-bsl-idx">96.30</span>
+                </div>
+                <div class="stat-row">
+                    <span>CLO Junior OC Cushion</span>
+                    <span class="stat-value" style="color: var(--amber);" id="stat-clo-oc">2.10%</span>
+                </div>
+                <div class="stat-row">
+                    <span>SOFR Spot / All-In BSL</span>
+                    <span class="stat-value" style="color: var(--purple);" id="stat-sofr">4.85% / 8.35%</span>
                 </div>
                 <div class="stat-row">
                     <span>PROV-O Compliant</span>
@@ -955,6 +967,20 @@
                     <h3 style="color: var(--red);">Unified Banking World Model</h3>
                     <p>Digital Twin of the global banking system. Maps interbank lending, liquidity drains, and contagion risk in real-time.</p>
                     <span class="action-link">Launch Twin →</span>
+                </a>
+
+                <a href="newsletters/market_mayhem_20261031.html" class="module-card" data-keywords="market mayhem newsletter 20261031 global macro bsl broadly syndicated loans clo sofr distress credit" style="border-top: 2px solid var(--red);">
+                    <div class="tag tag-live">NEW DISPATCH</div>
+                    <h3 style="color: var(--red);">Market Mayhem: Global Macro &amp; US BSL (Issue #143)</h3>
+                    <p>Comprehensive quantitative coverage of the 2Y/10Y Treasury steepening (+67 bps), Warsh Fed policy path, DXY strains, and the US Broadly Syndicated Loan (BSL) repricing mirage, covenant-lite (89.2%) distress, and CLO arbitrage.</p>
+                    <span class="action-link" style="color: var(--red);">Read Oct 31, 2026 Edition →</span>
+                </a>
+
+                <a href="newsletters/market_mayhem_latest.html" class="module-card" data-keywords="market mayhem latest portal intelligence archive bsl weekly macro">
+                    <div class="tag tag-core">LATEST HUB</div>
+                    <h3 style="color: var(--cyan);">Market Mayhem Intelligence Portal</h3>
+                    <p>Live gateway to the current macro regime, featuring rolling BSL metrics, debt stack contagion visualizers, and weekly newsletter archives.</p>
+                    <span class="action-link" style="color: var(--cyan);">Access Portal →</span>
                 </a>
 
                 <a href="market_mayhem_dashboard.html" class="module-card" data-keywords="market mayhem archive black swan historical events">
@@ -1228,6 +1254,9 @@
             document.getElementById('stat-latency').textContent = latency + 'ms';
             document.getElementById('stat-agents').textContent = agents.toLocaleString();
             document.getElementById('stat-db').textContent = db + '%';
+            if (document.getElementById('stat-bsl-idx')) document.getElementById('stat-bsl-idx').textContent = (96.28 + (Math.random() * 0.05)).toFixed(2);
+            if (document.getElementById('stat-clo-oc')) document.getElementById('stat-clo-oc').textContent = (2.10 + (Math.random() * 0.04 - 0.02)).toFixed(2) + '%';
+            if (document.getElementById('stat-sofr')) document.getElementById('stat-sofr').textContent = '4.85% / 8.35%';
             document.getElementById('stat-provo').textContent = '100%';
         }
         updateTelemetry();
@@ -1336,7 +1365,7 @@
     </div>
 
     <script>
-        const omniIndex = [{"u": "monte_carlo_visualizer.html", "t": "ADAM v30 :: MONTE CARLO VISUALIZER", "d": ""}, {"u": "unified_banking.html", "t": "ADAM v30 :: UNIFIED BANKING", "d": ""}, {"u": "nexus.html", "t": "ADAM v30 :: NEXUS", "d": ""}, {"u": "hub.html", "t": "ADAM v30.1 :: Unified Brand & Intelligence Hub", "d": "ADAM Unified Hub \u2014 Navigate all branded content, daily intelligence, showcase reports, and financial applications from a single interactive portal."}, {"u": "showcase_private_equity.html", "t": "ADAM v30 :: SHOWCASE PRIVATE EQUITY", "d": ""}, {"u": "agent_gallery.html", "t": "ADAM v30 :: AGENT GALLERY", "d": ""}, {"u": "credit_valuation_architect.html", "t": "ADAM v30 :: CREDIT VALUATION ARCHITECT", "d": ""}, {"u": "avg_search.html", "t": "ADAM v30 :: AVG SEARCH", "d": ""}, {"u": "editor_studio.html", "t": "ADAM v30 :: EDITOR STUDIO", "d": ""}, {"u": "comprehensive_credit_dashboard.html", "t": "ADAM v30 :: COMPREHENSIVE CREDIT DASHBOARD", "d": ""}, {"u": "workflow_orchestrator.html", "t": "ADAM v30 :: WORKFLOW ORCHESTRATOR", "d": ""}, {"u": "scenario_lab.html", "t": "ADAM v30 :: SCENARIO LAB", "d": ""}, {"u": "war_room.html", "t": "ADAM v30 :: WAR ROOM", "d": ""}, {"u": "interactive_prototype.html", "t": "ADAM Architecture - Interactive Prototype", "d": ""}, {"u": "network_map.html", "t": "ADAM v30 :: NETWORK MAP", "d": ""}, {"u": "policy_center.html", "t": "ADAM v30 :: POLICY CENTER", "d": ""}, {"u": "market_live.html", "t": "ADAM v30 :: MARKET LIVE", "d": ""}, {"u": "system_brain.html", "t": "ADAM v30 :: SYSTEM BRAIN", "d": ""}, {"u": "quantum_infrastructure.html", "t": "ADAM v30 :: QUANTUM INFRASTRUCTURE", "d": ""}, {"u": "agents.html", "t": "ADAM v30 :: AGENTS", "d": ""}, {"u": "institutional_radar.html", "t": "ADAM v30 :: INSTITUTIONAL RADAR", "d": ""}, {"u": "showcase_hedge_fund.html", "t": "ADAM v30 :: SHOWCASE HEDGE FUND", "d": ""}, {"u": "reports.html", "t": "ADAM v30 :: REPORTS", "d": ""}, {"u": "index_archive.html", "t": "ADAM v23.5 :: ARCHIVE", "d": ""}, {"u": "api_docs.html", "t": "ADAM v30 :: API DOCS", "d": ""}, {"u": "market_mayhem_dashboard.html", "t": "ADAM v30 :: MARKET MAYHEM DASHBOARD", "d": ""}, {"u": "market_mayhem_terminal.html", "t": "MARKET MAYHEM // ADAM v30.4 INSTITUTIONAL CREDIT & VALUATION TERMINAL", "d": ""}, {"u": "adam_convergence_live_neural_link.html", "t": "ADAM v30 :: ADAM CONVERGENCE LIVE NEURAL LINK", "d": ""}, {"u": "adam_daily_hub_index.html", "t": "ADAM v30 :: ADAM DAILY HUB INDEX", "d": ""}, {"u": "index.html", "t": "ADAM v30.1 :: Unified Financial Operating System", "d": "ADAM \u2014 Autonomous Deterministic Alpha Matrix. Institutional-grade neuro-symbolic multi-agent financial operating system for credit risk, market intelligence, and portfolio surveillance."}, {"u": "README.html", "t": "ADAM OS v30.1 - Autonomous Deterministic Alpha Matrix", "d": ""}, {"u": "index_v30.html", "t": "ADAM v30 :: UNIFIED FINANCIAL OS", "d": ""}, {"u": "sector_swarm.html", "t": "ADAM v30 :: SECTOR SWARM", "d": ""}, {"u": "changelog.html", "t": "ADAM v30 :: CHANGELOG", "d": ""}, {"u": "terminal_profile.html", "t": "ADAM v30 :: TERMINAL PROFILE", "d": ""}, {"u": "wargame_dashboard.html", "t": "ADAM v30 :: WARGAME DASHBOARD", "d": ""}, {"u": "analyst_os.html", "t": "ADAM v30 :: ANALYST OS", "d": ""}, {"u": "graph.html", "t": "ADAM v30 :: GRAPH", "d": ""}, {"u": "index_all.html", "t": "ADAM v30 :: UNIFIED REPOSITORY INDEX", "d": ""}, {"u": "adam_standalone_distribution.html", "t": "ADAM Repository \u2014 Standalone Interactive Distribution", "d": "ADAM Repository Standalone Interactive Distribution - Adaptive Moment Estimation & Loss Landscape Arena"}];
+        const omniIndex = [{"u": "showcase/data/adam_daily/2026-11-07/flash-lite.html", "t": "ADAM Market Mayhem :: Issue #144 (Nov 7, 2026) - Bitemporal Macro & BSL Stress", "d": "Bitemporal macro synthesis covering post-midterm whipsaw (SPX 7,376.86), VIX 25.64 breakout, oil crush (8.67 Brent), 8.420% BSL floor, and BLTC Chapter 11 liquidation waterfall."}, {"u": "newsletters/market_mayhem_latest.html", "t": "ADAM Market Mayhem :: Latest Intelligence Portal & Archive Hub", "d": "Real-time gateway for continuous macro-temporal baselines, rolling US BSL stress metrics, syndicated facility pricing, and newsletter archive."}, {"u": "newsletters/market_mayhem_20261031.html", "t": "ADAM Market Mayhem :: Issue #143 (Oct 31, 2026) - Global Macro & US BSL Deep Dive", "d": "Broad Global Macro & US Broadly Syndicated Loans dispatch covering 2Y/10Y bear-steepening (+67 bps), SOFR repricings, covenant-lite (89.2%) saturation, EBITDA add-backs, and CLO arbitrage."}, {"u": "monte_carlo_visualizer.html", "t": "ADAM v30 :: MONTE CARLO VISUALIZER", "d": ""}, {"u": "unified_banking.html", "t": "ADAM v30 :: UNIFIED BANKING", "d": ""}, {"u": "nexus.html", "t": "ADAM v30 :: NEXUS", "d": ""}, {"u": "hub.html", "t": "ADAM v30.1 :: Unified Brand & Intelligence Hub", "d": "ADAM Unified Hub \u2014 Navigate all branded content, daily intelligence, showcase reports, and financial applications from a single interactive portal."}, {"u": "showcase_private_equity.html", "t": "ADAM v30 :: SHOWCASE PRIVATE EQUITY", "d": ""}, {"u": "agent_gallery.html", "t": "ADAM v30 :: AGENT GALLERY", "d": ""}, {"u": "credit_valuation_architect.html", "t": "ADAM v30 :: CREDIT VALUATION ARCHITECT", "d": ""}, {"u": "avg_search.html", "t": "ADAM v30 :: AVG SEARCH", "d": ""}, {"u": "editor_studio.html", "t": "ADAM v30 :: EDITOR STUDIO", "d": ""}, {"u": "comprehensive_credit_dashboard.html", "t": "ADAM v30 :: COMPREHENSIVE CREDIT DASHBOARD", "d": ""}, {"u": "workflow_orchestrator.html", "t": "ADAM v30 :: WORKFLOW ORCHESTRATOR", "d": ""}, {"u": "scenario_lab.html", "t": "ADAM v30 :: SCENARIO LAB", "d": ""}, {"u": "war_room.html", "t": "ADAM v30 :: WAR ROOM", "d": ""}, {"u": "interactive_prototype.html", "t": "ADAM Architecture - Interactive Prototype", "d": ""}, {"u": "network_map.html", "t": "ADAM v30 :: NETWORK MAP", "d": ""}, {"u": "policy_center.html", "t": "ADAM v30 :: POLICY CENTER", "d": ""}, {"u": "market_live.html", "t": "ADAM v30 :: MARKET LIVE", "d": ""}, {"u": "system_brain.html", "t": "ADAM v30 :: SYSTEM BRAIN", "d": ""}, {"u": "quantum_infrastructure.html", "t": "ADAM v30 :: QUANTUM INFRASTRUCTURE", "d": ""}, {"u": "agents.html", "t": "ADAM v30 :: AGENTS", "d": ""}, {"u": "institutional_radar.html", "t": "ADAM v30 :: INSTITUTIONAL RADAR", "d": ""}, {"u": "showcase_hedge_fund.html", "t": "ADAM v30 :: SHOWCASE HEDGE FUND", "d": ""}, {"u": "reports.html", "t": "ADAM v30 :: REPORTS", "d": ""}, {"u": "index_archive.html", "t": "ADAM v23.5 :: ARCHIVE", "d": ""}, {"u": "api_docs.html", "t": "ADAM v30 :: API DOCS", "d": ""}, {"u": "market_mayhem_dashboard.html", "t": "ADAM v30 :: MARKET MAYHEM DASHBOARD", "d": ""}, {"u": "market_mayhem_terminal.html", "t": "MARKET MAYHEM // ADAM v30.4 INSTITUTIONAL CREDIT & VALUATION TERMINAL", "d": ""}, {"u": "adam_convergence_live_neural_link.html", "t": "ADAM v30 :: ADAM CONVERGENCE LIVE NEURAL LINK", "d": ""}, {"u": "adam_daily_hub_index.html", "t": "ADAM v30 :: ADAM DAILY HUB INDEX", "d": ""}, {"u": "index.html", "t": "ADAM v30.1 :: Unified Financial Operating System", "d": "ADAM \u2014 Autonomous Deterministic Alpha Matrix. Institutional-grade neuro-symbolic multi-agent financial operating system for credit risk, market intelligence, and portfolio surveillance."}, {"u": "README.html", "t": "ADAM OS v30.1 - Autonomous Deterministic Alpha Matrix", "d": ""}, {"u": "index_v30.html", "t": "ADAM v30 :: UNIFIED FINANCIAL OS", "d": ""}, {"u": "sector_swarm.html", "t": "ADAM v30 :: SECTOR SWARM", "d": ""}, {"u": "changelog.html", "t": "ADAM v30 :: CHANGELOG", "d": ""}, {"u": "terminal_profile.html", "t": "ADAM v30 :: TERMINAL PROFILE", "d": ""}, {"u": "wargame_dashboard.html", "t": "ADAM v30 :: WARGAME DASHBOARD", "d": ""}, {"u": "analyst_os.html", "t": "ADAM v30 :: ANALYST OS", "d": ""}, {"u": "graph.html", "t": "ADAM v30 :: GRAPH", "d": ""}, {"u": "index_all.html", "t": "ADAM v30 :: UNIFIED REPOSITORY INDEX", "d": ""}, {"u": "adam_standalone_distribution.html", "t": "ADAM Repository \u2014 Standalone Interactive Distribution", "d": "ADAM Repository Standalone Interactive Distribution - Adaptive Moment Estimation & Loss Landscape Arena"}];
 
         function omniSearch(query) {
             const out = document.getElementById('omni-search-results');

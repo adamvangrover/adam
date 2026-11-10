@@ -186,7 +186,8 @@ class AdamNavigator {
             { name: 'Credit Automation', icon: 'fa-file-invoice-dollar', link: 'credit_memo_automation.html' },
             { name: 'Credit Analyst', icon: 'fa-user-tie', link: 'credit_memo_v2.html' },
             { name: 'Sovereign Dashboard', icon: 'fa-globe-americas', link: 'sovereign_dashboard.html' },
-            { name: 'Market Mayhem', icon: 'fa-newspaper', link: 'market_mayhem_dashboard.html' },
+            { name: 'Market Mayhem Latest', icon: 'fa-newspaper', link: 'NEWSLETTER_LATEST' },
+            { name: 'Market Mayhem Archive', icon: 'fa-archive', link: 'market_mayhem_dashboard.html' },
             { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
@@ -276,6 +277,8 @@ class AdamNavigator {
 
             if (item.link === 'ROOT') {
                 linkUrl = this._sanitizePath(`${this.rootPath}/index.html`);
+            } else if (item.link === 'NEWSLETTER_LATEST') {
+                linkUrl = this._sanitizePath(`${this.rootPath}/newsletters/market_mayhem_latest.html`);
             } else {
                 linkUrl = this._sanitizePath(`${this.showcasePath}/${item.link}`);
                 

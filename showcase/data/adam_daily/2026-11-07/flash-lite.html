@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.1 | Market Mayhem & Fortress and Hunt (Nov 7, 2026)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' },
+                        rose: { 500: '#f43f5e', 600: '#e11d48' },
+                        emerald: { 500: '#10b981', 400: '#34d399' },
+                        cyan: { 500: '#06b6d4', 400: '#22d3ee' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Interactive Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #070a17; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- Header & Navigation -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                AFOS V3 KERNEL
+            </span>
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                <span>MARKET MAYHEM &amp; FORTRESS AND HUNT</span>
+                <span class="text-xs text-slate-400 font-mono font-normal">| Nov 7, 2026</span>
+            </h1>
+        </div>
+        <div class="flex items-center space-x-4 text-xs font-mono">
+            <a href="../../../index.html" class="text-slate-400 hover:text-cyan-400 transition">&larr; Main Index</a>
+            <span class="text-slate-700">•</span>
+            <a href="../index.html" class="text-slate-400 hover:text-cyan-400 transition">Briefs Archive</a>
+            <span class="text-slate-700">•</span>
+            <a href="../../../newsletters/market_mayhem_latest.html" class="text-cyan-400 hover:underline">Newsletter Portal</a>
+            <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">
+                W3C PROV-O &amp; SR 11-7 / SR 26-2
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+        <!-- Executive BLUF Banner -->
+        <div class="p-5 rounded-lg border border-rose-500/30 bg-rose-950/20 text-rose-200 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-rose-400">CRITICAL SYSTEM STATUS // BLUF</span>
+                <span class="text-xs font-mono text-slate-400">Bitemporal Close: Friday Nov 6, 2026 16:15 EST</span>
+            </div>
+            <p class="text-sm font-semibold text-white">
+                Post-Midterm Equity Whipsaw (SPX 7,688.62 Wed &rarr; 7,376.86 Fri) &bull; VIX Breakout (25.64 Close / 28.18 Thu Peak) &bull; Physical Oil Unwind ($98.67 Brent / $90.87 WTI) &bull; All-In BSL Floor at 8.420% (SOFR 3.920% / 30D 3.91294%).
+            </p>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Wednesday's congressional gridlock relief rally reversed sharply Thursday into tech/AI CapEx liquidation. Friday's +165K payrolls and 4.1% unemployment print stabilized SPX at 7,376.86 (-2.68% week, worst since Apr 2025). 45% of Russell 2000 debt remains floating-rate exposed ahead of December FOMC.
+            </p>
+        </div>
+
+        <!-- Cross-Asset Ticker Ribbon -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 font-mono text-xs">
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">S&amp;P 500</div>
+                <div class="text-base font-bold text-white">7,376.86</div>
+                <div class="text-emerald-400">+0.31% Fri (-2.68% Wk)</div>
+            </div>
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">CBOE VIX</div>
+                <div class="text-base font-bold text-rose-400">25.64</div>
+                <div class="text-slate-400">Thu Peak: 28.18</div>
+            </div>
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">US 10Y Yield</div>
+                <div class="text-base font-bold text-cyan-400">4.860%</div>
+                <div class="text-slate-400">2s10s: +35.0 bps</div>
+            </div>
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">Overnight SOFR</div>
+                <div class="text-base font-bold text-amber-400">3.920%</div>
+                <div class="text-slate-400">30D Avg: 3.91294%</div>
+            </div>
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">Brent Crude</div>
+                <div class="text-base font-bold text-slate-200">$98.67</div>
+                <div class="text-emerald-400">Spread: $7.80/bbl</div>
+            </div>
+            <div class="p-3 rounded bg-slate-900 border border-slate-800">
+                <div class="text-slate-400">All-In BSL Floor</div>
+                <div class="text-base font-bold text-purple-400">8.420%</div>
+                <div class="text-rose-400">CADS DSCR: 0.993x</div>
+            </div>
+        </div>
+
+        <!-- Two Column Architecture: Credit Liquidation Waterfall & Multi-Asset Valuation -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Card 1: Benchmark Levered Corporate (BLTC) Distress Waterfall -->
+            <div class="p-5 rounded-lg border border-slate-800 bg-slate-900/60 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        BLTC Chapter 11 Enterprise Valuation Waterfall
+                    </h2>
+                    <span class="text-xs font-mono text-cyan-400">Gross Leverage: 8.93x</span>
+                </div>
+                <div class="text-xs text-slate-300 leading-relaxed">
+                    Under Absolute Priority Rule (§363 sale), BLTC's $2,500M funded capital structure faces substantial debt impairment across senior unsecured notes with blended enterprise LGD reaching 44.0% to 52.96%.
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs font-mono border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-left">
+                                <th class="py-2">Tranche Level</th>
+                                <th class="py-2">Claim ($M)</th>
+                                <th class="py-2">Base Rec (5.0x)</th>
+                                <th class="py-2 text-right">Stressed (4.2x)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/50">
+                            <tr>
+                                <td class="py-2 font-bold text-white">Senior Secured TLB</td>
+                                <td class="py-2">$1,500M</td>
+                                <td class="py-2 text-emerald-400">93.33% ($1,400M)</td>
+                                <td class="py-2 text-right text-amber-400">78.40% ($1,176M)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 font-bold text-slate-400">Senior Unsecured Notes</td>
+                                <td class="py-2">$1,000M</td>
+                                <td class="py-2 text-rose-400">0.00% ($0.0M)</td>
+                                <td class="py-2 text-right text-rose-400">0.00% ($0.0M)</td>
+                            </tr>
+                            <tr class="bg-slate-800/30">
+                                <td class="py-2 font-bold text-cyan-300">Enterprise Blended</td>
+                                <td class="py-2 font-bold text-cyan-300">$2,500M</td>
+                                <td class="py-2 font-bold text-cyan-300">56.00% Rec (44.0% LGD)</td>
+                                <td class="py-2 font-bold text-right text-cyan-300">47.04% Rec (52.96% LGD)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 rounded bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-400">
+                    <div>Cumulative 3Y Probability of Default: <strong class="text-rose-400">54.32%</strong></div>
+                    <div>QMC 99th-Percentile Tail PD: <strong class="text-rose-400">68.40%</strong> | Basel III RWA: <strong class="text-amber-400">150%</strong></div>
+                </div>
+            </div>
+
+            <!-- Card 2: Strategic Barbell Portfolio (75/25) -->
+            <div class="p-5 rounded-lg border border-slate-800 bg-slate-900/60 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        Fortress &amp; Hunt: Strategic Barbell ($100M Baseline)
+                    </h2>
+                    <span class="text-xs font-mono text-emerald-400">Carry: $9,479 / Day</span>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Sovereign Fortress Sleeve (75% / $75M)</span>
+                            <span class="text-emerald-400">Annual Risk-Free Carry: $3,412,500</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden flex">
+                            <div class="bg-emerald-500 h-2" style="width: 50%;"></div>
+                            <div class="bg-teal-500 h-2" style="width: 25%;"></div>
+                            <div class="bg-slate-700 h-2" style="width: 25%;"></div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 space-y-1 font-mono">
+                            <div>&bull; $50.0M in Sub-90-Day US T-Bills @ 4.190% (Zero Duration)</div>
+                            <div>&bull; $25.0M in AAA Senior CLO Tranches @ 5.270% (SOFR + 135 bps)</div>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-800 pt-3">
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Convex Hunt Sleeve (25% / $25M)</span>
+                            <span class="text-cyan-400">Collar Monetized at 7,376 SPX</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 space-y-1 font-mono">
+                            <div>&bull; 5.0% ($5M) Downstream Refining (Trimmed 50% on $7.80/bbl Brent-WTI arb)</div>
+                            <div>&bull; 12.5% ($12.5M) Floating-Rate Small-Cap Shorts (45% RUT floating-rate debt)</div>
+                            <div>&bull; 7.5% ($7.5M) Rolled Put Spread Collar (7,350 / 7,050 financed by 7,650 Calls)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Model Risk Governance Callout (SR 11-7 and SR 26-2) -->
+        <div class="p-4 rounded border border-slate-700 bg-slate-900/60 text-xs text-slate-400 space-y-1">
+            <div class="font-bold text-slate-200 text-xs uppercase tracking-wider mb-1">Supervisory Model Risk Governance Architecture</div>
+            <p><strong class="text-cyan-400">Foundational SR 11-7:</strong> Joint supervisory guidance issued on April 4, 2011, by the Federal Reserve System and the Office of the Comptroller of the Currency (OCC) to manage model risk across banking and financial institutions.</p>
+            <p><strong class="text-amber-400">Modernized SR 26-2:</strong> In April 2026, the supervisory agencies issued SR 26-2, which modernizes and supersedes the foundational framework of SR 11-7 while retaining core risk management principles for autonomous multi-agent neuro-symbolic systems.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900 px-6 py-4 text-xs font-mono text-slate-500 flex flex-wrap justify-between items-center gap-4">
+        <div>&copy; 2026 ADAM Financial Operating System (AFOS V3) &bull; Zero-Trust Ring-0 Kernel</div>
+        <div class="flex space-x-4">
+            <a href="daily_brief.md" class="hover:text-cyan-400">Raw Brief (MD)</a>
+            <a href="data.jsonl" class="hover:text-cyan-400">W3C PROV-O Ledger (JSONL)</a>
+            <a href="../../../index.html" class="hover:text-cyan-400">Return to Terminal</a>
+        </div>
+    </footer>
+
+</body>
+</html>
