@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.1 | Market Mayhem & Fortress and Hunt (Nov 7, 2026)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' },
+                        rose: { 500: '#f43f5e', 600: '#e11d48' },
+                        emerald: { 500: '#10b981', 400: '#34d399' },
+                        cyan: { 500: '#06b6d4', 400: '#22d3ee' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Interactive Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1329; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="bg-rose-600 text-white p-2 rounded-lg font-mono font-bold text-lg leading-none shadow-lg shadow-rose-900/40">
+                ADAM
+            </div>
+            <div>
+                <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                    MARKET MAYHEM & FORTRESS AND HUNT
+                    <span class="bg-rose-500/10 text-rose-400 text-xs px-2 py-0.5 rounded border border-rose-500/20 font-mono">v30.1 CRITICAL</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">Cycle: Nov 4 Mid-Week Pivot &rarr; Nov 6 EOD Settlement | Observation: Sat, Nov 7, 2026</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                ZERO-TRUST KERNEL: ACTIVE
+            </span>
+            <a href="interactive_credit_model.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-medium px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-cyan-400"></i> Credit Stress Engine
+            </a>
+            <a href="../../index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-medium px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                &larr; Hub
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+        <!-- BLUF Banner -->
+        <div class="bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900 border border-rose-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
+                <i class="fa-solid fa-radiation text-9xl text-rose-500"></i>
+            </div>
+            <div class="flex items-center gap-2 text-rose-400 font-mono text-xs uppercase tracking-widest font-semibold mb-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> Bottom Line Up Front (BLUF) &bull; System Status Critical
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight mb-3">
+                Post-Midterm Equity Whipsaw &bull; VIX Regime Breakout (25.64) &bull; Physical Oil Crush &bull; 8.420% BSL Borrowing Floor
+            </h2>
+            <p class="text-slate-300 text-sm leading-relaxed max-w-5xl">
+                Global capital markets staged a violent two-way regime inflection: Wednesday's post-election relief surge (SPX 7,688.62, Dow +1,500 pts) was followed by Thursday's severe tech/AI capex liquidation (SPX 7,353.73, RUT -4.45%, VIX 28.18 peak) and Friday's payrolls stabilization (SPX 7,376.86, +165K jobs, 4.1% unemployment). Front-month Brent crude unwound from $114.17 to $98.67/bbl on Middle East diplomatic de-escalation, compressing the Brent-WTI spread to $7.80/bbl and triggering a 50% trimming of our energy sleeve. Overnight SOFR closed at 3.920% with 30D average at 3.91294%, locking all-in syndicated corporate borrowing costs at 8.420%.
+            </p>
+        </div>
+
+        <!-- Telemetry Grid (6 Metrics) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 font-mono">
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>S&P 500</span>
+                    <span class="text-emerald-400">+0.31% Fri</span>
+                </div>
+                <div class="text-2xl font-bold text-white mt-1">7,376.86</div>
+                <div class="text-[11px] text-rose-400 mt-1">-2.68% Week (Worst Wk)</div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>CBOE VIX</span>
+                    <span class="text-rose-400">-9.0% Fri</span>
+                </div>
+                <div class="text-2xl font-bold text-amber-400 mt-1">25.64</div>
+                <div class="text-[11px] text-slate-400 mt-1">Thu Peak: 28.18</div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>US 10Y Yield</span>
+                    <span class="text-amber-400">+2.0 bps</span>
+                </div>
+                <div class="text-2xl font-bold text-cyan-400 mt-1">4.860%</div>
+                <div class="text-[11px] text-slate-400 mt-1">Down from 4.992% Oct 27</div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>Overnight SOFR</span>
+                    <span class="text-slate-400">-2.0 bps</span>
+                </div>
+                <div class="text-2xl font-bold text-rose-400 mt-1">3.920%</div>
+                <div class="text-[11px] text-amber-400 mt-1">30D Avg: 3.91294%</div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>ICE Brent</span>
+                    <span class="text-slate-400">+0.44% Fri</span>
+                </div>
+                <div class="text-2xl font-bold text-amber-400 mt-1">$98.67</div>
+                <div class="text-[11px] text-emerald-400 mt-1">-13.6% from $114.17</div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+                <div class="text-slate-400 text-xs flex justify-between">
+                    <span>BSL Hurdle</span>
+                    <span class="text-rose-400">LOCKED</span>
+                </div>
+                <div class="text-2xl font-bold text-rose-500 mt-1">8.420%</div>
+                <div class="text-[11px] text-slate-400 mt-1">SOFR + 450 bps Spread</div>
+            </div>
+        </div>
+
+        <!-- Visual Analytics: Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Chart 1: Equity & Vol Whipsaw -->
+            <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-cyan-400"></i> Bitemporal Regime Inflection (Oct 27 &rarr; Nov 6)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">S&P 500 correction vs VIX breakout and Brent crush</p>
+                    </div>
+                    <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-mono px-2 py-0.5 rounded">
+                        PROV-O VERIFIED
+                    </span>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="bitemporalChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Fortress & Hunt Barbell Allocation -->
+            <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chess-rook text-emerald-400"></i> Barbell Portfolio ($100M NAV)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">75% Fortress Ballast / 25% Convex Hunt</p>
+                    </div>
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono px-2 py-0.5 rounded">
+                        ASYMMETRIC ALPHA
+                    </span>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="barbellChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Credit Stress Resolution & LGD Waterfall -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Debt Service Solvency Summary -->
+            <div class="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-transfer text-rose-400"></i> BLTC Corporate Debt Service Solvency (SOFR 3.920%)
+                </h3>
+                <div class="grid grid-cols-3 gap-3 font-mono text-center">
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">Year 1 CADS</div>
+                        <div class="text-lg font-bold text-emerald-400 mt-1">$190.00 M</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">Total Debt Service</div>
+                        <div class="text-lg font-bold text-rose-400 mt-1">$191.30 M</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">Cash FCF DSCR</div>
+                        <div class="text-lg font-bold text-rose-500 mt-1">0.993x</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    With an all-in floating borrowing floor of 8.420% ($126.30M TLB interest + $50.00M fixed notes + $15.00M mandatory amortization), BLTC suffers a <strong>-$1.30M net cash bleed</strong> in Year 1. Standardized Basel III risk weights trigger 150% treatment and jsonLogic watchlist escalation.
+                </p>
+            </div>
+
+            <!-- Chapter 11 APR Liquidation EV Waterfall -->
+            <div class="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-water-ladder text-amber-400"></i> Absolute Priority Rule (APR) Liquidation Recovery
+                </h3>
+                <div class="grid grid-cols-3 gap-3 font-mono text-center">
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">Senior TLB Recovery</div>
+                        <div class="text-lg font-bold text-emerald-400 mt-1">93.33%</div>
+                        <div class="text-[10px] text-slate-400">LGD: 6.67% (5.0x)</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">Unsecured Notes</div>
+                        <div class="text-lg font-bold text-rose-500 mt-1">0.00%</div>
+                        <div class="text-[10px] text-rose-400">LGD: 100.0%</div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 text-[11px]">3Y Cumulative PD</div>
+                        <div class="text-lg font-bold text-rose-400 mt-1">54.32%</div>
+                        <div class="text-[10px] text-amber-400">QMC Tail: 68.40%</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Under a 5.0x distressed EBITDA liquidation ($1,400.00M EV), the $1,500.00M Senior TLB recovers $1,400.00M (93.33%), completely wiping out junior unsecured notes and equity. Under stressed 4.2x EBITDA ($1,176.00M), TLB recovery falls to 78.40% (21.60% LGD).
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 px-6 py-4 text-xs font-mono text-slate-500 flex flex-wrap justify-between items-center gap-2">
+        <div>ADAM v30.1 Neuro-Symbolic Sovereign Risk Core &bull; SR 11-7 Calibrated</div>
+        <div>W3C PROV-O Digest: MM-V30.1-20261107-SYSCORE.jsonl</div>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Bitemporal Trajectory
+            const ctx1 = document.getElementById('bitemporalChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Oct 27 Baseline', 'Nov 4 Mid-Term Pivot', 'Nov 5 VaR Liquidation', 'Nov 6 Close Settlement'],
+                    datasets: [
+                        {
+                            label: 'S&P 500 (Pts / 10)',
+                            data: [772.26, 768.86, 735.37, 737.68],
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'CBOE VIX Index',
+                            data: [17.51, 19.20, 28.18, 25.64],
+                            borderColor: '#f43f5e',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'Brent Crude ($/bbl)',
+                            data: [114.17, 104.50, 98.22, 98.67],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono' } }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono' } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 11 } }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Barbell Allocation Doughnut
+            const ctx2 = document.getElementById('barbellChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        '50% Sub-90D T-Bills (4.19%)',
+                        '25% AAA CLO Tranches (5.27%)',
+                        '12.5% Floating Debt Shorts (ATUS/RUT)',
+                        '7.5% SPX Put Spread Roll',
+                        '5% Refining/Energy Long (VLO/XOM)'
+                    ],
+                    datasets: [{
+                        data: [50.0, 25.0, 12.5, 7.5, 5.0],
+                        backgroundColor: [
+                            '#10b981',
+                            '#06b6d4',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#f59e0b'
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#0f172a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 12 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

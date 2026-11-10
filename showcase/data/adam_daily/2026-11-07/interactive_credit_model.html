@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v30.1 | Interactive Credit Stress Engine (Nov 7, 2026)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151f32', 900: '#0b1329', 950: '#070a17' },
+                        amber: { 500: '#f59e0b', 400: '#fbbf24' },
+                        rose: { 500: '#f43f5e', 600: '#e11d48' },
+                        emerald: { 500: '#10b981', 400: '#34d399' },
+                        cyan: { 500: '#06b6d4', 400: '#22d3ee' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col p-6">
+
+    <div class="max-w-6xl w-full mx-auto space-y-6">
+
+        <!-- Top Header Navigation -->
+        <header class="border-b border-slate-800 pb-4 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <span class="text-rose-500 font-mono text-xs uppercase tracking-widest font-bold">Quantitative Credit Laboratory</span>
+                <h1 class="text-2xl font-extrabold text-white mt-0.5">Interactive Credit Stress & LGD Engine</h1>
+                <p class="text-xs text-slate-400 font-mono">Benchmark Levered Corporate (BLTC) &bull; Nov 6, 2026 Clearing Tape</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="flash-lite.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-cyan-400"></i> Flash Lite Dashboard
+                </a>
+                <button onclick="resetDefaults()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-mono px-3 py-1.5 rounded-lg transition">
+                    Reset Defaults
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Interactive Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Controls Column -->
+            <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
+                <h2 class="text-sm font-bold text-white uppercase font-mono tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Macro Stress Parameters
+                </h2>
+
+                <!-- Parameter 1: Base SOFR -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-300">Base Cash SOFR:</span>
+                        <span id="sofrVal" class="text-cyan-400 font-bold">3.92%</span>
+                    </div>
+                    <input type="range" id="sofrInput" min="2.50" max="6.50" step="0.01" value="3.92" oninput="updateModel()" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer accent-cyan-400">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>2.50%</span>
+                        <span>Spot: 3.92%</span>
+                        <span>6.50%</span>
+                    </div>
+                </div>
+
+                <!-- Parameter 2: Senior TLB Spread -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-300">Senior TLB Spread:</span>
+                        <span id="spreadVal" class="text-cyan-400 font-bold">450 bps</span>
+                    </div>
+                    <input type="range" id="spreadInput" min="250" max="750" step="5" value="450" oninput="updateModel()" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer accent-cyan-400">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>250 bps</span>
+                        <span>Base: 450 bps</span>
+                        <span>750 bps</span>
+                    </div>
+                </div>
+
+                <!-- Parameter 3: EBITDA -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-300">Operating EBITDA:</span>
+                        <span id="ebitdaVal" class="text-emerald-400 font-bold">$280 M</span>
+                    </div>
+                    <input type="range" id="ebitdaInput" min="150" max="400" step="5" value="280" oninput="updateModel()" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer accent-emerald-400">
+                </div>
+
+                <!-- Parameter 4: Maintenance CapEx -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-300">Maintenance CapEx:</span>
+                        <span id="capexVal" class="text-amber-400 font-bold">$90 M</span>
+                    </div>
+                    <input type="range" id="capexInput" min="50" max="150" step="5" value="90" oninput="updateModel()" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer accent-amber-400">
+                </div>
+
+                <!-- Parameter 5: Distressed EV Multiple -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-300">Chapter 11 EV Multiple:</span>
+                        <span id="multipleVal" class="text-purple-400 font-bold">5.0x</span>
+                    </div>
+                    <input type="range" id="multipleInput" min="3.0" max="8.0" step="0.1" value="5.0" oninput="updateModel()" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer accent-purple-400">
+                </div>
+
+                <!-- Summary Info Card -->
+                <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 font-mono text-xs space-y-1.5">
+                    <div class="text-slate-400 uppercase tracking-wider text-[10px]">Capital Structure Baseline</div>
+                    <div class="flex justify-between"><span>Total Debt:</span><span class="text-white">$2,500.00 M</span></div>
+                    <div class="flex justify-between"><span>Senior Secured TLB (60%):</span><span class="text-white">$1,500.00 M</span></div>
+                    <div class="flex justify-between"><span>Fixed Unsecured Notes (40%):</span><span class="text-white">$1,000.00 M @ 5.0%</span></div>
+                    <div class="flex justify-between"><span>Mandatory TLB Amortization:</span><span class="text-white">$15.00 M / yr</span></div>
+                </div>
+            </div>
+
+            <!-- Right Visual Output Column -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Calculated Key Metrics Banner -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-center">
+                        <div class="text-slate-400 text-xs font-mono">All-In Floating Floor</div>
+                        <div id="allInRate" class="text-xl font-bold font-mono text-rose-400 mt-1">8.420%</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-center">
+                        <div class="text-slate-400 text-xs font-mono">Cash FCF DSCR</div>
+                        <div id="dscrScore" class="text-xl font-bold font-mono text-rose-400 mt-1">0.993x</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-center">
+                        <div class="text-slate-400 text-xs font-mono">Senior TLB LGD %</div>
+                        <div id="seniorLgd" class="text-xl font-bold font-mono text-amber-400 mt-1">6.67%</div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-center">
+                        <div class="text-slate-400 text-xs font-mono">3Y Cumulative PD</div>
+                        <div id="cumPd" class="text-xl font-bold font-mono text-rose-500 mt-1">54.32%</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Chart 1: Debt Service Waterfall -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-white uppercase font-mono tracking-wider">Debt Service vs CADS Solvency</h3>
+                        <span id="fcfBleedTag" class="text-xs font-mono font-bold text-rose-400">Net Bleed: -$1.30M</span>
+                    </div>
+                    <div class="h-56 relative">
+                        <canvas id="waterfallChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Dynamic Chart 2: Priority LGD Waterfall -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-white uppercase font-mono tracking-wider">Chapter 11 Liquidation Claims Recovery ($M)</h3>
+                        <span id="liqEvTag" class="text-xs font-mono text-emerald-400 font-bold">Liquidation EV: $1,400.0M</span>
+                    </div>
+                    <div class="h-48 relative">
+                        <canvas id="lgdChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Interactive Logic Script -->
+    <script>
+        let waterfallChart, lgdChart;
+
+        function initCharts() {
+            const ctx1 = document.getElementById('waterfallChart').getContext('2d');
+            waterfallChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['CADS', 'Floating Int', 'Fixed Int', 'Amortization', 'Total Service'],
+                    datasets: [{
+                        label: 'USD ($M)',
+                        data: [190, 126.30, 50, 15, 191.30],
+                        backgroundColor: ['#10b981', '#38bdf8', '#818cf8', '#a78bfa', '#f59e0b'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono' } } },
+                        x: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono' } } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('lgdChart').getContext('2d');
+            lgdChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Senior TLB ($1,500M)', 'Unsecured Notes ($1,000M)'],
+                    datasets: [
+                        { label: 'Recovered ($M)', data: [1400, 0], backgroundColor: '#10b981' },
+                        { label: 'Loss / Impaired ($M)', data: [100, 1000], backgroundColor: '#f43f5e' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { labels: { color: '#cbd5e1', font: { family: 'JetBrains Mono' } } } },
+                    scales: {
+                        x: { stacked: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        y: { stacked: true, grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+        }
+
+        function updateModel() {
+            const sofr = parseFloat(document.getElementById('sofrInput').value);
+            const spread = parseInt(document.getElementById('spreadInput').value);
+            const ebitda = parseFloat(document.getElementById('ebitdaInput').value);
+            const capex = parseFloat(document.getElementById('capexInput').value);
+            const multiple = parseFloat(document.getElementById('multipleInput').value);
+
+            // Update Labels
+            document.getElementById('sofrVal').innerText = sofr.toFixed(2) + '%';
+            document.getElementById('spreadVal').innerText = spread + ' bps';
+            document.getElementById('ebitdaVal').innerText = '$' + ebitda + ' M';
+            document.getElementById('capexVal').innerText = '$' + capex + ' M';
+            document.getElementById('multipleVal').innerText = multiple.toFixed(1) + 'x';
+
+            // Calculations
+            const allInFloating = (sofr + spread / 100.0) / 100.0;
+            const floatingInt = 1500.0 * allInFloating;
+            const fixedInt = 1000.0 * 0.05;
+            const totalInt = floatingInt + fixedInt;
+            const annualAmort = 15.0;
+            const totalDebtService = totalInt + annualAmort;
+            const cads = ebitda - capex;
+            const dscr = cads / totalDebtService;
+            const netBleed = cads - totalDebtService;
+
+            // Liquidation EV & Waterfall
+            const liqEv = ebitda * multiple;
+            const seniorClaim = 1500.0;
+            const unsecuredClaim = 1000.0;
+            const seniorRec = Math.min(liqEv, seniorClaim);
+            const seniorLgdPct = ((seniorClaim - seniorRec) / seniorClaim) * 100.0;
+            const remEv = Math.max(0.0, liqEv - seniorClaim);
+            const unsecRec = Math.min(remEv, unsecuredClaim);
+
+            // Hazard PD Shift
+            const basePd = 54.32 * (allInFloating / 0.0842);
+
+            // Update Display Metrics
+            document.getElementById('allInRate').innerText = (allInFloating * 100.0).toFixed(3) + '%';
+            document.getElementById('dscrScore').innerText = dscr.toFixed(3) + 'x';
+            document.getElementById('seniorLgd').innerText = seniorLgdPct.toFixed(2) + '%';
+            document.getElementById('cumPd').innerText = Math.min(99.9, basePd).toFixed(2) + '%';
+
+            document.getElementById('fcfBleedTag').innerText = (netBleed >= 0 ? 'Surplus: +$' : 'Net Bleed: -$') + Math.abs(netBleed).toFixed(2) + 'M';
+            document.getElementById('fcfBleedTag').className = 'text-xs font-mono font-bold ' + (netBleed >= 0 ? 'text-emerald-400' : 'text-rose-400');
+            document.getElementById('liqEvTag').innerText = 'Liquidation EV: $' + liqEv.toFixed(1) + 'M';
+
+            // Update Waterfall Chart
+            waterfallChart.data.datasets[0].data = [
+                cads, parseFloat(floatingInt.toFixed(2)), fixedInt, annualAmort, parseFloat(totalDebtService.toFixed(2))
+            ];
+            waterfallChart.update();
+
+            // Update LGD Chart
+            lgdChart.data.datasets[0].data = [seniorRec, unsecRec];
+            lgdChart.data.datasets[1].data = [seniorClaim - seniorRec, unsecuredClaim - unsecRec];
+            lgdChart.update();
+        }
+
+        function resetDefaults() {
+            document.getElementById('sofrInput').value = 3.92;
+            document.getElementById('spreadInput').value = 450;
+            document.getElementById('ebitdaInput').value = 280;
+            document.getElementById('capexInput').value = 90;
+            document.getElementById('multipleInput').value = 5.0;
+            updateModel();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateModel();
+        });
+    </script>
+</body>
+</html>
