@@ -1,0 +1,22 @@
+{
+  "name": "sentinel-security-plugin",
+  "version": "30.1.0",
+  "type": "security-governance",
+  "description": "Zero-trust policy enforcement and quarantine gatekeeper for Antigravity Agent actions",
+  "hooks": [
+    {
+      "trigger": "pre-tool-execution",
+      "action": "enforce_policy",
+      "policies": [
+        "deny('execute_shell_root')",
+        "allow('read_*')",
+        "allow('write_*')"
+      ]
+    }
+  ],
+  "zero_trust": {
+    "sts_token_ttl_seconds": 900,
+    "require_ecdsa_signature": true,
+    "quarantine_on_failure": true
+  }
+}

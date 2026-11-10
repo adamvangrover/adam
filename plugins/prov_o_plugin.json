@@ -1,0 +1,15 @@
+{
+  "name": "w3c-prov-o-plugin",
+  "version": "30.1.0",
+  "type": "audit-provenance",
+  "description": "Cryptographic W3C PROV-O audit trail and SHA-256 state tracking for Antigravity workflows",
+  "provenance_standard": "W3C PROV-O / ISO 27001",
+  "hash_algorithm": "SHA-256",
+  "hooks": [
+    {
+      "trigger": "post-tool-execution",
+      "action": "record_activity",
+      "fields": ["prov:Activity", "prov:used", "prov:generated", "timestamp"]
+    }
+  ]
+}
