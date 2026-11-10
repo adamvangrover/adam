@@ -244,6 +244,66 @@ class MilestoneLogger:
             return {}
         return sorted(self.milestones, key=lambda m: m["conviction"] / max(m["complexity"], 0.001), reverse=True)[0]
 
+class RustPDILBridgeGatekeeper:
+    """
+    Python wrapper bridging RustPDILGatekeeper with zero-copy JCS evaluation
+    and pure-Python fallback if rust_ext is unavailable.
+    """
+    def __init__(self, min_conviction: float = 0.85, max_vpin: float = 0.82, min_dscr: float = 1.05):
+        self.min_conviction = min_conviction
+        self.max_vpin = max_vpin
+        self.min_dscr = min_dscr
+        self._rust_gate = None
+        try:
+            import rust_ext  # type: ignore[import-not-found]
+            if hasattr(rust_ext, "RustPDILGatekeeper"):
+                self._rust_gate = rust_ext.RustPDILGatekeeper(min_conviction, max_vpin, min_dscr)
+        except Exception:
+            self._rust_gate = None
+
+    def evaluate(
+        self,
+        raw_json_bytes: bytes,
+        jev_conviction: float,
+        vpin_toxicity: float,
+        stressed_dscr: float,
+        cedar_forbid_triggered: bool,
+        raw_quality_score: float,
+    ) -> tuple[int, float, str, str]:
+        if self._rust_gate is not None:
+            return self._rust_gate.evaluate_gate(
+                raw_json_bytes,
+                jev_conviction,
+                vpin_toxicity,
+                stressed_dscr,
+                cedar_forbid_triggered,
+                raw_quality_score,
+            )
+
+        # Pure-Python fallback matching rust_ext logic
+        parsed = json.loads(raw_json_bytes.decode("utf-8"))
+        canonical_str = json.dumps(parsed, sort_keys=True, separators=(",", ":"))
+        sha256_hex = hashlib.sha256(canonical_str.encode("utf-8")).hexdigest()
+
+        if cedar_forbid_triggered:
+            return 0, 0.0, sha256_hex, "BLOCK_CEDAR_FORBID"
+        if vpin_toxicity > self.max_vpin:
+            return 0, 0.0, sha256_hex, "BLOCK_CBF_VPIN_TOXICITY"
+        if stressed_dscr < self.min_dscr:
+            return 0, 0.0, sha256_hex, "BLOCK_DSCR_FLOOR_BREACH"
+        if jev_conviction < self.min_conviction:
+            return 0, 0.0, sha256_hex, "ABSTAIN_JEV_LOW_CONVICTION"
+
+        final_score = 1.0 * min(5.0, max(0.0, raw_quality_score))
+        if final_score >= 4.0:
+            route = "COMMIT_CANDIDATE"
+        elif final_score >= 3.0:
+            route = "HUMAN_ESCALATE"
+        else:
+            route = "BLOCK_AND_LOG"
+        return 1, final_score, sha256_hex, route
+
+
 __all__ = [
     "GovernanceError",
     "JsonLogicGovernanceGatekeeper",
@@ -251,4 +311,5 @@ __all__ = [
     "DriftIntelligenceLayer",
     "ProofOfThoughtLogger",
     "MilestoneLogger",
+    "RustPDILBridgeGatekeeper",
 ]
