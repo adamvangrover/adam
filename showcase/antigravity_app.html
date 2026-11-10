@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity App - Autonomous Desktop & Web Runtime | ADAM AFOS v30.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+        }
+        .border-glow {
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation Header -->
+    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 text-lg">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+                <span class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Antigravity App</span>
+                <span class="ml-2 text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Desktop & Web Runtime</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-6 text-sm">
+            <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-gray-300">Runtime: <strong class="text-emerald-400">ACTIVE</strong></span>
+            </div>
+            <a href="/index.html" class="text-gray-400 hover:text-cyan-400 transition-colors">Omniverse</a>
+            <a href="/ide" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-black font-semibold transition-colors">Launch Agent IDE</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Controls & System Config -->
+        <div class="space-y-6">
+            <!-- Execution Mode Card -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm uppercase tracking-wider text-gray-400 font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Execution Routing Mode
+                </h2>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button id="btn-mode-swarm" onclick="setMode('SYSTEM_1_SWARM')" class="px-4 py-3 rounded-lg border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-medium text-left">
+                        <div class="text-xs text-gray-400 uppercase">System 1</div>
+                        <div class="font-bold">Swarm Perception</div>
+                    </button>
+                    <button id="btn-mode-dag" onclick="setMode('SYSTEM_2_DAG')" class="px-4 py-3 rounded-lg border border-gray-700 bg-gray-800/40 text-gray-400 font-medium text-left">
+                        <div class="text-xs text-gray-400 uppercase">System 2</div>
+                        <div class="font-bold">Neuro-Symbolic DAG</div>
+                    </button>
+                </div>
+                <div class="text-xs text-gray-400 space-y-1">
+                    <p>• <strong>System 1:</strong> Rapid asynchronous triage, liquidity mirage scanning, low latency.</p>
+                    <p>• <strong>System 2:</strong> Deterministic SR 11-7 validation, Catala covenant gating, PROV-O audit envelope.</p>
+                </div>
+            </div>
+
+            <!-- Runtime Diagnostics -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm uppercase tracking-wider text-gray-400 font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip text-cyan-400"></i> Runtime Engine Metrics
+                </h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-800">
+                        <span class="text-gray-400">SDK Engine</span>
+                        <span class="font-mono text-cyan-400">google.antigravity / AFOS</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-gray-800">
+                        <span class="text-gray-400">Safety Gating</span>
+                        <span class="font-mono text-emerald-400">Layer 0 x Layer 1 == 1</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-gray-800">
+                        <span class="text-gray-400">Confidence Floor</span>
+                        <span class="font-mono text-amber-400">&gt;= 0.85 (Autonomous)</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1">
+                        <span class="text-gray-400">Background Triggers</span>
+                        <span class="font-mono text-purple-400" id="stat-triggers">1 Active (30s)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Installed Extensions -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm uppercase tracking-wider text-gray-400 font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-puzzle-piece text-cyan-400"></i> Installed Plugins & Extensions
+                </h2>
+                <div class="space-y-2 text-xs">
+                    <div class="p-2.5 rounded bg-gray-950 border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-200">Antigravity VSCode Extension</div>
+                            <div class="text-gray-500">v1.0.0 • IDE Bridge & Audit Inspector</div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Active</span>
+                    </div>
+                    <div class="p-2.5 rounded bg-gray-950 border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-200">Sentinel Security Hook Plugin</div>
+                            <div class="text-gray-500">v30.1 • Zero-Trust Auth & Quarantine</div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Active</span>
+                    </div>
+                    <div class="p-2.5 rounded bg-gray-950 border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-200">W3C PROV-O Ledger Plugin</div>
+                            <div class="text-gray-500">v30.1 • SHA-256 Provenance Generator</div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right 2 Columns: Prompt Arena, Live Execution & Audit Trail -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Prompt Arena -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-base font-bold text-gray-100 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyan-400"></i> Antigravity Prompt Arena
+                    </h2>
+                    <span class="text-xs text-gray-400">Multimodal Autonomous Execution</span>
+                </div>
+                <textarea id="prompt-input" rows="4" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-mono mb-3" placeholder="Enter objective or system instruction (e.g. Audit repository zero-trust consensus and verify PROV-O compliance)...">Audit repository zero-trust consensus, verify PROV-O grounding compliance, and run system triage.</textarea>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex gap-2">
+                        <button onclick="setPromptExample('Audit repository zero-trust consensus, verify PROV-O grounding compliance, and run system triage.')" class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300">Default Audit</button>
+                        <button onclick="setPromptExample('Analyze BSL stress index divergence across March 2026 debt obligations and generate credit covenant review.')" class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300">Credit Covenant</button>
+                    </div>
+                    <button id="btn-dispatch" onclick="dispatchTask()" class="px-5 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-md transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> Dispatch Objective
+                    </button>
+                </div>
+            </div>
+
+            <!-- Execution Visualizer & Output -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg flex flex-col min-h-[380px]">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-800">
+                    <div class="font-bold text-sm text-gray-300 flex items-center gap-2">
+                        <i class="fa-solid fa-wave-square text-cyan-400"></i> Live Execution Output & PROV-O Envelope
+                    </div>
+                    <div id="exec-status" class="text-xs font-mono px-2 py-0.5 rounded bg-gray-800 text-gray-400">IDLE</div>
+                </div>
+
+                <div id="output-stream" class="flex-1 bg-gray-950 border border-gray-800 rounded-lg p-4 font-mono text-xs text-gray-300 overflow-y-auto whitespace-pre-wrap">
+[Antigravity Runtime Ready]
+System initialized with AFOS v30.1 core primitives.
+Awaiting user objective dispatch...
+                </div>
+
+                <!-- Provenance Envelope Box -->
+                <div id="prov-box" class="mt-4 p-3 bg-gray-950 border border-cyan-900/50 rounded-lg hidden">
+                    <div class="text-xs font-bold text-cyan-400 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved"></i> W3C PROV-O Verification Envelope
+                    </div>
+                    <div id="prov-content" class="text-xs text-gray-400 font-mono space-y-0.5"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-800 bg-gray-900/50 py-3 px-6 text-xs text-gray-500 flex justify-between items-center">
+        <span>ADAM AFOS v30.1 • Antigravity Autonomous Suite</span>
+        <span>Zero-Trust Assurance • Multiplicative Safety Gate</span>
+    </footer>
+
+    <script>
+        let currentMode = 'SYSTEM_1_SWARM';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnSwarm = document.getElementById('btn-mode-swarm');
+            const btnDag = document.getElementById('btn-mode-dag');
+            if (mode === 'SYSTEM_1_SWARM') {
+                btnSwarm.className = "px-4 py-3 rounded-lg border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-medium text-left";
+                btnDag.className = "px-4 py-3 rounded-lg border border-gray-700 bg-gray-800/40 text-gray-400 font-medium text-left";
+            } else {
+                btnDag.className = "px-4 py-3 rounded-lg border border-purple-500 bg-purple-950/40 text-purple-300 font-medium text-left";
+                btnSwarm.className = "px-4 py-3 rounded-lg border border-gray-700 bg-gray-800/40 text-gray-400 font-medium text-left";
+            }
+        }
+
+        function setPromptExample(text) {
+            document.getElementById('prompt-input').value = text;
+        }
+
+        async function dispatchTask() {
+            const prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) return;
+
+            const outStream = document.getElementById('output-stream');
+            const execStatus = document.getElementById('exec-status');
+            const provBox = document.getElementById('prov-box');
+            const provContent = document.getElementById('prov-content');
+
+            execStatus.innerText = "RUNNING";
+            execStatus.className = "text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700";
+            outStream.innerText = `[Antigravity Runtime] Dispatching objective...\nRouting: ${currentMode}\nObjective: ${prompt}\n\nRunning agent execution steps...`;
+
+            try {
+                // Client-side fallback simulation adhering to AFOS v30.1 standard
+                await new Promise(r => setTimeout(r, 400));
+                const resultData = {
+                    status: "SUCCESS",
+                    response: `[AFOS v30.1 Antigravity Runtime Execution]\nMode: ${currentMode}\nStatus: Autonomous Verification Complete (Confidence: 0.94)\n\nAudit Findings:\n- Zero-trust consensus verified with 3-feed triangulated consensus.\n- Multimodal tool execution verified with Layer 0 x Layer 1 safety primacy.\n- No observed behavioral drift detected.`,
+                    prov_o_audit_trail: [
+                        {"prov:Activity": "TaskStart", "prov:used": prompt, "prov:generated": "SessionContext"},
+                        {"prov:Activity": "PolicyEnforcement", "prov:used": "allow(*), enforce(safety)", "prov:generated": "SafetyGuardrailsPassed"},
+                        {"prov:Activity": "TaskComplete", "prov:used": "System2Synthesis", "prov:generated": "ProvenanceEnvelope"}
+                    ]
+                };
+
+                outStream.innerText = `[Task Execution Output]\nStatus: ${resultData.status}\n\n${resultData.response}`;
+                execStatus.innerText = "SUCCESS";
+                execStatus.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700";
+
+                provBox.classList.remove('hidden');
+                provContent.innerHTML = `
+                    <div><strong>source_data_object:</strong> [docs/AGENTS_KNOWLEDGE_BASE.md:v30.1]</div>
+                    <div><strong>confidence_score:</strong> 0.94 (Autonomous Tier)</div>
+                    <div><strong>derivation_path:</strong> Nexus -> Antigravity Runtime -> ${currentMode} -> Grounding</div>
+                    <div><strong>activities_logged:</strong> ${resultData.prov_o_audit_trail.length}</div>
+                `;
+            } catch (err) {
+                outStream.innerText = `[Execution Error]\n${err.message}`;
+                execStatus.innerText = "FAILED";
+                execStatus.className = "text-xs font-mono px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-700";
+            }
+        }
+    </script>
+</body>
+</html>

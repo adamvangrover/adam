@@ -61,6 +61,7 @@ class Conversation:
     """
 
     def __init__(self, tool_runner: ToolRunner | None = None, hook_runner: HookRunner | None = None) -> None:
+        self.session_id: str = str(uuid4())
         self.tool_runner = tool_runner or ToolRunner()
         self.hook_runner = hook_runner or HookRunner()
         self.history: list[Step] = []

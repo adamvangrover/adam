@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Agent Workbench & IDE - ADAM AFOS v30.1</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --panel-bg: #111827;
+            --panel-border: #1f2937;
+            --editor-bg: #030712;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-hover: #0891b2;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --tab-active: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navbar */
+        header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            letter-spacing: -0.5px;
+        }
+        .badge {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .top-nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .top-nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .top-nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* Workspace Grid */
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 260px 1fr 380px;
+            overflow: hidden;
+        }
+
+        /* Sidebar - Files & Tree */
+        .sidebar {
+            background: var(--panel-bg);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-title {
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+        .tree-item {
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tree-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .tree-item.selected {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        /* Editor Section */
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            background: var(--editor-bg);
+            border-right: 1px solid var(--panel-border);
+            overflow: hidden;
+        }
+        .editor-tabs {
+            display: flex;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--panel-border);
+            height: 38px;
+            align-items: center;
+            padding: 0 8px;
+            gap: 4px;
+        }
+        .tab {
+            background: var(--bg-dark);
+            border: 1px solid var(--panel-border);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+        }
+        .tab.active {
+            background: var(--editor-bg);
+            color: var(--text-main);
+            border-bottom: 1px solid var(--editor-bg);
+        }
+        .editor-toolbar {
+            padding: 6px 12px;
+            background: rgba(17, 24, 39, 0.6);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .code-textarea {
+            flex: 1;
+            background: var(--editor-bg);
+            color: #e2e8f0;
+            border: none;
+            padding: 14px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            overflow: auto;
+            white-space: pre;
+        }
+
+        /* Right Panel: Chat, Tools, Audit */
+        .right-panel {
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .panel-nav {
+            display: flex;
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .panel-nav-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .panel-nav-btn.active {
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .panel-tab-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 10px;
+        }
+        .chat-stream {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+        .chat-bubble {
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .chat-bubble.user {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            align-self: flex-end;
+            max-width: 85%;
+        }
+        .chat-bubble.agent {
+            background: #1f2937;
+            border: 1px solid #374151;
+            align-self: flex-start;
+            max-width: 90%;
+            white-space: pre-wrap;
+        }
+
+        .chat-input-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            background: var(--bg-dark);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: var(--accent-cyan-hover);
+            color: #fff;
+        }
+
+        /* Telemetry Footer */
+        footer {
+            background: var(--panel-bg);
+            border-top: 1px solid var(--panel-border);
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .telemetry-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dot-online {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        .audit-card {
+            background: #030712;
+            border: 1px solid var(--panel-border);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <span>⚡ Antigravity Agent IDE</span>
+            <span class="badge">AFOS v30.1</span>
+        </div>
+        <div class="top-nav-links">
+            <a href="/showcase/antigravity_app.html" target="_blank">Desktop/Web App</a>
+            <a href="/index.html">Adam Omniverse</a>
+            <span id="model-badge" class="badge">gemini-2.5-pro</span>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- Workspace File Explorer -->
+        <div class="sidebar">
+            <div class="panel-title">
+                <span>Workspace Files</span>
+                <button onclick="refreshFiles()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">⟳</button>
+            </div>
+            <div class="file-tree" id="file-tree">
+                <div style="color: var(--text-muted); padding: 10px;">Loading tree...</div>
+            </div>
+        </div>
+
+        <!-- Code Editor Section -->
+        <div class="editor-section">
+            <div class="editor-tabs">
+                <div class="tab active" id="active-tab">scratchpad.py</div>
+            </div>
+            <div class="editor-toolbar">
+                <span id="editor-status" style="font-size: 0.75rem; color: var(--text-muted);">Ready</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-primary" onclick="saveCurrentFile()" style="padding: 4px 10px; font-size: 0.75rem;">Save File</button>
+                    <button class="btn-primary" onclick="runInEditor()" style="padding: 4px 10px; font-size: 0.75rem; background: var(--accent-purple); color: #fff;">Execute Prompt</button>
+                </div>
+            </div>
+            <textarea class="code-textarea" id="editor-code" spellcheck="false"># Antigravity Agent Workbench Editor
+# Open any workspace file or type code/prompt here.
+
+import asyncio
+from src.antigravity_sdk import Agent, LocalAgentConfig
+
+async def main():
+    config = LocalAgentConfig()
+    async with Agent(config) as agent:
+        response = await agent.chat("Evaluate AFOS v30.1 safety primacy")
+        print(await response.text())
+
+if __name__ == "__main__":
+    asyncio.run(main())
+</textarea>
+        </div>
+
+        <!-- Right Side: Agent Stream, Tools & Audit -->
+        <div class="right-panel">
+            <div class="panel-nav">
+                <button class="panel-nav-btn active" onclick="switchRightTab('chat')">Agent Chat</button>
+                <button class="panel-nav-btn" onclick="switchRightTab('tools')">Tools & Hooks</button>
+                <button class="panel-nav-btn" onclick="switchRightTab('audit')">PROV-O Trace</button>
+            </div>
+
+            <div class="panel-tab-content" id="tab-chat">
+                <div class="chat-stream" id="chat-stream">
+                    <div class="chat-bubble agent">🤖 Antigravity Agent initialized. Enter an objective, coding task, or question below.</div>
+                </div>
+                <div class="chat-input-bar">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask agent or run task..." onkeydown="if(event.key==='Enter') sendChat()">
+                    <button class="btn-primary" onclick="sendChat()">Send</button>
+                </div>
+            </div>
+
+            <div class="panel-tab-content" id="tab-tools" style="display: none; overflow-y: auto;">
+                <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">Registered Tools</div>
+                <div id="tools-container">Loading tools...</div>
+                <div style="font-size: 0.8rem; font-weight: 700; margin: 16px 0 8px 0;">Active Triggers</div>
+                <div id="triggers-container">Loading triggers...</div>
+            </div>
+
+            <div class="panel-tab-content" id="tab-audit" style="display: none; overflow-y: auto;">
+                <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">W3C PROV-O Audit Stream</div>
+                <div id="audit-container">
+                    <div class="audit-card">
+                        <div style="color: var(--accent-green);">[PROV-O Activity] SessionStart</div>
+                        <div>Target: Antigravity IDE Workbench</div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem;">derivation_path: Root -> Nexus -> PDIL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="telemetry-indicator">
+            <div class="dot-online"></div>
+            <span>Antigravity Runtime: ONLINE</span>
+            <span style="margin: 0 8px;">|</span>
+            <span id="trigger-count">Active Triggers: 1</span>
+        </div>
+        <div>
+            <span>Safety Shield: Active (Layer 0 x Layer 1)</span>
+        </div>
+    </footer>
+
+    <script>
+        let currentFilepath = "scratchpad.py";
+
+        function switchRightTab(tabId) {
+            document.querySelectorAll('.panel-nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-chat').style.display = tabId === 'chat' ? 'flex' : 'none';
+            document.getElementById('tab-tools').style.display = tabId === 'tools' ? 'block' : 'none';
+            document.getElementById('tab-audit').style.display = tabId === 'audit' ? 'block' : 'none';
+            if (tabId === 'tools') loadToolsAndTriggers();
+        }
+
+        async function refreshFiles() {
+            try {
+                const res = await fetch('/api/files?path=.');
+                const data = await res.json();
+                const container = document.getElementById('file-tree');
+                container.innerHTML = data.entries.map(e => `
+                    <div class="tree-item" onclick="openFile('${e.path}', ${e.is_dir})">
+                        <span>${e.is_dir ? '📁' : '📄'}</span>
+                        <span>${e.name}</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Failed to load files", err);
+            }
+        }
+
+        async function openFile(filepath, isDir) {
+            if (isDir) return;
+            try {
+                const res = await fetch(`/api/file?filepath=${encodeURIComponent(filepath)}`);
+                if (!res.ok) throw new Error("Could not load file");
+                const data = await res.json();
+                currentFilepath = data.filepath;
+                document.getElementById('active-tab').innerText = filepath.split('/').pop();
+                document.getElementById('editor-code').value = data.content;
+                document.getElementById('editor-status').innerText = `Loaded: ${filepath}`;
+            } catch (err) {
+                alert("Error loading file: " + err.message);
+            }
+        }
+
+        async function saveCurrentFile() {
+            const content = document.getElementById('editor-code').value;
+            try {
+                const res = await fetch('/api/file', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({filepath: currentFilepath, content})
+                });
+                const data = await res.json();
+                document.getElementById('editor-status').innerText = `Saved ${data.bytes_written} bytes at ${new Date().toLocaleTimeString()}`;
+            } catch (err) {
+                alert("Save failed: " + err.message);
+            }
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+
+            const stream = document.getElementById('chat-stream');
+            stream.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+            stream.scrollTop = stream.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg})
+                });
+                const data = await res.json();
+                stream.innerHTML += `<div class="chat-bubble agent">${data.reply}</div>`;
+                stream.scrollTop = stream.scrollHeight;
+            } catch (err) {
+                stream.innerHTML += `<div class="chat-bubble agent">⚠️ Error: ${err.message}</div>`;
+            }
+        }
+
+        async function runInEditor() {
+            const code = document.getElementById('editor-code').value;
+            switchRightTab('chat');
+            const stream = document.getElementById('chat-stream');
+            stream.innerHTML += `<div class="chat-bubble user">Execute Prompt from Editor...</div>`;
+            try {
+                const res = await fetch('/api/run', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: code.slice(0, 300)})
+                });
+                const data = await res.json();
+                stream.innerHTML += `<div class="chat-bubble agent">Task Result: ${data.status}\n\n${data.response}</div>`;
+                if (data.prov_o_audit_trail) {
+                    const auditCont = document.getElementById('audit-container');
+                    auditCont.innerHTML = data.prov_o_audit_trail.map(t => `
+                        <div class="audit-card">
+                            <div style="color: var(--accent-cyan);">[Activity] ${t['prov:Activity']}</div>
+                            <div>used: ${t['prov:used']}</div>
+                            <div>generated: ${t['prov:generated']}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                stream.innerHTML += `<div class="chat-bubble agent">⚠️ Run Error: ${err.message}</div>`;
+            }
+        }
+
+        async function loadToolsAndTriggers() {
+            try {
+                const [toolsRes, trigRes] = await Promise.all([
+                    fetch('/api/tools'),
+                    fetch('/api/triggers')
+                ]);
+                const toolsData = await toolsRes.json();
+                const trigData = await trigRes.json();
+
+                const tc = document.getElementById('tools-container');
+                tc.innerHTML = toolsData.tools.map(t => `
+                    <div class="audit-card">
+                        <div style="color: var(--accent-cyan); font-weight: bold;">${t.name}</div>
+                        <div>${t.description}</div>
+                    </div>
+                `).join('');
+
+                const trc = document.getElementById('triggers-container');
+                trc.innerHTML = `
+                    <div class="audit-card">
+                        <div>Active Triggers: <b>${trigData.active_triggers}</b></div>
+                        <div>Interval: ${trigData.default_interval_seconds}s</div>
+                        <div>Events Fired: ${trigData.events.length}</div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Initialize file tree
+        refreshFiles();
+    </script>
+</body>
+</html>

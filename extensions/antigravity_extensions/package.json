@@ -1,0 +1,60 @@
+{
+  "name": "antigravity-ide-extension",
+  "displayName": "Antigravity Agent IDE Extension",
+  "description": "ADAM AFOS v30.1 Antigravity Agent integration for VS Code, Cursor, and IDE Workbenches",
+  "version": "1.0.0",
+  "publisher": "adam-kernel",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:antigravity.runTask",
+    "onCommand:antigravity.chat",
+    "onCommand:antigravity.verifyProvenance"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "antigravity.runTask",
+        "title": "Antigravity: Run Autonomous Task",
+        "category": "Antigravity"
+      },
+      {
+        "command": "antigravity.chat",
+        "title": "Antigravity: Open Agent Chat",
+        "category": "Antigravity"
+      },
+      {
+        "command": "antigravity.verifyProvenance",
+        "title": "Antigravity: Verify W3C PROV-O Grounding",
+        "category": "Antigravity"
+      }
+    ],
+    "configuration": {
+      "title": "Antigravity Agent Configuration",
+      "properties": {
+        "antigravity.serverUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8000",
+          "description": "Antigravity IDE Server endpoint URL"
+        },
+        "antigravity.model": {
+          "type": "string",
+          "default": "gemini-2.5-pro",
+          "description": "Agent model identifier"
+        },
+        "antigravity.safetyPrimacy": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce Layer 0 x Layer 1 safety gating"
+        }
+      }
+    }
+  }
+}
