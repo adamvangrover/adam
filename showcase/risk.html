@@ -279,46 +279,51 @@
         While the strategic deployment of AI promises unprecedented efficiency, it simultaneously introduces novel systemic vulnerabilities. Poorly managed AI deployments can lead to algorithmic bias, catastrophic hallucination in financial modeling, severe data privacy breaches, and devastating regulatory penalization. To secure institutional trust and satisfy stringent supervisory expectations, a highly structured, non-negotiable governance framework must be deeply embedded into the foundation of the enterprise AI architecture.
     </p>
 
-    <h3>Modernizing Model Risk Management: SR 11-7 in the Age of Agentic AI</h3>
+    <h3>Modernizing Model Risk Management: From SR 11-7 to SR 26-2 & OCC 2026-13</h3>
     <p>
-        The bedrock of banking model governance in the United States is the Federal Reserve and OCC's Supervisory Guidance on Model Risk Management, commonly referred to as SR 11-7. Originally issued in 2011, SR 11-7 was explicitly designed for deterministic, statistical models with clearly defined inputs, transparent inner workings, and highly predictable outputs. These conditions historically enabled static validation cycles and well-understood, episodic governance practices.
+        The historical bedrock of banking model governance in the United States was the Federal Reserve and OCC's Supervisory Guidance on Model Risk Management, commonly referred to as SR 11-7 (issued April 4, 2011). On <strong>April 17, 2026</strong>, the Federal Reserve Board, the OCC (Bulletin 2026-13), and the FDIC (FIL-15-2026) jointly issued <strong>SR 26-2: Revised Guidance on Model Risk Management</strong>, officially superseding and rescinding SR 11-7 and SR 21-8 while retaining core principles of model development, independent review, and ongoing monitoring.
     </p>
     <p>
-        Generative and agentic AI systems inherently break these traditional supervisory assumptions. LLMs and autonomous agentic workflows are often highly opaque, produce non-deterministic or probabilistic outputs, and possess the capability to recalibrate autonomously based on continuous environmental interaction and ongoing data ingestion. Because agentic systems can materially change their behavior without a formal redevelopment event, periodic back-testing is grossly insufficient.
+        SR 26-2 establishes a risk-based proportionality framework focused on institutions with over $30 billion in total assets and model materiality. Importantly, SR 26-2 clarifies the three-prong definition of a model (complex quantitative method, theoretical economic/statistical underpinning, and quantitative output), while explicitly placing generative and agentic AI models outside its primary scope due to their novel and rapidly evolving nature.
     </p>
     <p>
-        To adapt to this fluid reality, the traditional MRM paradigm must rapidly evolve from episodic, gate-based validation to a posture of continuous, dynamic governance. Group Risk must establish continuous monitoring controls, real-time boundary guardrails, and automated anomaly detection mechanisms to prevent model drift, detect data poisoning, and contain rogue autonomous execution. Furthermore, the industry's heavy concentration on a small number of foundational, third-party AI models introduces correlated systemic risks that necessitate enhanced third-party vendor validation strategies to prevent widespread contagion if an external provider fails.
+        To address this regulatory reality, ADAM OS v30.1 / AFOS V3 operates a bifurcated architecture: quantitative models (TimesFM tail-risk quantile heads, Scrambled Sobol QMC simulations, and Basel III CRE 31 PD calculators) are strictly validated under SR 26-2 standards, whereas agentic interaction layers and multi-agent swarms are governed by real-time technology risk, kill-switch circuit breakers, and the <strong>W3C PROV-O Root-Source Disjointness Engine</strong> (<code>afos_v3/prov_o_consensus.py</code>). This mathematically eliminates synthetic consensus across agent swarms by enforcing pairwise Jaccard source overlap limits (&le; 0.20) across at least 3 distinct institutional modalities.
     </p>
 
     <table class="matrix-table">
-        <caption><strong>Table 3: Evolution of Model Risk Management Parameters.</strong></caption>
+        <caption><strong>Table 3: Evolution of Model Risk Management Parameters (SR 11-7 vs. SR 26-2 vs. Agentic Swarms).</strong></caption>
         <thead>
             <tr>
                 <th>Model Governance Dimension</th>
-                <th>Traditional Models (SR 11-7 Baseline)</th>
-                <th>Agentic & Generative AI Systems</th>
+                <th>Legacy Models (SR 11-7 Baseline)</th>
+                <th>Quantitative Engines (SR 26-2 Active)</th>
+                <th>Agentic Swarms (AFOS V3 / W3C PROV-O)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Model Nature</td>
-                <td>Deterministic, highly stable, mathematically transparent.</td>
-                <td>Probabilistic, autonomously adaptive, highly opaque.</td>
+                <td>Scope & Applicability</td>
+                <td>Broad, uniform across all institutions.</td>
+                <td>Tailored to &gt;$30B assets; proportional to materiality.</td>
+                <td>Real-time technology risk & operational resilience framework.</td>
             </tr>
             <tr>
                 <td>Validation Cadence</td>
-                <td>Periodic, static validation cycles (e.g., annual reviews).</td>
-                <td>Continuous, real-time dynamic monitoring and telemetry.</td>
+                <td>Rigid annual validation cycles.</td>
+                <td>Dynamic, risk-based on change velocity & out-of-time drift.</td>
+                <td>Continuous, real-time W3C PROV-O telemetry & tripwires.</td>
             </tr>
             <tr>
-                <td>Control Mechanism</td>
-                <td>Gate-based approvals strictly prior to deployment.</td>
-                <td>Embedded live guardrails, kill-switches, strict API limits.</td>
+                <td>Mathematical Base</td>
+                <td>Standard statistical/econometric formulas.</td>
+                <td>Adapted TimesFM quantiles & Sobol QMC (N = 2<sup>16</sup>).</td>
+                <td>Probabilistic reasoning + Multiplicative Assurance (Layer 0 &times; Layer 1).</td>
             </tr>
             <tr>
-                <td>Primary Risk Profile</td>
-                <td>Firm-specific calculation errors and data entry mistakes.</td>
-                <td>Systemic correlation, hallucination, autonomous misalignment.</td>
+                <td>Consensus & Guardrails</td>
+                <td>Manual committee reviews.</td>
+                <td>AE<sub>0.99</sub> &le; 1.35 & Brier score &le; 0.065 gates.</td>
+                <td>Pairwise Jaccard disjointness &le; 0.20 across K &ge; 3 roots.</td>
             </tr>
         </tbody>
     </table>
