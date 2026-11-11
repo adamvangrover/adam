@@ -24,3 +24,15 @@ You are operating within the `adamvangrover/adam` repository, an institutional-g
 ## 5. Codebase Hygiene & Prompt Eviction
 * Keep Python files under 350 lines. Abstract excess logic into delegated helper functions.
 * Never embed large prompt strings, prompt templates, or heuristic dictionaries directly in Python logic. Evict them to external markdown/JSON assets and use dynamic loaders to mitigate attention decay.
+
+## 6. Claude Code (CLI) & Claude Cowork Operational Protocols
+* **Claude Code Command Execution:**
+  - Fast test runner: `uv run pytest tests/unit/`
+  - Integration runner: `uv run pytest tests/integration/` (or target specific file)
+  - Linting: `uv run ruff check .`
+  - Documentation gate: `uv run python scripts/build_instructions.py --verify`
+* **MCP Integration:** Leverage tools in `mcp.json` via Model Context Protocol (`server/server.py`).
+* **Claude Cowork (Multi-Agent Pairing):**
+  - When pairing with human operators or peer subagents in collaborative coworking sessions, state the proposed plan explicitly before executing edits.
+  - Adhere to the two-tier cognitive bifurcation: Fast System 1 responses must never bypass System 2 validation when generating binding credit assessments or capital allocation decisions.
+  - Maintain session state via append-only logs and W3C PROV-O headers to ensure multi-agent trace reproducibility.
