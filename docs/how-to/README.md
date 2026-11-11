@@ -5,3 +5,4 @@ This directory contains how-to guides for common tasks and workflows in the Adam
 ## Available Guides
 
 *   [Deploying Adam Platform to Kubernetes](deploy-kubernetes.md)
+*   [Integrating AI Coding Agents (OpenAI Dots, Claude Code, Claude Cowork, Meta Muse)](ai_coding_agents_integration.md)

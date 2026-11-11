@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/partial-tsconfig.json",
+  "project_name": "ADAM Financial Operating System (AFOS v30.1)",
+  "assistant_integration": {
+    "targets": [
+      "claude_code",
+      "claude_cowork",
+      "anthropic_claude"
+    ],
+    "context_files": [
+      "CLAUDE.md",
+      "LLM_README.md",
+      "mcp.json",
+      "llms.txt"
+    ]
+  },
+  "environment": {
+    "package_manager": "uv",
+    "python_version": "3.12",
+    "entrypoint_commands": {
+      "sync": "uv sync --all-extras",
+      "test": "uv run pytest tests/unit/",
+      "lint": "uv run ruff check .",
+      "verify_instructions": "uv run python scripts/build_instructions.py --verify"
+    }
+  },
+  "mcp": {
+    "config_file": "mcp.json",
+    "server_entrypoint": "server/server.py",
+    "strict_mode": true
+  },
+  "rules": {
+    "bifurcation": "Path A (core/, adam_*/, src/) vs Path B (experimental/, research/, tinker_lab/)",
+    "logic_as_data": "Store rules in assets/ as jsonLogic, never hardcode credit math in source code",
+    "max_file_lines": 350,
+    "provenance": "All mutations must emit W3C PROV-O headers"
+  }
+}
