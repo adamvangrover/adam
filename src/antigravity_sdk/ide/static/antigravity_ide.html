@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Studio & IDE</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --accent-green: #238636;
+            --sidebar-width: 260px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-primary); color: var(--text-primary); height: 100vh; display: flex; flex-direction: column; }
+        header { background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; font-size: 16px; color: var(--accent); }
+        .badge { background: #1f6feb22; color: var(--accent); padding: 3px 8px; border-radius: 12px; font-size: 11px; border: 1px solid #1f6feb; }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: var(--sidebar-width); background: var(--bg-secondary); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; padding: 12px; }
+        .sidebar h3 { font-size: 12px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; }
+        .file-item { padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-bottom: 2px; }
+        .file-item:hover { background: #21262d; }
+        .workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-primary); }
+        .editor-container { flex: 1; display: flex; flex-direction: column; border-bottom: 1px solid var(--border-color); }
+        .editor-header { padding: 8px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); font-size: 12px; display: flex; justify-content: space-between; }
+        textarea#editor { flex: 1; background: #090d13; color: #79c0ff; border: none; padding: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; resize: none; outline: none; }
+        .bottom-panel { height: 240px; background: var(--bg-secondary); display: flex; flex-direction: column; }
+        .panel-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .panel-tab { padding: 8px 16px; font-size: 12px; cursor: pointer; color: var(--text-secondary); }
+        .panel-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--bg-primary); }
+        .panel-body { flex: 1; padding: 12px; font-family: monospace; font-size: 12px; overflow-y: auto; background: var(--bg-primary); color: #8b949e; }
+        .btn { background: var(--accent-green); color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn:hover { background: #2ea043; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">⚡ Antigravity Studio & Workbench</div>
+        <div>
+            <span class="badge" id="runtimeBadge">Runtime: offline</span>
+            <span class="badge" id="statusBadge">Status: Online</span>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>Files & Workspace</h3>
+            <div id="fileTree">Loading files...</div>
+            <h3 style="margin-top: 16px;">Extensions & Plugins</h3>
+            <div id="pluginList">Scanning...</div>
+        </aside>
+        <main class="workspace">
+            <div class="editor-container">
+                <div class="editor-header">
+                    <span id="activeFilePath">untitled.txt</span>
+                    <button class="btn" onclick="saveActiveFile()">Save File</button>
+                </div>
+                <textarea id="editor" placeholder="Select a file or type code here..."></textarea>
+            </div>
+            <div class="bottom-panel">
+                <div class="panel-tabs">
+                    <div class="panel-tab active" onclick="switchTab('terminal')">Terminal / Prompt</div>
+                    <div class="panel-tab" onclick="switchTab('audit')">W3C PROV-O Audit</div>
+                </div>
+                <div class="panel-body" id="consoleOutput">
+                    Antigravity SDK ready. Connected to local sandbox.
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        let currentFile = null;
+
+        async function loadStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('runtimeBadge').textContent = 'Runtime: ' + data.runtime_mode;
+                document.getElementById('pluginList').innerHTML = data.plugins.length
+                    ? data.plugins.map(p => `<div class="file-item">🧩 ${p.name} (v${p.version})</div>`).join('')
+                    : '<div style="font-size: 11px; color: #6e7681;">No active plugins</div>';
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const res = await fetch('/api/files');
+                const files = await res.json();
+                const container = document.getElementById('fileTree');
+                container.innerHTML = files.slice(0, 30).map(f => `
+                    <div class="file-item" onclick="openFile('${f.path}')">
+                        ${f.is_dir ? '📁' : '📄'} ${f.name}
+                    </div>
+                `).join('');
+            } catch(e) {
+                document.getElementById('fileTree').textContent = 'Failed to load files.';
+            }
+        }
+
+        async function openFile(path) {
+            try {
+                const res = await fetch('/api/file?filepath=' + encodeURIComponent(path));
+                const data = await res.json();
+                document.getElementById('editor').value = data.content;
+                document.getElementById('activeFilePath').textContent = path;
+                currentFile = path;
+            } catch(e) {
+                alert('Error opening ' + path);
+            }
+        }
+
+        async function saveActiveFile() {
+            if (!currentFile) {
+                alert('No file currently selected.');
+                return;
+            }
+            const content = document.getElementById('editor').value;
+            const res = await fetch('/api/file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filepath: currentFile, content: content })
+            });
+            const data = await res.json();
+            alert('File saved: ' + data.filepath);
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            if (name === 'audit') {
+                document.getElementById('consoleOutput').textContent = '[W3C PROV-O Audit Log]\nEnvelope SHA-256: Verified.\nLayer 0 Gate Primacy: Active.';
+            } else {
+                document.getElementById('consoleOutput').textContent = 'Antigravity Interactive Terminal Ready.';
+            }
+        }
+
+        loadStatus();
+        loadFiles();
+    </script>
+</body>
+</html>

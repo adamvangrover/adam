@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 
 pub mod error;
+pub mod pdil_gate;
 pub mod portfolio;
 pub mod risk;
 pub mod statistics;
@@ -9,6 +10,7 @@ pub mod stress;
 /// Deterministic numerical math kernel for AFOS
 #[pymodule]
 fn rust_ext(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<pdil_gate::RustPDILGatekeeper>()?;
     m.add_class::<risk::RiskResult>()?;
     m.add_function(wrap_pyfunction!(risk::calculate_var, m)?)?;
     m.add_function(wrap_pyfunction!(statistics::calculate_mean, m)?)?;
