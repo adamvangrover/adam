@@ -52,7 +52,7 @@ NMARGINS = [0.0, 0.05, 0.10]                # call neutral if within margin of t
 #   assetw     = as asset, but scale shrinks with the size of that per-asset edge
 FLOWS = [("zero", 0.0), ("mom", 0.4), ("rev", 0.8), ("mom1", 0.4), ("rev1", 0.8), ("tdiff", 0.6),
          ("asset", 0.4, 10), ("asset", 0.4, 20), ("asset", 0.8, 20), ("asset", 0.8, 40),
-         ("assetw", 0.8, 20), ("assetw", 0.8, 40)]
+         ("assetw", 0.8, 20), ("assetw", 0.8, 40), ("blend", 0.8, 40)]  # blend = mean(assetw w40, rev0.8)
 NPRIORS, NMARGINS = ["dyn20"], [0.0]
 VARIANTS = [dict(flow=f, band=b, track=t, nprior=n, nmargin=m)
             for f, b, t, n, m in itertools.product(FLOWS, BANDS, TRACKS, NPRIORS, NMARGINS)]
@@ -129,6 +129,8 @@ def flow_for(prior: list[dict], cfg) -> float:
     mode, scale = cfg[0], cfg[1]
     if mode == "zero" or not prior:
         return 0.0
+    if mode == "blend":
+        return round((flow_for(prior, ("assetw", scale, cfg[2])) + flow_for(prior, ("rev", scale))) / 2, 4)
     if mode in ("mom1", "rev1"):
         sign, sig = (1 if mode == "mom1" else -1), _sig(prior, 1)
     elif mode == "tdiff":
