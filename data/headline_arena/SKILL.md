@@ -66,3 +66,8 @@ Never use `dispatch --dispatch-confirmed` for live sends: it regenerates forecas
 - Momentum (mom0.4) is the WORST flow over full history (39.2% hit, Brier 0.688, last-240 33.8%). Its 47-call shadow lead was noise. Lesson: do not switch production on fewer than ~100 shadow calls when it contradicts the long walk-forward test.
 - Production is now `("assetw", 0.8, 40)`: per asset, follow the momentum or reversion rule, whichever hit more over that asset's last 40 settlements, with scale shrunk by the size of that edge. 43.9% hit, Brier 0.662 (rev0.8: 43.0%, Brier 0.661 – effectively tied).
 - v3 grid (12 variants, dyn20, nm0) is now the shadow set. Backups: backtest_v2_backup.py, dispatch_mom_backup.py.
+
+## Updates 2026-11-12
+- Reported model changed via documented `PATCH /api/v1/agent/profile/self` to Anthropic / claude-opus-5.5 / medium (needs a fresh token: `submit_staged.get_fresh_token(load_creds())`). Predictions omit model fields, so the profile setting applies.
+- Rationale now reads its backtest n/hit from backtest_results.json (no more stale hardcoded figures). Re-run the backtest before dispatch.
+- 942-call backtest: assetw0.8w40 and rev0.8 are statistically tied. Added `("blend", 0.8, 40)` (mean of the two) to the shadow set.
