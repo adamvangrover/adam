@@ -244,6 +244,7 @@ Implemented in `src/iak/adam_iak_primitives.py` and `adam_iak_primitives.py`:
 - [x] **SSRF Redirect & Jinja2 XSS Prevention:** Disabled automatic redirects in `SecurityGovernanceGatekeeper` and enabled `autoescape=True` in `build_dashboard.py`.
 - [x] **API Auth & Adaptive JWT Fallback:** Enforced `X-API-Key` and Adaptive JWT fallback across command endpoints.
 - [ ] **Continuous `importlib` & `pickle` CI Gate:** Enforce automated CI gate blocking any new `pickle.load` or unwhitelisted `importlib.import_module` across `core/` and `src/`.
+- [x] **Continuous `importlib` & `pickle` CI Gate:** Automated AST gate enforced via `EcosystemHub.run_security_ci_gate()`, `python3 -m src.antigravity_cli audit-security`, and `GET /api/security/audit`, blocking `pickle.load`/`loads` and unwhitelisted `importlib.import_module` across `core/` and `src/`.
 
 ### P1: Kernel, Architecture & Performance (Bolt)
 - [x] **ADAM-IAK-CORE Primitives (`src/iak/`):** Remediated `DtypeSafeMaskedEntmaxSoftmax`, `UncertaintyGatedCRFSlotDecoder`, and `DeterministicPolicyEpistemicGate`.
@@ -261,3 +262,4 @@ Implemented in `src/iak/adam_iak_primitives.py` and `adam_iak_primitives.py`:
 
 ### P3: Documentation & Governance Housekeeping
 - [x] **Update Tutorials & PDIL Mapping:** Added `docs/architecture/PDIL_MAPPING.md`, `docs/jules_tools_reference.md`, and `docs/how-to/using_jules_cli_ide_sdk.md`.
+- [x] **EcosystemHub, Unified CLI/MCP & Command Center (`v30.1`):** Integrated `src/orchestration/ecosystem_hub.py`, zero-dependency PDIL/FastAPI fallbacks (`src/pdil/middleware.py`, `src/antigravity_ide/_web_shim.py`), unified CLI subcommands (`orchestrate`, `underwrite`, `skills`, `audit-security`, `portals`), MCP registry (`mcp.json`, `server/mcp_server.py`, `src/mcp_server.py`), and WCAG/ARIA `showcase/command_center_v30_1.html`.
