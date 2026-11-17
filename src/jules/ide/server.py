@@ -10,6 +10,21 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+try:
+    import uvicorn
+    from fastapi import FastAPI, HTTPException
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.responses import HTMLResponse
+    HAS_FASTAPI = True
+except ImportError:
+    uvicorn = None
+    from src.antigravity_ide._web_shim import (
+        CORSMiddleware,
+        FastAPI,
+        HTMLResponse,
+        HTTPException,
+    )
+    HAS_FASTAPI = False
 from pydantic import BaseModel
 
 from src.jules.sdk.agent import JulesAgent
@@ -140,3 +155,7 @@ def get_ide_html():
 
 def run_server(host: str = "127.0.0.1", port: int = 8080) -> None:
     uvicorn.run(app, host=host, port=port, log_level="info")
+    if HAS_FASTAPI and uvicorn is not None:
+        uvicorn.run(app, host=host, port=port, log_level="info")
+    else:
+        app.serve_stdlib(host=host, port=port)
