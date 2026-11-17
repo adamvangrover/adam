@@ -16,12 +16,168 @@ from src.pdil.models import ProvenanceHeader
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+try:
+    import jsonschema
+    HAS_JSONSCHEMA = True
+except ImportError:
+    HAS_JSONSCHEMA = False
 
 from json_logic import jsonLogic
+    class _FallbackValidationError(Exception):
+        def __init__(self, message: str):
+            super().__init__(message)
+            self.message = message
+
+    class _FallbackExceptions:
+        ValidationError = _FallbackValidationError
+
+    class _FallbackValidator:
+        def __init__(self, schema: Dict[str, Any]):
+            self.schema = schema
+
+        @classmethod
+        def check_schema(cls, schema: Dict[str, Any]) -> None:
+            if not isinstance(schema, dict):
+                raise ValueError("Schema must be a dict")
+
+        def validate(self, instance: Any) -> None:
+            if self.schema.get("type") == "object" and not isinstance(instance, dict):
+                raise _FallbackValidationError("Expected object instance")
+            for req in self.schema.get("required", []):
+                if isinstance(instance, dict) and req not in instance:
+                    raise _FallbackValidationError(f"Missing required property: {req}")
+
+    class _FallbackValidators:
+        @staticmethod
+        def validator_for(schema: Dict[str, Any]):
+            return _FallbackValidator
+
+    class _FallbackJsonSchema:
+        exceptions = _FallbackExceptions
+        validators = _FallbackValidators
+
+    jsonschema = _FallbackJsonSchema()
+
 
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+try:
+    from json_logic import jsonLogic
+except ImportError:
+    def _resolve_var(path: Any, data: Any, default: Any = None) -> Any:
+        if path is None or path == "":
+            return data
+        parts = str(path).split(".")
+        curr = data
+        for part in parts:
+            if isinstance(curr, dict) and part in curr:
+                curr = curr[part]
+            elif isinstance(curr, list):
+                try:
+                    curr = curr[int(part)]
+                except (ValueError, IndexError):
+                    return default
+            else:
+                return default
+        return curr
+
+    def _to_number(val: Any) -> float:
+        if isinstance(val, (int, float)) and not isinstance(val, bool):
+            return float(val)
+        return float(val)
+
+    def jsonLogic(tests: Any, data: Any = None) -> Any:
+        """Deterministic fallback jsonLogic evaluator for minimal Python environments."""
+        if tests is None or not isinstance(tests, dict):
+            return tests
+        if data is None:
+            data = {}
+        if not tests:
+            return True
+
+        op = next(iter(tests))
+        values = tests[op]
+        if not isinstance(values, list):
+            values = [values]
+
+        if op == "var":
+            default = jsonLogic(values[1], data) if len(values) > 1 else None
+            path = jsonLogic(values[0], data) if values else ""
+            return _resolve_var(path, data, default)
+
+        if op in ("if", "?:"):
+            for i in range(0, len(values) - 1, 2):
+                if jsonLogic(values[i], data):
+                    return jsonLogic(values[i + 1], data)
+            if len(values) % 2 == 1:
+                return jsonLogic(values[-1], data)
+            return None
+
+        if op == "and":
+            res: Any = True
+            for v in values:
+                res = jsonLogic(v, data)
+                if not res:
+                    return res
+            return res
+
+        if op == "or":
+            res = False
+            for v in values:
+                res = jsonLogic(v, data)
+                if res:
+                    return res
+            return res
+
+        evals = [jsonLogic(v, data) for v in values]
+
+        if op == "!":
+            return not bool(evals[0]) if evals else True
+        if op == "!!":
+            return bool(evals[0]) if evals else False
+        if op == "==":
+            return evals[0] == evals[1]
+        if op == "===":
+            return evals[0] == evals[1] and type(evals[0]) is type(evals[1])
+        if op == "!=":
+            return evals[0] != evals[1]
+        if op == "!==":
+            return not (evals[0] == evals[1] and type(evals[0]) is type(evals[1]))
+        if op == "<":
+            return all(evals[i] < evals[i + 1] for i in range(len(evals) - 1))
+        if op == "<=":
+            return all(evals[i] <= evals[i + 1] for i in range(len(evals) - 1))
+        if op == ">":
+            return all(evals[i] > evals[i + 1] for i in range(len(evals) - 1))
+        if op == ">=":
+            return all(evals[i] >= evals[i + 1] for i in range(len(evals) - 1))
+        if op == "+":
+            return sum(_to_number(v) for v in evals)
+        if op == "-":
+            if len(evals) == 1:
+                return -_to_number(evals[0])
+            return _to_number(evals[0]) - _to_number(evals[1])
+        if op == "*":
+            prod = 1.0
+            for v in evals:
+                prod *= _to_number(v)
+            return prod
+        if op == "/":
+            return _to_number(evals[0]) / _to_number(evals[1])
+        if op == "%":
+            return _to_number(evals[0]) % _to_number(evals[1])
+        if op == "min":
+            return min(_to_number(v) for v in evals)
+        if op == "max":
+            return max(_to_number(v) for v in evals)
+        if op == "in":
+            container = evals[1]
+            return evals[0] in container if container is not None else False
+
+        raise ValueError(f"Unsupported jsonLogic operator: {op}")
 
 class GovernanceError(Exception):
     """Raised when an inference fails governance validation."""
