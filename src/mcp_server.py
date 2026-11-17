@@ -8,6 +8,38 @@ from textblob import TextBlob
 from datetime import datetime
 import os
 
+try:
+    from mcp.server.fastmcp import FastMCP, Context
+except ImportError:
+    class FastMCP:
+        def __init__(self, name: str, dependencies: Optional[List[str]] = None) -> None:
+            self.name = name
+            self.tools: List[Dict[str, Any]] = []
+            self.resources: List[Dict[str, Any]] = []
+
+        def resource(self, path: str):
+            def decorator(f):
+                self.resources.append({"path": path, "func": f})
+                return f
+            return decorator
+
+        def tool(self, name: Optional[str] = None):
+            def decorator(f):
+                self.tools.append({"name": name or f.__name__, "func": f})
+                return f
+            return decorator
+
+        def run(self) -> None:
+            logging.info("Mock FastMCP server running: %s", self.name)
+
+    class Context:
+        pass
+
+try:
+    from textblob import TextBlob
+except ImportError:
+    TextBlob = None
+
 # Adjust import to work with both 'src.core_valuation' (module) and 'core_valuation' (if PYTHONPATH is set to src)
 try:
     from src.core_valuation import ValuationEngine
@@ -217,6 +249,75 @@ def execute_reasoning_loop(query: str, context: Dict[str, Any]) -> str:
         return f"Executed reasoning loop for: {query}"
     except ImportError:
          return "CyclicalReasoningGraph not available."
+
+
+# --- AFOS v30.1 EcosystemHub Integration ---
+
+@mcp.tool()
+def run_v30_1_orchestrator(orchestrator_id: str = "gate_clearance") -> str:
+    """Execute a v30.1-R orchestrator via AFOS EcosystemHub with W3C PROV-O telemetry."""
+    try:
+        from src.orchestration.ecosystem_hub import EcosystemHub
+
+        return json.dumps(EcosystemHub().run_orchestrator(orchestrator_id), indent=2, default=str)
+    except Exception as e:
+        return json.dumps({"status": "error", "error": f"Orchestrator failed: {e!s}"})
+
+
+@mcp.tool()
+def underwrite_ai_credit_obligor(
+    obligor_id: str = "NEOC",
+    ebitda: float = 240.0,
+    total_debt: float = 650.0,
+    annual_lease_payment: float = 135.0,
+    lease_term_years: int = 6,
+    discount_rate: float = 0.085,
+    pd_alpha: float = 0.042,
+    pd_beta: float = 0.068,
+) -> str:
+    """Compute ASC 842 / SR 26-2 leverage, CADS waterfall, FCCR tripwire, and Dual-PD arbitration."""
+    try:
+        from src.orchestration.ecosystem_hub import EcosystemHub
+
+        discount_pct = discount_rate * 100.0 if discount_rate <= 1.0 else discount_rate
+        params = {
+            "ticker": obligor_id,
+            "ebitda_m": ebitda,
+            "gaap_funded_debt_m": total_debt,
+            "annual_lease_expense_m": annual_lease_payment,
+            "lease_term_years": lease_term_years,
+            "off_balance_sheet_lease_commitments_m": annual_lease_payment * max(1, lease_term_years),
+            "lease_discount_rate_pct": discount_pct,
+            "pd_alpha": pd_alpha,
+            "pd_beta": pd_beta,
+        }
+        return json.dumps(EcosystemHub().underwrite_obligor(params), indent=2, default=str)
+    except Exception as e:
+        return json.dumps({"status": "error", "error": f"Underwriting failed: {e!s}"})
+
+
+@mcp.tool()
+def run_workspace_skill(skill_id: str = "pd_model_challenger", payload_json: str = "{}") -> str:
+    """Execute a governed AFOS workspace skill with optional JSON payload."""
+    try:
+        from src.orchestration.ecosystem_hub import EcosystemHub
+
+        parsed = json.loads(payload_json) if payload_json and payload_json.strip() not in ("", "{}") else None
+        return json.dumps(EcosystemHub().run_skill(skill_id, payload=parsed), indent=2, default=str)
+    except Exception as e:
+        return json.dumps({"status": "error", "error": f"Skill execution failed: {e!s}"})
+
+
+@mcp.tool()
+def list_ecosystem_capabilities() -> str:
+    """List AFOS v30.1 EcosystemHub orchestrators, workspace skills, and portals."""
+    try:
+        from src.orchestration.ecosystem_hub import EcosystemHub
+
+        return json.dumps(EcosystemHub().get_ecosystem_manifest(), indent=2, default=str)
+    except Exception as e:
+        return json.dumps({"status": "error", "error": f"Manifest lookup failed: {e!s}"})
+
 
 if __name__ == "__main__":
     mcp.run()
