@@ -1,5 +1,7 @@
 # Deployment Guide
 
+> Consolidated overview: [setup_guide.md](setup_guide.md). This page keeps the detailed deployment notes; where they differ, `setup_guide.md` reflects the current tree.
+
 This guide covers the deployment strategies for the Adam platform, including local development, Docker containers, and cloud environments.
 
 ## 1. Local Development
