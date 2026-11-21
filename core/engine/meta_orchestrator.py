@@ -141,6 +141,7 @@ ROUTE_PATTERNS: Tuple[Tuple[Route, Pattern[str]], ...] = (
 _DOLLAR_TICKER_RE = re.compile(r"\$([A-Za-z]{1,5})\b")
 _UPPER_TICKER_RE = re.compile(r"\b[A-Z]{2,5}\b")
 _PROPER_NOUN_RE = re.compile(r"\b[A-Z][\w&.-]*(?:\s+[A-Z][\w&.-]*)*")
+_TARGET_PREP_RE = re.compile(r"\b(?:for|on|of|about|into)\s+$", re.IGNORECASE)
 _QTY_RE = re.compile(
     r"\b(?:buy|sell|order(?:\s+for)?)\s+(\d+(?:\.\d+)?)(?![\w.])"
     r"|(?<![\w.$])(\d+(?:\.\d+)?)\s+(?:shares?|units?|contracts?)\b",
@@ -163,8 +164,8 @@ def _default_non_tickers() -> FrozenSet[str]:
 
 def _default_entity_stopwords() -> FrozenSet[str]:
     return frozenset({
-        "Analyze", "Analyse", "Assess", "Buy", "Check", "Covenant", "Deep", "Evaluate", "Get", "How", "Is",
-        "Perform", "Please", "Price", "Red", "Review", "Risk", "Run", "Sell", "Show", "The", "Team", "What",
+        "Analyze", "Analyse", "Assess", "Buy", "Check", "Evaluate", "Get", "How", "Is", "Perform",
+        "Please", "Price", "Red", "Review", "Risk", "Run", "Sell", "Show", "The", "Team", "What",
     })
 
 
@@ -882,14 +883,18 @@ class MetaOrchestrator:
         if ticker:
             return ticker
 
-        # First proper noun wins; capitalised command words ("Deep dive on Ford") are entity_stopwords.
+        # A proper noun introduced by "for/on/of/about/into" ("Summarize risks for Boeing") is the target;
+        # otherwise the first proper noun wins ("Exxon credit outlook in Europe").
+        candidates = []
         for match in _PROPER_NOUN_RE.finditer(query):
             words = [w for w in match.group(0).split() if w not in self.config.non_ticker_tokens]
             while words and words[0] in self.config.entity_stopwords:
                 words.pop(0)
             if words:
-                return " ".join(words)
-        return None
+                targeted = bool(_TARGET_PREP_RE.search(query[: match.start()]))
+                candidates.append((not targeted, " ".join(words)))
+        candidates.sort(key=lambda c: c[0])
+        return candidates[0][1] if candidates else None
 
     @staticmethod
     def _resolve_quantity(query: str, context: Dict[str, Any]) -> Optional[float]:
