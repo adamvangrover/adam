@@ -1,6 +1,8 @@
+"""Single source of truth for System 2 agent I/O (`AgentInput` / `AgentOutput`)."""
+from typing import Any, Dict, List
+from pydantic import BaseModel, Field, field_validator
+
 from src.pdil.models import ProvenanceHeader
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
 
 class AgentInput(BaseModel):
     """
@@ -19,15 +21,19 @@ class AgentOutput(BaseModel):
     sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
-    provenance_trace: ProvenanceHeader = Field(..., description="Immutable provenance trace linking the agent output to source and logic version.")
+    provenance_trace: List[ProvenanceHeader] = Field(default_factory=list, description="PROV-O headers linking the output to source data and logic version (empty = ungrounded).")
     observed_drift: bool = Field(default=False, description="Flag indicating if behavior or calculation drift was observed.")
 
+    @field_validator("provenance_trace", mode="before")
+    @classmethod
+    def _wrap_single_header(cls, value: Any) -> Any:
+        if isinstance(value, (ProvenanceHeader, dict)):
+            return [value]
+        return value
+
     def check_grounding(self) -> bool:
-        """
-        Verifies that this output contains a valid reference to its source data object,
-        satisfying W3C PROV-O compliance requirements.
-        """
-        return bool(self.provenance_trace.source_data_object)
+        """True iff there is at least one PROV-O header and every header names its source data object."""
+        return bool(self.provenance_trace) and all(h.source_data_object for h in self.provenance_trace)
 
 class FundamentalReport(BaseModel):
     """

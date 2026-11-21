@@ -91,9 +91,9 @@ async def test_legacy_execution_success(agent):
         result = await agent.execute("ABC_TEST")
 
         assert isinstance(result, dict)
-        assert result["company_id"] == "ABC_TEST"
-        assert result["enterprise_value"] is not None
-        assert result["financial_health"] == "Strong"
+        assert result["metadata"]["company_id"] == "ABC_TEST"
+        assert result["metadata"]["enterprise_value"] is not None
+        assert result["metadata"]["financial_health"] == "Strong"
 
 @pytest.mark.asyncio
 async def test_standard_execution_success(agent):
@@ -118,8 +118,8 @@ async def test_execution_failure_legacy(agent):
         mock_send.return_value = None # Failure
 
         result = await agent.execute("FAIL_TEST")
-        assert "error" in result
-        assert "Could not retrieve data" in result["error"]
+        assert "error" in result["metadata"]
+        assert "Could not retrieve data" in result["metadata"]["error"]
 
 @pytest.mark.asyncio
 async def test_execution_failure_standard(agent):

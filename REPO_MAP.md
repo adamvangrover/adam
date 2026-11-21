@@ -39,7 +39,7 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
 | Entry point | Location | Contract |
 |---|---|---|
 | `MetaOrchestrator.route_request(query, context)` | `core/engine/meta_orchestrator.py` | Routes a query via `Route` enum + `OrchestratorConfig`; async |
-| `AgentBase.execute(...)` | `core/agents/agent_base.py` | Agent execution; standard I/O in `core/schemas/agent_schema.py` |
+| `AgentBase.execute(...)` | `core/agents/agent_base.py` | Agent execution; every subclass `execute` is wrapped at class creation (`__init_subclass__`) to run the JSONLogic logic layer + swarm logging |
 | Flask API `create_app()` | `services/webapp/api.py` | `/api/v23/analyze` → `MetaOrchestrator.route_request`; `/api/credit/*`, `/api/consensus`, ... |
 | CLI | `scripts/run_adam.py`, `core/main.py` | Graph run from the command line |
 | MCP server | `server/server.py` | Tool surface for MCP clients |
@@ -76,7 +76,10 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
 
 ## 5. Contracts
 
-- Agent I/O: `core/schemas/agent_schema.py` (`AgentInput`, `AgentOutput`). Single source of truth.
+- Agent I/O: `core/schemas/agent_schema.py` (`AgentInput`, `AgentOutput`). Single source of truth; `core.agents.agent_base` re-exports it.
+  `AgentOutput.provenance_trace` is a list of `ProvenanceHeader` (default `[]` = ungrounded; `check_grounding()` is False).
+- System 2 template: `core/agents/templates/v30_template_agent.py::TemplateAgentV30` (override `analyze`; confidence tiers from `config/agent_schema.yaml`).
+- `PydanticAgentBase.execute`: `AgentInput` in → `AgentOutput` out; any other call shape → `AgentOutput.model_dump()`.
 - v30 NeuralMesh agents (`core/v30_architecture/python_intelligence/agents/base_agent.py`) use packet emission, not `AgentInput`/`AgentOutput`.
 - JSON Schemas for cross-runtime use: `schemas/*.schema.json`.
 

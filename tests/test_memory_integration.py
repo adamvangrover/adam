@@ -37,7 +37,7 @@ async def run_integration_test():
     # Run with ABC_TEST (Mock Data)
     print("Executing Run 1...")
     result1 = await faa.execute("ABC_TEST")
-    assert result1["company_id"] == "ABC_TEST"
+    assert result1["metadata"]["company_id"] == "ABC_TEST"
 
     history = faa.memory_manager.query_history("ABC_TEST")
     assert len(history) == 1
