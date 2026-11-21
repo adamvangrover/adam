@@ -252,6 +252,7 @@ Implemented in `src/iak/adam_iak_primitives.py` and `adam_iak_primitives.py`:
 - [x] **Deduplicate Scrubbers & Archive Graph PoCs:** Unified `GoldStandardArtifact` and `GoldStandardScrubber` in `core/data_processing/utils.py`; moved `experimental/v23_prototypes/v23_graph_engine` to `archive/v23_prototypes/`.
 - [x] **Multi-State Reasoning Grader:** Added `evals/graders/multi_state_reasoning_evaluator.py` evaluating trace fidelity, fact insertion $F_1$, reasoning rubrics, and ECE.
 - [x] **Fix Async & Append-Only Loggers:** Ensured all Swarm and Jules agents use append mode (`open(..., 'a')`).
+- [x] **Stale First-Party Imports & Workflow Targets:** Repointed `covenant_agent` (→ `core.agents.templates.v26_template_agent`), `mcp_server`/`demo_phase3` (→ `credit_snc`, `financial_covenant_agent`), the MCP architecture resource and the legacy daily-ritual workflow. `tests/regression/test_internal_import_seams.py` now fails on any unresolved first-party import or missing workflow file target (known orphan: `core.analysis.xai.explainer`).
 - [ ] **Consolidate Legacy Graph Imports:** Complete migration of remaining `core/v23_graph_engine` references into `core/engine/unified_knowledge_graph.py`.
 - [ ] **Complete Scrubber Consolidation:** Merge any remaining duplicate text-cleaning logic in `universal_ingestor.py` into `core/data_processing/utils.py`.
 

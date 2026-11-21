@@ -62,13 +62,13 @@ except ImportError:
 
 # 2. Specialized Agents
 try:
-    from core.agents.specialized.snc_rating_agent import SNCRatingAgent
+    from core.agents.specialized.credit_snc import SNCRatingAgent
     SNC_AVAILABLE = True
 except ImportError:
     SNC_AVAILABLE = False
 
 try:
-    from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
+    from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent
     COVENANT_AVAILABLE = True
 except ImportError:
     COVENANT_AVAILABLE = False

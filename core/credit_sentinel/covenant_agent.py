@@ -1,8 +1,7 @@
 import logging
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
-from adam.core.engine.base import TemplateAgentV26 # Base graph agent
-from adam.core.mcp.client import MCPClient
+from core.agents.templates.v26_template_agent import TemplateAgentV26
 
 logger = logging.getLogger("adam.credit_sentinel.covenant")
 
@@ -23,7 +22,7 @@ class CovenantAnalystAgent(TemplateAgentV26):
     Strictly uses deterministic tools for calculations to prevent hallucination.
     """
 
-    def __init__(self, mcp_client: MCPClient):
+    def __init__(self, mcp_client: Any):
         super().__init__()
         self.mcp = mcp_client
         self.confidence_threshold = 0.85 # Config-driven, no magic numbers
