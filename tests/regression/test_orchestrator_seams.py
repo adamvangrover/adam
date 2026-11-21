@@ -91,6 +91,7 @@ def test_default_model_is_gemini_neon_without_routing_file():
     ("Covenant review for Boeing", "Boeing"),
     ("What is the US GDP outlook?", None),           # acronyms are not entities
     ("Exxon credit outlook", "Exxon"),               # sentence-initial fallback still works
+    ("Exxon credit outlook in Europe", "Exxon"),     # trailing qualifier must not displace the company
 ])
 def test_resolve_entity_prefers_non_initial_proper_nouns(orch, query, expected):
     assert orch.resolve_entity(query, {}) == expected
