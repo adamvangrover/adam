@@ -45,6 +45,15 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
 | MCP server | `server/server.py` | Tool surface for MCP clients |
 | v30 swarm | `core/v30_architecture/python_intelligence/orchestrator/v30_orchestrator.py` | NeuralMesh `BaseAgent` contract (see §5) |
 
+### v30 forward path (first-class)
+
+| Entry | Path |
+|---|---|
+| Swarm runner (FastAPI :8001) | `core/v30_architecture/python_intelligence/agents/swarm_runner.py` |
+| NeuralMesh bridge (FastAPI :8000) | `core/v30_architecture/python_intelligence/bridge/neural_link.py` |
+| `EACIOrchestrator.process_intent_async` | `core/v30_architecture/python_intelligence/orchestrator/v30_orchestrator.py` |
+| Docs | `core/v30_architecture/README.md` |
+
 ## 3. Config registry (`config/`)
 
 | File | Purpose |
@@ -81,7 +90,7 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
   `AgentOutput.provenance_trace` is a list of `ProvenanceHeader` (default `[]` = ungrounded; `check_grounding()` is False).
 - System 2 template: `core/agents/templates/v30_template_agent.py::TemplateAgentV30` (override `analyze`; confidence tiers from `config/agent_schema.yaml`).
 - `PydanticAgentBase.execute`: `AgentInput` in → `AgentOutput` out; any other call shape → `AgentOutput.model_dump()`.
-- v30 NeuralMesh agents (`core/v30_architecture/python_intelligence/agents/base_agent.py`) use packet emission, not `AgentInput`/`AgentOutput`.
+- v30 NeuralMesh agents (`core/v30_architecture/python_intelligence/agents/base_agent.py`) are System 1 actors: `run()` loop + `emit(packet_type, payload)` → `NeuralPacket`. Deliberately not `AgentInput`/`AgentOutput`; see `core/v30_architecture/README.md` (contract + audit).
 - JSON Schemas for cross-runtime use: `schemas/*.schema.json`.
 
 ## 6. Rust slices
