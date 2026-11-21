@@ -439,7 +439,7 @@ def audit_logger(agent_id: str, event_type: str, details: dict[str, Any] | None 
     })
 
 @mcp.tool()
-def analyze_snc_credit(financials: dict[str, float], capital_structure: list[dict[str, Any]], enterprise_value: float) -> str:
+async def analyze_snc_credit(financials: dict[str, float], capital_structure: list[dict[str, Any]], enterprise_value: float) -> str:
     """
     Performs a Shared National Credit (SNC) rating analysis.
     
@@ -452,7 +452,7 @@ def analyze_snc_credit(financials: dict[str, float], capital_structure: list[dic
         return json.dumps({"error": "SNC Agent not available."})
     try:
         agent = SNCRatingAgent(config={"name": "mcp_snc"})
-        result = agent.execute(financials, capital_structure, enterprise_value)
+        result = await agent.execute(financials, capital_structure, enterprise_value)
         return result.model_dump_json(indent=2)
     except Exception as e:
         return json.dumps({"error": str(e)})
