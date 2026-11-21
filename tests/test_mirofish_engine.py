@@ -133,6 +133,6 @@ async def test_mirofish_engine_graceful_degradation():
 
     orchestrator.mirofish_engine.initialize_environment = mock_init
 
-    result = await orchestrator._run_swarm_flow("test query")
+    result = await orchestrator._run_swarm_flow("test query", {})
     # Gracefully falls back to CrisisSimulationEngine which returns "Crisis Simulation Complete"
     assert result.get("status", "") == "Crisis Simulation Complete" or "error" in result
