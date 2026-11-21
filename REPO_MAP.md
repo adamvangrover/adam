@@ -31,9 +31,9 @@ If this file disagrees with code, the code wins — fix this file.
 | `core/zero_trust/` | Zero-trust ingestion gateway, schema bounds, triangulated feed consensus | canonical |
 | `archive/` | Historical scripts; `archive/snapshots/` = learning snapshots (§7) | not imported |
 
-Root `index.html` is the only HTML page at the repo root. Generated "Index of" pages are not
-produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_architecture`, `services/webapp`
-(`scripts/generate_directory_indexes.py` `SKIP_PATHS`).
+Root `index.html` is the only HTML page at the repo root. Generated "Index of" repo-browser pages are
+written only to `showcase/browser/` (git-ignored; `scripts/generate_directory_indexes.py`), never inside
+source directories.
 
 ## 2. Entry points
 
