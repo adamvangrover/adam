@@ -3,11 +3,13 @@ on:
   push:
     branches: [ main, master ]
     paths:
-      - 'services/webapp/client/'
+      - 'services/webapp/client/**'
+      - '.github/workflows/frontend-build.yml'
   pull_request:
     branches: [ main, master ]
     paths:
-      - 'services/webapp/client/'
+      - 'services/webapp/client/**'
+      - '.github/workflows/frontend-build.yml'
 jobs:
   frontend-build:
     runs-on: ubuntu-latest
@@ -23,11 +25,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd services/webapp/client
-          if [ -f package-lock.json ]; then
-            npm ci --legacy-peer-deps
-          else
-            npm ci --legacy-peer-deps
-          fi
+          npm ci --legacy-peer-deps
       - name: Build Frontend
         run: |
           cd services/webapp/client

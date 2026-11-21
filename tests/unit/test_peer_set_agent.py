@@ -6,6 +6,10 @@ import os
 import types
 import numpy as np
 
+# Snapshot real modules so the mocks below don't leak into other test modules.
+_MOCKED_MODULES = ['core.agents.agent_base', 'core.schemas.agent_schema', 'yfinance', 'sklearn.feature_extraction.text', 'sklearn.metrics.pairwise', 'sklearn']
+_ORIGINAL_MODULES = {name: sys.modules.get(name) for name in _MOCKED_MODULES}
+
 # --- MOCKING DEPENDENCIES FOR ISOLATION ---
 # Mock core.agents.agent_base
 mock_agent_base_module = types.ModuleType("core.agents.agent_base")
@@ -69,6 +73,13 @@ sys.modules["peer_set_agent_test"] = psa_module
 spec.loader.exec_module(psa_module)
 
 PeerSetAgent = psa_module.PeerSetAgent
+
+for _name, _module in _ORIGINAL_MODULES.items():
+    if _module is None:
+        sys.modules.pop(_name, None)
+    else:
+        sys.modules[_name] = _module
+
 
 
 class TestPeerSetAgent(unittest.TestCase):

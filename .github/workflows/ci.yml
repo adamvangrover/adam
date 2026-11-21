@@ -58,9 +58,11 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
+        working-directory: afos
         run: uv sync --frozen --all-extras
 
       - name: Run Test Suite
+        working-directory: afos
         run: uv run pytest --cov=afos --cov-report=xml --cov-fail-under=85
 
   simulation-gate:
@@ -75,8 +77,10 @@ jobs:
         uses: astral-sh/setup-uv@v5.3.0
 
       - name: Install Dependencies
+        working-directory: afos
         run: uv sync --frozen --all-extras
 
       - name: Validate Synthetic Generators
+        working-directory: afos
         run: |
-          uv run python -c "from afos.risk.arbitration import ArbitrationEngine; e = ArbitrationEngine(); print('Simulation gate operational.')"
+          uv run python -c "from afos.engine import arbitrate_dual_models; r = arbitrate_dual_models(0.02, 0.03); assert not r.arbitration_flag_triggered; print('Simulation gate operational.')"
