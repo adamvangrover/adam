@@ -21,8 +21,6 @@ try:
     HAS_JSONSCHEMA = True
 except ImportError:
     HAS_JSONSCHEMA = False
-
-from json_logic import jsonLogic
     class _FallbackValidationError(Exception):
         def __init__(self, message: str):
             super().__init__(message)
