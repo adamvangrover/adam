@@ -41,8 +41,8 @@ class TestLogLeak(unittest.TestCase):
 
     def test_log_leak(self):
         # 1. Generate a sensitive log
-        secret = "SUPER_SECRET_KEY_123"
-        logging.getLogger('core').info(f"Processing request with key: {secret}")
+        marker = "LOG_PRIVACY_MARKER_123"
+        logging.getLogger('core').info("Processing request %s", marker)
 
         # 2. Call the API
         response = self.app.get('/api/state')
@@ -54,14 +54,14 @@ class TestLogLeak(unittest.TestCase):
         # 4. Assert logs are missing or empty
         self.assertTrue(logs is None or len(logs) == 0, "Logs field should be missing or empty")
 
-        # Double check secret is not there in case logs are present
+        # Double check the marker is not there in case logs are present
         if logs:
             found = False
             for log in logs:
-                if secret in log:
+                if marker in log:
                     found = True
                     break
-            self.assertFalse(found, "Secret found in logs!")
+            self.assertFalse(found, "Log marker found in API response!")
 
 
 if __name__ == '__main__':

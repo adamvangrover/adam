@@ -94,6 +94,9 @@ def test_default_model_is_gemini_neon_without_routing_file():
     ("Exxon credit outlook in Europe", "Exxon"),     # trailing qualifier must not displace the company
     ("Summarize compliance risks for Boeing", "Boeing"),  # sentence-initial verb is not the target
     ("Analyze Covenant Logistics", "Covenant Logistics"),  # leading name words are kept
+    ("Exxon credit outlook for Europe", "Exxon"),    # regions are qualifiers, never targets
+    ("Analyze Boeing exposure to sanctions on Russia", "Boeing"),
+    ("Assess the Middle East", None),
 ])
 def test_resolve_entity_prefers_non_initial_proper_nouns(orch, query, expected):
     assert orch.resolve_entity(query, {}) == expected

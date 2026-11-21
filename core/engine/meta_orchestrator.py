@@ -169,6 +169,14 @@ def _default_entity_stopwords() -> FrozenSet[str]:
     })
 
 
+def _default_entity_regions() -> FrozenSet[str]:
+    return frozenset({
+        "Africa", "APAC", "Asia", "Asia Pacific", "Brazil", "Canada", "China", "EMEA", "Europe",
+        "Eurozone", "France", "Germany", "India", "Iran", "Israel", "Japan", "Korea", "LatAm",
+        "Latin America", "Mexico", "Middle East", "North America", "Russia", "Taiwan", "Ukraine",
+    })
+
+
 def _default_reflect_on() -> FrozenSet[Route]:
     return frozenset({Route.DEEP_DIVE, Route.HIGH, Route.CRISIS, Route.RED_TEAM, Route.CODE_GEN})
 
@@ -186,6 +194,7 @@ class OrchestratorConfig:
     ticker_aliases: Dict[str, str] = field(default_factory=_default_aliases)
     non_ticker_tokens: FrozenSet[str] = field(default_factory=_default_non_tickers)
     entity_stopwords: FrozenSet[str] = field(default_factory=_default_entity_stopwords)
+    entity_regions: FrozenSet[str] = field(default_factory=_default_entity_regions)
     price_history_days: int = 365
     universe_metadata_path: str = "config/default_universe_metadata.yaml"
 
@@ -883,14 +892,15 @@ class MetaOrchestrator:
         if ticker:
             return ticker
 
-        # A proper noun introduced by "for/on/of/about/into" ("Summarize risks for Boeing") is the target;
-        # otherwise the first proper noun wins ("Exxon credit outlook in Europe").
+        # Regions are qualifiers, never targets. A proper noun after "for/on/of/about/into"
+        # ("Summarize risks for Boeing") wins; otherwise the first one does ("Exxon outlook for Europe").
+        # Callers that know the target should pass context["entity"].
         candidates = []
         for match in _PROPER_NOUN_RE.finditer(query):
             words = [w for w in match.group(0).split() if w not in self.config.non_ticker_tokens]
             while words and words[0] in self.config.entity_stopwords:
                 words.pop(0)
-            if words:
+            if words and " ".join(words) not in self.config.entity_regions:
                 targeted = bool(_TARGET_PREP_RE.search(query[: match.start()]))
                 candidates.append((not targeted, " ".join(words)))
         candidates.sort(key=lambda c: c[0])

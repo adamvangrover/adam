@@ -880,15 +880,16 @@ function renderAudit(){
 // ============================================================
 //  RENDER: CONSTITUTION & ONTOLOGY
 // ============================================================
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderOntology(){
   const schemaStr = document.getElementById('adam-constitution-ontology').textContent;
   const config = JSON.parse(schemaStr);
 
-  let h='<div class="card"><div class="card-title"><span class="icon">🏛️</span> Core Neutrality Principles (v'+config.ontology_version+')</div>';
+  let h='<div class="card"><div class="card-title"><span class="icon">🏛️</span> Core Neutrality Principles (v'+esc(config.ontology_version)+')</div>';
   config.constitution_framework.principles.forEach(p => {
     h+=`<div style="margin-bottom:16px;padding-left:12px;border-left:3px solid var(--accent-blue)">
-      <div style="font-weight:700;color:var(--accent-blue);font-size:12px;margin-bottom:4px">${p.id}: ${p.title}</div>
-      <div style="color:var(--text-secondary);font-size:11px">${p.description}</div>
+      <div style="font-weight:700;color:var(--accent-blue);font-size:12px;margin-bottom:4px">${esc(p.id)}: ${esc(p.title)}</div>
+      <div style="color:var(--text-secondary);font-size:11px">${esc(p.description)}</div>
     </div>`;
   });
   h+='</div>';
@@ -897,18 +898,18 @@ function renderOntology(){
   h+='<table class="dt"><thead><tr><th>Entity Type</th><th>Monitored Attributes</th></tr></thead><tbody>';
   config.canonical_risk_ontology.entities.forEach(e => {
     h+=`<tr>
-      <td style="color:var(--accent-cyan);font-weight:700">${e.type}</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--text-muted)">[${e.attributes.join(', ')}]</td>
+      <td style="color:var(--accent-cyan);font-weight:700">${esc(e.type)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--text-muted)">[${esc(e.attributes.join(', '))}]</td>
     </tr>`;
   });
   h+='</tbody></table></div>';
 
   h+='<div class="card"><div class="card-title"><span class="icon">🔁</span> Benchmarking & Learning Loop</div>';
   h+='<div class="metrics">';
-  h+=`<div class="metric"><div class="metric-label">Cycle Frequency</div><div class="metric-value" style="color:var(--accent-emerald);font-size:14px">${config.benchmarking_learning_loop.cycle_frequency}</div></div>`;
-  h+=`<div class="metric"><div class="metric-label">Adaptation Target</div><div class="metric-value" style="color:var(--accent-amber);font-size:11px;white-space:normal;line-height:1.4">${config.benchmarking_learning_loop.adaptation_target}</div></div>`;
+  h+=`<div class="metric"><div class="metric-label">Cycle Frequency</div><div class="metric-value" style="color:var(--accent-emerald);font-size:14px">${esc(config.benchmarking_learning_loop.cycle_frequency)}</div></div>`;
+  h+=`<div class="metric"><div class="metric-label">Adaptation Target</div><div class="metric-value" style="color:var(--accent-amber);font-size:11px;white-space:normal;line-height:1.4">${esc(config.benchmarking_learning_loop.adaptation_target)}</div></div>`;
   h+='</div>';
-  h+='<div style="margin-top:12px;font-size:11px;color:var(--text-secondary)"><span style="font-weight:600;color:var(--text-primary)">Feedback Mechanisms:</span> '+config.benchmarking_learning_loop.feedback_mechanisms.join(' → ')+'</div>';
+  h+='<div style="margin-top:12px;font-size:11px;color:var(--text-secondary)"><span style="font-weight:600;color:var(--text-primary)">Feedback Mechanisms:</span> '+esc(config.benchmarking_learning_loop.feedback_mechanisms.join(' → '))+'</div>';
   h+='</div>';
 
   document.getElementById('ontologyContent').innerHTML=h;
