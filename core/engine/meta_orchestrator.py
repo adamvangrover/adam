@@ -23,6 +23,7 @@ import re
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, FrozenSet, List, Optional, Pattern, Tuple
 
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
@@ -80,6 +81,8 @@ from core.system.agent_orchestrator import AgentOrchestrator
 from core.utils.logging_utils import SwarmLogger
 from core.utils.proof_of_thought import ProofOfThoughtLogger
 from core.utils.repo_context import RepoContextManager
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +186,7 @@ class OrchestratorConfig:
     non_ticker_tokens: FrozenSet[str] = field(default_factory=_default_non_tickers)
     entity_stopwords: FrozenSet[str] = field(default_factory=_default_entity_stopwords)
     price_history_days: int = 365
+    universe_metadata_path: str = "config/default_universe_metadata.yaml"
 
 
 def assert_model_allowed(model_id: str) -> str:
@@ -671,6 +675,8 @@ class MetaOrchestrator:
 
     async def _run_crisis_flow(self, query: str, context: Dict[str, Any]):
         portfolio = context.get("portfolio") or await self._construct_default_portfolio(context)
+        if "allocation" in portfolio and "positions" not in portfolio:
+            portfolio = self._positions_from_allocation(portfolio)
         return await self._generic_graph_run(crisis_simulation_app,
             init_crisis_state(query, portfolio), "Crisis Simulation")
 
@@ -736,6 +742,34 @@ class MetaOrchestrator:
             "_constructed": False,
             "_estimated": True,
         }
+
+    def _positions_from_allocation(self, portfolio: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Bridges an `allocation` ({symbol: weight}) into crisis-engine `positions` using
+        `config.universe_metadata_path`. Symbols without metadata are skipped and listed in `_skipped_symbols`.
+        """
+        metadata = self._load_universe_metadata()
+        aum = float(portfolio.get("aum") or self.config.default_portfolio_aum)
+        positions, skipped = [], []
+        for symbol, weight in portfolio["allocation"].items():
+            meta = metadata.get(symbol)
+            if not meta:
+                skipped.append(symbol)
+                continue
+            positions.append({"name": symbol, "weight": float(weight), "exposure": float(weight) * aum, **meta})
+        if skipped:
+            logger.warning(f"No universe metadata for {skipped}; excluded from crisis positions.")
+        return {**portfolio, "positions": positions, "_skipped_symbols": skipped}
+
+    def _load_universe_metadata(self) -> Dict[str, Dict[str, Any]]:
+        path = Path(self.config.universe_metadata_path)
+        if not path.is_absolute() and not path.exists():
+            path = Path(__file__).resolve().parents[2] / path
+        try:
+            return yaml.safe_load(path.read_text()) or {}
+        except (OSError, yaml.YAMLError) as e:
+            logger.warning(f"Universe metadata '{path}' unavailable: {e}")
+            return {}
 
     def _fetch_universe_prices(self, universe: List[str]):
         """Returns (close-price DataFrame, used_synthetic_data) for the universe, or (None, False)."""

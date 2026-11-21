@@ -51,7 +51,8 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
 |---|---|
 | `llm_routing.yaml` | Model routing tiers; `routing_tiers.tier_1_primary_system2.model_id` overrides the orchestrator default; SR 11-7 registry |
 | `agents.yaml` | Agent registry / per-agent config |
-| `agent_schema.yaml` | Agent config schema |
+| `agent_schema.yaml` | Confidence-tier thresholds (autonomous / HITL / abort) + role constraints |
+| `default_universe_metadata.yaml` | Sector/leverage/rating per symbol for crisis positions; each entry `source` or `_estimated: true` |
 | `orchestration.yaml`, `workflow.yaml` | Orchestrator and workflow settings |
 | `governance_policy.yaml` | Restricted endpoints, roles, risk levels |
 | `system.yaml`, `settings.yaml`, `config.yaml` | General system settings |
