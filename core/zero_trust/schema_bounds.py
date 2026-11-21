@@ -12,7 +12,7 @@ from typing import Any, Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
-from afos_v3.gateway.zero_trust_gateway import QuarantineSink, ZeroTrustSecurityError
+from core.zero_trust.gateway import QuarantineSink, ZeroTrustSecurityError
 
 MAX_SP500_DAILY_VARIANCE: Final[float] = 0.25  # 25% hard physical limit
 MAX_OWNERSHIP_ALIGNMENT_TOLERANCE_PCT: Final[float] = 0.05  # 5 bps mathematical tolerance

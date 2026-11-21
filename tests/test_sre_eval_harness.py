@@ -14,7 +14,7 @@ try:
 except ImportError:
     pytest = None  # type: ignore[assignment]
 
-from afos_v3.gateway.zero_trust_gateway import QuarantineSink
+from core.zero_trust.gateway import QuarantineSink
 from scripts.sre_eval_harness import (
     GENESIS_CHAIN_HASH,
     AsyncProvOBatchLedger,

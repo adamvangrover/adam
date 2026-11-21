@@ -27,7 +27,8 @@ If this file disagrees with code, the code wins — fix this file.
 | `docs/` | Long-form docs, ADRs | docs |
 | `showcase/` | All static HTML (GitHub Pages root). `showcase/dashboards/` = former root-level dashboards | presentation |
 | `data/` | Seed data, ledgers, telemetry | data |
-| `archive/` | Historical scripts and learning snapshots | not imported |
+| `core/zero_trust/` | Zero-trust ingestion gateway, schema bounds, triangulated feed consensus | canonical |
+| `archive/` | Historical scripts; `archive/snapshots/` = learning snapshots (§7) | not imported |
 
 Root `index.html` is the only HTML page at the repo root. Generated "Index of" pages are not
 produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_architecture`, `services/webapp`
@@ -91,16 +92,22 @@ produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_
 
 ## 7. Snapshot index
 
-Versioned codebases are kept as learning snapshots. They are not imported by `core/` and are excluded
-from lint/test paths. Each has a `SNAPSHOT.md`.
+Versioned codebases are kept as learning snapshots under `archive/snapshots/<name>/`, each with a `SNAPSHOT.md`.
+They are not imported by live code and are excluded from ruff (`[tool.ruff] exclude`), pytest (`norecursedirs`)
+and the unit-test CI path filter.
 
-| Snapshot | Location |
-|---|---|
-| `adam_v24` | `adam_v24/` |
-| `afos_v3` | `afos_v3/` |
-| `ufos` | `ufos/` |
-| `tinker_lab` | `tinker_lab/` |
-| `experimental` | `experimental/` |
+| Snapshot | Location | Pulled into live tree |
+|---|---|---|
+| `afos_v3` | `archive/snapshots/afos_v3/` | `core/engine/prov_o_consensus.py`, `core/zero_trust/` (all code) |
+| `adam_v24` | `archive/snapshots/adam_v24/` | `data/schemas/unified_ledger_bitemporal.sql` |
+| `ufos` | `archive/snapshots/ufos/` | — |
+| `tinker_lab` | `archive/snapshots/tinker_lab/` | — (`tinker-cookbook` submodule path moved) |
+| `experimental` | `archive/snapshots/experimental/` | — (`core/experimental/` is separate and live) |
+| `adam-core` | `adam-core/` (retained) | Optional Rust runtime slice, see §6 |
+
+Consensus engines in `core/`: `consensus_engine.py` (weighted agent-vote arbitration + HITL),
+`consensus_engine_v2.py` (memory-matrix house view), `risk_consensus_engine.py` (SNC risk),
+`prov_o_consensus.py` (PROV-O disjoint-root corroboration), `core/zero_trust/triangulated_consensus.py` (3-feed outlier rejection + lockdown).
 
 ## 8. Run
 

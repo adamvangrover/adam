@@ -140,7 +140,7 @@ def extract_training_data(agents, prompts):
         })
 
     # 4. Add existing Tinker Lab data (as fallback/augmentation)
-    input_path = 'tinker_lab/tinker-cookbook/example-data/conversations.jsonl'
+    input_path = 'archive/snapshots/tinker_lab/tinker-cookbook/example-data/conversations.jsonl'
     if os.path.exists(input_path):
         try:
             with open(input_path, 'r', encoding='utf-8') as f:

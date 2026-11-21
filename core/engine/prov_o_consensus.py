@@ -1,6 +1,6 @@
 """
 ADAM OS v30.1 / AFOS V3 — W3C PROV-O Lineage & Disjointness Consensus Engine
-Module: afos_v3/prov_o_consensus.py
+Module: core/engine/prov_o_consensus.py
 Compliance: Federal Reserve SR 11-7, OCC 2026-13 (Agent Lineage Auditability)
 """
 

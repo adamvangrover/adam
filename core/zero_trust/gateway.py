@@ -66,7 +66,7 @@ class QuarantineSink:
     Serializes failed payloads outside the main execution event loop.
     """
 
-    def __init__(self, sink_path: Path | str = Path("/tmp/afos_v3_quarantine/quarantine.jsonl")) -> None:
+    def __init__(self, sink_path: Path | str = Path("/tmp/afos_quarantine/quarantine.jsonl")) -> None:
         self.sink_path = Path(sink_path)
         self.sink_path.parent.mkdir(parents=True, exist_ok=True)
         self._memory_buffer: list[QuarantineRecord] = []

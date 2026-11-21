@@ -13,14 +13,14 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any, Callable, Coroutine, Final
 
-from afos_v3.gateway.zero_trust_gateway import (
+from core.zero_trust.gateway import (
     EphemeralSTSToken,
     MTLSConnectionHandshake,
     QuarantineSink,
     ZeroTrustGatewayMiddleware,
     ZeroTrustSecurityError,
 )
-from afos_v3.validation.schema_bounds import CoreMetricsPayload, DeterministicValidationEngine
+from core.zero_trust.schema_bounds import CoreMetricsPayload, DeterministicValidationEngine
 
 FORTRESS_WEIGHT: Final[float] = 0.75  # 75% Fortress (sub-90-day sovereign paper)
 CONVEX_HUNT_WEIGHT: Final[float] = 0.25  # 25% Convex Hunt

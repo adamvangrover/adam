@@ -1,5 +1,5 @@
 """
-Unit test suite for W3C PROV-O Root-Source Disjointness Engine (afos_v3/prov_o_consensus.py).
+Unit test suite for W3C PROV-O Root-Source Disjointness Engine (core/engine/prov_o_consensus.py).
 Compliance: Federal Reserve SR 11-7, OCC 2026-13 (Agent Lineage Auditability).
 """
 
@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-from afos_v3.prov_o_consensus import (
+from core.engine.prov_o_consensus import (
     AgentAssertion,
     ProvEntity,
     ProvOGraphConsensusValidator,

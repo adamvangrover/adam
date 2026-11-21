@@ -46,14 +46,14 @@ from src.zero_trust.sec_validator import SECIntegrityError, WhalescannerSECValid
 from src.zero_trust.sts import SecurityTokenError, SecurityTokenService
 
 # --- Suite B Imports (afos_v3) ---
-from afos_v3.consensus.triangulated_engine import (
+from core.zero_trust.triangulated_consensus import (
     AFOSKernelStateManager,
     ConsensusLockdownError,
     NodeFeedBundle,
     SystemStatus,
     TriangulatedConsensusEngine,
 )
-from afos_v3.gateway.zero_trust_gateway import (
+from core.zero_trust.gateway import (
     EphemeralSTSProvider,
     EphemeralTokenError,
     MTLSConnectionHandshake,
@@ -63,7 +63,7 @@ from afos_v3.gateway.zero_trust_gateway import (
     ZeroTrustGatewayMiddleware,
     strip_static_credentials,
 )
-from afos_v3.validation.schema_bounds import (
+from core.zero_trust.schema_bounds import (
     DeterministicValidationEngine,
     KernelPhysicsViolationError,
     SECCIKEntityRecord,

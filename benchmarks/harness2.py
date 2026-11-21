@@ -15,7 +15,7 @@ from adam_finance.risk_adapter_gate import (
     TimesFMRiskSurface,
     evaluate_neuro_symbolic_decision,
 )
-from afos_v3.prov_o_consensus import (
+from core.engine.prov_o_consensus import (
     AgentAssertion,
     ProvEntity,
     ProvOGraphConsensusValidator,
