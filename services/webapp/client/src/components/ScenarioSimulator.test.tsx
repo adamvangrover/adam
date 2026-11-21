@@ -2,16 +2,16 @@ import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react';
 import { ScenarioSimulator } from './ScenarioSimulator';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('ScenarioSimulator', () => {
     it('debounces the onSimulate callback', () => {
-        const handleSimulate = jest.fn();
+        const handleSimulate = vi.fn();
         const { container } = render(<ScenarioSimulator onSimulate={handleSimulate} />);
 
         // Initial render triggers useEffect, but should be skipped by isMounted check
         act(() => {
-            jest.runAllTimers();
+            vi.runAllTimers();
         });
         expect(handleSimulate).not.toHaveBeenCalled();
 
@@ -27,7 +27,7 @@ describe('ScenarioSimulator', () => {
 
         // Fast forward time
         act(() => {
-            jest.advanceTimersByTime(500);
+            vi.advanceTimersByTime(500);
         });
 
         // Should be called now

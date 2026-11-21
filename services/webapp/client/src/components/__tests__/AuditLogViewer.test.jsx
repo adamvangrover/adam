@@ -3,7 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import AuditLogViewer from '../AuditLogViewer';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('AuditLogViewer', () => {
     beforeEach(() => {

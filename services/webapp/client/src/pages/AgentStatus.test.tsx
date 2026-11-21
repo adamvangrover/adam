@@ -4,15 +4,15 @@ import AgentStatus from './AgentStatus';
 import { dataManager } from '../utils/DataManager';
 
 // Mock the DataManager
-jest.mock('../utils/DataManager', () => ({
+vi.mock('../utils/DataManager', () => ({
   dataManager: {
-    getManifest: jest.fn(),
+    getManifest: vi.fn(),
   },
 }));
 
 describe('AgentStatus Component', () => {
   beforeEach(() => {
-    (dataManager.getManifest as jest.Mock).mockResolvedValue({
+    (dataManager.getManifest as ReturnType<typeof vi.fn>).mockResolvedValue({
       agents: [
         { id: '1', name: 'Test Agent', status: 'Active', specialization: 'Testing' },
       ],
