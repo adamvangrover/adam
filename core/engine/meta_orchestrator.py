@@ -163,8 +163,8 @@ def _default_non_tickers() -> FrozenSet[str]:
 
 def _default_entity_stopwords() -> FrozenSet[str]:
     return frozenset({
-        "Analyze", "Analyse", "Assess", "Buy", "Check", "Evaluate", "Get", "How", "Is", "Perform",
-        "Please", "Price", "Red", "Review", "Risk", "Run", "Sell", "Show", "The", "Team", "What",
+        "Analyze", "Analyse", "Assess", "Buy", "Check", "Covenant", "Deep", "Evaluate", "Get", "How", "Is",
+        "Perform", "Please", "Price", "Red", "Review", "Risk", "Run", "Sell", "Show", "The", "Team", "What",
     })
 
 
@@ -503,8 +503,10 @@ class MetaOrchestrator:
 
             # 2. Fundamentals
             fund_data = await agents["fund"].execute(company_id)
-            dcf_val = fund_data.get("dcf_valuation", 0.0) if isinstance(fund_data, dict) else 0.0
-            raw_metrics = fund_data.get("raw_metrics", {}) if isinstance(fund_data, dict) else {}
+            # Non-standard PydanticAgentBase calls return AgentOutput.model_dump(); metrics live in metadata.
+            fund_meta = fund_data.get("metadata", fund_data) if isinstance(fund_data, dict) else {}
+            dcf_val = fund_meta.get("dcf_valuation", 0.0)
+            raw_metrics = fund_meta.get("raw_metrics") or {}
 
             # Placeholder financials when the fundamentals agent returns nothing; flagged below.
             estimated_fields = [k for k in ("ebitda", "total_debt", "interest_expense") if raw_metrics.get(k) is None]
@@ -880,16 +882,14 @@ class MetaOrchestrator:
         if ticker:
             return ticker
 
-        # A capitalised sentence-initial word ("Deep dive on Ford") is only used if nothing else matches.
-        candidates = []
+        # First proper noun wins; capitalised command words ("Deep dive on Ford") are entity_stopwords.
         for match in _PROPER_NOUN_RE.finditer(query):
             words = [w for w in match.group(0).split() if w not in self.config.non_ticker_tokens]
             while words and words[0] in self.config.entity_stopwords:
                 words.pop(0)
             if words:
-                candidates.append((match.start() == 0, " ".join(words)))
-        candidates.sort(key=lambda c: c[0])
-        return candidates[0][1] if candidates else None
+                return " ".join(words)
+        return None
 
     @staticmethod
     def _resolve_quantity(query: str, context: Dict[str, Any]) -> Optional[float]:
