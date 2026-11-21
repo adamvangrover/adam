@@ -338,7 +338,6 @@ def _default_ide_tools() -> List[Any]:
 
 
 app = FastAPI(
-    title="ADAM Antigravity IDE Workspace Server",
     title="ADAM Antigravity IDE & Ecosystem Server",
     version="30.1.1",
     docs_url=None,
