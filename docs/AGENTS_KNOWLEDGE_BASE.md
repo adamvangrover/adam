@@ -177,12 +177,12 @@ Implemented in `src/iak/adam_iak_primitives.py` and `adam_iak_primitives.py`:
 
 ### 5.2 W3C PROV-O, PDIL Gatekeepers, HNASP & Dual-Model Arbitration
 * **`ProvenanceHeader` (`src/pdil/models.py`, `docs/architecture/PDIL_MAPPING.md`):** Requires `git_commit_hash`, `timestamp`, `content_hash` (SHA-256 of canonical `json.dumps(payload, sort_keys=True)`), `jsonLogic_version`, `confidence_score`, `derivation_path`, and `source_data_object`. `hash_state()` hashes `git_commit_hash:jsonLogic_version`.
-* **`AgentOutput.check_grounding()` (`src/schemas/core_types.py`, `core/schemas/agent_schema.py`):** Verifies non-empty `source_data_object` grounding; tested via hypothesis property tests in `tests/test_pdil_property.py` and `ops/checks/check_provenance.py` (`variable_node` entries must include `context_provenance`).
+* **`AgentOutput.check_grounding()` (`src/schemas/core_types.py`, `core/schemas/agent_schema.py`):** Verifies non-empty `source_data_object` grounding; tested via hypothesis property tests in `tests/unit/test_pdil_property.py` and `ops/checks/check_provenance.py` (`variable_node` entries must include `context_provenance`).
 * **PDIL Middleware (`src/pdil/middleware.py`, `src/pdil/network_validator.py`):** Houses `SecurityGovernanceGatekeeper`, `JsonLogicGovernanceGatekeeper`, `DriftIntelligenceLayer`, `ProofOfThoughtLogger`, and `MilestoneLogger` (`adam_governance/state_control.py`).
 * **`ModelArbitrationOutput` (`afos/afos/core_types.py`):** Enforces `ConfigDict(strict=True, extra="forbid")` with `bidirectional_disparity`, `arbitration_flag_triggered`, $\text{one\_sided\_downside\_spread} = \max(0, \text{PD}_\beta - \text{PD}_\alpha)$, and `capital_buffer_penalty`.
 * **`HNASPState` (`core/schemas/hnasp.py`):** Tracks `Meta`, `PersonaState` (`EPAVector`), `LogicLayer` (evaluated via `jsonLogic` before `_original_execute`), `ContextStream`, and `ExecutionTrace`.
 
-### 5.3 ADAM Harness 2 Reflective Evolution (`adam_harness2`, `tests/test_adam_harness2.py`)
+### 5.3 ADAM Harness 2 Reflective Evolution (`adam_harness2`, `tests/unit/test_adam_harness2.py`)
 * **`HarnessConfig`:** Computes a deterministic 12-character `fingerprint()`. Component `guardrails` is immutable (raises `PermissionError` if a patch attempts to weaken guardrails); `plugins` is strictly append-only.
 * **`Harness2Controller` & `ExperienceLibrary`:** Runs the 3-stage Editor $\rightarrow$ Composer $\rightarrow$ Reflector loop (`prompts/harness2_stage_prompts.py`) over `ExecutionTrace` probes, committing verified domain lessons to `ExperienceLibrary` and streaming events to append-only JSONL telemetry.
 
@@ -205,7 +205,7 @@ Implemented in `src/iak/adam_iak_primitives.py` and `adam_iak_primitives.py`:
 * Enforce strict Absolute Priority Rule (APR) senior-to-junior recovery monotonicity across restructuring trees.
 
 ### 6.4 Credit Dominance Rules (`MarketSentimentAgent.check_credit_dominance_rule`)
-* Validated in `tests/test_adam_v24_logic.py`:
+* Validated in `tests/unit/test_adam_v24_logic.py`:
   * Trigger "Liquidity Mirage" when $\text{spy\_change\_pct} > 0.5\%$ while $\text{relative\_credit\_performance} < -0.15\%$.
   * Trigger "Systemic Tremor" whenever the Treasury curve inverts (`^TNX < ^IRX`).
 

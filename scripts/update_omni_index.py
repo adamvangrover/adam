@@ -4,7 +4,7 @@ import re
 import json
 
 NEW_ENTRY = {
-    "u": "adam_standalone_distribution.html",
+    "u": "showcase/dashboards/adam_standalone_distribution.html",
     "t": "ADAM Repository — Standalone Interactive Distribution",
     "d": "ADAM Repository Standalone Interactive Distribution - Adaptive Moment Estimation & Loss Landscape Arena"
 }

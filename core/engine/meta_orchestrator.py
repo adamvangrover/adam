@@ -880,13 +880,16 @@ class MetaOrchestrator:
         if ticker:
             return ticker
 
+        # A capitalised sentence-initial word ("Deep dive on Ford") is only used if nothing else matches.
+        candidates = []
         for match in _PROPER_NOUN_RE.finditer(query):
-            words = match.group(0).split()
+            words = [w for w in match.group(0).split() if w not in self.config.non_ticker_tokens]
             while words and words[0] in self.config.entity_stopwords:
                 words.pop(0)
             if words:
-                return " ".join(words)
-        return None
+                candidates.append((match.start() == 0, " ".join(words)))
+        candidates.sort(key=lambda c: c[0])
+        return candidates[0][1] if candidates else None
 
     @staticmethod
     def _resolve_quantity(query: str, context: Dict[str, Any]) -> Optional[float]:

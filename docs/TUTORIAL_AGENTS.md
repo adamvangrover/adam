@@ -48,4 +48,4 @@ plan = agent.planner.discover_plan("Analyze AAPL for credit risk")
 
 ## Testing Agents
 
-Use `pytest` to verify agent behavior. See `tests/test_neuro_symbolic_planner.py` for examples.
+Use `pytest` to verify agent behavior. See `tests/unit/test_neuro_symbolic_planner.py` for examples.

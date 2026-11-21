@@ -43,5 +43,5 @@ Refer to `AGENTS.md` for strict development standards.
 Run agent tests using `pytest`:
 
 ```bash
-pytest tests/test_fundamental_analyst.py
+pytest tests/unit/test_fundamental_analyst.py
 ```

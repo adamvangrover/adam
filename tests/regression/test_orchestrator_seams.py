@@ -46,11 +46,12 @@ def test_positions_sum_to_one_and_aum(orch):
     assert all(p.get("_estimated") or p.get("source") for p in out["positions"])
 
 
-def test_missing_metadata_symbol_is_skipped_not_defaulted(orch, caplog):
-    out = orch._positions_from_allocation({"aum": 100, "allocation": {"SPY": 0.5, "ZZZZ": 0.5}})
+def test_missing_metadata_symbol_is_skipped_not_defaulted(orch):
+    with patch.object(mo.logger, "warning") as warn:
+        out = orch._positions_from_allocation({"aum": 100, "allocation": {"SPY": 0.5, "ZZZZ": 0.5}})
     assert [p["name"] for p in out["positions"]] == ["SPY"]
     assert out["_skipped_symbols"] == ["ZZZZ"]
-    assert "ZZZZ" in caplog.text
+    assert "ZZZZ" in str(warn.call_args_list)
 
 
 def test_crisis_engine_gets_per_asset_results(orch):
@@ -83,3 +84,13 @@ def test_default_model_is_gemini_neon_without_routing_file():
     assert OrchestratorConfig().llm_model == "gemini-4-neon"
     cfg = MetaOrchestrator._resolve_config(OrchestratorConfig(routing_config_path="/nonexistent.yaml"))
     assert cfg.llm_model == "gemini-4-neon"
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("Deep dive on Ford Motor", "Ford Motor"),       # sentence-initial capital is not the entity
+    ("Covenant review for Boeing", "Boeing"),
+    ("What is the US GDP outlook?", None),           # acronyms are not entities
+    ("Exxon credit outlook", "Exxon"),               # sentence-initial fallback still works
+])
+def test_resolve_entity_prefers_non_initial_proper_nouns(orch, query, expected):
+    assert orch.resolve_entity(query, {}) == expected

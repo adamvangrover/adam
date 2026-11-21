@@ -1,80 +1,53 @@
-# ADAM Financial Operating System (AFOS) — Agent Network Registry
+# ADAM — Agent Guide
 
-## The Adam Agent Developer's Bible (v30.1)
+How to build and change agents in this repository. Start with `REPO_MAP.md` (where things are) and
+`docs/ARCHITECTURE.md` (how they connect). If this file disagrees with code, the code wins — fix this file.
 
-> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
-
-This document is the definitive source of truth for creating, modifying, and debugging agents within the **Adam v30.1** ecosystem. Operating as an institutional-grade, neuro-symbolic multi-agent framework, AFOS manages autonomous credit risk control and financial modeling under `ARCHITECT_INFINITE` governance protocols.
-
-Human-centric role designations are deprecated. System state, underwriting decisions, and portfolio monitoring are exclusively driven by agent consensus, telemetry, and deterministic logic.
-
----
-
-## 🧭 Navigation
-
-* [1. The Prime Directive: Institutional Bifurcation](#1-the-prime-directive-institutional-bifurcation)
+* [1. Bifurcation: Core vs. Lab](#1-bifurcation-core-vs-lab)
 * [2. Architecture: System 1 vs. System 2](#2-architecture-system-1-vs-system-2)
 * [3. Operating Confidence Tiers](#3-operating-confidence-tiers)
 * [4. Core Agent Role Boundaries & State Schemas](#4-core-agent-role-boundaries--state-schemas)
-* [5. Swarm Protocols & Standard Interfaces](#5-swarm-protocols--standard-interfaces)
-* [6. Pheromones & Pre-Flight Checklist](#6-pheromones--pre-flight-checklist)
-* [7. Architectural Invariants & Permissions](#7-architectural-invariants--permissions)
-* [8. AFOS Agent System Instructions & Extended Persona Catalog](#8-afos-agent-system-instructions--extended-persona-catalog)
-* [9. v30.1-R Orchestrators & Specialized Gate Clearance Systems](#9-v301-r-orchestrators--specialized-gate-clearance-systems)
+* [5. Standard Interface](#5-standard-interface)
+* [6. Pre-Flight Checklist](#6-pre-flight-checklist)
+* [7. Architectural Invariants](#7-architectural-invariants)
+* [8. Extended Persona Catalog](#8-afos-agent-system-instructions--extended-persona-catalog)
+* [9. v30.1-R Orchestrators](#9-v301-r-orchestrators--specialized-gate-clearance-systems)
 
 ---
 
-## 1. The Prime Directive: Institutional Bifurcation
+## 1. Bifurcation: Core vs. Lab
 
-The AFOS repository manages the tension between **Tier 1 G-SIB Alignment (Internal Synthetic Benchmark)** and **Agentic Velocity** through strict environmental bifurcation. Do not import "Lab" code into "Product" modules.
+Do not import Lab code into Core modules.
 
-### Path A: The Core (Reliability & Risk Control)
+| Path | Locations | Rules |
+|---|---|---|
+| **Core** | `core/`, `services/`, `server/`, `adam_os/`, `config/`, `schemas/` | Pydantic at every I/O boundary; provenance on material decisions; defensive handling of external calls; optional heavy deps must not break imports. |
+| **Lab** | `research/`, `core/experimental/` | Free iteration. Promote into `core/` by copying + testing, never by importing. |
+| **Snapshots** | `archive/snapshots/<name>/` | Frozen learning snapshots, each with `SNAPSHOT.md`. Excluded from ruff, pytest and CI. Never imported. |
 
-* **Locations:** `core/agents/`, `core/credit_sentinel/`, `adam_os/`
-* **Philosophy:** "Deterministic Execution. Zero Hallucination."
-* **Mandates:**
-  * **Underwriting & Sizing:** TMT and Leveraged Finance forward-looking cash flow modeling, Enterprise Value (EV) abstraction, and rigorous Base/Bull/Bear scenarios.
-  * **Surveillance:** Continuous monitoring for covenant breaches, liquidity runway exhaustion, and distress signals.
-* **Requirements:**
-  * **Strict Boundary:** Total separation of UI presentation logic (`frontend/`, `services/webapp/`, `showcase/`) from the core asynchronous execution layer.
-  * **Auditability:** Every decision must generate a W3C PROV-O compliant telemetry log with a reasoning trace.
-  * **Type Safety:** Pydantic models validate all I/O boundary crossings. Defensive error handling around all external calls.
-
-### Path B: The Lab (Velocity & Discovery)
-
-* **Locations:** `experimental/`, `research/`, `tinker_lab/`
-* **Philosophy:** "Expansive Iteration."
-* **Requirements:** Optimized token throughput and bleeding-edge swarm protocols. Code in Path B must never be imported into Path A execution paths.
-
----
+Presentation (`showcase/`, `frontend/`, `services/webapp/client/`) stays separate from execution code.
 
 ## 2. Architecture: System 1 vs. System 2
 
-AFOS v30.1 splits cognitive processing into a high-concurrency event loop and a reflective, stateful graph, feeding data asynchronously to presentation layers.
+| | System 1 — NeuralMesh swarm | System 2 — reasoning graph |
+|---|---|---|
+| Path | `core/v30_architecture/python_intelligence/` | `core/agents/`, `core/engine/` |
+| Base class | `agents/base_agent.py::BaseAgent` | `core/agents/agent_base.py::AgentBase` → `PydanticAgentBase` → `core/agents/templates/v30_template_agent.py::TemplateAgentV30` |
+| Contract | `run()` loop; `emit(packet_type, payload)` → `NeuralPacket` | `AgentInput` → `AgentOutput` (`core/schemas/agent_schema.py`) |
+| Entry | `swarm_runner.py`, `EACIOrchestrator` | `core/engine/meta_orchestrator.py::MetaOrchestrator.route_request` |
+| Docs | `core/v30_architecture/README.md` | §5 below |
 
-### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
-
-* **Role:** The Autonomic Nervous System. Handles raw market telemetry, perception, and reflexes.
-* **Architecture:** Event-Driven, Asynchronous Python Pub/Sub (Event Loop).
-* **Base Class:** `AsyncAgentBase`
-* **Key Characteristics:** Non-blocking I/O, millisecond latency, stateless execution driven by local pheromone data.
-* **Example:** Real-time ingestion of leveraged loan pricing or TMT sector news alerts, instantly depositing `RISK_ALERT` tokens without blocking UI threads.
-
-### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
-
-* **Role:** The Prefrontal Cortex. Handles complex underwriting synthesis, capital structure modeling, and scenario evaluation.
-* **Architecture:** Directed Acyclic Graph (DAG) state machine.
-* **Base Class:** `TemplateAgentV30`
-* **Key Characteristics:** Stateful, tool-augmented (MCP), and highly reflective. Uses context across multiple steps and loops back to correct errors.
-* **Example:** Executing a comprehensive credit memo, reconciling conflicting Q3 earnings data via Qdrant JIT memory retrieval, and structuring a finalized risk rating.
-
----
+System 1 output is telemetry. Anything binding (ratings, sizing, capital) goes through System 2 so it
+carries a `provenance_trace`. `core/system/v22_async/async_agent_base.py::AsyncAgentBase` is the older
+v22 async base; new System 1 work uses the v30 `BaseAgent`.
 
 ## 3. Operating Confidence Tiers
 
-* **Autonomous (>= 0.85):** Autonomous execution permitted for low/medium-impact actions.
-* **HITL Required (0.50 - 0.8499):** Execution paused. Mandatory Human-in-the-Loop approval required.
-* **Hard Abort (< 0.50):** Hard execution abort. System halts and records failure event.
+Thresholds live in `config/agent_schema.yaml` (`TemplateAgentV30` reads them; do not hardcode).
+
+* **Autonomous (>= 0.85):** execution permitted for low/medium-impact actions.
+* **HITL Required (0.50 - 0.8499):** paused for human approval.
+* **Hard Abort (< 0.50):** halt and record the failure.
 
 ---
 
@@ -172,61 +145,67 @@ AFOS v30.1 splits cognitive processing into a high-concurrency event loop and a 
 
 ---
 
-## 5. Swarm Protocols & Standard Interfaces
 
-### Input & Output Schemas
+---
 
-All System 2 agents must adhere to the Standard Interface:
+## 5. Standard Interface
+
+Single source of truth: `core/schemas/agent_schema.py` (re-exported by `core.agents.agent_base`).
 
 ```python
-from pydantic import BaseModel, Field
-from typing import Dict, Any, List
-
 class AgentInput(BaseModel):
-    query: str = Field(..., description="The specific question or objective.")
-    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
-    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
+    query: str
+    context: Dict[str, Any] = {}
+    tools: List[str] = []
 
 class AgentOutput(BaseModel):
-    answer: str = Field(..., description="The final synthesized answer.")
-    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, next_step requests.")
-    prov_o_audit_trail: List[Dict[str, Any]] = Field(default_factory=list, description="W3C PROV-O audit trail metadata.")
+    answer: str
+    sources: List[str] = []
+    confidence: float            # 0.0-1.0
+    metadata: Dict[str, Any] = {}
+    provenance_trace: List[ProvenanceHeader] = []   # empty = ungrounded; check_grounding() is False
 ```
 
-### Routing & Consensus Rules
+The `prov_o_audit_trail` fields in the §4 state schemas are carried in `AgentOutput.provenance_trace`
+(see `docs/PROVENANCE.md`).
 
-1. **Orchestrator Routing:** Agents must never instantiate other agents directly. Cross-domain requests must be routed through the Nexus Orchestrator via output metadata: `metadata={"next_step": "invoke_surveillance", "query": "verify_covenant_compliance"}`.
-2. **Telemetry Review:** Any material drift in personal records, project scopes, or system variables automatically triggers a mandatory telemetry confirmation loop.
-3. **Consensus Arbitration:** In the event of conflicting data between models, the Consensus Engine evaluates confidence arrays and defers to rules defined within `jsonLogic`.
+To add a System 2 agent: subclass `TemplateAgentV30`, override `async analyze(input_data)` returning
+`(answer, sources, confidence, metadata)`. The base class adds the provenance header, confidence tier,
+JSONLogic guardrails and swarm logging (`AgentBase.__init_subclass__` wraps every `execute`).
 
----
+Routing rules:
 
-## 6. Pheromones & Pre-Flight Checklist
+1. Agents never instantiate other agents. Request follow-ups via `metadata={"next_step": "...", "query": "..."}`.
+2. `MetaOrchestrator` routes by ordered word-boundary patterns (`ROUTE_PATTERNS`); unresolved tickers /
+   entities return `status: clarification_needed` instead of a guess.
+3. Conflicting model outputs go to a consensus engine (`core/engine/consensus_engine*.py`,
+   `core/engine/prov_o_consensus.py`) whose thresholds are JSONLogic/YAML.
+4. The orchestrator model defaults to `gemini-4-neon` (`OrchestratorConfig`), overridden by
+   `config/llm_routing.yaml` tier 1. Models in `core/config/models.py::BLOCKED_MODELS` raise
+   `SR11_7_BLOCKED_MODEL_ERROR` (SR 11-7).
 
-Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
+## 6. Pre-Flight Checklist
 
-### Pre-Flight Checklist
-1. **Security Check:** Validate user input sanitization via EACI middleware and static AST analyzers.
-2. **Graph Check:** Verify schema alignment with FIBO ontology models.
-3. **Frontend Check:** Ensure presentation logic stays in `frontend/`, `services/webapp/`, or `showcase/`.
-4. **Logging:** Record any new failure patterns or edge cases into `docs/AGENTS_KNOWLEDGE_BASE.md`.
+1. Inputs/outputs are Pydantic; no new duplicate of `AgentInput`/`AgentOutput`.
+2. Thresholds and rules are in `config/*.yaml` or `assets/` JSONLogic, not in Python.
+3. Hand-picked placeholder values carry `_estimated: true` (`docs/PROVENANCE.md`).
+4. Tests: unit tests in `tests/unit/`; a bug fix adds a seam test in `tests/regression/`; routing/entity
+   behaviour changes update `tests/evals/datasets/*.json` and pass `python tests/evals/run_accuracy.py`.
+5. `.venv/bin/python -m pytest tests/ -q` and `.venv/bin/ruff check <changed files>`.
+6. Record new failure patterns in `docs/AGENTS_KNOWLEDGE_BASE.md`.
 
----
+## 7. Architectural Invariants
 
-## 7. Architectural Invariants & Permissions
-
-* **INVARIANT A:** LLMs may propose calculations but may not implement authoritative financial calculations in the cognitive/orchestration layer.
-* **INVARIANT B:** All state-changing operations pass through the governance plane.
-* **INVARIANT C:** All state-changing operations receive a risk classification.
-* **INVARIANT D:** All state-changing operations produce an immutable event.
-* **INVARIANT E:** All material decisions receive provenance metadata (`prov_o_audit_trail`).
-* **INVARIANT F:** Frozen analytical context may not silently mutate during a decision.
-* **INVARIANT G:** Rust execution kernels are deterministic and independently testable.
-* **INVARIANT H:** Generated/native build artifacts are never manually edited.
-* **INVARIANT I:** Policy is externalized from prompts into YAML/JSONLogic configurations.
-* **INVARIANT J:** Tests must validate both successful and adversarial execution paths.
+* **A:** LLMs may propose calculations; authoritative financial math runs in deterministic Python/Rust engines.
+* **B:** State-changing operations pass through the governance plane (`core/governance/`, `config/governance_policy.yaml`).
+* **C:** State-changing operations receive a risk classification.
+* **D:** State-changing operations produce an immutable event.
+* **E:** Material decisions carry provenance (`provenance_trace`, `docs/PROVENANCE.md`).
+* **F:** Frozen analytical context may not silently mutate during a decision.
+* **G:** Rust kernels are deterministic and independently testable (`cargo test`).
+* **H:** Generated/native build artifacts are never manually edited.
+* **I:** Policy lives in YAML/JSONLogic, not prompts or code.
+* **J:** Tests cover success and adversarial paths.
 
 ---
 
@@ -439,23 +418,23 @@ Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md`.
 ### A. ADAM v30.1-R Gate Clearance & LMT Contagion Orchestrator
 - **Module:** `scripts/lmt_contagion_gate_orchestrator.py` & `scripts/run_v30_1_r_gate_clearance_orchestrator.py`
 - **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/ADAM_v30_1_R_LMT_Contagion_Orchestrator_Prompt.md`
-- **Test Suite:** `tests/test_lmt_contagion_gate_orchestrator.py`
+- **Test Suite:** `tests/unit/test_lmt_contagion_gate_orchestrator.py`
 - **Description:** Chains 5 workspace skills (`cache-search-recall` & `world-modeling`, `credit-risk-briefing` & `graph-credit-contagion`, `pd-backtesting-calibration`, `llm-as-judge-arbiter`, `librarian-archivist`) across 7 Release Gates, evaluating LMT restructuring trees (Serta uptier vs Unrestricted Sub drop-down vs Chapter 11) and counterparty spillover with SHA-256 W3C PROV-O sealing.
 
 ### B. Market Mayhem v30.1-R — Frontier AI Capex & Credit Contagion
 - **Module:** `scripts/run_market_mayhem_v30_1_r.py`
 - **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/Market_Mayhem_v30_1_R_Frontier_AI_Capex_Prompt.md`
-- **Test Suite:** `tests/test_market_mayhem_v30_1_r.py`
+- **Test Suite:** `tests/unit/test_market_mayhem_v30_1_r.py`
 - **Description:** Chains macro ERP signals, frontier AI lab valuation discounts, neocloud GPU SPV contagion graphs, and barbell positioning playbooks with Z-score targets and CRPS prediction bounds.
 
 ### C. IAEH & AFOS v30.1 Bitemporal Context & Policy Drift Audit
 - **Module:** `scripts/run_iaeh_afos_v30_1_bitemporal_audit.py`
 - **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/IAEH_AFOS_v30_1_Bitemporal_Audit_Prompt.md`
-- **Test Suite:** `tests/test_iaeh_afos_v30_1_bitemporal_audit.py`
+- **Test Suite:** `tests/unit/test_iaeh_afos_v30_1_bitemporal_audit.py`
 - **Description:** Zero-trust architecture linter inspecting cross-skill schema interfaces, bitemporal cache invalidation, and 7-Gate Release Matrix neuro-symbolic tripwires.
 
 ### D. AFOS v30.1-R2-Expanded Orchestrator
 - **Module:** `scripts/run_afos_v30_1_r2_expanded_orchestrator.py`
 - **Prompt Spec:** `prompt_library/AOPL-v2.0/professional_outcomes/AFOS_v30_1_R2_Expanded_Orchestrator_Prompt.md`
-- **Test Suite:** `tests/test_afos_v30_1_r2_expanded_orchestrator.py`
+- **Test Suite:** `tests/unit/test_afos_v30_1_r2_expanded_orchestrator.py`
 - **Description:** Evaluates exploits, defenses, and market-moving intelligence across 5 execution vectors, enforcing Lexicographic Safety Primacy (L0 > L1 > L2), VPIN order-flow toxicity filtering, zero-trust order routing, multi-oracle consensus kill-switches, and W3C PROV-O SHA-256 audit bundles.

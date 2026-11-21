@@ -22,7 +22,7 @@ If this file disagrees with code, the code wins — fix this file.
 | `services/webapp/` | Flask API + React client (`client/`) | runtime |
 | `server/` | MCP server (`server/server.py`, tools listed in `mcp.json`) | runtime |
 | `rust_ext/`, `core/rust_pricing/`, `adam-core/` | Rust kernels (see §6) | optional runtime slices |
-| `tests/` | pytest suite | canonical |
+| `tests/` | pytest: `unit/` (module), `regression/` (bug seams), `evals/` (datasets + `run_accuracy.py`), `integration/`, domain dirs | canonical |
 | `scripts/` | CLI / maintenance / generators | tooling |
 | `docs/` | Long-form docs, ADRs | docs |
 | `showcase/` | All static HTML (GitHub Pages root). `showcase/dashboards/` = former root-level dashboards | presentation |
@@ -127,5 +127,6 @@ Consensus engines in `core/`: `consensus_engine.py` (weighted agent-vote arbitra
 ```bash
 uv venv --python 3.12 && uv sync --extra data-science --extra orchestration
 .venv/bin/python -m pytest tests/ -q
+.venv/bin/python tests/evals/run_accuracy.py   # routing/entity accuracy vs. floors
 .venv/bin/ruff check <files>
 ```
