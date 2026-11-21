@@ -77,7 +77,7 @@ The output is a regenerable artifact and is git-ignored; generate it locally or 
 Pages work from the filesystem (static mode). Features that call the API need the backend
 (`python services/webapp/api.py`, port 5001, or the Docker stack) — see the
 [Setup Guide](../docs/setup_guide.md#slice-g--docker--full-stack). Pages that `fetch()` JSON need to be
-served over HTTP (`python3 -m http.server 8080` from the repo root) rather than opened via `file://`.
+served over HTTP (`python3 -m http.server 8080 --bind 127.0.0.1` from the repo root; never expose it on other interfaces, since the server would also publish `.env`) rather than opened via `file://`.
 
 ## Adding or forking a page
 

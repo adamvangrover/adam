@@ -109,7 +109,7 @@ Open in a browser:
 - [`showcase/index.html`](../showcase/index.html) — standalone credit sensitivity engine
 - [`showcase/dashboards/index.html`](../showcase/dashboards/index.html) — dashboard catalog (from `manifest.json`)
 
-Or serve locally: `python3 -m http.server 8080` and open `http://localhost:8080/`.
+Or serve locally: `python3 -m http.server 8080 --bind 127.0.0.1` and open `http://localhost:8080/`.
 Template families are described in [TEMPLATES.md](TEMPLATES.md) and [showcase/README.md](../showcase/README.md).
 
 ## Slice B — Minimal: orchestrator only
