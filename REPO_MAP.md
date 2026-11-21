@@ -25,6 +25,7 @@ If this file disagrees with code, the code wins — fix this file.
 | `tests/` | pytest: `unit/` (module), `regression/` (bug seams), `evals/` (datasets + `run_accuracy.py`), `integration/`, domain dirs | canonical |
 | `scripts/` | CLI / maintenance / generators | tooling |
 | `docs/` | Long-form docs, ADRs | docs |
+| `docs/TEMPLATES.md` | Template library catalog: doc, brand/product, newsletter, terminal, prompt and code templates (starting points, not canonical) | docs |
 | `showcase/` | All static HTML (GitHub Pages root). `showcase/dashboards/` = former root-level dashboards; catalog `showcase/dashboards/index.html` + `manifest.json` (rebuild: `scripts/build_dashboard_manifest.py`) | presentation |
 | `data/` | Seed data, ledgers, telemetry | data |
 | `core/zero_trust/` | Zero-trust ingestion gateway, schema bounds, triangulated feed consensus | canonical |
