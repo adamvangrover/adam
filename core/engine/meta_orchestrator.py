@@ -18,6 +18,7 @@ import asyncio
 import dataclasses
 import datetime
 import logging
+import math
 import re
 import uuid
 from dataclasses import dataclass, field
@@ -102,6 +103,8 @@ class Route(str, Enum):
 
     @classmethod
     def coerce(cls, value: Any) -> Optional["Route"]:
+        if isinstance(value, cls):
+            return value
         try:
             return cls(str(value).upper())
         except ValueError:
@@ -135,7 +138,11 @@ ROUTE_PATTERNS: Tuple[Tuple[Route, Pattern[str]], ...] = (
 _DOLLAR_TICKER_RE = re.compile(r"\$([A-Za-z]{1,5})\b")
 _UPPER_TICKER_RE = re.compile(r"\b[A-Z]{2,5}\b")
 _PROPER_NOUN_RE = re.compile(r"\b[A-Z][\w&.-]*(?:\s+[A-Z][\w&.-]*)*")
-_QTY_RE = re.compile(r"(?<![\w.$])(\d+(?:\.\d+)?)(?![\w.])")
+_QTY_RE = re.compile(
+    r"\b(?:buy|sell|order(?:\s+for)?)\s+(\d+(?:\.\d+)?)(?![\w.])"
+    r"|(?<![\w.$])(\d+(?:\.\d+)?)\s+(?:shares?|units?|contracts?)\b",
+    re.IGNORECASE,
+)
 
 CLARIFICATION_NO_ENTITY = {"error": "no_entity_resolved", "status": "clarification_needed"}
 
@@ -850,10 +857,11 @@ class MetaOrchestrator:
     @staticmethod
     def _resolve_quantity(query: str, context: Dict[str, Any]) -> Optional[float]:
         qty = context.get("qty", context.get("quantity"))
-        if qty is not None:
-            try:
-                return float(qty)
-            except (TypeError, ValueError):
-                return None
-        match = _QTY_RE.search(query)
-        return float(match.group(1)) if match else None
+        if qty is None:
+            match = _QTY_RE.search(query)
+            qty = (match.group(1) or match.group(2)) if match else None
+        try:
+            value = float(qty)
+        except (TypeError, ValueError):
+            return None
+        return value if math.isfinite(value) and value > 0 else None

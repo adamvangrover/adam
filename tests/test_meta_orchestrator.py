@@ -193,3 +193,22 @@ async def test_crisis_flow_uses_context_portfolio(orchestrator):
 
     orchestrator._construct_default_portfolio.assert_not_awaited()
     assert orchestrator._generic_graph_run.await_args.args[1]["portfolio_data"] == portfolio
+
+
+def test_force_route_accepts_enum_member(orchestrator):
+    assert orchestrator._assess_complexity("price of AAPL", {"force_route": Route.ESG}) is Route.ESG
+
+
+@pytest.mark.parametrize(
+    "query, context, expected",
+    [
+        ("In account 12345, buy 10 AAPL", {}, 10.0),
+        ("sell 25 shares of MSFT at 400", {}, 25.0),
+        ("buy AAPL at 150", {}, None),
+        ("buy AAPL", {"qty": "nan"}, None),
+        ("buy AAPL", {"qty": -5}, None),
+        ("buy AAPL", {"quantity": "7"}, 7.0),
+    ],
+)
+def test_resolve_quantity(query, context, expected):
+    assert MetaOrchestrator._resolve_quantity(query, context) == expected
