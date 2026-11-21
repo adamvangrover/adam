@@ -119,7 +119,6 @@ def generate_indexes(root_dir, output_dir=OUTPUT_DIR):
 
         # Files
         for f in sorted(filenames):
-            if f == "index.html": continue
             if f.startswith('.'): continue
 
             icon = "📄"
