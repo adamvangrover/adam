@@ -3,6 +3,8 @@ import html
 
 # Configuration
 SKIP_DIRS = {'.git', 'node_modules', '__pycache__', 'webapp', 'services/webapp/client', '.idea', '.vscode', 'venv', 'env', '.env'}
+# Source trees stay free of generated HTML; browse them via showcase/ instead.
+SKIP_PATHS = ('core/engine', 'core/agents', 'core/credit_sentinel', 'services/webapp', 'core/v30_architecture')
 CUSTOM_INDEX_MARKER = "ADAM AUTO-GENERATED SHOWCASE"
 
 # Template
@@ -71,7 +73,11 @@ TEMPLATE = """<!DOCTYPE html>
 def generate_indexes(root_dir):
     for dirpath, dirnames, filenames in os.walk(root_dir):
         # Filter directories in place
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith('.')]
+        dirnames[:] = [
+            d for d in dirnames
+            if d not in SKIP_DIRS and not d.startswith('.')
+            and os.path.relpath(os.path.join(dirpath, d), root_dir).replace(os.sep, '/') not in SKIP_PATHS
+        ]
 
         # Determine paths
         rel_path = os.path.relpath(dirpath, root_dir)

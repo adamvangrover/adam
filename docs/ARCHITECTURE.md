@@ -1,92 +1,58 @@
-# Architecture: The Neuro-Symbolic Sovereign
+# Architecture
 
-## Overview
-Adam v26.0 is architected as a **Hybrid Cognitive Engine**, fusing the speed of neural networks (System 1) with the precision of symbolic logic (System 2).
+Short module map. File locations: `REPO_MAP.md`. Agent rules: `AGENTS.md`.
 
-The system is composed of three distinct, decoupled layers that can operate standalone or in concert.
-
-## 1. Intelligence Layer (The "Brain")
-*   **Role**: Reasoning, Planning, and Decision Making.
-*   **Components**:
-    *   **Neuro-Symbolic Planner**: Decomposes complex goals into executable graphs.
-    *   **Agent Swarm**: Specialized agents (Risk, Legal, Market) for specific domains.
-    *   **Consensus Engine**: Aggregates multi-agent perspectives into a single conviction score.
-*   **Standalone Operation**: Can be run as a pure reasoning engine without live data or execution, useful for backtesting strategies or analyzing static documents.
-
-## 2. Compute Layer (The "Engine")
-*   **Role**: Simulation, Risk Calculation, and Execution.
-*   **Components**:
-    *   **LiveMockEngine**: High-fidelity simulation of market conditions.
-    *   **CrisisSimulationEngine**: Graph-theoretic shock propagation for stress testing.
-    *   **Rust Pricing Engine**: Deterministic financial calculations (Black-Scholes, Greeks).
-*   **Standalone Operation**: Can be run as a "Financial Calculator" or "Scenario Simulator" independent of the AI agents.
-
-## 3. Data Layer (The "Memory")
-*   **Role**: Ingestion, Processing, and Storage.
-*   **Components**:
-    *   **Universal Ingestor**: Handles PDFs, HTML, unstructured text, as well as multimodal data such as images (charts, tables) and audio transcripts.
-    *   **Knowledge Graph**: Neo4j/NetworkX based entity relationship storage.
-    *   **Vector Store**: Semantic memory for RAG (Retrieval Augmented Generation).
-*   **Standalone Operation**: Can be run as an ETL (Extract, Transform, Load) pipeline to build datasets without invoking intelligence or compute.
-
-## 4. Integration Layer
-*   **Role**: Governance and Translation.
-*   **Components**:
-    *   **Probabilistic-to-Deterministic Integration Layer (PDIL)**: Acts as a strict gatekeeper and translation layer, mapping stochastic outputs from the Intelligence Layer (System 1/Swarm) into strongly-typed, deterministic parameters for the Compute Layer (System 2/Engine).
-
-## 5. Swarm Environment Layer
-To support long-running autonomous operations, the architecture includes a modular, portable, and async adversarial-aware swarm environment. This environment leverages fine-tuned in-context learning, deeply managed execution loops, and comprehensive harness telemetry.
-
-The environment utilizes a multidimensional 3x5x7 tiered architecture:
-*   **3-Layer Execution:** Data, Reasoning, Execution.
-*   **5-Layer Governance:** Governance, Models, Agents, Environments, Telemetry.
-*   **7-Layer Integration:** Hardware, OS, Kernel, Swarm, App, Interface, User.
-
-Key capabilities include continuous computation of confidence bands around simulated world model probabilities, active tracking of node connection likelihoods across the semantic and execution graphs, and the population of predictive tail scenarios to forecast high-impact, rare events.
-
-*For a detailed breakdown of the tiered architecture and its capabilities, see the [Swarm Environment Layer Deep Dive](architecture/swarm_environment_layer.md).*
-
-## Architecture Diagram
-
-```mermaid
-graph TD
-    User --> Intelligence
-    Intelligence --> PDIL
-    PDIL --> Compute
-    Intelligence --> Data
-    Compute --> Data
-
-    subgraph "Integration Layer"
-        PDIL[PDIL Gatekeeper]
-    end
-
-    subgraph "Intelligence Layer"
-        Planner[Neuro-Symbolic Planner]
-        Swarm[Agent Swarm]
-    end
-
-    subgraph "Compute Layer"
-        Sim[LiveMockEngine / CrisisEngine]
-        Risk[Risk Calculator]
-    end
-
-    subgraph "Data Layer"
-        Ingest[Universal Ingestor]
-        KG[Knowledge Graph]
-    end
+```
+request ──► services/webapp/api.py (Flask)  /  scripts/run_adam.py  /  server/server.py (MCP)
+                 │
+                 ▼
+     core/engine/meta_orchestrator.py :: MetaOrchestrator.route_request(query, context)
+        1. SR 11-7 model gate (core/config/models.py::BLOCKED_MODELS)
+        2. route = force_route | ROUTE_PATTERNS (ordered \b regex) | LOW
+        3. handler(query, context)  ── unresolved entity ──► {"status": "clarification_needed"}
+                 │
+   ┌─────────────┼───────────────────────────────┬──────────────────────────┐
+   ▼             ▼                               ▼                          ▼
+ LangGraph     Family-office handlers          Agent registry           System 1 swarm
+ graphs        (wealth / deal / execution /    (MEDIUM, LOW via         core/v30_architecture/
+ core/engine/  market)                         AgentBase.execute)        (NeuralMesh packets)
+ *_graph.py
+   │
+   ▼
+ Deterministic engines: crisis/sector/contagion (core/engine/), valuation, Rust kernels
+   │
+   ▼
+ AgentOutput (core/schemas/agent_schema.py) + provenance_trace ──► governance ledger (core/governance/)
 ```
 
-## Environment Rotation
-The system supports dynamic **Environment Rotation**, allowing seamless switching between execution engines (e.g., `LiveMockEngine` vs. `RealTradingEngine`) via configuration. This enables:
-*   **Blue/Green Deployment**: Testing new models in simulation before live rollout.
-*   **Chaos Engineering**: Injecting fault-tolerant engines to test system resilience.
+## Layers
 
-## 5. Swarm Environment Layer
-To support long-running autonomous operations, the architecture includes a modular, portable, and async adversarial-aware swarm environment. As detailed in ADR-0003, this environment leverages fine-tuned in-context learning, deeply managed execution loops, and comprehensive harness telemetry.
+| Layer | Modules | Contract |
+|---|---|---|
+| Entry | `services/webapp/`, `server/`, `scripts/run_adam.py` | HTTP / MCP / CLI |
+| Orchestration | `core/engine/meta_orchestrator.py`, `core/engine/semantic_router.py` | `Route` enum, `OrchestratorConfig` |
+| System 2 agents | `core/agents/` (`AgentBase`, `PydanticAgentBase`, `templates/TemplateAgentV30`) | `AgentInput` → `AgentOutput` |
+| Graphs | `core/engine/*_graph.py` (deep dive, crisis, red team, ESG, compliance, SNC, reflector) | state in → state diff out |
+| Engines | `core/engine/` (consensus, crisis, sector impact, contagion), `core/credit_sentinel/` | deterministic, no LLM math |
+| System 1 | `core/v30_architecture/python_intelligence/` | `BaseAgent.emit` → `NeuralPacket` |
+| Ingestion | `core/zero_trust/` (gateway, schema bounds, triangulated consensus), `src/ingestion/` | Pydantic bounds; lockdown on disagreement |
+| Governance | `core/governance/`, `config/governance_policy.yaml`, `src/pdil/` | risk class + immutable event per state change |
+| Provenance | `core/provenance/`, `src/pdil/models.py::ProvenanceHeader` | `docs/PROVENANCE.md` |
+| Rust | `adam-core/` (memory), `core/rust_pricing/`, `rust_ext/`, `core/v30_architecture/rust_core/` | `cargo test` |
+| Presentation | `showcase/`, `frontend/`, `services/webapp/client/` | reads outputs only |
 
-The environment utilizes a multidimensional 3x5x7 tiered architecture:
-*   **3-Layer Execution:** Data, Reasoning, Execution.
-*   **5-Layer Governance:** Governance, Models, Agents, Environments, Telemetry.
-*   **7-Layer Integration:** Hardware, OS, Kernel, Swarm, App, Interface, User.
+## Configuration
 
-Key capabilities include continuous computation of confidence bands around simulated world model probabilities, active tracking of node connection likelihoods across the semantic and execution graphs, and the population of predictive tail scenarios to forecast high-impact, rare events.
+`config/*.yaml` is the registry (index in `REPO_MAP.md` §3). Key files: `llm_routing.yaml` (model tiers;
+tier 1 overrides the orchestrator default), `agent_schema.yaml` (confidence tiers),
+`default_universe_metadata.yaml` (crisis position metadata), `governance_policy.yaml`.
+Rules: `assets/` JSONLogic.
+
+## Tests
+
+| Dir | Purpose |
+|---|---|
+| `tests/unit/` | Module tests |
+| `tests/regression/` | One seam test per fixed bug |
+| `tests/evals/` | JSON datasets + `run_accuracy.py` (routing, entity) with accuracy floors |
+| `tests/integration/`, `tests/<domain>/` | Cross-module and domain suites |

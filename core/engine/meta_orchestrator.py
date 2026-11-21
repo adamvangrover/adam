@@ -23,6 +23,7 @@ import re
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, FrozenSet, List, Optional, Pattern, Tuple
 
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
@@ -81,6 +82,8 @@ from core.utils.logging_utils import SwarmLogger
 from core.utils.proof_of_thought import ProofOfThoughtLogger
 from core.utils.repo_context import RepoContextManager
 
+import yaml
+
 logger = logging.getLogger(__name__)
 
 
@@ -138,6 +141,7 @@ ROUTE_PATTERNS: Tuple[Tuple[Route, Pattern[str]], ...] = (
 _DOLLAR_TICKER_RE = re.compile(r"\$([A-Za-z]{1,5})\b")
 _UPPER_TICKER_RE = re.compile(r"\b[A-Z]{2,5}\b")
 _PROPER_NOUN_RE = re.compile(r"\b[A-Z][\w&.-]*(?:\s+[A-Z][\w&.-]*)*")
+_TARGET_PREP_RE = re.compile(r"\b(?:for|on|of|about|into)\s+$", re.IGNORECASE)
 _QTY_RE = re.compile(
     r"\b(?:buy|sell|order(?:\s+for)?)\s+(\d+(?:\.\d+)?)(?![\w.])"
     r"|(?<![\w.$])(\d+(?:\.\d+)?)\s+(?:shares?|units?|contracts?)\b",
@@ -165,6 +169,14 @@ def _default_entity_stopwords() -> FrozenSet[str]:
     })
 
 
+def _default_entity_regions() -> FrozenSet[str]:
+    return frozenset({
+        "Africa", "APAC", "Asia", "Asia Pacific", "Brazil", "Canada", "China", "EMEA", "Europe",
+        "Eurozone", "France", "Germany", "India", "Iran", "Israel", "Japan", "Korea", "LatAm",
+        "Latin America", "Mexico", "Middle East", "North America", "Russia", "Taiwan", "Ukraine",
+    })
+
+
 def _default_reflect_on() -> FrozenSet[Route]:
     return frozenset({Route.DEEP_DIVE, Route.HIGH, Route.CRISIS, Route.RED_TEAM, Route.CODE_GEN})
 
@@ -182,7 +194,9 @@ class OrchestratorConfig:
     ticker_aliases: Dict[str, str] = field(default_factory=_default_aliases)
     non_ticker_tokens: FrozenSet[str] = field(default_factory=_default_non_tickers)
     entity_stopwords: FrozenSet[str] = field(default_factory=_default_entity_stopwords)
+    entity_regions: FrozenSet[str] = field(default_factory=_default_entity_regions)
     price_history_days: int = 365
+    universe_metadata_path: str = "config/default_universe_metadata.yaml"
 
 
 def assert_model_allowed(model_id: str) -> str:
@@ -499,8 +513,10 @@ class MetaOrchestrator:
 
             # 2. Fundamentals
             fund_data = await agents["fund"].execute(company_id)
-            dcf_val = fund_data.get("dcf_valuation", 0.0) if isinstance(fund_data, dict) else 0.0
-            raw_metrics = fund_data.get("raw_metrics", {}) if isinstance(fund_data, dict) else {}
+            # Non-standard PydanticAgentBase calls return AgentOutput.model_dump(); metrics live in metadata.
+            fund_meta = fund_data.get("metadata", fund_data) if isinstance(fund_data, dict) else {}
+            dcf_val = fund_meta.get("dcf_valuation", 0.0)
+            raw_metrics = fund_meta.get("raw_metrics") or {}
 
             # Placeholder financials when the fundamentals agent returns nothing; flagged below.
             estimated_fields = [k for k in ("ebitda", "total_debt", "interest_expense") if raw_metrics.get(k) is None]
@@ -671,6 +687,8 @@ class MetaOrchestrator:
 
     async def _run_crisis_flow(self, query: str, context: Dict[str, Any]):
         portfolio = context.get("portfolio") or await self._construct_default_portfolio(context)
+        if "allocation" in portfolio and "positions" not in portfolio:
+            portfolio = self._positions_from_allocation(portfolio)
         return await self._generic_graph_run(crisis_simulation_app,
             init_crisis_state(query, portfolio), "Crisis Simulation")
 
@@ -736,6 +754,34 @@ class MetaOrchestrator:
             "_constructed": False,
             "_estimated": True,
         }
+
+    def _positions_from_allocation(self, portfolio: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Bridges an `allocation` ({symbol: weight}) into crisis-engine `positions` using
+        `config.universe_metadata_path`. Symbols without metadata are skipped and listed in `_skipped_symbols`.
+        """
+        metadata = self._load_universe_metadata()
+        aum = float(portfolio.get("aum") or self.config.default_portfolio_aum)
+        positions, skipped = [], []
+        for symbol, weight in portfolio["allocation"].items():
+            meta = metadata.get(symbol)
+            if not meta:
+                skipped.append(symbol)
+                continue
+            positions.append({"name": symbol, "weight": float(weight), "exposure": float(weight) * aum, **meta})
+        if skipped:
+            logger.warning(f"No universe metadata for {skipped}; excluded from crisis positions.")
+        return {**portfolio, "positions": positions, "_skipped_symbols": skipped}
+
+    def _load_universe_metadata(self) -> Dict[str, Dict[str, Any]]:
+        path = Path(self.config.universe_metadata_path)
+        if not path.is_absolute() and not path.exists():
+            path = Path(__file__).resolve().parents[2] / path
+        try:
+            return yaml.safe_load(path.read_text()) or {}
+        except (OSError, yaml.YAMLError) as e:
+            logger.warning(f"Universe metadata '{path}' unavailable: {e}")
+            return {}
 
     def _fetch_universe_prices(self, universe: List[str]):
         """Returns (close-price DataFrame, used_synthetic_data) for the universe, or (None, False)."""
@@ -846,13 +892,19 @@ class MetaOrchestrator:
         if ticker:
             return ticker
 
+        # Regions are qualifiers, never targets. A proper noun after "for/on/of/about/into"
+        # ("Summarize risks for Boeing") wins; otherwise the first one does ("Exxon outlook for Europe").
+        # Callers that know the target should pass context["entity"].
+        candidates = []
         for match in _PROPER_NOUN_RE.finditer(query):
-            words = match.group(0).split()
+            words = [w for w in match.group(0).split() if w not in self.config.non_ticker_tokens]
             while words and words[0] in self.config.entity_stopwords:
                 words.pop(0)
-            if words:
-                return " ".join(words)
-        return None
+            if words and " ".join(words) not in self.config.entity_regions:
+                targeted = bool(_TARGET_PREP_RE.search(query[: match.start()]))
+                candidates.append((not targeted, " ".join(words)))
+        candidates.sort(key=lambda c: c[0])
+        return candidates[0][1] if candidates else None
 
     @staticmethod
     def _resolve_quantity(query: str, context: Dict[str, Any]) -> Optional[float]:

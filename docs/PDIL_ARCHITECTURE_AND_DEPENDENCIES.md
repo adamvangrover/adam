@@ -513,7 +513,7 @@ class RiskAssessmentOutput(BaseModel):
 
 ## Provenance Test Suite
 
-Tests enforce that `check_grounding` functions correctly across the integration layer. (Executed via `uv run pytest tests/unit/test_agent_schemas.py tests/test_provenance.py tests/test_pdil_property.py`)
+Tests enforce that `check_grounding` functions correctly across the integration layer. (Executed via `uv run pytest tests/unit/test_agent_schemas.py tests/unit/test_provenance.py tests/unit/test_pdil_property.py`)
 
 **Example test from `tests/unit/test_agent_schemas.py`:**
 ```python

@@ -9,7 +9,7 @@ against Hardened (Bounded Semaphore + Memoryview/Zero-Copy Validation + Async Ba
 
 Integrates directly with:
   - `src.pdil.models.ProvenanceHeader` & `src.schemas.core_types.compute_deterministic_hash`
-  - `afos_v3.gateway.zero_trust_gateway.QuarantineSink`
+  - `core.zero_trust.gateway.QuarantineSink`
   - `src.adam.core.state_manager.StateManager` (75% Fortress / 25% Convex Hunt Barbell Circuit Breaker)
   - `core.evaluation.invariant_enforcer.enforce_invariants` & `core.evaluation.integration_verifier.decide_integration`
 """
@@ -35,7 +35,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from afos_v3.gateway.zero_trust_gateway import QuarantineRecord, QuarantineSink
+from core.zero_trust.gateway import QuarantineRecord, QuarantineSink
 from core.evaluation.integration_verifier import IntegrationDecision, decide_integration
 from core.evaluation.invariant_enforcer import GateResult, enforce_invariants
 from src.adam.core.state_manager import StateManager

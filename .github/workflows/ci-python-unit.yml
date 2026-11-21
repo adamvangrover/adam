@@ -4,10 +4,12 @@ on:
     paths-ignore:
       - 'core/experimental/adamos_kernel/'
       - 'docs/'
+      - 'archive/**'
   pull_request:
     paths-ignore:
       - 'core/experimental/adamos_kernel/'
       - 'docs/'
+      - 'archive/**'
 jobs:
   test-unit:
     runs-on: ubuntu-latest
@@ -32,4 +34,4 @@ jobs:
         env:
           PYTHONPATH: .
         run: |
-          pytest -m "not integration" --ignore=tests/test_v23_5_pipeline.py
+          pytest -m "not integration" --ignore=tests/unit/test_v23_5_pipeline.py

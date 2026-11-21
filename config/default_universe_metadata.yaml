@@ -1,0 +1,47 @@
+# Crisis-simulation metadata for portfolio symbols, consumed by
+# MetaOrchestrator._positions_from_allocation (core/engine/meta_orchestrator.py).
+# Fields: sector (SectorImpactEngine sector names), leverage (x EBITDA proxy), rating.
+# Convention (docs/PROVENANCE.md): every entry has either `source` (where the values come from)
+# or `_estimated: true` (hand-picked proxy values, not sourced data).
+# Symbols missing here are skipped with a warning, never defaulted.
+
+SPY:
+  sector: Technology        # largest GICS weight in the S&P 500; ETF proxy
+  leverage: 2.0
+  rating: A
+  _estimated: true
+TLT:
+  sector: Utilities         # rate-sensitive proxy; Treasuries have no GICS sector
+  leverage: 1.0
+  rating: AA
+  _estimated: true
+GLD:
+  sector: Energy            # commodity proxy; gold has no GICS sector
+  leverage: 1.0
+  rating: AA
+  _estimated: true
+HYG:
+  sector: Industrials       # high-yield index proxy
+  leverage: 5.0
+  rating: B
+  _estimated: true
+LQD:
+  sector: Financials        # IG corporate index proxy (financials-heavy)
+  leverage: 3.0
+  rating: BBB
+  _estimated: true
+AAPL:
+  sector: Technology
+  leverage: 1.0
+  rating: AA
+  _estimated: true
+MSFT:
+  sector: Technology
+  leverage: 0.5
+  rating: AA
+  _estimated: true
+TSLA:
+  sector: Consumer Discretionary
+  leverage: 1.0
+  rating: BBB
+  _estimated: true

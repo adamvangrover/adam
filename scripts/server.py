@@ -100,13 +100,16 @@ class RAGRequestHandler(http.server.SimpleHTTPRequestHandler):
         # default behavior is fine for now as we want to access specific pages.
         return super().do_GET()
 
-# Set the working directory to the repo root for file serving
-# This ensures that http://localhost:8000/showcase/sovereign_dashboard.html works
-os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+def main():
+    # Serve from the repo root so http://localhost:8000/showcase/sovereign_dashboard.html works
+    os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    with socketserver.TCPServer(("", PORT), RAGRequestHandler) as httpd:
+        print(f"Serving at port {PORT}")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
 
-with socketserver.TCPServer(("", PORT), RAGRequestHandler) as httpd:
-    print(f"Serving at port {PORT}")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
+
+if __name__ == "__main__":
+    main()

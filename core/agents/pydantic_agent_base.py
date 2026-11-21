@@ -14,6 +14,9 @@ class PydanticAgentBase(AgentBase):
     Pydantic input/output schemas.
     
     Subclasses must implement the `execute_pydantic` method.
+
+    `execute(AgentInput)` returns an `AgentOutput`; any other call shape (str, dict, kwargs)
+    returns `AgentOutput.model_dump()` so callers always get answer/confidence/metadata/provenance.
     """
     
     @abstractmethod
@@ -51,7 +54,7 @@ class PydanticAgentBase(AgentBase):
                 confidence=0.0,
                 metadata={"error": "Invalid input format", "args": str(args), "kwargs": str(kwargs)}
             )
-            return err_out if is_standard_mode else err_out.metadata
+            return err_out if is_standard_mode else err_out.model_dump()
 
         # Set context from input
         if input_data.context:
@@ -69,9 +72,7 @@ class PydanticAgentBase(AgentBase):
                 else:
                     raise ValueError(f"Agent {self.name} did not return AgentOutput or valid dict.")
                     
-            if not is_standard_mode:
-                return output.metadata
-            return output
+            return output if is_standard_mode else output.model_dump()
             
         except ValidationError as ve:
             logger.error(f"Pydantic Validation Error in {self.name}: {ve}")
@@ -80,7 +81,7 @@ class PydanticAgentBase(AgentBase):
                 confidence=0.0,
                 metadata={"error": str(ve)}
             )
-            return err_out if is_standard_mode else err_out.metadata
+            return err_out if is_standard_mode else err_out.model_dump()
         except Exception as e:
             logger.exception(f"Execution Error in {self.name}: {e}")
             err_out = AgentOutput(
@@ -88,4 +89,4 @@ class PydanticAgentBase(AgentBase):
                 confidence=0.0,
                 metadata={"error": str(e)}
             )
-            return err_out if is_standard_mode else err_out.metadata
+            return err_out if is_standard_mode else err_out.model_dump()

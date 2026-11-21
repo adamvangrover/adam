@@ -1,29 +1,15 @@
-from src.pdil.models import ProvenanceHeader
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
+import contextvars
+import functools
+import inspect
 import logging
 import json
 import asyncio
-from pydantic import BaseModel, Field
 import uuid
-import warnings
 from datetime import datetime
 
-class AgentInput(BaseModel):
-    query: str = Field(..., description="The specific question or objective.")
-    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
-    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
-
-class AgentOutput(BaseModel):
-    answer: str = Field(..., description="The final synthesized answer.")
-    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, etc.")
-    provenance_trace: ProvenanceHeader = Field(..., description="Immutable provenance trace linking the agent output to source and logic version.")
-import uuid
-import warnings
-from datetime import datetime
-
+from core.schemas.agent_schema import AgentInput, AgentOutput  # noqa: F401  (re-exported for legacy imports)
 from core.utils.logging_utils import SwarmLogger
 
 # HNASP Imports
@@ -57,7 +43,18 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
     Abstract base class for all agents in the system.
     Defines the common interface and behavior expected of all agents.
     This version incorporates MCP, A2A, Semantic Kernel, HNASP, Memory persistence, and Boot Protocol.
+
+    Every subclass ``execute`` is wrapped once at class-creation time (``__init_subclass__``) so the
+    HNASP logic layer runs before the agent logic and start/complete/error events are logged.
     """
+
+    MAX_PENDING_REQUESTS = 1000
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+        fn = cls.__dict__.get("execute")
+        if fn is not None and not getattr(fn, "__guarded__", False) and not getattr(fn, "__isabstractmethod__", False):
+            cls.execute = _guard_execute(fn)
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
         """
@@ -98,7 +95,7 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
         self.context: Dict[str, Any] = {}
 
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
-        self.pending_requests: Dict[str, asyncio.Future] = {}  # For Async A2A responses
+        self.pending_requests: Dict[str, asyncio.Future] = {}  # For Async A2A responses; capped at MAX_PENDING_REQUESTS
 
         # Swarm Memory (Consensus)
         self.swarm_memory = MemoryMatrix()
@@ -113,46 +110,20 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
             log_message += "."
         logging.info(log_message)
 
-        # Monkey-patch execute to enforce logic layer evaluation (Guardrails)
-        # Fix: Ensure execute is not already wrapped or if we are in a subclass init causing issues
-        if not hasattr(self, '_original_execute'):
-             self._original_execute = self.execute
-             self.execute = self._wrapped_execute # Bind method
-
     @property
     def name(self) -> str:
         return self.config.get("agent_id", type(self).__name__)
 
-    async def _wrapped_execute(self, *args: Any, **kwargs: Any) -> Any:
-        swarm_logger = SwarmLogger()
-        agent_id = self.config.get("agent_id", self.name)
-
-        # Log Start
-        swarm_logger.log_event("TASK_START", agent_id, {"inputs": kwargs, "args": [str(a) for a in args]})
-
-        # Update state variables from inputs if applicable
+    def _pre_execute(self, args: tuple, kwargs: Dict[str, Any]) -> None:
         if kwargs:
             self.state.logic_layer.state_variables.update(kwargs)
-            # Also update legacy context for backward compatibility
             self.context.update(kwargs)
-
-        # Evaluate Logic Layer
-        self.evaluate_logic_layer()
-
-        # Update Persona (using first string arg if available as input text?)
+        rule_warnings = self.evaluate_logic_layer()
+        SwarmLogger().log_event("TASK_START", self.name, {
+            "inputs": kwargs, "args": [str(a) for a in args], "rule_warnings": rule_warnings,
+        })
         if args and isinstance(args[0], str):
             self.update_persona(args[0])
-
-        try:
-            # Execute original logic
-            result = await self._original_execute(*args, **kwargs)
-            # Log Complete
-            swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": result})
-            return result
-        except Exception as e:
-            # Log Error
-            swarm_logger.log_event("TASK_ERROR", agent_id, {"error": str(e)})
-            raise e
 
     def set_context(self, context: Dict[str, Any]):
         """
@@ -173,54 +144,35 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
         """
         return self.state.model_dump()
 
-    def evaluate_logic_layer(self):
+    def evaluate_logic_layer(self) -> List[str]:
         """
-        Utilizes the json-logic library to execute all ASTs defined in
-        self.state.logic_layer.active_rules against state_variables.
-        This must run before the execute method to set guardrails.
+        Run every JSONLogic rule in ``state.logic_layer.active_rules`` against ``state_variables``.
+
+        Each result is appended to ``state.logic_layer.execution_trace`` as an ``ExecutionTrace``.
+        Rules that evaluate falsy or raise are logged and returned as warning strings.
         """
-        try:
-            logic_layer = self.state.logic_layer
-            state_vars = logic_layer.state_variables
-            active_rules = logic_layer.active_rules
+        from core.schemas.hnasp import ExecutionTrace
 
-            if not active_rules:
-                return
-
-            from core.schemas.hnasp import ExecutionTrace # Import locally to avoid circulars if any
-
-            results: List[ExecutionTrace] = []
-            for rule_id, rule in active_rules.items():
-                try:
-                    result = jsonLogic(rule, state_vars)
-                    results.append(ExecutionTrace(
-                        rule_id=rule_id,
-                        result=result,
-                        timestamp=datetime.utcnow()
-                    ))
-                    # Implicit guardrail: if result is explicitly False, maybe warn?
-                    # For now we strictly log.
-                except Exception as e:
-                    logging.error(f"Error evaluating HNASP rule {rule_id}: {e}")
-                    results.append(ExecutionTrace(
-                        rule_id=rule_id,
-                        result=None,
-                        error=str(e),
-                        timestamp=datetime.utcnow()
-                    ))
-
-            if logic_layer.execution_trace is None:
-                 # Should theoretically not happen due to default_factory=list but being safe
-                 pass
-
-            # logic_layer.execution_trace.extend(results)
-
-        except Exception as e:
-            logging.error(f"Critical error in evaluate_logic_layer: {e}")
+        logic_layer = self.state.logic_layer
+        rule_warnings: List[str] = []
+        for rule_id, rule in (logic_layer.active_rules or {}).items():
+            error: Optional[str] = None
+            try:
+                result = jsonLogic(rule, logic_layer.state_variables)
+            except Exception as e:  # rules are user data; any evaluation failure is a failed rule
+                result, error = None, str(e)
+            logic_layer.execution_trace.append(
+                ExecutionTrace(rule_id=rule_id, result=result, error=error, timestamp=datetime.utcnow())
+            )
+            if error or not result:
+                rule_warnings.append(f"rule {rule_id} failed: {error or result!r}")
+        for w in rule_warnings:
+            logging.warning("Agent %s: %s", self.name, w)
+        return rule_warnings
 
     def update_persona(self, input_text: str):
         """
-        Updates transient_epa vectors based on input text.
+        PLACEHOLDER: keyword/length heuristic, not a sentiment model. Updates transient_epa vectors.
 
         Args:
             input_text (str): The input text to analyze for sentiment/EPA updates.
@@ -277,6 +229,10 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
         message['correlation_id'] = correlation_id
         # Ensure we have a return address. Ideally this is the queue name the agent listens on.
         message['reply_to'] = type(self).__name__
+
+        if len(self.pending_requests) >= self.MAX_PENDING_REQUESTS:
+            logging.warning(f"Agent {self.name}: {len(self.pending_requests)} pending requests; dropping message to {target_agent}.")
+            return None
 
         future = asyncio.get_running_loop().create_future()
         self.pending_requests[correlation_id] = future
@@ -496,3 +452,54 @@ class AgentBase(ABC, MemoryMixin, BootProtocol):
             logging.info(f"Agent {agent_id} published insight on '{topic}' to Swarm Consensus.")
         except Exception as e:
             logging.error(f"Agent {agent_id} failed to publish insight: {e}")
+
+
+_ACTIVE_EXECUTIONS: contextvars.ContextVar[frozenset] = contextvars.ContextVar("_ACTIVE_EXECUTIONS", default=frozenset())
+
+
+def _guard_execute(fn: Callable[..., Any]) -> Callable[..., Any]:
+    """Wrap ``execute`` with logic-layer evaluation and swarm logging. Nested ``super().execute`` calls run unguarded."""
+
+    def _enter(self: AgentBase, args: tuple, kwargs: Dict[str, Any]) -> Optional[contextvars.Token]:
+        active = _ACTIVE_EXECUTIONS.get()
+        if id(self) in active:
+            return None
+        self._pre_execute(args, kwargs)
+        return _ACTIVE_EXECUTIONS.set(active | {id(self)})
+
+    def _log(self: AgentBase, event: str, payload: Dict[str, Any]) -> None:
+        SwarmLogger().log_event(event, self.name, payload)
+
+    if inspect.iscoroutinefunction(fn):
+        @functools.wraps(fn)
+        async def wrapper(self: AgentBase, *args: Any, **kwargs: Any) -> Any:
+            token = _enter(self, args, kwargs)
+            if token is None:
+                return await fn(self, *args, **kwargs)
+            try:
+                result = await fn(self, *args, **kwargs)
+                _log(self, "TASK_COMPLETE", {"output": result})
+                return result
+            except Exception as e:
+                _log(self, "TASK_ERROR", {"error": str(e)})
+                raise
+            finally:
+                _ACTIVE_EXECUTIONS.reset(token)
+    else:
+        @functools.wraps(fn)
+        def wrapper(self: AgentBase, *args: Any, **kwargs: Any) -> Any:
+            token = _enter(self, args, kwargs)
+            if token is None:
+                return fn(self, *args, **kwargs)
+            try:
+                result = fn(self, *args, **kwargs)
+                _log(self, "TASK_COMPLETE", {"output": result})
+                return result
+            except Exception as e:
+                _log(self, "TASK_ERROR", {"error": str(e)})
+                raise
+            finally:
+                _ACTIVE_EXECUTIONS.reset(token)
+
+    wrapper.__guarded__ = True  # type: ignore[attr-defined]
+    return wrapper
