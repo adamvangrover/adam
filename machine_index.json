@@ -9,7 +9,7 @@
   "description": "Institutional-grade neuro-symbolic multi-agent financial operating system for credit risk, market intelligence, and portfolio surveillance.",
   "domain": "Institutional Credit Risk & Market Intelligence",
   "architecture": "Hybrid Cognitive Engine (System 1 Swarm + System 2 Neuro-Symbolic DAG)",
-  "last_updated": "2026-08-22T00:00:00Z",
+  "last_updated": "2026-11-21T00:00:00Z",
   "tech_stack": {
     "deterministic_execution": "Rust",
     "orchestration": "Python 3.11+",
@@ -24,13 +24,14 @@
   "entry_points": {
     "human": {
       "web_portal": "index.html",
-      "analyst_os": "analyst_os.html",
+      "analyst_os": "showcase/dashboards/analyst_os.html",
       "neural_dashboard": "showcase/index.html",
       "command_center": "portal/index.html",
-      "daily_reports": "adam_daily_hub_index.html",
+      "daily_reports": "showcase/dashboards/adam_daily_hub_index.html",
       "documentation": "docs/index.html"
     },
     "machine": {
+      "repo_map": "REPO_MAP.md",
       "llm_context_optimized": "llms.txt",
       "llm_context_full": "llms-full.txt",
       "llm_readme": "LLM_README.md",
@@ -38,6 +39,14 @@
       "agent_catalog": "AGENT_CATALOG.md",
       "api_schema": "api_schema.yaml",
       "this_manifest": "machine_index.json"
+    },
+    "code": {
+      "orchestrator": "core/engine/meta_orchestrator.py::MetaOrchestrator.route_request",
+      "agent_base": "core/agents/agent_base.py::AgentBase.execute",
+      "agent_io_schema": "core/schemas/agent_schema.py",
+      "web_api": "services/webapp/api.py::create_app",
+      "mcp_server": "server/server.py",
+      "v30_orchestrator": "core/v30_architecture/python_intelligence/orchestrator/v30_orchestrator.py"
     }
   },
   "cognitive_systems": {
@@ -47,68 +56,205 @@
       "architecture": "Event-driven Pub/Sub",
       "base_class": "AsyncAgentBase",
       "latency": "<12 seconds for full 10-K ingestion",
-      "locations": ["core/system/", "adam_swarm/"]
+      "locations": [
+        "core/system/",
+        "adam_swarm/"
+      ]
     },
     "system_2": {
       "name": "Neuro-Symbolic Graph (Planner)",
       "role": "Deep reasoning, credit underwriting, scenario analysis",
       "architecture": "Directed Acyclic Graph (DAG) state machine",
       "base_class": "TemplateAgentV30",
-      "locations": ["core/engine/", "core/agents/"]
+      "locations": [
+        "core/engine/",
+        "core/agents/"
+      ]
     }
   },
   "agent_registry": {
     "core_agents": [
-      { "name": "Nexus (Orchestrator)", "role": "Workflow runtime, task dispatch", "location": "core/engine/orchestrator.py" },
-      { "name": "Underwriting Agent (AFOS-UWR-01)", "role": "Credit analysis, capital structures", "sector": "TMT / Leveraged Finance" },
-      { "name": "Compliance Agent (AFOS-CMP-01)", "role": "Regulatory capital & audit verification", "location": "core/agents/compliance_agent.py" },
-      { "name": "Surveillance Agent", "role": "Portfolio monitoring, threat telemetry" },
-      { "name": "Sentinel Agent", "role": "Security, PROV-O compliance audits" },
-      { "name": "Architect Agent (Jules)", "role": "Repository architecture, refactoring" }
+      {
+        "name": "Nexus (Orchestrator)",
+        "role": "Workflow runtime, task dispatch",
+        "location": "core/engine/meta_orchestrator.py"
+      },
+      {
+        "name": "Underwriting Agent (AFOS-UWR-01)",
+        "role": "Credit analysis, capital structures",
+        "sector": "TMT / Leveraged Finance"
+      },
+      {
+        "name": "Compliance Agent (AFOS-CMP-01)",
+        "role": "Regulatory capital & audit verification",
+        "location": "core/agents/regulatory_compliance_agent.py"
+      },
+      {
+        "name": "Surveillance Agent",
+        "role": "Portfolio monitoring, threat telemetry"
+      },
+      {
+        "name": "Sentinel Agent",
+        "role": "Security, PROV-O compliance audits"
+      },
+      {
+        "name": "Architect Agent (Jules)",
+        "role": "Repository architecture, refactoring"
+      }
     ],
     "specialized_agents": {
-      "risk_credit": ["CreditRiskAgent", "SNCAnalystAgent", "CovenantAgent", "LiquidityRiskAgent"],
-      "quantitative_market": ["AlgoTradingAgent", "OptionsFlowAgent", "QuantumPortfolioManagerAgent", "MarketMakingAgent"],
-      "macro_altdata": ["BlackSwanAgent", "MacroeconomicAnalysisAgent", "GeopoliticalRiskAgent", "AlternativeDataAgent"],
-      "governance_security": ["RedTeamAgent", "ComplianceAgent", "DataVerificationAgent", "FraudDetectionAgent"]
+      "risk_credit": [
+        "CreditRiskAgent",
+        "SNCAnalystAgent",
+        "CovenantAgent",
+        "LiquidityRiskAgent"
+      ],
+      "quantitative_market": [
+        "AlgoTradingAgent",
+        "OptionsFlowAgent",
+        "QuantumPortfolioManagerAgent",
+        "MarketMakingAgent"
+      ],
+      "macro_altdata": [
+        "BlackSwanAgent",
+        "MacroeconomicAnalysisAgent",
+        "GeopoliticalRiskAgent",
+        "AlternativeDataAgent"
+      ],
+      "governance_security": [
+        "RedTeamAgent",
+        "ComplianceAgent",
+        "DataVerificationAgent",
+        "FraudDetectionAgent"
+      ]
     },
     "full_catalog": "AGENT_CATALOG.md"
   },
   "modules": {
     "core_workspaces": [
-      { "name": "Analyst OS", "path": "analyst_os.html", "type": "interactive", "status": "active" },
-      { "name": "Portal UI", "path": "portal/index.html", "type": "interactive", "status": "active" },
-      { "name": "Daily Reports Hub", "path": "adam_daily_hub_index.html", "type": "hub", "status": "active" },
-      { "name": "Workflow Orchestrator", "path": "workflow_orchestrator.html", "type": "interactive", "status": "new" }
+      {
+        "name": "Analyst OS",
+        "path": "showcase/dashboards/analyst_os.html",
+        "type": "interactive",
+        "status": "active"
+      },
+      {
+        "name": "Portal UI",
+        "path": "portal/index.html",
+        "type": "interactive",
+        "status": "active"
+      },
+      {
+        "name": "Daily Reports Hub",
+        "path": "showcase/dashboards/adam_daily_hub_index.html",
+        "type": "hub",
+        "status": "active"
+      },
+      {
+        "name": "Workflow Orchestrator",
+        "path": "showcase/dashboards/workflow_orchestrator.html",
+        "type": "interactive",
+        "status": "new"
+      }
     ],
     "prototypes": [
-      { "name": "Telemetry & Logic Router", "path": "interactive_prototype.html", "status": "active" },
-      { "name": "Market Mayhem Terminal", "path": "showcase/market_mayhem_v26.html", "status": "active" },
-      { "name": "Neural Dashboard", "path": "showcase/neural_dashboard.html", "status": "static" },
-      { "name": "Repository Codex", "path": "showcase/codex.html", "status": "active" }
+      {
+        "name": "Telemetry & Logic Router",
+        "path": "showcase/dashboards/interactive_prototype.html",
+        "status": "active"
+      },
+      {
+        "name": "Market Mayhem Terminal",
+        "path": "showcase/market_mayhem_v26.html",
+        "status": "active"
+      },
+      {
+        "name": "Neural Dashboard",
+        "path": "showcase/neural_dashboard.html",
+        "status": "static"
+      },
+      {
+        "name": "Repository Codex",
+        "path": "showcase/codex.html",
+        "status": "active"
+      }
     ],
     "financial_modeling": [
-      { "name": "Credit & Valuation Architect", "path": "credit_valuation_architect.html" },
-      { "name": "Monte Carlo Risk Engine", "path": "monte_carlo_visualizer.html" },
-      { "name": "Comprehensive Credit Dashboard", "path": "comprehensive_credit_dashboard.html" },
-      { "name": "Institutional Radar (13F)", "path": "institutional_radar.html" },
-      { "name": "Unified Banking World Model", "path": "unified_banking.html", "status": "beta" }
+      {
+        "name": "Credit & Valuation Architect",
+        "path": "showcase/dashboards/credit_valuation_architect.html"
+      },
+      {
+        "name": "Monte Carlo Risk Engine",
+        "path": "showcase/dashboards/monte_carlo_visualizer.html"
+      },
+      {
+        "name": "Comprehensive Credit Dashboard",
+        "path": "showcase/dashboards/comprehensive_credit_dashboard.html"
+      },
+      {
+        "name": "Institutional Radar (13F)",
+        "path": "showcase/dashboards/institutional_radar.html"
+      },
+      {
+        "name": "Unified Banking World Model",
+        "path": "showcase/dashboards/unified_banking.html",
+        "status": "beta"
+      }
     ],
     "swarms_simulations": [
-      { "name": "Market Live / Neural Exchange", "path": "market_live.html", "status": "live" },
-      { "name": "Sector Swarm Roundtable", "path": "sector_swarm.html" },
-      { "name": "Wargame Console", "path": "wargame_dashboard.html" },
-      { "name": "Agent Gallery", "path": "agent_gallery.html" },
-      { "name": "Neural Link Convergence", "path": "adam_convergence_live_neural_link.html", "status": "new" },
-      { "name": "Nexus Simulation", "path": "nexus.html" }
+      {
+        "name": "Market Live / Neural Exchange",
+        "path": "showcase/dashboards/market_live.html",
+        "status": "live"
+      },
+      {
+        "name": "Sector Swarm Roundtable",
+        "path": "showcase/dashboards/sector_swarm.html"
+      },
+      {
+        "name": "Wargame Console",
+        "path": "showcase/dashboards/wargame_dashboard.html"
+      },
+      {
+        "name": "Agent Gallery",
+        "path": "showcase/dashboards/agent_gallery.html"
+      },
+      {
+        "name": "Neural Link Convergence",
+        "path": "showcase/dashboards/adam_convergence_live_neural_link.html",
+        "status": "new"
+      },
+      {
+        "name": "Nexus Simulation",
+        "path": "showcase/dashboards/nexus.html"
+      }
     ],
     "developer_tools": [
-      { "name": "System Brain (Knowledge Graph)", "path": "system_brain.html" },
-      { "name": "Quantum Infrastructure", "path": "quantum_infrastructure.html" },
-      { "name": "Prompt Library & Alpha", "path": "apps/prompt_alpha.html" },
-      { "name": "Creator Studio", "path": "editor_studio.html" },
-      { "name": "Scenario Lab (VAE)", "path": "scenario_lab.html" },
-      { "name": "AVG Search Engine", "path": "avg_search.html" }
+      {
+        "name": "System Brain (Knowledge Graph)",
+        "path": "showcase/dashboards/system_brain.html"
+      },
+      {
+        "name": "Quantum Infrastructure",
+        "path": "showcase/dashboards/quantum_infrastructure.html"
+      },
+      {
+        "name": "Prompt Library & Alpha",
+        "path": "apps/prompt_alpha.html"
+      },
+      {
+        "name": "Creator Studio",
+        "path": "showcase/dashboards/editor_studio.html"
+      },
+      {
+        "name": "Scenario Lab (VAE)",
+        "path": "showcase/dashboards/scenario_lab.html"
+      },
+      {
+        "name": "AVG Search Engine",
+        "path": "showcase/dashboards/avg_search.html"
+      }
     ]
   },
   "showcase_statistics": {
@@ -126,7 +272,12 @@
     "rules_engine": "JSONLogic",
     "minimum_conviction_threshold": 0.85,
     "break_glass_protocol": "HMAC-SHA256 signed X-Governance-Override header",
-    "security_mandates": ["No pickle.load()", "No dynamic imports", "No eval/exec", "Input sanitization required"]
+    "security_mandates": [
+      "No pickle.load()",
+      "No dynamic imports",
+      "No eval/exec",
+      "Input sanitization required"
+    ]
   },
   "benchmarks": {
     "financebench_accuracy": "99%",
@@ -136,12 +287,33 @@
   },
   "io_schemas": {
     "agent_input": {
-      "fields": ["query (str)", "context (Dict)", "tools (List[str])"],
+      "fields": [
+        "query (str)",
+        "context (Dict)",
+        "tools (List[str])"
+      ],
       "validation": "Pydantic BaseModel"
     },
     "agent_output": {
-      "fields": ["answer (str)", "sources (List[str])", "confidence (float 0.0-1.0)", "metadata (Dict)", "prov_o_audit_trail (List[Dict])"],
+      "fields": [
+        "answer (str)",
+        "sources (List[str])",
+        "confidence (float 0.0-1.0)",
+        "metadata (Dict)",
+        "prov_o_audit_trail (List[Dict])"
+      ],
       "validation": "Pydantic BaseModel"
     }
+  },
+  "config_registry": "config/ (see REPO_MAP.md §3)",
+  "snapshots": {
+    "index": "REPO_MAP.md §7",
+    "locations": [
+      "adam_v24/",
+      "afos_v3/",
+      "ufos/",
+      "tinker_lab/",
+      "experimental/"
+    ]
   }
 }
