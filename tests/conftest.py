@@ -1,6 +1,8 @@
 import sys
 import types
 from unittest.mock import MagicMock
+from pathlib import Path
+
 import pytest
 
 # Global mocks for heavy/missing dependencies
@@ -67,3 +69,30 @@ def mock_settings_env(monkeypatch):
     monkeypatch.setenv("OPENAI_ORG_ID", "dummy_org")
     monkeypatch.setenv("COHERE_API_KEY", "dummy_key")
     monkeypatch.setenv("HUGGINGFACE_API_KEY", "dummy_key")
+
+
+_QUARANTINE_FILE = Path(__file__).with_name("quarantine.txt")
+
+
+def _load_quarantine():
+    xfail, skip = set(), set()
+    for raw in _QUARANTINE_FILE.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("skip "):
+            skip.add(line[5:].strip())
+        else:
+            xfail.add(line)
+    return xfail, skip
+
+
+def pytest_collection_modifyitems(config, items):
+    if not _QUARANTINE_FILE.exists():
+        return
+    xfail, skip = _load_quarantine()
+    for item in items:
+        if item.nodeid in skip:
+            item.add_marker(pytest.mark.skip(reason="quarantined: hangs (tests/quarantine.txt)"))
+        elif item.nodeid in xfail:
+            item.add_marker(pytest.mark.xfail(reason="quarantined (tests/quarantine.txt)", strict=False))
