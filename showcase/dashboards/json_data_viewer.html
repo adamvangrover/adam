@@ -45,7 +45,7 @@
             const container = document.getElementById('jsonContainer');
             container.innerText = "Loading " + file + "...";
             try {
-                const response = await fetch(file);
+                const response = await fetch('../../' + file);
                 if(!response.ok) throw new Error("HTTP error " + response.status);
                 const data = await response.json();
                 container.innerText = JSON.stringify(data, null, 4);
