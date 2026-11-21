@@ -1,5 +1,7 @@
 # Alternative Setup & Installation Guides (Legacy)
 
+> Consolidated overview: [setup_guide.md](setup_guide.md). This page keeps the detailed alternative setups notes; where they differ, `setup_guide.md` reflects the current tree.
+
 > **⚠️ NOTE:** This document covers alternative and legacy methods for setting up older versions of Adam (e.g., v23.5).
 > For the **recommended modern setup** (v26.0+) using `uv`, please refer to the [**Official Setup Guide**](setup_guide.md).
 

@@ -1,5 +1,7 @@
 # ADAM v26.0 :: Custom Build System
 
+> Consolidated overview: [setup_guide.md](setup_guide.md). This page keeps the detailed custom builds notes; where they differ, `setup_guide.md` reflects the current tree.
+
 The **Adam Custom Build System** allows you to create tailored, portable environments of the platform. Instead of deploying the entire monolithic repository, you can select specific modules (e.g., just the 13F Tracker or the Simulation Dashboard) and generate a self-contained package with its own dependencies and Docker configuration.
 
 ## 🚀 Quick Start
