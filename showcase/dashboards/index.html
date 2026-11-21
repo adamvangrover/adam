@@ -40,7 +40,7 @@ function render(){
   const rows=data.dashboards.filter(d=>(kind==='all'||d.kind===kind)&&(d.title+' '+d.path).toLowerCase().includes(term));
   list.replaceChildren(...rows.map(d=>{
     const li=document.createElement('li'),a=document.createElement('a'),t=document.createElement('div'),m=document.createElement('div');
-    a.href=d.path;t.className='t';t.textContent=d.title;m.className='m';m.textContent=d.kind+' · '+d.path;
+    if(/^[\w.-]+\.html$/.test(d.path))a.href=d.path;t.className='t';t.textContent=d.title;m.className='m';m.textContent=d.kind+' · '+d.path;
     a.append(t,m);li.appendChild(a);return li;
   }));
   document.getElementById('count').textContent=rows.length+' of '+data.dashboards.length+' dashboards';
