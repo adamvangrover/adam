@@ -10,9 +10,10 @@ under `ARCHITECT_INFINITE` governance protocols. System state, underwriting deci
 monitoring are driven by agent consensus, telemetry and deterministic logic; humans govern through the
 confidence tiers (§3), policy files and the governance plane (§7).
 
-Start with `REPO_MAP.md` (where things are), `docs/ARCHITECTURE.md` (how they connect) and
-`docs/PROVENANCE.md` (what an auditable output looks like). Copyable agent, prompt and page templates are
-catalogued in `docs/TEMPLATES.md`. If this file disagrees with code, the code wins — fix this file.
+Start with [`REPO_MAP.md`](REPO_MAP.md) (where things are), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+(how they connect) and [`docs/PROVENANCE.md`](docs/PROVENANCE.md) (what an auditable output looks like).
+Copyable agent, prompt and page templates are catalogued in [`docs/TEMPLATES.md`](docs/TEMPLATES.md); the
+project overview is [`README.md`](README.md). If this file disagrees with code, the code wins — fix this file.
 
 * [1. Bifurcation: Core vs. Lab](#1-bifurcation-core-vs-lab)
 * [2. Architecture: System 1 vs. System 2](#2-architecture-system-1-vs-system-2)

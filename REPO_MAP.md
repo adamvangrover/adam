@@ -3,6 +3,10 @@
 Terse, factual map of this repository for new contributors and for models ingesting the repo.
 If this file disagrees with code, the code wins — fix this file.
 
+Companion docs: [README.md](README.md) (overview, diagrams, glossary) · [AGENTS.md](AGENTS.md) (agent contract) ·
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (request flow) · [docs/TEMPLATES.md](docs/TEMPLATES.md) (template library) ·
+[docs/setup_guide.md](docs/setup_guide.md) (per-slice setup).
+
 ## 1. Canonical tree
 
 | Path | Role | Status |

@@ -1,6 +1,9 @@
 # Architecture
 
-Short module map. File locations: `REPO_MAP.md`. Agent rules: `AGENTS.md`.
+Short module map. File locations: [`REPO_MAP.md`](../REPO_MAP.md). Agent rules: [`AGENTS.md`](../AGENTS.md).
+Overview, diagrams and glossary: [`README.md`](../README.md#-system-architecture). Setup per slice:
+[`setup_guide.md`](setup_guide.md). Presentation templates (brands, newsletters, terminals, prompts):
+[`TEMPLATES.md`](TEMPLATES.md).
 
 ```
 request ──► services/webapp/api.py (Flask)  /  scripts/run_adam.py  /  server/server.py (MCP)
