@@ -3,7 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import AgentIntercom from './AgentIntercom';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock localStorage
 const localStorageMock = (function() {
@@ -26,21 +26,21 @@ const localStorageMock = (function() {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock scrollIntoView since it's not implemented in jsdom
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = vi.fn();
 
 describe('AgentIntercom', () => {
   beforeEach(() => {
-    (global.fetch as jest.Mock).mockClear();
-    jest.useFakeTimers();
+    (global.fetch as ReturnType<typeof vi.fn>).mockClear();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('renders initial loading state', () => {
     // Mock fetch to return pending promise
-    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (global.fetch as ReturnType<typeof vi.fn>).mockReturnValue(new Promise(() => {}));
 
     render(<AgentIntercom />);
     expect(screen.getByText(/ESTABLISHING NEURAL LINK/i)).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('AgentIntercom', () => {
       { id: '2', timestamp: new Date().toISOString(), agent_name: 'MarketAnalyst', content: 'Thought 2', conviction_score: 0.5 }
     ];
 
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => mockThoughts
     });
@@ -69,7 +69,7 @@ describe('AgentIntercom', () => {
       const initialThoughts = [{ id: '1', timestamp: new Date().toISOString(), agent_name: 'RiskOfficer', content: 'Initial Thought', conviction_score: 0.9 }];
       const newThoughts = [{ id: '2', timestamp: new Date().toISOString(), agent_name: 'MarketAnalyst', content: 'New Thought', conviction_score: 0.5 }, { id: '1', timestamp: new Date().toISOString(), agent_name: 'RiskOfficer', content: 'Initial Thought', conviction_score: 0.9 }];
 
-      (global.fetch as jest.Mock)
+      (global.fetch as ReturnType<typeof vi.fn>)
           .mockResolvedValueOnce({
               ok: true,
               json: async () => initialThoughts
@@ -89,7 +89,7 @@ describe('AgentIntercom', () => {
       // Advance timers to trigger next fetch (2000ms)
       // Since it uses recursive setTimeout, verifying update requires triggering it
       act(() => {
-          jest.advanceTimersByTime(2500); // 2000ms timeout + buffer
+          vi.advanceTimersByTime(2500); // 2000ms timeout + buffer
       });
 
       // Wait for update

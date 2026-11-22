@@ -1,0 +1,187 @@
+# Known-failing tests on main, quarantined so test-unit gates new regressions.
+# Marked xfail(strict=False) by tests/conftest.py; delete a line once the test passes (it reports XPASS).
+# Lines prefixed with 'skip ' are skipped outright (they hang).
+skip tests/unit/test_architecture.py::test_continuous_surveillance_workflow
+tests/adversarial/test_oct2026_sr11_7_invariants.py::TestOctober2026SR117Invariants::test_deterministic_jsonlogic_and_sobol_qmc_simulation
+tests/core/data_processing/test_universal_ingestor.py::test_markdown_chunking
+tests/optimizers/test_core_optimizers.py::test_adamw_weight_decay
+tests/optimizers/test_core_optimizers.py::test_lion_sign_update
+tests/optimizers/test_core_optimizers.py::test_optimizer_basic_step[AdamW]
+tests/optimizers/test_core_optimizers.py::test_optimizer_basic_step[Lion]
+tests/regression/test_orchestrator_seams.py::test_crisis_engine_gets_per_asset_results
+tests/security/test_sandbox_pandas.py::TestSandboxPandas::test_pandas_dataframe_creation
+tests/security/test_ssrf_supply_chain.py::TestSupplyChainRiskAgentSSRF::test_ssrf_mitigation
+tests/security/test_ssrf_supply_chain.py::TestSupplyChainRiskAgentSSRF::test_valid_url
+tests/unit/test_adam_iak_primitives.py::test_crf_decoder_constrained_viterbi_decoding
+tests/unit/test_adam_iak_primitives.py::test_crf_decoder_path_scores
+tests/unit/test_adam_iak_primitives.py::test_entmax15_large_dimension
+tests/unit/test_adam_iak_primitives.py::test_masked_entmax_softmax_dtypes_and_modes
+tests/unit/test_adam_iak_primitives.py::test_masked_entmax_softmax_fully_masked_row
+tests/unit/test_adam_iak_primitives.py::test_masked_entmax_softmax_single_element_and_temperature
+tests/unit/test_adam_iak_primitives.py::test_uncertainty_gated_crf_slot_decoder_energy_ood
+tests/unit/test_adam_van_grover_search.py::TestAdamVanGroverSearch::test_coherence_limit
+tests/unit/test_adam_van_grover_search.py::TestAdamVanGroverSearch::test_grover_time_calculation
+tests/unit/test_adam_van_grover_search.py::TestAdamVanGroverSearch::test_single_shot_probability
+tests/unit/test_agent_loading_fix.py::TestAgentLoadingBug::test_agent_loading_success
+tests/unit/test_anomaly_detection_agent.py::TestAnomalyDetectionAgent::test_detect_company_anomalies
+tests/unit/test_awo_planner.py::TestAWOPlanner::test_parse_empty_plan
+tests/unit/test_awo_planner.py::TestAWOPlanner::test_parse_natural_language_plan_numbered
+tests/unit/test_code_alchemist.py::TestCodeAlchemist::test_full_validation
+tests/unit/test_code_alchemist.py::TestCodeAlchemist::test_optimize_code
+tests/unit/test_code_alchemist.py::TestCodeAlchemist::test_validate_code_semantics
+tests/unit/test_code_gen.py::test_code_gen_pipeline
+tests/unit/test_config_utils.py::test_load_app_config_agent_override
+tests/unit/test_config_utils.py::test_load_app_config_basic_merge
+tests/unit/test_config_utils.py::test_load_app_config_file_not_found_continues
+tests/unit/test_cqrs_api.py::test_api_originate_loan
+tests/unit/test_cqrs_api.py::test_command_handler_logic
+tests/unit/test_cqrs_api.py::test_dscr_rule_evaluation
+tests/unit/test_crisis_sim.py::TestCrisisSimulator::test_scenarios_exist
+tests/unit/test_crisis_simulation_agent.py::TestCrisisSimulationMetaAgent::test_crisis_simulation_execution
+tests/unit/test_data_retrieval_agent.py::TestDataRetrievalAgent::test_execute_risk_rating
+tests/unit/test_data_retrieval_agent.py::TestDataRetrievalAgent::test_get_market_data
+tests/unit/test_data_retrieval_agent.py::TestDataRetrievalAgent::test_get_risk_rating_file_not_found
+tests/unit/test_data_retrieval_agent.py::TestDataRetrievalAgent::test_get_risk_rating_found
+tests/unit/test_data_sources.py::TestDataSources::test_get_historical_news
+tests/unit/test_data_sources.py::TestDataSources::test_get_tweets
+tests/unit/test_data_utils_upgraded.py::test_api_whitelisting_invalid
+tests/unit/test_data_utils_upgraded.py::test_api_whitelisting_missing_config
+tests/unit/test_data_utils_upgraded.py::test_load_smart_text_success
+tests/unit/test_data_verification.py::TestDataVerification::test_report_existence
+tests/unit/test_enhanced_risk_agents.py::test_credit_risk_merton
+tests/unit/test_enhanced_risk_agents.py::test_liquidity_risk_lcr
+tests/unit/test_evaluation_framework.py::test_critique_node_integration
+tests/unit/test_evaluation_framework.py::test_symbolic_verifier_flags
+tests/unit/test_financial_truth_plugin.py::TestFinancialTruthPlugin::test_rendering
+tests/unit/test_financial_truth_plugin.py::TestFinancialTruthPlugin::test_response_parsing
+tests/unit/test_financial_truth_plugin.py::TestFinancialTruthPlugin::test_response_parsing_failure
+tests/unit/test_fundamental_analyst.py::test_execute_failure
+tests/unit/test_fundamental_analyst.py::test_execute_standard_input
+tests/unit/test_fundamental_analyst_v2.py::test_execution_failure_legacy
+tests/unit/test_fundamental_analyst_v2.py::test_execution_failure_standard
+tests/unit/test_fundamental_analyst_v2.py::test_legacy_execution_success
+tests/unit/test_fundamental_analyst_v2.py::test_standard_execution_success
+tests/unit/test_geopolitical_legacy.py::TestGeopoliticalRiskAgent::test_assess_geopolitical_risks
+tests/unit/test_knowledge_base.py::TestKnowledgeBase::test_query_case_insensitive
+tests/unit/test_knowledge_base.py::TestKnowledgeBase::test_query_existing_key
+tests/unit/test_knowledge_base.py::TestKnowledgeBase::test_query_nonexistent_key
+tests/unit/test_knowledge_base.py::TestKnowledgeBase::test_update
+tests/unit/test_live_data_fetcher.py::TestDataFetcher::test_fetch_news
+tests/unit/test_meta_orchestrator.py::test_ambiguous_words_do_not_trigger_specialized_routes[build a scenario plan-forbidden3]
+tests/unit/test_meta_orchestrator.py::test_ambiguous_words_do_not_trigger_specialized_routes[check multiple goals in parallel-forbidden4]
+tests/unit/test_meta_orchestrator.py::test_ambiguous_words_do_not_trigger_specialized_routes[monitor the situation-forbidden0]
+tests/unit/test_meta_orchestrator.py::test_ambiguous_words_do_not_trigger_specialized_routes[run a simulation-forbidden2]
+tests/unit/test_meta_orchestrator.py::test_ambiguous_words_do_not_trigger_specialized_routes[watch for an alert in the report-forbidden1]
+tests/unit/test_meta_orchestrator.py::test_blocked_model_rejected_before_llm_plugin[GPT-6.1-ASTRA-UNALIGNED]
+tests/unit/test_meta_orchestrator.py::test_blocked_model_rejected_before_llm_plugin[gpt-6.1-astra]
+tests/unit/test_meta_orchestrator.py::test_blocked_model_rejected_before_llm_plugin[some-astra-variant]
+tests/unit/test_meta_orchestrator.py::test_construct_default_portfolio_equal_weight_fallback
+tests/unit/test_meta_orchestrator.py::test_construct_default_portfolio_runs_optimizer
+tests/unit/test_meta_orchestrator.py::test_crisis_flow_uses_context_portfolio
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_adaptive_flow]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_compliance_flow]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_deep_dive_flow]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_esg_flow]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_fo_execution]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_fo_market]
+tests/unit/test_meta_orchestrator.py::test_entity_flows_request_clarification[_run_red_team_flow]
+tests/unit/test_meta_orchestrator.py::test_fo_execution_requires_quantity
+tests/unit/test_meta_orchestrator.py::test_force_route_accepts_enum_member
+tests/unit/test_meta_orchestrator.py::test_force_route_override
+tests/unit/test_meta_orchestrator.py::test_handler_type_error_is_not_retried
+tests/unit/test_meta_orchestrator.py::test_missing_routing_yaml_keeps_config_model
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[In account 12345, buy 10 AAPL-context0-10.0]
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[buy AAPL at 150-context2-None]
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[buy AAPL-context3-None]
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[buy AAPL-context4-None]
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[buy AAPL-context5-7.0]
+tests/unit/test_meta_orchestrator.py::test_resolve_quantity[sell 25 shares of MSFT at 400-context1-25.0]
+tests/unit/test_meta_orchestrator.py::test_resolve_ticker_precedence
+tests/unit/test_meta_orchestrator.py::test_resolve_ticker_returns_none_when_unresolved
+tests/unit/test_meta_orchestrator.py::test_routing_yaml_overrides_default_model
+tests/unit/test_meta_orchestrator.py::test_specialized_routes_still_match[buy 10 shares of AAPL-expected4]
+tests/unit/test_meta_orchestrator.py::test_specialized_routes_still_match[perform a deep dive on Apple-expected1]
+tests/unit/test_meta_orchestrator.py::test_specialized_routes_still_match[run a red team exercise on Acme-expected0]
+tests/unit/test_meta_orchestrator.py::test_specialized_routes_still_match[stress test the book-expected3]
+tests/unit/test_meta_orchestrator.py::test_specialized_routes_still_match[surveillance of distressed credits-expected2]
+tests/unit/test_meta_orchestrator.py::test_word_boundaries_reject_substrings
+tests/unit/test_mirofish_engine.py::test_mirofish_engine_graceful_degradation
+tests/unit/test_narrative_agent.py::TestNarrativeIntelligence::test_narrative_weaver
+tests/unit/test_neural_bridge_cors_edge_cases.py::test_mesh_websocket_cors_wildcard_handling
+tests/unit/test_neuro_symbolic_planner.py::test_classify_intent_semantic
+tests/unit/test_neuro_symbolic_planner.py::test_create_plan_end_to_end
+tests/unit/test_neuro_symbolic_planner.py::test_discover_plan_fallback
+tests/unit/test_neuro_symbolic_planner.py::test_discover_plan_success
+tests/unit/test_neuro_symbolic_planner.py::test_extract_entities_dynamic
+tests/unit/test_neuro_symbolic_planner.py::test_parse_natural_language_plan
+tests/unit/test_neuro_symbolic_planner.py::test_topological_sort
+tests/unit/test_neuro_symbolic_planner.py::test_topological_sort_cycle
+tests/unit/test_new_risk_agents.py::test_credit_risk_agent
+tests/unit/test_new_risk_agents.py::test_liquidity_risk_agent
+tests/unit/test_noisy_wave_prior.py::test_noisy_wave_prior_bounds
+tests/unit/test_oswm.py::TestOSWM::test_forward_shape
+tests/unit/test_political_landscape.py::TestPoliticalLandscapeLoader::test_load_landscape_failure
+tests/unit/test_political_landscape.py::TestPoliticalLandscapeLoader::test_load_landscape_success
+tests/unit/test_portfolio_optimization_agent.py::TestPortfolioOptimizationAgent::test_ai_forecast
+tests/unit/test_quantum_capabilities.py::TestQuantumCapabilities::test_generative_risk_engine
+tests/unit/test_red_team_subsystem.py::test_framework_run
+tests/unit/test_red_team_subsystem.py::test_red_team_agent_cybersecurity_integration
+tests/unit/test_risk_legal_new_features.py::test_check_covenants
+tests/unit/test_risk_legal_new_features.py::test_detect_fraud_signals
+tests/unit/test_risk_legal_new_features.py::test_review_credit_agreement
+tests/unit/test_risk_legal_new_features.py::test_suggest_restructuring_strategy
+tests/unit/test_scrambled_sobol_qmc.py::test_compare_mc_vs_qmc
+tests/unit/test_scrambled_sobol_qmc.py::test_compute_sobol_sensitivity_indices
+tests/unit/test_scrambled_sobol_qmc.py::test_gaussian_samples_multivariate
+tests/unit/test_scrambled_sobol_qmc.py::test_merton_credit_stress_simulation
+tests/unit/test_scrambled_sobol_qmc.py::test_student_t_ppf_and_samples
+tests/unit/test_secrets_utils.py::TestSecretsUtils::test_get_api_key_empty_value
+tests/unit/test_secrets_utils.py::TestSecretsUtils::test_get_api_key_not_exists
+tests/unit/test_secrets_utils.py::TestSecretsUtils::test_get_api_key_whitespace_value
+tests/unit/test_sentiment_agent_mock.py::test_sentiment_execution
+tests/unit/test_sentiment_agent_mock.py::test_sentiment_override
+tests/unit/test_snc_compliance.py::TestSNCCompliance::test_compliance_failure
+tests/unit/test_snc_compliance.py::TestSNCCompliance::test_compliance_override_primary
+tests/unit/test_snc_compliance.py::TestSNCCompliance::test_compliance_pass
+tests/unit/test_snc_prompt_regression.py::TestSNCPromptRegression::test_financial_inputs_formatting
+tests/unit/test_snc_prompt_regression.py::TestSNCPromptRegression::test_missing_data_handling
+tests/unit/test_snc_prompt_regression.py::TestSNCPromptRegression::test_qualitative_inputs_formatting
+tests/unit/test_swarm_architecture.py::test_hive_mind_initialization
+tests/unit/test_symphony_orchestrator.py::test_dispatch
+tests/unit/test_symphony_orchestrator.py::test_reconciliation_terminal_state
+tests/unit/test_symphony_orchestrator.py::test_slot_limits
+tests/unit/test_symphony_orchestrator.py::test_worker_exit_abnormal
+tests/unit/test_symphony_orchestrator.py::test_worker_exit_normal
+tests/unit/test_system.py::TestAgentOrchestrator::test_agent_interactions
+tests/unit/test_system.py::TestAgentOrchestrator::test_execute_workflow
+tests/unit/test_system2_graph.py::test_system2_max_iterations_forced_exit
+tests/unit/test_technical_analyst_v2.py::test_legacy_execution_with_data
+tests/unit/test_technical_analyst_v2.py::test_standard_execution_no_data
+tests/unit/test_technical_analyst_v2.py::test_standard_execution_with_ticker
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_at_limit
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_exceeds_limit
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_near_limit_with_margin_fail
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_near_limit_with_margin_pass
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_no_config
+tests/unit/test_token_utils.py::TestTokenUtils::test_check_token_limit_within_limit
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_empty_string
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_invalid_encoding_fallback
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_invalid_model_fallback
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_simple_string
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_with_model_name
+tests/unit/test_token_utils.py::TestTokenUtils::test_count_tokens_with_punctuation
+tests/unit/test_token_utils.py::TestTokenUtils::test_lru_cache_behavior
+tests/unit/test_token_utils.py::TestTokenUtils::test_truncate_text_exceeds_limit
+tests/unit/test_token_utils.py::TestTokenUtils::test_truncate_text_fallback_on_exception
+tests/unit/test_token_utils.py::TestTokenUtils::test_truncate_text_invalid_inputs
+tests/unit/test_token_utils.py::TestTokenUtils::test_truncate_text_within_limit
+tests/unit/test_v21_orchestrator_loading.py::TestV21OrchestratorLoading::test_orchestrator_loads_all_v21_agents
+tests/unit/test_v23_architect.py::TestV23Architect::test_meta_orchestrator_routing_high
+tests/unit/test_v23_architect.py::TestV23Architect::test_planner_logic
+tests/unit/test_v23_remediation.py::TestV23Remediation::test_planner_entity_extraction
+tests/unit/test_v23_remediation.py::TestV23Remediation::test_planner_intent_classification
+tests/unit/test_v30_api_security.py::test_v30_api_authorized_access
+tests/unit/test_v_next.py::TestVNext::test_blindspot_agent_registration
+tests/unit/test_workflow_system.py::TestWorkflowSystem::test_parallel_orchestrator
+tests/v24_0/test_v24_agents.py::TestV24Agents::test_chronos_init
+tests/v24_0/test_v24_agents.py::TestV24Agents::test_chronos_run

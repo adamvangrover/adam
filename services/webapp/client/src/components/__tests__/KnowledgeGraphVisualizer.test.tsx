@@ -3,14 +3,14 @@ import { render, screen } from '@testing-library/react';
 import { KnowledgeGraphVisualizer } from '../KnowledgeGraphVisualizer';
 
 // Mock react-force-graph-2d
-jest.mock('react-force-graph-2d', () => {
-    return function DummyGraph(props: any) {
+vi.mock('react-force-graph-2d', () => {
+    return { default: function DummyGraph(props: any) {
         return (
             <div data-testid="force-graph">
                 {JSON.stringify(props.graphData)}
             </div>
         );
-    };
+    } };
 });
 
 const mockData = {

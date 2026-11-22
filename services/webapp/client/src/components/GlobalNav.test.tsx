@@ -4,41 +4,41 @@ import GlobalNav from './GlobalNav';
 import { dataManager } from '../utils/DataManager';
 
 // Mock dependencies
-jest.mock('react-router-dom', () => ({
-  useNavigate: () => jest.fn(),
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => vi.fn(),
 }));
 
-jest.mock('../utils/DataManager', () => ({
+vi.mock('../utils/DataManager', () => ({
   dataManager: {
-    checkConnection: jest.fn(),
-    toggleSimulationMode: jest.fn(),
+    checkConnection: vi.fn(),
+    toggleSimulationMode: vi.fn(),
   },
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Loader2: () => <div data-testid="spinner">Spinner</div>,
 }));
 
 describe('GlobalNav Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock DataManager
-    (dataManager.checkConnection as jest.Mock).mockResolvedValue({ status: 'ONLINE' });
+    (dataManager.checkConnection as ReturnType<typeof vi.fn>).mockResolvedValue({ status: 'ONLINE' });
 
     // Mock global fetch
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
         Promise.resolve({
             json: () => Promise.resolve({ mode: 'LIVE' }),
             ok: true,
             status: 200,
         })
-    ) as jest.Mock;
+    ) as ReturnType<typeof vi.fn>;
   });
 
   afterEach(() => {
     // Clean up fetch mock if needed, though beforeEach handles it
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('toggle mode shows loading state and disables button', async () => {
@@ -47,7 +47,7 @@ describe('GlobalNav Component', () => {
         resolveCheck = resolve;
     });
 
-    (dataManager.checkConnection as jest.Mock).mockResolvedValue({ status: 'ONLINE' });
+    (dataManager.checkConnection as ReturnType<typeof vi.fn>).mockResolvedValue({ status: 'ONLINE' });
 
     await act(async () => {
       render(<GlobalNav />);
@@ -63,7 +63,7 @@ describe('GlobalNav Component', () => {
     });
 
     // Now mock the connection check to hang
-    (dataManager.checkConnection as jest.Mock).mockReturnValue(checkPromise);
+    (dataManager.checkConnection as ReturnType<typeof vi.fn>).mockReturnValue(checkPromise);
 
     // Click to go back to LIVE
     const archiveButton = screen.getByRole('button', { name: /Switch to Live Mode/i });

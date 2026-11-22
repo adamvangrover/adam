@@ -3,17 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Terminal from './Terminal';
 
 // Mock the dataManager
-jest.mock('../utils/DataManager', () => ({
+vi.mock('../utils/DataManager', () => ({
   dataManager: {
-    checkConnection: jest.fn(),
-    getManifest: jest.fn(),
-    isOfflineMode: jest.fn(),
-    toggleSimulationMode: jest.fn(),
+    checkConnection: vi.fn(),
+    getManifest: vi.fn(),
+    isOfflineMode: vi.fn(),
+    toggleSimulationMode: vi.fn(),
   },
 }));
 
 // Mock scrollIntoView since it's not implemented in JSDOM
-window.HTMLElement.prototype.scrollIntoView = jest.fn();
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 test('renders terminal with accessible input and output', () => {
   render(<Terminal />);
