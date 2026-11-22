@@ -11,7 +11,7 @@
 #
 # Usage: scripts/verify_repo_health.sh [--skip-sync] [--skip-rust] [--quick]
 #   --quick  runs tests/unit + tests/regression instead of the full suite.
-set -uo pipefail
+set -uo pipefail  # empty arrays expand as ${a[@]+"${a[@]}"} for macOS bash 3.2
 cd "$(dirname "$0")/.."
 
 SKIP_SYNC=0 SKIP_RUST=0 QUICK=0
@@ -47,25 +47,25 @@ if [[ $SKIP_SYNC -eq 0 ]] && command -v uv >/dev/null 2>&1 && [[ -f requirements
     uv pip install --python .venv/bin/python -q -r requirements/base.txt pytest-timeout hypothesis aiosqlite
 fi
 
-step "ruff check ." "${RUN[@]}" ruff check .
+step "ruff check ." ${RUN[@]+"${RUN[@]}"} ruff check .
 
 if [[ $QUICK -eq 1 ]]; then TESTS=(tests/unit tests/regression); else TESTS=(tests/); fi
 TIMEOUT=()
-"${RUN[@]}" python -c 'import pytest_timeout' 2>/dev/null && TIMEOUT=(--timeout=120) \
+${RUN[@]+"${RUN[@]}"} python -c 'import pytest_timeout' 2>/dev/null && TIMEOUT=(--timeout=120) \
   || echo "note: pytest-timeout not installed; running without the 120 s per-test timeout"
-step "pytest ${TESTS[*]} --strict-markers" env PYTHONPATH=. "${RUN[@]}" python -m pytest "${TESTS[@]}" -q \
-  --strict-markers -p no:cacheprovider -m "not integration" --ignore=tests/unit/test_v23_5_pipeline.py "${TIMEOUT[@]}"
+step "pytest ${TESTS[*]} --strict-markers" env PYTHONPATH=. ${RUN[@]+"${RUN[@]}"} python -m pytest "${TESTS[@]}" -q \
+  --strict-markers -p no:cacheprovider -m "not integration" --ignore=tests/unit/test_v23_5_pipeline.py ${TIMEOUT[@]+"${TIMEOUT[@]}"}
 
 if [[ $SKIP_RUST -eq 1 ]]; then skip "cargo"
 elif ! command -v cargo >/dev/null 2>&1; then skip "cargo (cargo not installed)"
 else
   # PyO3 builds against the project interpreter (abi3-py311 needs >= 3.11).
-  PYO3_PYTHON=$("${RUN[@]}" python -c 'import sys; print(sys.executable)'); export PYO3_PYTHON
+  PYO3_PYTHON=$(${RUN[@]+"${RUN[@]}"} python -c 'import sys; print(sys.executable)'); export PYO3_PYTHON
   step "cargo test core/experimental/adamos_kernel" cargo test --quiet --manifest-path core/experimental/adamos_kernel/Cargo.toml
   step "cargo check rust_ext" cargo check --quiet --manifest-path rust_ext/Cargo.toml
 fi
 
-step "golden-path smoke (S1, S2, Nexus, governance, PROV-O)" "${RUN[@]}" python scripts/golden_path_smoke.py
+step "golden-path smoke (S1, S2, Nexus, governance, PROV-O)" ${RUN[@]+"${RUN[@]}"} python scripts/golden_path_smoke.py
 
 printf '\n==> Summary\n'
 printf '  %s\n' "${RESULTS[@]}"
