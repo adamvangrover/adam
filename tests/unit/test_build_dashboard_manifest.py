@@ -46,6 +46,20 @@ def test_build_manifest_skips_hub_and_records_fields(tmp_path):
         "title": "Brief",
         "kind": "dashboard",
         "family": "daily_briefing",
+        "section": "root",
         "date": "2025-01-14",
     }
     json.dumps(manifest)
+
+
+def test_include_subdirectories_and_render_hub(tmp_path):
+    (tmp_path / "Market_Pulse_2025_03_01.html").write_text("<title>Pulse</title>")
+    (tmp_path / "dashboards").mkdir()
+    (tmp_path / "dashboards" / "adam_v30_terminal.html").write_text("<title>Terminal</title>")
+    manifest = bdm.build_manifest(tmp_path, "catalog.html", ("dashboards",))
+    by_path = {e["path"]: e for e in manifest["dashboards"]}
+    assert by_path["dashboards/adam_v30_terminal.html"]["section"] == "dashboards"
+    assert by_path["dashboards/adam_v30_terminal.html"]["family"] == "adam_os"
+    page = bdm.render_hub(manifest, "Unified Showcase")
+    assert "__MANIFEST__" not in page and "Unified Showcase" in page
+    assert "dashboards/adam_v30_terminal.html" in page
