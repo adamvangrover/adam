@@ -54,7 +54,7 @@ a.card:hover,a.card:focus{border-color:var(--accent);outline:none;transform:tran
 <ul class="grid" id="list"></ul>
 </main>
 </div>
-<script type="application/json" id="manifest">__MANIFEST__</script>
+<script type="application/json" id="manifest" data-root="__ROOT__">__MANIFEST__</script>
 <script>
 const data=JSON.parse(document.getElementById('manifest').textContent),pages=data.dashboards;
 const COLORS={market_mayhem:'#ff4d6d',daily_briefing:'#ffb703',market_pulse:'#06d6a0',house_view:'#8ecae6',newsletter:'#f4a261',afos:'#b388ff',adam_os:'#00f3ff',credit:'#e76f51',scenario:'#ef476f',research:'#90be6d',eval_governance:'#c77dff',agents:'#4cc9f0',operations:'#f9c74f',hub:'#adb5bd',other:'#6c757d'};
@@ -70,7 +70,13 @@ function card(p,tag='a'){
   const m=el('div',{className:'m'},el('span',{className:'tag',textContent:label(p.family)}),el('span',{className:'tag',textContent:p.kind}));
   if(p.date)m.append(el('span',{className:'date',textContent:p.date}));
   const copy=el('button',{className:'copy',type:'button',textContent:'copy path',title:'Copy as a starting template'});
-  copy.onclick=e=>{e.preventDefault();navigator.clipboard&&navigator.clipboard.writeText('showcase/'+p.path);copy.textContent='copied';setTimeout(()=>copy.textContent='copy path',1200);};
+  copy.onclick=e=>{
+    e.preventDefault();
+    const flash=t=>{copy.textContent=t;setTimeout(()=>copy.textContent='copy path',1200);};
+    const path=document.getElementById('manifest').dataset.root+'/'+p.path;
+    if(!navigator.clipboard){flash('copy failed');return;}
+    navigator.clipboard.writeText(path).then(()=>flash('copied'),()=>flash('copy failed'));
+  };
   c.append(el('div',{className:'t',textContent:p.title}),m,el('div',{className:'row'},el('code',{textContent:p.path}),copy));
   return c;
 }

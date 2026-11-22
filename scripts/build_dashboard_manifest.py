@@ -100,9 +100,11 @@ def build_manifest(root: Path, hub: str = _HUB, include: tuple[str, ...] = ()) -
     return {"generator": "scripts/build_dashboard_manifest.py", "count": len(entries), "dashboards": entries}
 
 
-def render_hub(manifest: dict, title: str) -> str:
+def render_hub(manifest: dict, title: str, root: str = "showcase") -> str:
+    """``root`` is the repo-relative catalog directory; copied paths are ``root/<entry path>``."""
     embedded = json.dumps(manifest, separators=(",", ":")).replace("</", "<\\/")
-    return _TEMPLATE_PATH.read_text(encoding="utf-8").replace("__TITLE__", title).replace("__MANIFEST__", embedded)
+    page = _TEMPLATE_PATH.read_text(encoding="utf-8").replace("__TITLE__", title).replace("__ROOT__", html.escape(root))
+    return page.replace("__MANIFEST__", embedded)
 
 
 def main() -> None:
@@ -115,7 +117,7 @@ def main() -> None:
     manifest = build_manifest(root, hub, tuple(args.include))
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     title = "Dashboard Catalog" if root.name == "dashboards" else "Unified Showcase"
-    (root / hub).write_text(render_hub(manifest, title), encoding="utf-8")
+    (root / hub).write_text(render_hub(manifest, title, root.as_posix().rstrip("/")), encoding="utf-8")
     print(f"Wrote {manifest['count']} pages to {root}/manifest.json and {root}/{hub}")
 
 

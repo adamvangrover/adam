@@ -62,4 +62,6 @@ def test_include_subdirectories_and_render_hub(tmp_path):
     assert by_path["dashboards/adam_v30_terminal.html"]["family"] == "adam_os"
     page = bdm.render_hub(manifest, "Unified Showcase")
     assert "__MANIFEST__" not in page and "Unified Showcase" in page
+    assert 'data-root="showcase"' in page
+    assert 'data-root="showcase/dashboards"' in bdm.render_hub(manifest, "Dashboard Catalog", "showcase/dashboards")
     assert "dashboards/adam_v30_terminal.html" in page
