@@ -1,4 +1,4 @@
-.PHONY: install check test lint format clean docker-build docker-up setup-dev
+.PHONY: install check test lint format clean docker-build docker-up setup-dev verify verify-quick
 
 install:
 	pip install -r requirements.txt
@@ -9,6 +9,12 @@ check:
 
 test:
 	pytest tests/
+
+verify:
+	bash scripts/verify_repo_health.sh
+
+verify-quick:
+	bash scripts/verify_repo_health.sh --skip-sync --quick
 
 lint:
 	flake8 core/ services/

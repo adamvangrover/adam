@@ -246,6 +246,16 @@ services) are in [deployment.md](deployment.md).
 
 ## Verify your install
 
+One command runs the whole golden path — `uv sync --frozen`, `ruff check .`, strict-marker pytest, `cargo test`
+for the Rust crates CI builds, and an offline System 1 / System 2 / Nexus / JSONLogic-governance smoke that writes a
+W3C PROV-O audit trail to `runs/golden_path_prov.jsonld`:
+
+```bash
+make verify          # or: bash scripts/verify_repo_health.sh
+make verify-quick    # skip sync; tests/unit + tests/regression only
+```
+
+
 ```bash
 .venv/bin/python tests/evals/run_accuracy.py                        # routing + entity accuracy
 .venv/bin/python -m pytest tests/unit -q                            # module tests (some need optional extras)
