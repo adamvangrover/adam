@@ -1,4 +1,5 @@
 # core/engine/evaluator.py
+from typing import Dict
 
 class EvaluatorKernel:
     def __init__(self, golden_dataset: Dict):

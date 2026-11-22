@@ -1,33 +1,23 @@
 import logging
-from typing import Dict, Any, List
-from pydantic import BaseModel, Field
-from core.agents.templates.v26_template_agent import TemplateAgentV26
+from typing import Any, Dict, List, Optional, Tuple
+
+from core.agents.templates.v30_template_agent import TemplateAgentV30
+from core.schemas.agent_schema import AgentInput
 
 logger = logging.getLogger("adam.credit_sentinel.covenant")
 
-class AgentInput(BaseModel):
-    query: str = Field(..., description="The specific question or objective.")
-    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, financials).")
-    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
 
-class AgentOutput(BaseModel):
-    answer: str = Field(..., description="The final synthesized answer.")
-    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, HDKG nodes, etc.")
-
-class CovenantAnalystAgent(TemplateAgentV26):
+class CovenantAnalystAgent(TemplateAgentV30):
     """
     System 2 Agent responsible for evaluating debt covenants and calculating headroom.
     Strictly uses deterministic tools for calculations to prevent hallucination.
     """
 
-    def __init__(self, mcp_client: Any):
-        super().__init__()
+    def __init__(self, mcp_client: Any, config: Optional[Dict[str, Any]] = None):
+        super().__init__(config or {"name": "credit_sentinel_covenant"})
         self.mcp = mcp_client
-        self.confidence_threshold = 0.85 # Config-driven, no magic numbers
 
-    async def execute(self, input_data: AgentInput) -> AgentOutput:
+    async def analyze(self, input_data: AgentInput) -> Tuple[str, List[str], float, Dict[str, Any]]:
         try:
             # 1. Extract Financials from Context
             financials = input_data.context.get("financial_statements", {})
@@ -35,12 +25,7 @@ class CovenantAnalystAgent(TemplateAgentV26):
             interest_expense = financials.get("interest_expense")
 
             if not ebitda or not interest_expense:
-                return AgentOutput(
-                    answer="Insufficient financial data to calculate covenant headroom.",
-                    sources=[],
-                    confidence=0.1,
-                    metadata={"error": "Missing EBITDA or Interest Expense in context"}
-                )
+                return ("Insufficient financial data to calculate covenant headroom.", [], 0.1, {"error": "Missing EBITDA or Interest Expense in context"})
 
             # 2. Call Deterministic MCP Tool (No LLM Math)
             fccr_result = await self.mcp.call_tool(
@@ -63,21 +48,11 @@ class CovenantAnalystAgent(TemplateAgentV26):
                 answer = f"Covenant compliant. FCCR stands at {fccr_result['fccr']} with {headroom_bps} bps of headroom."
                 confidence = 0.90
 
-            return AgentOutput(
-                answer=answer,
-                sources=["10-K Line Items: EBITDA, Interest Expense"],
-                confidence=confidence,
-                metadata={
+            return (answer, ["10-K Line Items: EBITDA, Interest Expense"], confidence, {
                     "next_step": "consult_legal" if is_breached else "update_hdkg",
                     "hdkg_covenant_node": fccr_result
-                }
-            )
+                })
 
         except Exception as e:
             logger.error(f"[Agent:Risk] Execution failed: {str(e)}")
-            return AgentOutput(
-                answer="System error during covenant evaluation. Failsafe triggered.",
-                sources=[],
-                confidence=0.0,
-                metadata={"trace": str(e)}
-            )
+            return ("System error during covenant evaluation. Failsafe triggered.", [], 0.0, {"trace": str(e)})

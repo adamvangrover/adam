@@ -50,6 +50,9 @@ def test_first_party_imports_resolve():
         ("core.credit_sentinel.covenant_agent", "CovenantAnalystAgent"),
         ("core.agents.specialized.credit_snc", "SNCRatingAgent"),
         ("core.agents.specialized.financial_covenant_agent", "CovenantAnalystAgent"),
+        ("core.agents.catalyst_agent", "CatalystAgent"),
+        ("core.engine.evaluator", "EvaluatorKernel"),
+        ("core.pipelines.sovereign_pipeline", "SovereignPipeline"),
     ],
 )
 def test_repointed_modules_import(module, attr):

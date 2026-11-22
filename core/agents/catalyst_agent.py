@@ -184,7 +184,7 @@ class CatalystAgent:
 if __name__ == "__main__":
     agent = CatalystAgent()
     result = agent.run("client123", "company456", "tech")
-print(json.dumps(result, indent=4))
+    print(json.dumps(result, indent=4))
 
 # """
 # #json
