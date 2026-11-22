@@ -3,6 +3,10 @@
 Terse, factual map of this repository for new contributors and for models ingesting the repo.
 If this file disagrees with code, the code wins — fix this file.
 
+Companion docs: [README.md](README.md) (overview, diagrams, glossary) · [AGENTS.md](AGENTS.md) (agent contract) ·
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (request flow) · [docs/TEMPLATES.md](docs/TEMPLATES.md) (template library) ·
+[docs/setup_guide.md](docs/setup_guide.md) (per-slice setup).
+
 ## 1. Canonical tree
 
 | Path | Role | Status |
@@ -25,14 +29,15 @@ If this file disagrees with code, the code wins — fix this file.
 | `tests/` | pytest: `unit/` (module), `regression/` (bug seams), `evals/` (datasets + `run_accuracy.py`), `integration/`, domain dirs | canonical |
 | `scripts/` | CLI / maintenance / generators | tooling |
 | `docs/` | Long-form docs, ADRs | docs |
+| `docs/TEMPLATES.md` | Template library catalog: doc, brand/product, newsletter, terminal, prompt and code templates (starting points, not canonical) | docs |
 | `showcase/` | All static HTML (GitHub Pages root). `showcase/dashboards/` = former root-level dashboards; catalog `showcase/dashboards/index.html` + `manifest.json` (rebuild: `scripts/build_dashboard_manifest.py`) | presentation |
 | `data/` | Seed data, ledgers, telemetry | data |
 | `core/zero_trust/` | Zero-trust ingestion gateway, schema bounds, triangulated feed consensus | canonical |
 | `archive/` | Historical scripts; `archive/snapshots/` = learning snapshots (§7) | not imported |
 
-Root `index.html` is the only HTML page at the repo root. Generated "Index of" pages are not
-produced inside `core/engine`, `core/agents`, `core/credit_sentinel`, `core/v30_architecture`, `services/webapp`
-(`scripts/generate_directory_indexes.py` `SKIP_PATHS`).
+Root `index.html` is the only HTML page at the repo root. Generated "Index of" repo-browser pages are
+written only to `showcase/browser/` (git-ignored; `scripts/generate_directory_indexes.py`), never inside
+source directories.
 
 ## 2. Entry points
 

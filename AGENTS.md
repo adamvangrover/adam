@@ -1,14 +1,26 @@
 # ADAM — Agent Guide
 
-How to build and change agents in this repository. Start with `REPO_MAP.md` (where things are) and
-`docs/ARCHITECTURE.md` (how they connect). If this file disagrees with code, the code wins — fix this file.
+## The Adam Agent Developer's Bible (v30.1)
+
+> **"Architecture dictates destiny. The UI observes, but the asynchronous swarm executes."**
+
+How to create, modify and debug agents in the **Adam v30.1** ecosystem — an institutional-grade,
+neuro-symbolic multi-agent framework (AFOS) for autonomous credit risk control and financial modeling
+under `ARCHITECT_INFINITE` governance protocols. System state, underwriting decisions and portfolio
+monitoring are driven by agent consensus, telemetry and deterministic logic; humans govern through the
+confidence tiers (§3), policy files and the governance plane (§7).
+
+Start with [`REPO_MAP.md`](REPO_MAP.md) (where things are), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+(how they connect) and [`docs/PROVENANCE.md`](docs/PROVENANCE.md) (what an auditable output looks like).
+Copyable agent, prompt and page templates are catalogued in [`docs/TEMPLATES.md`](docs/TEMPLATES.md); the
+project overview is [`README.md`](README.md). If this file disagrees with code, the code wins — fix this file.
 
 * [1. Bifurcation: Core vs. Lab](#1-bifurcation-core-vs-lab)
 * [2. Architecture: System 1 vs. System 2](#2-architecture-system-1-vs-system-2)
 * [3. Operating Confidence Tiers](#3-operating-confidence-tiers)
 * [4. Core Agent Role Boundaries & State Schemas](#4-core-agent-role-boundaries--state-schemas)
 * [5. Standard Interface](#5-standard-interface)
-* [6. Pre-Flight Checklist](#6-pre-flight-checklist)
+* [6. Pheromones & Pre-Flight Checklist](#6-pheromones--pre-flight-checklist)
 * [7. Architectural Invariants](#7-architectural-invariants)
 * [8. Extended Persona Catalog](#8-afos-agent-system-instructions--extended-persona-catalog)
 * [9. v30.1-R Orchestrators](#9-v301-r-orchestrators--specialized-gate-clearance-systems)
@@ -27,6 +39,26 @@ Do not import Lab code into Core modules.
 
 Presentation (`showcase/`, `frontend/`, `services/webapp/client/`) stays separate from execution code.
 
+### Path A: The Core (Reliability & Risk Control)
+
+* **Philosophy:** "Deterministic Execution. Zero Hallucination."
+* **Key locations:** `core/agents/`, `core/credit_sentinel/`, `core/engine/`, `adam_os/`.
+* **Mandates:**
+  * **Underwriting & sizing:** TMT and Leveraged Finance forward-looking cash-flow modeling, Enterprise
+    Value (EV) abstraction, Base/Bull/Bear scenarios.
+  * **Surveillance:** continuous monitoring for covenant breaches, liquidity runway exhaustion and distress signals.
+* **Requirements:** UI logic never imported into execution modules; every material decision carries a
+  `provenance_trace` (W3C PROV-O); Pydantic validates every I/O boundary; defensive error handling around
+  external calls.
+
+### Path B: The Lab (Velocity & Discovery)
+
+* **Philosophy:** "Expansive Iteration."
+* **Locations:** `research/`, `core/experimental/`. Historical labs (`experimental/`, `tinker_lab/`) now
+  live under `archive/snapshots/` and are read-only.
+* **Requirements:** optimized token throughput and bleeding-edge swarm protocols are welcome here, but Lab
+  code is never imported into Path A — promote by copying into `core/` with tests.
+
 ## 2. Architecture: System 1 vs. System 2
 
 | | System 1 — NeuralMesh swarm | System 2 — reasoning graph |
@@ -36,6 +68,24 @@ Presentation (`showcase/`, `frontend/`, `services/webapp/client/`) stays separat
 | Contract | `run()` loop; `emit(packet_type, payload)` → `NeuralPacket` | `AgentInput` → `AgentOutput` (`core/schemas/agent_schema.py`) |
 | Entry | `swarm_runner.py`, `EACIOrchestrator` | `core/engine/meta_orchestrator.py::MetaOrchestrator.route_request` |
 | Docs | `core/v30_architecture/README.md` | §5 below |
+
+### ⚡ System 1: The Neural Swarm (Fast & Intuitive)
+
+* **Role:** the autonomic nervous system — raw market telemetry, perception and reflexes.
+* **Architecture:** event-driven async Python pub/sub (NeuralMesh).
+* **Characteristics:** non-blocking I/O, millisecond latency, stateless execution driven by local
+  "pheromone" signals (packets on the mesh).
+* **Example:** real-time ingestion of leveraged loan pricing or TMT news, emitting `RISK_ALERT` packets
+  without blocking UI threads.
+
+### 🧠 System 2: The Neuro-Symbolic Graph (Slow & Deliberate)
+
+* **Role:** the prefrontal cortex — underwriting synthesis, capital structure modeling, scenario evaluation.
+* **Architecture:** DAG state machines (LangGraph graphs in `core/engine/*_graph.py`) dispatched by `MetaOrchestrator`.
+* **Characteristics:** stateful, tool-augmented (MCP), reflective; carries context across steps and loops
+  back to correct errors.
+* **Example:** a full credit memo that reconciles conflicting Q3 earnings data via Qdrant JIT retrieval and
+  ends in a rating with a `provenance_trace`.
 
 System 1 output is telemetry. Anything binding (ratings, sizing, capital) goes through System 2 so it
 carries a `provenance_trace`. `core/system/v22_async/async_agent_base.py::AsyncAgentBase` is the older
@@ -154,15 +204,15 @@ Single source of truth: `core/schemas/agent_schema.py` (re-exported by `core.age
 
 ```python
 class AgentInput(BaseModel):
-    query: str
-    context: Dict[str, Any] = {}
-    tools: List[str] = []
+    query: str = Field(..., description="The specific question or objective.")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Shared graph state (RAG data, previous results).")
+    tools: List[str] = Field(default_factory=list, description="List of allowed tool names.")
 
 class AgentOutput(BaseModel):
-    answer: str
-    sources: List[str] = []
-    confidence: float            # 0.0-1.0
-    metadata: Dict[str, Any] = {}
+    answer: str = Field(..., description="The final synthesized answer.")
+    sources: List[str] = Field(default_factory=list, description="List of citations (filenames, URLs).")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0).")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Debug info, token usage, next_step requests.")
     provenance_trace: List[ProvenanceHeader] = []   # empty = ungrounded; check_grounding() is False
 ```
 
@@ -173,7 +223,28 @@ To add a System 2 agent: subclass `TemplateAgentV30`, override `async analyze(in
 `(answer, sources, confidence, metadata)`. The base class adds the provenance header, confidence tier,
 JSONLogic guardrails and swarm logging (`AgentBase.__init_subclass__` wraps every `execute`).
 
-Routing rules:
+Minimal System 2 agent (copy from the template, do not write a new base class):
+
+```python
+from core.agents.templates.v30_template_agent import TemplateAgentV30
+
+class CovenantHeadroomAgent(TemplateAgentV30):
+    async def analyze(self, input_data):
+        # deterministic math via engines/Rust, thresholds from config/*.yaml
+        return answer, sources, confidence, {"next_step": "invoke_surveillance"}
+```
+
+### Swarm protocol
+
+* **System 1 → System 2:** put the packet payload in `AgentInput.context`; System 2 decides.
+* **System 2 → System 1:** emit `AgentOutput.model_dump()` as a `NeuralPacket` payload.
+* **Telemetry review:** material drift in tracked variables (portfolio health, covenant breach
+  probability, liquidity runway) triggers a confirmation loop through the orchestrator, not a direct
+  agent-to-agent call.
+* **Pheromones:** System 1 agents coordinate only through mesh packets (topic subscriptions); they hold
+  no references to each other.
+
+### Routing & consensus rules
 
 1. Agents never instantiate other agents. Request follow-ups via `metadata={"next_step": "...", "query": "..."}`.
 2. `MetaOrchestrator` routes by ordered word-boundary patterns (`ROUTE_PATTERNS`); unresolved tickers /
@@ -184,15 +255,22 @@ Routing rules:
    `config/llm_routing.yaml` tier 1. Models in `core/config/models.py::BLOCKED_MODELS` raise
    `SR11_7_BLOCKED_MODEL_ERROR` (SR 11-7).
 
-## 6. Pre-Flight Checklist
+## 6. Pheromones & Pre-Flight Checklist
 
-1. Inputs/outputs are Pydantic; no new duplicate of `AgentInput`/`AgentOutput`.
-2. Thresholds and rules are in `config/*.yaml` or `assets/` JSONLogic, not in Python.
-3. Hand-picked placeholder values carry `_estimated: true` (`docs/PROVENANCE.md`).
-4. Tests: unit tests in `tests/unit/`; a bug fix adds a seam test in `tests/regression/`; routing/entity
+Before deploying or modifying agents, consult `docs/AGENTS_KNOWLEDGE_BASE.md` — the accumulated
+"pheromone trail" of traps and fixes left by earlier agents.
+
+1. **Security:** user input is sanitized via EACI middleware (`core/security/eaci_middleware.py`); no
+   `pickle`/`eval` on untrusted data (`core/security/safe_unpickler.py`).
+2. **Graph:** schemas align with the FIBO-aligned knowledge graph (`config/knowledge_graph*.yaml`).
+3. **Frontend:** presentation logic stays in `frontend/`, `services/webapp/` or `showcase/`.
+4. Inputs/outputs are Pydantic; no new duplicate of `AgentInput`/`AgentOutput`.
+5. Thresholds and rules are in `config/*.yaml` or `assets/` JSONLogic, not in Python.
+6. Hand-picked placeholder values carry `_estimated: true` (`docs/PROVENANCE.md`).
+7. Tests: unit tests in `tests/unit/`; a bug fix adds a seam test in `tests/regression/`; routing/entity
    behaviour changes update `tests/evals/datasets/*.json` and pass `python tests/evals/run_accuracy.py`.
-5. `.venv/bin/python -m pytest tests/ -q` and `.venv/bin/ruff check <changed files>`.
-6. Record new failure patterns in `docs/AGENTS_KNOWLEDGE_BASE.md`.
+8. `.venv/bin/python -m pytest tests/ -q` and `.venv/bin/ruff check <changed files>`.
+9. Record new failure patterns in `docs/AGENTS_KNOWLEDGE_BASE.md`.
 
 ## 7. Architectural Invariants
 

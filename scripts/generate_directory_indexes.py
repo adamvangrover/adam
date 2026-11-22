@@ -2,9 +2,10 @@ import os
 import html
 
 # Configuration
-SKIP_DIRS = {'.git', 'node_modules', '__pycache__', 'webapp', 'services/webapp/client', '.idea', '.vscode', 'venv', 'env', '.env'}
-# Source trees stay free of generated HTML; browse them via showcase/ instead.
-SKIP_PATHS = ('core/engine', 'core/agents', 'core/credit_sentinel', 'services/webapp', 'core/v30_architecture')
+SKIP_DIRS = {'.git', 'node_modules', '__pycache__', '.idea', '.vscode', 'venv', '.venv', 'env', '.env', 'target', 'dist', 'build'}
+SKIP_PATHS = ('services/webapp/client/node_modules',)
+# Generated pages live only in the presentation layer; source directories stay free of generated HTML.
+OUTPUT_DIR = os.path.join('showcase', 'browser')
 CUSTOM_INDEX_MARKER = "ADAM AUTO-GENERATED SHOWCASE"
 
 # Template
@@ -48,6 +49,7 @@ TEMPLATE = """<!DOCTYPE html>
         <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
             <a href="{parent_link}" class="cyber-btn">&uarr; UP LEVEL</a>
             <a href="{root_link}index.html" class="cyber-btn">ROOT</a>
+            <a href="{source_link}" class="cyber-btn">SOURCE DIR</a>
             <a href="{root_link}showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">MISSION CONTROL</a>
         </nav>
 
@@ -70,54 +72,37 @@ TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
-def generate_indexes(root_dir):
+def generate_indexes(root_dir, output_dir=OUTPUT_DIR):
+    """Mirror the repo tree as browsable index pages under ``output_dir`` (never inside source dirs)."""
+    root_dir = os.path.abspath(root_dir)
+    out_root = os.path.join(root_dir, output_dir)
+    out_rel = os.path.relpath(out_root, root_dir).replace(os.sep, '/')
+    out_depth = len(out_rel.split('/'))
     for dirpath, dirnames, filenames in os.walk(root_dir):
-        # Filter directories in place
         dirnames[:] = [
             d for d in dirnames
             if d not in SKIP_DIRS and not d.startswith('.')
-            and os.path.relpath(os.path.join(dirpath, d), root_dir).replace(os.sep, '/') not in SKIP_PATHS
+            and os.path.relpath(os.path.join(dirpath, d), root_dir).replace(os.sep, '/') not in SKIP_PATHS + (out_rel,)
         ]
 
-        # Determine paths
         rel_path = os.path.relpath(dirpath, root_dir)
         if rel_path == '.':
             depth = 0
             display_path = "/ROOT"
-            parent_link = "."
-            root_link = "./"
+            parent_link = "index.html"
         else:
             depth = len(rel_path.split(os.sep))
-            display_path = "/" + rel_path
-            parent_link = "../"
-            root_link = "../" * depth
+            display_path = "/" + rel_path.replace(os.sep, '/')
+            parent_link = "../index.html"
 
-        # CSS Path
+        # Links from showcase/browser/<rel>/ back to the repo root and to the real source directory.
+        root_link = "../" * (out_depth + depth)
+        source_link = root_link + ("" if rel_path == '.' else rel_path.replace(os.sep, '/') + "/")
         css_path = root_link + "showcase/css/style.css"
 
-        # Check existing index.html
-        index_path = os.path.join(dirpath, "index.html")
-        if os.path.exists(index_path):
-            try:
-                with open(index_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-
-                    # Force update if it matches the marker (overwrite previous generated ones)
-                    # Skip if it DOES NOT match marker and seems complex
-                    if CUSTOM_INDEX_MARKER not in content and "Directory Listing" not in content and len(content) > 500:
-
-                        # Root and Showcase Root are special
-                        if rel_path == '.':
-                            print(f"Skipping root: {dirpath}")
-                            continue
-                        if rel_path == "showcase" or dirpath.endswith("/showcase"):
-                             print(f"Skipping showcase root: {dirpath}")
-                             continue
-
-                        print(f"Skipping custom index: {index_path}")
-                        continue
-            except:
-                pass
+        target_dir = out_root if rel_path == '.' else os.path.join(out_root, rel_path)
+        os.makedirs(target_dir, exist_ok=True)
+        index_path = os.path.join(target_dir, "index.html")
 
         # Generate File List
         items = []
@@ -134,7 +119,6 @@ def generate_indexes(root_dir):
 
         # Files
         for f in sorted(filenames):
-            if f == "index.html": continue
             if f.startswith('.'): continue
 
             icon = "📄"
@@ -156,7 +140,7 @@ def generate_indexes(root_dir):
 
             items.append({
                 'name': f,
-                'href': f,
+                'href': source_link + f,
                 'icon': icon,
                 'tag': tag,
                 'tag_class': tag_class
@@ -198,6 +182,7 @@ def generate_indexes(root_dir):
             display_path=display_path,
             parent_link=parent_link,
             root_link=root_link,
+            source_link=source_link,
             file_list_html=file_list_html,
             readme_html=readme_html,
             current_dir_name=os.path.basename(dirpath) or "ROOT"
@@ -208,4 +193,5 @@ def generate_indexes(root_dir):
         print(f"Generated: {index_path}")
 
 if __name__ == "__main__":
-    generate_indexes(".")
+    import sys
+    generate_indexes(sys.argv[1] if len(sys.argv) > 1 else ".")
