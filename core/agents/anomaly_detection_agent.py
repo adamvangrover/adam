@@ -471,6 +471,72 @@ class AnomalyDetectionAgent:
                     }
                     anomalies.append(anomaly)
 
+        # Multivariate Anomaly Detection using LOF and One-Class SVM
+        numeric_company_data = self.company_data.select_dtypes(include=[np.number])
+        if not numeric_company_data.empty:
+            scaled_company_data = self.scaler.fit_transform(numeric_company_data.fillna(0))
+            df_scaled = pd.DataFrame(scaled_company_data, columns=numeric_company_data.columns)
+
+            # LOF anomaly detection
+            n_samples = len(numeric_company_data)
+            n_neighbors = min(20, n_samples - 1) if n_samples > 1 else 1
+            if n_samples > 1:
+                outliers_lof = self._detect_outliers_lof(df_scaled, n_neighbors=n_neighbors)
+                for outlier_index in outliers_lof:
+                    anomaly = {
+                        'type': 'company_data_anomaly',
+                        'method': 'LOF',
+                        'message': f"Unusual company data profile detected (LOF) at index {outlier_index}"
+                    }
+                    if 'revenue' in self.company_data.columns:
+                        anomaly['revenue'] = self.company_data['revenue'].iloc[outlier_index]
+                    anomalies.append(anomaly)
+
+            # One-Class SVM anomaly detection
+            if n_samples > 0:
+                outliers_svm = self._detect_outliers_one_class_svm(df_scaled)
+                for outlier_index in outliers_svm:
+                    anomaly = {
+                        'type': 'company_data_anomaly',
+                        'method': 'One-Class SVM',
+                        'message': f"Unusual company data profile detected (SVM) at index {outlier_index}"
+                    }
+                    if 'revenue' in self.company_data.columns:
+                        anomaly['revenue'] = self.company_data['revenue'].iloc[outlier_index]
+                    anomalies.append(anomaly)
+
+        # Financial ratio based anomaly detection using LOF and One-Class SVM
+        if not ratios.empty and len(ratios.columns) > 0:
+            numeric_ratios = ratios.select_dtypes(include=[np.number]).fillna(0)
+            if not numeric_ratios.empty:
+                scaled_ratios = self.scaler.fit_transform(numeric_ratios)
+                df_scaled_ratios = pd.DataFrame(scaled_ratios, columns=numeric_ratios.columns)
+
+                n_samples_ratios = len(numeric_ratios)
+                n_neighbors_ratios = min(20, n_samples_ratios - 1) if n_samples_ratios > 1 else 1
+
+                # LOF on financial ratios
+                if n_samples_ratios > 1:
+                    outliers_lof_ratios = self._detect_outliers_lof(df_scaled_ratios, n_neighbors=n_neighbors_ratios)
+                    for outlier_index in outliers_lof_ratios:
+                        anomaly = {
+                            'type': 'financial_ratio_anomaly',
+                            'method': 'LOF',
+                            'message': f"Unusual financial ratio profile detected (LOF) at index {outlier_index}"
+                        }
+                        anomalies.append(anomaly)
+
+                # One-Class SVM on financial ratios
+                if n_samples_ratios > 0:
+                    outliers_svm_ratios = self._detect_outliers_one_class_svm(df_scaled_ratios)
+                    for outlier_index in outliers_svm_ratios:
+                        anomaly = {
+                            'type': 'financial_ratio_anomaly',
+                            'method': 'One-Class SVM',
+                            'message': f"Unusual financial ratio profile detected (SVM) at index {outlier_index}"
+                        }
+                        anomalies.append(anomaly)
+
         return anomalies
 
     async def run(self):
