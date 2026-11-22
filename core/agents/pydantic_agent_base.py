@@ -34,6 +34,8 @@ class PydanticAgentBase(AgentBase):
         input_data = None
         is_standard_mode = False
 
+        if not args and len(kwargs) == 1 and isinstance(kwargs.get("input_data"), AgentInput):
+            args = (kwargs.pop("input_data"),)
         if len(args) == 1 and isinstance(args[0], AgentInput):
             input_data = args[0]
             is_standard_mode = True

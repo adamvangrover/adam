@@ -38,3 +38,11 @@ def test_covenant_agent_breach_and_missing_data():
     missing = _run(CovenantAnalystAgent(_FakeMCP({})), {})
     assert missing.confidence == 0.1
     assert missing.metadata["confidence_tier"] == "hard_abort"
+
+
+def test_keyword_agent_input_is_unpacked():
+    mcp = _FakeMCP({"fccr": 3.1, "headroom_bps": 1100, "is_breached": False})
+    ctx = {"financial_statements": {"EBITDA": 310.0, "interest_expense": 100.0}}
+    out = asyncio.run(CovenantAnalystAgent(mcp).execute(input_data=AgentInput(query="q", context=ctx)))
+    assert isinstance(out, AgentOutput)
+    assert mcp.calls and out.metadata["next_step"] == "update_hdkg"
