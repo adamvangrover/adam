@@ -1,7 +1,8 @@
 """The golden-path smoke script runs offline and emits a valid PROV-O document."""
-import asyncio
 import importlib.util
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -21,10 +22,12 @@ def smoke():
     return mod
 
 
-def test_golden_path_emits_valid_prov(smoke, tmp_path, monkeypatch):
+def test_golden_path_emits_valid_prov(tmp_path):
+    # Fresh interpreter: earlier tests in the suite patch/reload core modules in sys.modules.
     out = tmp_path / "prov.jsonld"
-    monkeypatch.setattr(sys, "argv", ["golden_path_smoke.py", "--out", str(out)])
-    assert asyncio.run(smoke.main()) == 0
+    env = {**os.environ, "PYTHONPATH": str(SCRIPT.parents[1])}
+    proc = subprocess.run([sys.executable, str(SCRIPT), "--out", str(out)], capture_output=True, text=True, env=env, timeout=110)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
     doc = json.loads(out.read_text())
     types = [n["@type"] for n in doc["@graph"]]
     assert types.count("prov:Activity") == 4 and types.count("prov:Entity") == 4
