@@ -9,7 +9,7 @@ This document is the central registry and Agent Card catalog for all autonomous 
 ### `underwriting_agent` (`AFOS-UWR-01`)
 
 * **Role ID:** `AFOS-UWR-01`
-* **File:** `core/agents/underwriting_agent.py`
+* **File:** _planned — no implementation on `main` yet_
 * **Bounded Context:** `Credit Underwriting & Capital Structure Sizing`
 * **Persona / Authority:** Obligor Credit Evaluation Specialist
 * **Description:** Performs deep-dive corporate underwriting, debt capacity sizing, and forward-looking cash flow modeling across TMT and Leveraged Finance verticals.
@@ -39,7 +39,7 @@ This document is the central registry and Agent Card catalog for all autonomous 
 ### `compliance_agent` (`AFOS-CMP-01`)
 
 * **Role ID:** `AFOS-CMP-01`
-* **File:** `core/agents/compliance_agent.py`
+* **File:** _planned — no implementation on `main` yet_
 * **Bounded Context:** `Regulatory Capital & Audit Verification`
 * **Persona / Authority:** Regulatory Compliance & Capital Audit Guardian
 * **Description:** Evaluates regulatory capital buffers, cross-model divergence, and verifies auditability before capital allocation decisions are committed.
@@ -65,7 +65,7 @@ This document is the central registry and Agent Card catalog for all autonomous 
 ### `sentinel_agent`
 
 * **Role ID:** `sentinel_agent`
-* **File:** `core/credit_sentinel/sentinel.py`
+* **File:** _planned — no implementation on `main` yet (related: `core/governance/sentinel/harness.py`)_
 * **Bounded Context:** `Security & System Governance`
 * **Persona / Authority:** Sentinel Guardian
 * **Description:** Continuously monitors inter-agent execution logs for threat vectors, ungrounded hallucinations, missing provenance headers, or policy violations.
@@ -234,7 +234,7 @@ This document is the central registry and Agent Card catalog for all autonomous 
 ### `NewsDesk_Orchestrator`
 
 * **Role ID:** `NewsDesk_Orchestrator`
-* **File:** `core/agents/newsdesk_orchestrator.py`
+* **File:** `core/agents/orchestrators/news_desk_orchestrator.py`
 * **Bounded Context:** `Market Mayhem Publication Pipeline`
 * **Persona / Authority:** Editor-in-Chief (Quantitative Raconteur)
 * **Description:** Orchestrates end-to-end production of the Market Mayhem publication, synthesizing deep web data, sentiment signals, and macro tail risks.

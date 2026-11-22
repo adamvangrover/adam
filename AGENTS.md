@@ -39,6 +39,11 @@ Do not import Lab code into Core modules.
 
 Presentation (`showcase/`, `frontend/`, `services/webapp/client/`) stays separate from execution code.
 
+Every top-level directory carries an owner tag (`PATH_A`, `PATH_B`, `UI`, `DATA_EXPORTS`, `TOOLING`, `DOCS`,
+`DEPRECATED_ARCHIVE`) in `machine_index.json` → `directory_map`. `tests/unit/test_architecture_boundaries.py`
+fails CI on an untagged new top-level directory, a `PATH_A` import of `PATH_B`/archive code, `eval`/`exec`/
+`pickle.load` in `PATH_A`, or an `AGENT_CATALOG.md` file path that does not exist.
+
 ### Path A: The Core (Reliability & Risk Control)
 
 * **Philosophy:** "Deterministic Execution. Zero Hallucination."
