@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List
 
-from core.agents.specialized.snc_rating_agent import SNCRatingAgent
-from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
+from core.agents.specialized.credit_snc import SNCRatingAgent
+from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent
 from core.schemas.v23_5_schema import CreditAnalysis
 
 # Configure Logging

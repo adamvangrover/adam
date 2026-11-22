@@ -179,7 +179,7 @@ def get_architecture_docs() -> str:
     """
     try:
         # Try to read the actual architecture doc if it exists, else return summary
-        with open("docs/v23_architecture_vision.md", "r") as f:
+        with open("docs/ARCHITECTURE.md", "r") as f:
             return f.read()
     except FileNotFoundError:
         return """

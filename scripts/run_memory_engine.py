@@ -25,8 +25,8 @@ async def run_memory_tests():
     # 1. PREPOPULATE VECTOR DATABASE
     print("\n--- INGESTING HISTORICAL REPORTS INTO VECTOR MEMORY ---")
     mock_files = [
-        "showcase/market_mayhem_historical_report.md",
-        "showcase/market_mayhem_cro_ib_week_ahead.md"
+        "core/libraries_and_archives/newsletters/market_mayhem_historical_report_03142026.md",
+        "core/libraries_and_archives/newsletters/market_mayhem_cro_ib_week_ahead_03152026.md"
     ]
     
     for file_path in mock_files:

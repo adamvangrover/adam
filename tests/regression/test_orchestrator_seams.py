@@ -59,8 +59,9 @@ def test_crisis_engine_gets_per_asset_results(orch):
     portfolio = orch._positions_from_allocation({"aum": 1e8, "allocation": {s: 1 / len(universe) for s in universe}})
     state = init_crisis_state("market crash", portfolio)
     state["sector_shocks"] = {"Technology": -0.8}
-    with patch("core.engine.crisis_simulation_graph.sector_engine.analyze_portfolio",
-               wraps=__import__("core.engine.crisis_simulation_graph", fromlist=["x"]).sector_engine.analyze_portfolio) as spy:
+    # Patch the engine simulate_direct_node actually sees; other tests may re-import the module in sys.modules.
+    engine = simulate_direct_node.__globals__["sector_engine"]
+    with patch.object(engine, "analyze_portfolio", wraps=engine.analyze_portfolio) as spy:
         simulate_direct_node(state)
     assert [a["name"] for a in spy.call_args.args[0]] == universe
 
