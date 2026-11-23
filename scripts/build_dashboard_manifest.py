@@ -53,6 +53,8 @@ _MONTHS = {m: i for i, m in enumerate(
 _YMD_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})(?!\d)")
 _MDY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})((?:19|20)\d{2})(?!\d)")
 _MON_Y_RE = re.compile(r"(?:^|_)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*_(?:(\d{1,2})_)?((?:19|20)\d{2})")
+# Kit markup written by scripts/apply_showcase_kit.py; stripped before hashing so it cannot mask duplicates.
+_KIT_RE = re.compile(r"<!-- adam-kit -->.*?<!-- /adam-kit -->\n?|\sdata-adam-(?:role|family|canonical)=\"[^\"]*\"", re.DOTALL)
 _REPORT_FAMILIES = {"market_mayhem", "daily_briefing", "market_pulse", "house_view", "newsletter", "research"}
 _HUB = "index.html"
 _TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "showcase_catalog.html.tmpl"
@@ -124,7 +126,7 @@ def _entry(page: Path, rel: str, section: str) -> dict:
     title = html.unescape(" ".join(match.group(1).split())) if match else page.stem
     entry = {"path": rel, "title": title, "kind": classify(page.stem), "family": family(page.stem), "section": section}
     entry["role"] = role(entry["family"], text)
-    entry["_sha"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    entry["_sha"] = hashlib.sha256(_KIT_RE.sub("", text).encode("utf-8")).hexdigest()
     date = edition_date(page.stem)
     if date:
         entry["date"] = date

@@ -103,3 +103,21 @@ def test_apply_kit_is_idempotent_and_relative(tmp_path):
     assert '<script src="../kit/adam-kit.js"></script>' in once
     assert '<html lang="en" data-adam-role="duplicate" data-adam-family="adam_os" data-adam-canonical="../catalog.html">' in once
     assert once.count("<!-- adam-kit -->") == 1
+
+
+def test_duplicates_survive_kit_and_parent_canonical(tmp_path):
+    sub = tmp_path / "dashboards"
+    sub.mkdir()
+    page = '<html lang="en"><head><title>T</title><script>1</script></head></html>'
+    (sub / "a_terminal.html").write_text(page)
+    (sub / "b_terminal.html").write_text(page)
+    (sub / "old_os.html").write_text(page.replace("1", "2"))
+    (tmp_path / "canonical.json").write_text(
+        json.dumps({"os": {"canonical": "dashboards/a_terminal.html", "members": ["dashboards/old_os.html"]}})
+    )
+    for _ in range(2):
+        entries = {e["path"]: e for e in bdm.build_manifest(sub)["dashboards"]}
+        for e in entries.values():
+            (sub / e["path"]).write_text(kit.apply(sub / e["path"], e, sub))
+    assert entries["b_terminal.html"]["canonical"] == "a_terminal.html"
+    assert entries["old_os.html"]["canonical"] == "a_terminal.html"
