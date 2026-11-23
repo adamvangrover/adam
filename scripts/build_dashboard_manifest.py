@@ -4,6 +4,8 @@ Scans ``<root>/*.html`` and writes:
   - ``<root>/manifest.json``: machine-readable catalog (path, title, kind, family, edition date).
   - ``<root>/<hub>``: searchable hub with the catalog embedded, so it works over file://.
 
+``role`` is terminal (interactive), report (static edition/research) or duplicate (an exact copy, or a
+member of a ``<root>/canonical.json`` group; ``canonical`` names the page to use instead).
 ``kind`` is the page shape (dashboard, terminal, viewer, index); ``family`` is the template family
 (Market Mayhem, Daily Briefing, Market Pulse, House View, Adam OS, ...) so a page can be copied as a
 starting template for its family. Idempotent: rerun after adding, moving or renaming a page.
@@ -16,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -49,6 +52,7 @@ _MONTHS = {m: i for i, m in enumerate(
 _YMD_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})(?!\d)")
 _MDY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})((?:19|20)\d{2})(?!\d)")
 _MON_Y_RE = re.compile(r"(?:^|_)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*_(?:(\d{1,2})_)?((?:19|20)\d{2})")
+_REPORT_FAMILIES = {"market_mayhem", "daily_briefing", "market_pulse", "house_view", "newsletter", "research"}
 _HUB = "index.html"
 _TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "showcase_catalog.html.tmpl"
 
@@ -82,10 +86,33 @@ def edition_date(name: str) -> str | None:
     return None
 
 
+def role(fam: str, text: str) -> str:
+    return "report" if fam in _REPORT_FAMILIES or "<script" not in text.lower() else "terminal"
+
+
+def _canonical_map(root: Path) -> dict[str, str]:
+    path = root / "canonical.json"
+    groups = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    return {m: g["canonical"] for k, g in groups.items() if not k.startswith("_") for m in g["members"]}
+
+
+def _assign_roles(entries: list[dict], root: Path) -> None:
+    canonical, seen = _canonical_map(root), {}
+    for e in entries:
+        digest = e.pop("_sha")
+        target = canonical.get(e["path"]) or seen.get(digest)
+        if target:
+            e["role"], e["canonical"] = "duplicate", target
+        seen.setdefault(digest, e["path"])
+
+
 def _entry(page: Path, rel: str, section: str) -> dict:
-    match = _TITLE_RE.search(page.read_text(encoding="utf-8", errors="ignore"))
+    text = page.read_text(encoding="utf-8", errors="ignore")
+    match = _TITLE_RE.search(text)
     title = html.unescape(" ".join(match.group(1).split())) if match else page.stem
     entry = {"path": rel, "title": title, "kind": classify(page.stem), "family": family(page.stem), "section": section}
+    entry["role"] = role(entry["family"], text)
+    entry["_sha"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
     date = edition_date(page.stem)
     if date:
         entry["date"] = date
@@ -97,6 +124,7 @@ def build_manifest(root: Path, hub: str = _HUB, include: tuple[str, ...] = ()) -
     entries = [_entry(p, p.name, "root") for p in sorted(root.glob("*.html")) if p.name != hub]
     for sub in include:
         entries += [_entry(p, f"{sub}/{p.name}", sub) for p in sorted((root / sub).glob("*.html"))]
+    _assign_roles(entries, root)
     return {"generator": "scripts/build_dashboard_manifest.py", "count": len(entries), "dashboards": entries}
 
 

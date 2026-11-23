@@ -47,6 +47,7 @@ def test_build_manifest_skips_hub_and_records_fields(tmp_path):
         "kind": "dashboard",
         "family": "daily_briefing",
         "section": "root",
+        "role": "report",
         "date": "2025-01-14",
     }
     json.dumps(manifest)
@@ -65,3 +66,40 @@ def test_include_subdirectories_and_render_hub(tmp_path):
     assert 'data-root="showcase"' in page
     assert 'data-root="showcase/dashboards"' in bdm.render_hub(manifest, "Dashboard Catalog", "showcase/dashboards")
     assert "dashboards/adam_v30_terminal.html" in page
+
+
+_KIT_SPEC = importlib.util.spec_from_file_location(
+    "apply_showcase_kit", Path(__file__).resolve().parents[2] / "scripts" / "apply_showcase_kit.py"
+)
+kit = importlib.util.module_from_spec(_KIT_SPEC)
+_KIT_SPEC.loader.exec_module(kit)
+
+
+def test_roles_canonical_groups_and_exact_duplicates(tmp_path):
+    live = "<title>T</title><script>1</script>"
+    (tmp_path / "a_terminal.html").write_text(live)
+    (tmp_path / "b_terminal.html").write_text(live)
+    (tmp_path / "old_os.html").write_text(live + "<!-- v1 -->")
+    (tmp_path / "Daily_Briefing_2025_01_14.html").write_text(live + "<!-- brief -->")
+    (tmp_path / "static.html").write_text("<title>S</title>")
+    (tmp_path / "canonical.json").write_text(json.dumps({"os": {"canonical": "a_terminal.html", "members": ["old_os.html"]}}))
+    by_path = {e["path"]: e for e in bdm.build_manifest(tmp_path)["dashboards"]}
+    assert by_path["a_terminal.html"]["role"] == "terminal"
+    assert (by_path["b_terminal.html"]["role"], by_path["b_terminal.html"]["canonical"]) == ("duplicate", "a_terminal.html")
+    assert (by_path["old_os.html"]["role"], by_path["old_os.html"]["canonical"]) == ("duplicate", "a_terminal.html")
+    assert by_path["Daily_Briefing_2025_01_14.html"]["role"] == "report"
+    assert by_path["static.html"]["role"] == "report"
+    assert all("_sha" not in e for e in by_path.values())
+
+
+def test_apply_kit_is_idempotent_and_relative(tmp_path):
+    (tmp_path / "dashboards").mkdir()
+    page = tmp_path / "dashboards" / "old.html"
+    page.write_text('<html lang="en"><head><title>x</title></head><body></body></html>')
+    entry = {"path": "dashboards/old.html", "role": "duplicate", "family": "adam_os", "canonical": "catalog.html"}
+    once = kit.apply(page, entry, tmp_path)
+    page.write_text(once)
+    assert kit.apply(page, entry, tmp_path) == once
+    assert '<script src="../kit/adam-kit.js" defer></script>' in once
+    assert '<html lang="en" data-adam-role="duplicate" data-adam-family="adam_os" data-adam-canonical="../catalog.html">' in once
+    assert once.count("<!-- adam-kit -->") == 1

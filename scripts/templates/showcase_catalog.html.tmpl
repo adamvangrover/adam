@@ -48,6 +48,7 @@ a.card:hover,a.card:focus{border-color:var(--accent);outline:none;transform:tran
 <p><code>Starting templates — pick one, refine to taste. Read <a href="manifest.json">manifest.json</a>.</code></p></nav>
 <main>
 <section id="latestWrap"><h2>Latest editions</h2><div class="latest" id="latest"></div></section>
+<div class="chips" id="role" role="toolbar" aria-label="Page role"><span>Role</span></div>
 <div class="chips" id="kind" role="toolbar" aria-label="Page kind"><span>Kind</span></div>
 <div class="chips" id="section" role="toolbar" aria-label="Section"><span>Section</span></div>
 <p id="count" aria-live="polite"></p>
@@ -61,13 +62,13 @@ const COLORS={market_mayhem:'#ff4d6d',daily_briefing:'#ffb703',market_pulse:'#06
 const EDITIONS=['market_mayhem','daily_briefing','market_pulse','house_view','newsletter'];
 const label=s=>s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()).replace('Adam Os','Adam OS').replace('Afos','AFOS');
 const $=id=>document.getElementById(id),SAFE=/^([\w-]+\/)?[\w.-]+\.html$/;
-const sel=Object.assign({family:'all',kind:'all',section:'all',q:'',sort:'new'},Object.fromEntries(new URLSearchParams(location.hash.slice(1))));
+const sel=Object.assign({family:'all',role:'all',kind:'all',section:'all',q:'',sort:'new'},Object.fromEntries(new URLSearchParams(location.hash.slice(1))));
 const count=k=>pages.reduce((m,p)=>(m[p[k]]=(m[p[k]]||0)+1,m),{});
 function el(tag,props,...kids){const e=document.createElement(tag);Object.assign(e,props||{});e.append(...kids);return e;}
 function card(p,tag='a'){
   const c=el(tag,{className:'card'});c.style.setProperty('--c',COLORS[p.family]||COLORS.other);
   if(tag==='a'&&SAFE.test(p.path))c.href=p.path;
-  const m=el('div',{className:'m'},el('span',{className:'tag',textContent:label(p.family)}),el('span',{className:'tag',textContent:p.kind}));
+  const m=el('div',{className:'m'},el('span',{className:'tag',textContent:label(p.family)}),el('span',{className:'tag',textContent:p.kind}),el('span',{className:'tag',textContent:p.role||'terminal'}));
   if(p.date)m.append(el('span',{className:'date',textContent:p.date}));
   const copy=el('button',{className:'copy',type:'button',textContent:'copy path',title:'Copy as a starting template'});
   copy.onclick=e=>{
@@ -103,15 +104,15 @@ function render(){
   sel.q=$('q').value.toLowerCase();sel.sort=$('sort').value;
   document.querySelectorAll('[data-k]').forEach(b=>{const key=b.closest('#fam')?'family':b.parentElement.id;b.setAttribute('aria-pressed',sel[key]===b.dataset.k);});
   const cmp={new:(a,b)=>(b.date||'').localeCompare(a.date||''),old:(a,b)=>(a.date||'9').localeCompare(b.date||'9'),az:(a,b)=>a.title.localeCompare(b.title)}[sel.sort];
-  const rows=pages.filter(p=>['family','kind','section'].every(k=>sel[k]==='all'||p[k]===sel[k])&&(p.title+' '+p.path).toLowerCase().includes(sel.q))
+  const rows=pages.filter(p=>['family','role','kind','section'].every(k=>sel[k]==='all'||p[k]===sel[k])&&(p.title+' '+p.path).toLowerCase().includes(sel.q))
     .sort((a,b)=>cmp(a,b)||a.path.localeCompare(b.path));
   $('list').replaceChildren(...(rows.length?rows.map(p=>el('li',{},card(p))):[el('li',{className:'empty',textContent:'No pages match.'})]));
   $('count').textContent=rows.length+' of '+pages.length+' pages';
-  $('latestWrap').hidden=!!(sel.q||sel.family!=='all'||sel.kind!=='all'||sel.section!=='all');
+  $('latestWrap').hidden=!!(sel.q||sel.family!=='all'||sel.kind!=='all'||sel.role!=='all'||sel.section!=='all');
   const h=new URLSearchParams(Object.entries(sel).filter(([k,v])=>v&&v!=='all'&&!(k==='sort'&&v==='new'))).toString();
   history.replaceState(null,'',h?'#'+h:location.pathname);
 }
-families();chips('kind','kind');chips('section','section');stats();
+families();chips('role','role');chips('kind','kind');chips('section','section');stats();
 $('q').value=sel.q;$('sort').value=sel.sort;$('q').oninput=render;$('sort').onchange=render;
 document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==$('q')){e.preventDefault();$('q').focus();}});
 render();
