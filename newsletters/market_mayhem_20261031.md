@@ -58,6 +58,8 @@ The secondary loan market is exhibiting extreme bifurcation:
 
 #### 3. Key US BSL Benchmark News & Syndicate Flow Ledger
 
+> Illustrative template data (`_estimated: true`): issuer names, pricing and bids below are synthetic scenario values, not sourced market quotes. See `docs/PROVENANCE.md`.
+
 | Issuer / Facility | Sector | Tranche Size | Pricing / Spread | Bid / Secondary | Key Catalyst / Syndicate Dynamic |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **CloudCore Systems** | Enterprise Software | $1,850M TLB | SOFR + 350 bps (0.00% Floor) | 99.125 | Successfully repriced down 50 bps; allocated heavily to Tier 1 CLO ramp accounts. |
