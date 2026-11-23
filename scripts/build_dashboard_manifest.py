@@ -21,6 +21,7 @@ import argparse
 import hashlib
 import html
 import json
+import os
 import re
 from pathlib import Path
 
@@ -91,9 +92,20 @@ def role(fam: str, text: str) -> str:
 
 
 def _canonical_map(root: Path) -> dict[str, str]:
-    path = root / "canonical.json"
-    groups = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    return {m: g["canonical"] for k, g in groups.items() if not k.startswith("_") for m in g["members"]}
+    """Member -> canonical, both relative to ``root``; ``canonical.json`` may sit in ``root`` or its parent."""
+    path = next((d / "canonical.json" for d in (root, root.parent) if (d / "canonical.json").exists()), None)
+    if path is None:
+        return {}
+    base, out = path.parent, {}
+    for key, group in json.loads(path.read_text(encoding="utf-8")).items():
+        if key.startswith("_"):
+            continue
+        target = Path(os.path.relpath(base / group["canonical"], root)).as_posix()
+        for member in group["members"]:
+            rel = Path(os.path.relpath(base / member, root)).as_posix()
+            if not rel.startswith("../"):
+                out[rel] = target
+    return out
 
 
 def _assign_roles(entries: list[dict], root: Path) -> None:
