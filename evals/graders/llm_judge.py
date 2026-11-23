@@ -122,24 +122,38 @@ class CleanRoomLLMJudge:
         if context:
             prompt += f"Context: {context}\n"
         prompt += f"Agent Answer: {agent_answer}\n\n"
-        prompt += "Provide scores and reasoning for each dimension, followed by OVERALL_SCORE: <float>."
+        prompt += (
+            "Provide reasoning, then one line per dimension as <NAME>_SCORE: <float> "
+            f"(weights: {self.weights}), followed by OVERALL_SCORE: <float>."
+        )
         return prompt
 
     def _parse_llm_response(self, response: str) -> Optional[JudgeResult]:
         """Extract scores from raw LLM text response."""
         try:
-            match = re.search(r"OVERALL_SCORE:\s*([0-9.]+)", response, re.IGNORECASE)
-            if match:
-                score = float(match.group(1))
-                score = max(0.0, min(1.0, score))
-                passed = score >= self.pass_threshold
-                return JudgeResult(
-                    overall_score=score,
-                    passed=passed,
-                    verdict="PASS" if passed else "FAIL",
-                    feedback="LLM Judge Evaluation Complete.",
-                    raw_response=response,
-                )
+            num = r"\s*([0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?)"
+            dims = []
+            for name, weight in self.weights.items():
+                m = re.search(rf"{name}_SCORE:{num}", response, re.IGNORECASE)
+                if m:
+                    dims.append(DimensionScore(name=name, score=max(0.0, min(1.0, float(m.group(1)))), weight=weight))
+            match = re.search(rf"OVERALL_SCORE:{num}", response, re.IGNORECASE)
+            total_weight = sum(d.weight for d in dims)
+            if dims and len(dims) == len(self.weights) and total_weight > 0:
+                score = sum(d.score * d.weight for d in dims) / total_weight
+            elif match:
+                score = max(0.0, min(1.0, float(match.group(1))))
+            else:
+                return None
+            passed = score >= self.pass_threshold
+            return JudgeResult(
+                overall_score=score,
+                passed=passed,
+                dimensions=dims,
+                verdict="PASS" if passed else "FAIL",
+                feedback="LLM Judge Evaluation Complete.",
+                raw_response=response,
+            )
         except Exception as e:
             logger.error(f"Failed to parse LLM response: {e}")
         return None
@@ -162,7 +176,7 @@ class CleanRoomLLMJudge:
             overall_score=score,
             passed=passed,
             dimensions=dims,
-            verdict=entry.get("verdict", "PASS" if passed else "FAIL"),
+            verdict="PASS" if passed else "FAIL",
             feedback=entry.get("feedback", "Replay Evaluation"),
             raw_response=entry.get("raw_response"),
         )

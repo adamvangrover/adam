@@ -77,3 +77,22 @@ def test_clean_room_judge_llm_callable():
     assert result.overall_score == 0.88
     assert result.passed is True
     assert result.verdict == "PASS"
+
+
+def test_llm_score_parses_scientific_notation():
+    judge = CleanRoomLLMJudge(llm_callable=lambda _p: "OVERALL_SCORE: 1e-2")
+    assert judge.evaluate("q", "a", "b").overall_score == 0.01
+
+
+def test_llm_dimension_scores_use_configured_weights():
+    judge = CleanRoomLLMJudge(
+        llm_callable=lambda _p: "CORRECTNESS_SCORE: 0\nOVERALL_SCORE: 0.9", weights={"correctness": 1.0}
+    )
+    result = judge.evaluate("q", "a", "b")
+    assert result.overall_score == 0.0 and not result.passed
+
+
+def test_replay_verdict_follows_current_threshold():
+    judge = CleanRoomLLMJudge(replay_store={"k": {"overall_score": 0.8, "verdict": "PASS"}}, pass_threshold=0.9)
+    result = judge.evaluate("q", "a", "b", replay_key="k")
+    assert (result.passed, result.verdict) == (False, "FAIL")
