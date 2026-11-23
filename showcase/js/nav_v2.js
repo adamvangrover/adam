@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 /**
  * ADAM v23.5 APEX NAVIGATOR SYSTEM
  * -----------------------------------------------------------------------------
@@ -440,12 +442,12 @@ class AdamNavigator {
 
         container.classList.remove('hidden');
         container.innerHTML = results.map(r => `
-            <a href="${r.link}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
+            <a href="${_esc(r.link)}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
                 <div class="flex justify-between">
-                    <span class="text-xs text-cyan-400 font-bold font-mono">${r.type || 'FILE'}</span>
+                    <span class="text-xs text-cyan-400 font-bold font-mono">${_esc(r.type || 'FILE')}</span>
                     <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
                 </div>
-                <div class="text-sm text-white font-medium">${r.title}</div>
+                <div class="text-sm text-white font-medium">${_esc(r.title)}</div>
             </a>
         `).join('');
     }

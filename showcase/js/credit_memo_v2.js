@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 document.addEventListener('DOMContentLoaded', async () => {
     // --- State Management ---
     let library = {};
@@ -610,7 +612,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function log(agent, message, type="info") {
         const div = document.createElement('div');
         div.className = `log-entry ${type}`; // Uses CSS from previous step
-        div.innerHTML = `<span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span><span class="log-agent">${agent}</span><span class="log-message">${message}</span>`;
+        div.innerHTML = `<span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span><span class="log-agent">${_esc(agent)}</span><span class="log-message">${_esc(message)}</span>`;
         elements.terminal.appendChild(div);
         elements.terminal.scrollTop = elements.terminal.scrollHeight;
     }

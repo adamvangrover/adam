@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 // Simulation Viewer Logic
 console.log("Simulation Viewer Loaded.");
 
@@ -110,7 +112,7 @@ function updateUI(index) {
         day.actions.forEach(action => {
             const div = document.createElement('div');
             div.className = 'sim-log-item';
-            div.innerHTML = `<span class="sim-log-date">[${day.date}]</span> <span class="sim-log-action">${action}</span>`;
+            div.innerHTML = `<span class="sim-log-date">[${_esc(day.date)}]</span> <span class="sim-log-action">${_esc(action)}</span>`;
             logContainer.prepend(div); // Add to top
         });
     }

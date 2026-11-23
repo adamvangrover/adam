@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 document.addEventListener('DOMContentLoaded', () => {
     // --- State ---
     let artifacts = [];
@@ -255,11 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'success') {
             toast.style.background = 'rgba(16, 185, 129, 0.9)';
             toast.style.color = 'white';
-            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${msg}`;
+            toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${_esc(msg)}`;
         } else {
             toast.style.background = 'rgba(0, 243, 255, 0.9)';
             toast.style.color = 'black';
-            toast.innerHTML = `<i class="fas fa-info-circle mr-2"></i> ${msg}`;
+            toast.innerHTML = `<i class="fas fa-info-circle mr-2"></i> ${_esc(msg)}`;
         }
 
         document.body.appendChild(toast);

@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 window.CyberDashboard = {
     init: function() {
         console.log("Initializing Cyberpunk Dashboard Protocol v2.0...");
@@ -175,7 +177,7 @@ window.CyberDashboard = {
         const entry = document.createElement('div');
         entry.className = 'log-entry';
         const time = new Date().toLocaleTimeString();
-        entry.innerHTML = `<span class="log-timestamp">[${time}]</span> <span style="color:#fff">${msg}</span>`;
+        entry.innerHTML = `<span class="log-timestamp">[${time}]</span> <span style="color:#fff">${_esc(msg)}</span>`;
         terminal.appendChild(entry);
         terminal.parentElement.scrollTop = terminal.parentElement.scrollHeight;
     },
@@ -373,7 +375,7 @@ window.CyberDashboard = {
             tooltip.className = 'source-tooltip';
             tooltip.innerHTML = `
                 <div class="tooltip-header">VERIFICATION NODE ${index + 1}</div>
-                <div>ID: ${verifyId}</div>
+                <div>ID: ${_esc(verifyId)}</div>
                 <div style="font-size:0.7rem; color:#aaa; margin-top:5px;">Source: Internal Knowledge Graph</div>
                 <div style="font-size:0.7rem; color:#00f3ff;">Hash: ${Math.random().toString(36).substring(7)}</div>
             `;

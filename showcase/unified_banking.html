@@ -82,7 +82,7 @@
     </style>
 <!-- adam-kit -->
 <link rel="stylesheet" href="kit/adam-kit.css">
-<script src="kit/adam-kit.js" defer></script>
+<script src="kit/adam-kit.js"></script>
 <!-- /adam-kit -->
 </head>
 <body class="h-screen flex flex-col grid-bg">
@@ -461,7 +461,7 @@
                 if(type === 'warn') colorClass = 'text-amber-400';
 
                 line.className = `${colorClass}`;
-                line.innerHTML = `<span class="text-slate-600 mr-2">[${timestamp}]</span> ${msg}`;
+                line.innerHTML = `<span class="text-slate-600 mr-2">[${timestamp}]</span> ${AdamKit.esc(msg)}`;
                 consoleEl.appendChild(line);
                 consoleEl.scrollTop = consoleEl.scrollHeight;
             }

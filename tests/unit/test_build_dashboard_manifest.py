@@ -100,6 +100,6 @@ def test_apply_kit_is_idempotent_and_relative(tmp_path):
     once = kit.apply(page, entry, tmp_path)
     page.write_text(once)
     assert kit.apply(page, entry, tmp_path) == once
-    assert '<script src="../kit/adam-kit.js" defer></script>' in once
+    assert '<script src="../kit/adam-kit.js"></script>' in once
     assert '<html lang="en" data-adam-role="duplicate" data-adam-family="adam_os" data-adam-canonical="../catalog.html">' in once
     assert once.count("<!-- adam-kit -->") == 1

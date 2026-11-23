@@ -508,7 +508,7 @@
   </style>
 <!-- adam-kit -->
 <link rel="stylesheet" href="kit/adam-kit.css">
-<script src="kit/adam-kit.js" defer></script>
+<script src="kit/adam-kit.js"></script>
 <!-- /adam-kit -->
 </head>
 <body>
@@ -1062,7 +1062,7 @@
         line.className = "log-line";
         const ts = new Date().toISOString().split("T")[1].slice(0, 8);
         const cls = tone === "ok" ? "text-emerald" : tone === "warn" ? "text-amber" : tone === "err" ? "text-rose" : "text-cyan";
-        line.innerHTML = '<span class="log-time">[' + ts + ']</span><span class="' + cls + '">' + msg + "</span>";
+        line.innerHTML = '<span class="log-time">[' + ts + ']</span><span class="' + cls + '">' + AdamKit.esc(msg) + "</span>";
         log.prepend(line);
       }
 

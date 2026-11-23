@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 // Nexus Apps: Financial Suite
 // Adds Financial Modeler, Report Viewer, and Briefing Center
 
@@ -150,11 +152,11 @@
                         const data = await res.json();
                         renderDCFModel(winId, data);
                     } else {
-                        main.innerHTML = `Error: No model found for ${ticker}.`;
+                        main.textContent = `Error: No model found for ${ticker}.`;
                     }
                 }
             } catch (e) {
-                main.innerHTML = `Error loading model: ${e}`;
+                main.textContent = `Error loading model: ${e}`;
             }
         });
     }

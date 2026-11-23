@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 // Nexus Apps: Investment Suite
 // Adds Portfolio Master and Scenario Lab
 
@@ -209,7 +211,7 @@
 
                 simulateScenario(fundRes, scenRes, resDiv);
             } catch(e) {
-                resDiv.innerHTML = 'Simulation Error: ' + e;
+                resDiv.textContent = 'Simulation Error: ' + e;
             }
         });
     }

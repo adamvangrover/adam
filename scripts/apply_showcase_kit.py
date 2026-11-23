@@ -27,7 +27,7 @@ _ROLES = {"terminal", "duplicate"}
 def _kit_block(page: Path, root: Path) -> str:
     rel = Path(os.path.relpath(root / "kit", page.parent)).as_posix()
     return (f'<!-- adam-kit -->\n<link rel="stylesheet" href="{rel}/adam-kit.css">\n'
-            f'<script src="{rel}/adam-kit.js" defer></script>\n<!-- /adam-kit -->')
+            f'<script src="{rel}/adam-kit.js"></script>\n<!-- /adam-kit -->')
 
 
 def _html_tag(tag: str, entry: dict, page: Path, root: Path) -> str:

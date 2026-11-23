@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 /**
  * MARKET MAYHEM BUILDER ENGINE
  * -----------------------------------------------------------------------------
@@ -124,11 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simulate Processing Delay
         setTimeout(() => {
             // Render
-            let bodyText = data.body.map(p => `<p>${p}</p>`).join('');
+            let bodyText = data.body.map(p => `<p>${_esc(p)}</p>`).join('');
 
             // Inject Target if provided
             if (target && target.trim() !== "") {
-                bodyText = bodyText.replace(/{TARGET}/g, `<span style="background:rgba(255,255,0,0.2); border-bottom:1px solid yellow;">${target}</span>`);
+                bodyText = bodyText.replace(/{TARGET}/g, `<span style="background:rgba(255,255,0,0.2); border-bottom:1px solid yellow;">${_esc(target)}</span>`);
             } else {
                 bodyText = bodyText.replace(/{TARGET}/g, "The sector");
             }
@@ -139,11 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const html = `
-                <h1 class="headline">${data.title}</h1>
-                <div class="subhead">${data.subhead}</div>
+                <h1 class="headline">${_esc(data.title)}</h1>
+                <div class="subhead">${_esc(data.subhead)}</div>
                 <div class="date-line">
                     <span>VOL. ${Math.floor(Math.random() * 1000)}</span>
-                    <span>DATE: ${data.date}</span>
+                    <span>DATE: ${_esc(data.date)}</span>
                     <span>PRICE: $${(Math.random() * 100).toFixed(2)}</span>
                 </div>
                 <div class="article-body">

@@ -1,5 +1,5 @@
 /* ADAM showcase kit: shared escaping helpers and the machine operator surface.
- * Load with <script src=".../kit/adam-kit.js" defer></script> (scripts/apply_showcase_kit.py does this).
+ * Load with <script src=".../kit/adam-kit.js"></script> in <head> so inline scripts can call AdamKit.esc (scripts/apply_showcase_kit.py does this).
  *   AdamKit.esc(value)             -> HTML-escaped string for interpolation into innerHTML
  *   AdamKit.html`<b>${value}</b>`  -> tagged template that escapes every interpolation
  *   AdamKit.publish(key, data)     -> add page data to the operator JSON view
