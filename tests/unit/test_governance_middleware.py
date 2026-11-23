@@ -1,5 +1,8 @@
 import unittest
 from flask import Flask
+from unittest import mock
+
+from services.webapp import governance as governance_module
 from services.webapp.governance import GovernanceMiddleware
 import json
 import logging
@@ -39,12 +42,12 @@ class TestGovernanceMiddleware(unittest.TestCase):
         # Protocol: ADAM-V-NEXT - Strict Enforcement check.
         # Should now return 403 Forbidden.
 
-        with self.assertLogs(level='WARNING') as captured:
+        # Patch the module's own logging reference: other tests may reconfigure or replace root logging.
+        with mock.patch.object(governance_module.logging, "warning") as warn:
             response = self.client.post('/api/trade')
-            self.assertEqual(response.status_code, 403)
-            # Check if any log message contains "Governance Alert" or "High risk operation detected"
-            self.assertTrue(any("Governance Alert" in r.message for r in captured.records))
-            self.assertIn("High risk operation blocked", response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(any("Governance Alert" in str(c.args[0]) for c in warn.call_args_list))
+        self.assertIn("High risk operation blocked", response.get_data(as_text=True))
 
     def test_blacklisted_keyword(self):
         # Use data=... which sends form data or body
