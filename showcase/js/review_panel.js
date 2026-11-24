@@ -28,8 +28,9 @@
     const edition = await r.json();
     const rv = edition.review || {};
     const panel = rv.panel || {};
-    const card = (side, data) => K.html`<article class="adam-term__card adam-term__card--${side}" data-adam-hook="review-${side}"><h3>${side.replace("_", " ")}</h3><p>${data.narrative || data.summary || "—"}</p></article>`.replace("</article>",
-      Object.entries(data.price_targets || {}).map(([k, v]) => K.html`<div>${k} ${v}</div>`).join("") + "</article>");
+    const levels = (data) => Object.entries(Object.assign({}, data.targets || {}, data.price_targets || {}))
+      .map(([k, v]) => K.html`<div>${k} ${v}</div>`).join("");
+    const card = (side, data) => K.html`<article class="adam-term__card adam-term__card--${side}" data-adam-hook="review-${side}"><h3>${side.replace("_", " ")}</h3><p>${data.narrative || data.summary || "—"}</p>` + levels(data) + "</article>";
     const list = (items) => (items && items.length ? "<ul>" + items.map((x) => K.html`<li>${x}</li>`).join("") + "</ul>" : "<p>None.</p>");
     $("detail").hidden = false;
     $("detail").innerHTML = K.html`<h2>${edition.title} (${entry.id})</h2><p><a href="${K.safeUrl(rel(entry.html))}">Open edition</a> · judge ${rv.score} · desk ${(rv.desk || {}).verdict} · red-team impact ${(rv.red_team || {}).impact_score}</p>` +
