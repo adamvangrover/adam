@@ -235,3 +235,8 @@ def test_h_act_truncates_stdout_and_normalizes_errors():
     assert res.truncated and len(res.stdout) < cfg.max_stdout_chars * 2
     err = h_act.post_tool(ValueError("bad input"), cfg)
     assert not err.ok and err.error["type"] == "ValueError"
+
+
+def test_h_ctx_counts_non_ascii_characters_once():
+    cfg = POLICY.context
+    assert h_ctx.estimate_tokens("中" * cfg.chars_per_token * 10, cfg.chars_per_token) <= 11

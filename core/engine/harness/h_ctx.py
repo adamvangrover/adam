@@ -19,7 +19,7 @@ def mask_stale_observations(context: Dict[str, Any], policy: ContextPolicy) -> T
 
 def estimate_tokens(payload: Any, chars_per_token: int) -> int:
     try:
-        text = json.dumps(payload, default=str)
+        text = json.dumps(payload, default=str, ensure_ascii=False)
     except (TypeError, ValueError):
         text = str(payload)
     return math.ceil(len(text) / chars_per_token)
