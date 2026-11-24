@@ -586,7 +586,7 @@
             aiMsg.className = 'glass-panel p-4 rounded-xl text-slate-300 self-start w-full max-w-[95%] shadow-lg border-l-2 border-l-term-amber';
 
             // Render text with a CSS typewriter wrapper
-            const formattedText = marked.parse(AdamKit.esc(responseText));
+            const formattedText = AdamKit.markdown(responseText);
             aiMsg.innerHTML = `
                 <p class="text-[10px] font-mono text-term-amber mb-2 uppercase tracking-wider flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-term-amber animate-pulse"></span> Adam v26.0 Output
@@ -629,7 +629,7 @@
 
             const result = await fetchGemini(prompt, SYSTEM_PROMPT, true);
 
-            resultEl.innerHTML = `<div class="typewriter-text border-transparent leading-relaxed">${marked.parse(AdamKit.esc(result))}</div>`;
+            resultEl.innerHTML = `<div class="typewriter-text border-transparent leading-relaxed">${AdamKit.markdown(result)}</div>`;
             btnEl.disabled = false;
             btnEl.innerHTML = '[ RUN SIMULATION ]';
         }

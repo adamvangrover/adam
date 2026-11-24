@@ -768,7 +768,7 @@ The structural distance-to-default across sub-investment grade corporate credit 
 
             document.getElementById('readerEditionTag').innerText = edition.tag;
             document.getElementById('readerTitle font-bold').innerText = edition.title;
-            document.getElementById('markdownOutput').innerHTML = marked.parse(AdamKit.esc(edition.markdown));
+            document.getElementById('markdownOutput').innerHTML = AdamKit.markdown(edition.markdown);
         }
 
         function copyMarkdownText() {
@@ -1014,7 +1014,7 @@ The structural distance-to-default across sub-investment grade corporate credit 
                     const aiMsgHtml = `
                         <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-cyan text-slate-200">
                             <div class="text-[10px] text-term-cyan font-bold mb-1">ADAM v26.0 VERDICT</div>
-                            <div class="font-sans leading-relaxed text-xs">${marked.parse(AdamKit.esc(replyText))}</div>
+                            <div class="font-sans leading-relaxed text-xs">${AdamKit.markdown(replyText)}</div>
                         </div>
                     `;
                     chatLog.insertAdjacentHTML('beforeend', aiMsgHtml);

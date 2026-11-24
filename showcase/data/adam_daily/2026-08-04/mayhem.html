@@ -929,7 +929,7 @@ Maintain 65% Fortress capital stack in zero-duration floaters and tariff-protect
 
             document.getElementById('readerEditionTag').innerText = edition.tag;
             document.getElementById('readerTitle').innerText = edition.title;
-            document.getElementById('markdownOutput').innerHTML = marked.parse(AdamKit.esc(edition.markdown));
+            document.getElementById('markdownOutput').innerHTML = AdamKit.markdown(edition.markdown);
         }
 
         function copyMarkdownText() {
@@ -1200,7 +1200,7 @@ Maintain 65% Fortress capital stack in zero-duration floaters and tariff-protect
                             <div class="text-[10px] text-term-cyan font-bold mb-2 flex items-center gap-1">
                                 <i class="fa-solid fa-brain"></i> ADAM v26.0 VERDICT
                             </div>
-                            <div class="font-sans leading-relaxed text-xs ai-rendered-content">${marked.parse(AdamKit.esc(replyText))}</div>
+                            <div class="font-sans leading-relaxed text-xs ai-rendered-content">${AdamKit.markdown(replyText)}</div>
                         </div>
                     `;
                     chatLog.insertAdjacentHTML('beforeend', aiMsgHtml);

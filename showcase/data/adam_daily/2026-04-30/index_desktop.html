@@ -1049,7 +1049,7 @@ Current Telemetry: ${JSON.stringify(window.systemTelemetry)}`;
 
             try {
                 const rawResponse = await fetchGemini(val, systemPrompt);
-                const parsedHtml = marked.parse(AdamKit.esc(rawResponse));
+                const parsedHtml = AdamKit.markdown(rawResponse);
                 
                 document.getElementById(typingId).remove();
                 

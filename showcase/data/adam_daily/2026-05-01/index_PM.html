@@ -998,7 +998,7 @@
         function initBriefingApp() {
             const container = document.getElementById('briefing-content');
             // Using Marked.js to parse the markdown from our JSON payload
-            container.innerHTML = marked.parse(AdamKit.esc(payload.briefing.markdown));
+            container.innerHTML = AdamKit.markdown(payload.briefing.markdown);
         }
 
         // --- App: Macro ---
@@ -1311,7 +1311,7 @@
                 });
                 const data = await response.json();
                 const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "NO DATA RETURNED.";
-                const parsedHtml = marked.parse(AdamKit.esc(resultText));
+                const parsedHtml = AdamKit.markdown(resultText);
 
                 document.getElementById(typingId).remove();
                 chatLog.insertAdjacentHTML('beforeend', `

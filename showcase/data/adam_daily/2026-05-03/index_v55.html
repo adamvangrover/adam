@@ -1422,7 +1422,7 @@ System ready. Type 'help' for commands.
                 btn.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme";
             }
             const mdContent = document.getElementById(templateId).innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(AdamKit.esc(mdContent));
+            document.getElementById('briefing-content').innerHTML = AdamKit.markdown(mdContent);
         }
 
         function initBriefingApp() {
@@ -2174,7 +2174,7 @@ System ready. Type 'help' for commands.
                                     <span class="text-xs font-display font-bold text-theme">A</span>
                                 </div>
                                 <div class="glass-panel p-4 border border-theme/20 text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none shadow-lg">
-                                    ${marked.parse(AdamKit.esc(responseHtml))}
+                                    ${AdamKit.markdown(responseHtml)}
                                 </div>
                             </div>
                         `);
@@ -2201,7 +2201,7 @@ Current Telemetry: ${JSON.stringify(payload.kpis)}`;
                         })
                     });
                     const data = await rawResponse.json();
-                    const parsedHtml = marked.parse(AdamKit.esc(data.candidates[0].content.parts[0].text));
+                    const parsedHtml = AdamKit.markdown(data.candidates[0].content.parts[0].text);
                     
                     document.getElementById(typingId).remove();
                     chatLog.insertAdjacentHTML('beforeend', `

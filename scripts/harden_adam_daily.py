@@ -4,8 +4,9 @@ Idempotent rewrite, re-run after adding a page:
 * inserts the shared kit (``<!-- adam-kit -->`` block) so pages can call ``AdamKit.esc``;
 * wraps simple ``${name}`` / ``${obj.field}`` interpolations inside ``.innerHTML = `...` `` /
   ``+= `...` `` template literals with ``AdamKit.esc(...)`` (names that carry pre-built markup, e.g.
-  ``rowsHtml``, are left alone);
-* escapes Markdown before ``marked.parse(...)`` and writes raw LLM ``response`` strings as text.
+  ``rowsHtml``, or variables assigned a ``<...>`` string literal, are left alone);
+* renders Markdown through ``AdamKit.markdown(...)`` (raw HTML escaped, fences kept) and writes raw LLM
+  ``response`` strings as text.
 
     python scripts/harden_adam_daily.py [--check]
 """
@@ -23,7 +24,8 @@ KIT = ROOT / "showcase" / "kit"
 _SINK_RE = re.compile(r"\.innerHTML\s*\+?=\s*`")
 _SIMPLE_RE = re.compile(r"^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\[\d+\])*\s*$")
 _MARKUP_RE = re.compile(r"html|svg|icon|badge|rows?$|cells|markup|tpl|template|spark|bars?$", re.IGNORECASE)
-_MARKED_RE = re.compile(r"marked\.parse\((?!AdamKit\.esc\()([^()]*(?:\([^()]*\))?[^()]*)\)")
+_MARKED_RE = re.compile(r"marked\.parse\(AdamKit\.esc\(([^()]*(?:\([^()]*\))?[^()]*)\)\)|marked\.parse\(")
+_MARKUP_ASSIGN_RE = re.compile(r"\b([A-Za-z_$][\w$]*)\s*\+?=\s*(?:[^;`'\"]*\?\s*)?[`'\"]\s*<")
 _RESPONSE_RE = re.compile(r"\.innerHTML\s*=\s*response\s*;")
 
 
@@ -54,16 +56,28 @@ def _literal_end(text: str, start: int) -> tuple[int, list[tuple[int, int]]]:
     return len(text), spans
 
 
+def _markup_vars(text: str) -> set[str]:
+    """Variables the page assigns an HTML string literal to (pre-built markup, not data)."""
+    return set(_MARKUP_ASSIGN_RE.findall(text))
+
+
+def _is_data(expr: str, markup: set[str]) -> bool:
+    return bool(_SIMPLE_RE.match(expr)) and not _MARKUP_RE.search(expr) and expr.strip() not in markup
+
+
 def unescaped_interpolations(text: str) -> list[str]:
     """Simple interpolations inside innerHTML literals that are not wrapped in AdamKit.esc."""
-    out = []
+    out, markup = [], _markup_vars(text)
     for m in _SINK_RE.finditer(text):
         _, spans = _literal_end(text, m.end() - 1)
-        out += [text[a:b].strip() for a, b in spans if _SIMPLE_RE.match(text[a:b]) and not _MARKUP_RE.search(text[a:b])]
+        out += [text[a:b].strip() for a, b in spans if _is_data(text[a:b], markup)]
     return out
 
 
 def harden(text: str, kit_href: str) -> str:
+    markup = _markup_vars(text)
+    for name in markup:
+        text = text.replace("${AdamKit.esc(" + name + ")}", "${" + name + "}")
     pieces, last = [], 0
     for m in _SINK_RE.finditer(text):
         if m.start() < last:
@@ -71,13 +85,13 @@ def harden(text: str, kit_href: str) -> str:
         end, spans = _literal_end(text, m.end() - 1)
         for a, b in spans:
             expr = text[a:b]
-            if _SIMPLE_RE.match(expr) and not _MARKUP_RE.search(expr):
+            if _is_data(expr, markup):
                 pieces += [text[last:a], f"AdamKit.esc({expr.strip()})"]
                 last = b
         pieces.append(text[last:end + 1])
         last = end + 1
     text = "".join(pieces) + text[last:]
-    text = _MARKED_RE.sub(lambda m: f"marked.parse(AdamKit.esc({m.group(1)}))", text)
+    text = _MARKED_RE.sub(lambda m: f"AdamKit.markdown({m.group(1)})" if m.group(1) is not None else "AdamKit.markdown(", text)
     text = _RESPONSE_RE.sub(".textContent = response;", text)
     if "<!-- adam-kit -->" not in text and "</head>" in text:
         block = (f'<!-- adam-kit -->\n<link rel="stylesheet" href="{kit_href}/adam-kit.css">\n'
