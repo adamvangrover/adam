@@ -9,6 +9,8 @@ The governance model consists of:
 2.  **Constitution**: Defining core principles and rules for agent behavior.
 3.  **MCP Integration**: Exposing governance checks via the MCP server.
 
+Component-level walkthrough (Constitution, `EnvironmentGate`, `ApprovalTool`, `GovernanceMiddleware`): [AGENTS_GOVERNANCE.md](AGENTS_GOVERNANCE.md).
+
 ## Constitution
 
 The `Constitution` class (in `core/governance/constitution.py`) enforces principles like:
