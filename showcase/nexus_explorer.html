@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="agents">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,6 +44,10 @@
         .tag-doc { border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .tag-code { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="relative">
 
@@ -182,7 +186,7 @@
 
             } catch (e) {
                 console.error(e);
-                document.getElementById('network-container').innerHTML = `<div class="text-red-500 p-10 text-center">FAILED TO LOAD DATA: ${file}</div>`;
+                document.getElementById('network-container').innerHTML = `<div class="text-red-500 p-10 text-center">FAILED TO LOAD DATA: ${AdamKit.esc(file)}</div>`;
             }
         }
 

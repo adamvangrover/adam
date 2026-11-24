@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 document.addEventListener('DOMContentLoaded', async () => {
     // --- 1. State Management ---
     let mockData = {};
@@ -898,10 +900,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid var(--glass-border, #333)';
         tr.innerHTML = `
-            <td style="padding: 8px; color: var(--text-secondary, #666); font-size: 0.8em; font-family:monospace;">${time}</td>
-            <td style="padding: 8px; color: var(--accent-color, #007bff); font-weight: bold;">${actor}</td>
-            <td style="padding: 8px; color: var(--text-primary, #ccc);">${action}</td>
-            <td style="padding: 8px; color: var(--text-secondary, #888); font-size: 0.9em;">${details}</td>
+            <td style="padding: 8px; color: var(--text-secondary, #666); font-size: 0.8em; font-family:monospace;">${_esc(time)}</td>
+            <td style="padding: 8px; color: var(--accent-color, #007bff); font-weight: bold;">${_esc(actor)}</td>
+            <td style="padding: 8px; color: var(--text-primary, #ccc);">${_esc(action)}</td>
+            <td style="padding: 8px; color: var(--text-secondary, #888); font-size: 0.9em;">${_esc(details)}</td>
         `;
         elements.auditLogContent.insertBefore(tr, elements.auditLogContent.firstChild);
     }

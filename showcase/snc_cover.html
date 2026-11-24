@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="credit">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen flex flex-col grid-bg text-slate-200 overflow-hidden">
     <div class="scan-line"></div>
@@ -194,7 +198,7 @@ Liquidity remains {{LIQUIDITY_STATUS}} with {{LIQUIDITY_AVAIL}} available under 
                     step.className = "text-emerald-400";
 
                     // Replace logic
-                    output.innerHTML = output.innerText
+                    output.innerHTML = AdamKit.esc(output.innerText)
                         .replace('{{REVENUE_DIRECTION}}', '<span class="text-emerald-400 font-bold">Robust</span>')
                         .replace('{{REVENUE_CURRENT}}', '<span class="text-white font-bold">$4.2B</span>')
                         .replace('{{REVENUE_YOY_VAR}}', '<span class="text-emerald-400 font-bold">+12%</span>')

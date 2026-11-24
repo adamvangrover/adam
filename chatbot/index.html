@@ -18,7 +18,7 @@ function sendMessage() {
     input.value = "";
 
     var chatHistory = document.getElementById("chat-history");
-    chatHistory.innerHTML += "<p><strong>You:</strong> " + message + "</p>";
+    chatHistory.innerHTML += "<p><strong>You:</strong> " + message.replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";") + "</p>";
 
     // Send message to the chatbot backend (to be implemented)
     // and display the response

@@ -4,6 +4,8 @@ Scans ``<root>/*.html`` and writes:
   - ``<root>/manifest.json``: machine-readable catalog (path, title, kind, family, edition date).
   - ``<root>/<hub>``: searchable hub with the catalog embedded, so it works over file://.
 
+``role`` is terminal (interactive), report (static edition/research) or duplicate (an exact copy, or a
+member of a ``<root>/canonical.json`` group; ``canonical`` names the page to use instead).
 ``kind`` is the page shape (dashboard, terminal, viewer, index); ``family`` is the template family
 (Market Mayhem, Daily Briefing, Market Pulse, House View, Adam OS, ...) so a page can be copied as a
 starting template for its family. Idempotent: rerun after adding, moving or renaming a page.
@@ -16,8 +18,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
+import importlib.util
 import json
+import os
 import re
 from pathlib import Path
 
@@ -49,6 +54,9 @@ _MONTHS = {m: i for i, m in enumerate(
 _YMD_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})(?!\d)")
 _MDY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})((?:19|20)\d{2})(?!\d)")
 _MON_Y_RE = re.compile(r"(?:^|_)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*_(?:(\d{1,2})_)?((?:19|20)\d{2})")
+# Kit markup written by scripts/apply_showcase_kit.py; stripped before hashing so it cannot mask duplicates.
+_KIT_RE = re.compile(r"<!-- adam-kit -->.*?<!-- /adam-kit -->\n?|\sdata-adam-(?:role|family|canonical)=\"[^\"]*\"", re.DOTALL)
+_REPORT_FAMILIES = {"market_mayhem", "daily_briefing", "market_pulse", "house_view", "newsletter", "research"}
 _HUB = "index.html"
 _TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "showcase_catalog.html.tmpl"
 
@@ -82,10 +90,44 @@ def edition_date(name: str) -> str | None:
     return None
 
 
+def role(fam: str, text: str) -> str:
+    return "report" if fam in _REPORT_FAMILIES or "<script" not in text.lower() else "terminal"
+
+
+def _canonical_map(root: Path) -> dict[str, str]:
+    """Member -> canonical, both relative to ``root``; ``canonical.json`` may sit in ``root`` or its parent."""
+    path = next((d / "canonical.json" for d in (root, root.parent) if (d / "canonical.json").exists()), None)
+    if path is None:
+        return {}
+    base, out = path.parent, {}
+    for key, group in json.loads(path.read_text(encoding="utf-8")).items():
+        if key.startswith("_"):
+            continue
+        target = Path(os.path.relpath(base / group["canonical"], root)).as_posix()
+        for member in group["members"]:
+            rel = Path(os.path.relpath(base / member, root)).as_posix()
+            if not rel.startswith("../"):
+                out[rel] = target
+    return out
+
+
+def _assign_roles(entries: list[dict], root: Path) -> None:
+    canonical, seen = _canonical_map(root), {}
+    for e in entries:
+        digest = e.pop("_sha")
+        target = canonical.get(e["path"]) or seen.get(digest)
+        if target:
+            e["role"], e["canonical"] = "duplicate", target
+        seen.setdefault(digest, e["path"])
+
+
 def _entry(page: Path, rel: str, section: str) -> dict:
-    match = _TITLE_RE.search(page.read_text(encoding="utf-8", errors="ignore"))
+    text = page.read_text(encoding="utf-8", errors="ignore")
+    match = _TITLE_RE.search(text)
     title = html.unescape(" ".join(match.group(1).split())) if match else page.stem
     entry = {"path": rel, "title": title, "kind": classify(page.stem), "family": family(page.stem), "section": section}
+    entry["role"] = role(entry["family"], text)
+    entry["_sha"] = hashlib.sha256(_KIT_RE.sub("", text).encode("utf-8")).hexdigest()
     date = edition_date(page.stem)
     if date:
         entry["date"] = date
@@ -97,6 +139,7 @@ def build_manifest(root: Path, hub: str = _HUB, include: tuple[str, ...] = ()) -
     entries = [_entry(p, p.name, "root") for p in sorted(root.glob("*.html")) if p.name != hub]
     for sub in include:
         entries += [_entry(p, f"{sub}/{p.name}", sub) for p in sorted((root / sub).glob("*.html"))]
+    _assign_roles(entries, root)
     return {"generator": "scripts/build_dashboard_manifest.py", "count": len(entries), "dashboards": entries}
 
 
@@ -105,6 +148,17 @@ def render_hub(manifest: dict, title: str, root: str = "showcase") -> str:
     embedded = json.dumps(manifest, separators=(",", ":")).replace("</", "<\\/")
     page = _TEMPLATE_PATH.read_text(encoding="utf-8").replace("__TITLE__", title).replace("__ROOT__", html.escape(root))
     return page.replace("__MANIFEST__", embedded)
+
+
+def apply_hub_kit(root: Path, hub: str) -> None:
+    """Give the hub the shared kit (operator JSON view); it is not in its own manifest, so the kit script skips it."""
+    spec = importlib.util.spec_from_file_location("apply_showcase_kit", Path(__file__).with_name("apply_showcase_kit.py"))
+    kit = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(kit)
+    canonical = _canonical_map(root).get(hub)
+    entry = {"role": "duplicate" if canonical else "terminal", "family": "hub", "canonical": canonical}
+    page = root / hub
+    page.write_text(kit.apply(page, entry, root), encoding="utf-8")
 
 
 def main() -> None:
@@ -118,6 +172,7 @@ def main() -> None:
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     title = "Dashboard Catalog" if root.name == "dashboards" else "Unified Showcase"
     (root / hub).write_text(render_hub(manifest, title, root.as_posix().rstrip("/")), encoding="utf-8")
+    apply_hub_kit(root, hub)
     print(f"Wrote {manifest['count']} pages to {root}/manifest.json and {root}/{hub}")
 
 

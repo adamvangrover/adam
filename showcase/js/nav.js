@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 /**
  * ADAM v23.5 APEX NAVIGATOR SYSTEM
  * -----------------------------------------------------------------------------
@@ -295,9 +297,9 @@ class AdamNavigator {
 
             html += `
                 <li>
-                    <a href="${linkUrl}" class="flex items-center gap-3 px-3 py-2 rounded text-sm font-medium transition group ${activeClass}">
+                    <a href="${_esc(linkUrl)}" class="flex items-center gap-3 px-3 py-2 rounded text-sm font-medium transition group ${activeClass}">
                         <i class="fas ${item.icon} w-5 text-center ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}" aria-hidden="true"></i>
-                        ${item.name}
+                        ${_esc(item.name)}
                     </a>
                 </li>
             `;

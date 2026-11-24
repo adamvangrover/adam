@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="agents">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,6 +80,10 @@
         .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
         .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen flex flex-col text-slate-200 overflow-hidden">
     <div class="scan-line"></div>
@@ -797,7 +801,7 @@
         function logToTerminal(container, text, colorClass = 'text-slate-300') {
             const div = document.createElement('div');
             const time = new Date().toLocaleTimeString('en-US', {hour12: false});
-            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${colorClass}">${text}</span>`;
+            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${colorClass}">${AdamKit.esc(text)}</span>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }

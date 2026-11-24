@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="other">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -351,6 +351,10 @@
             .editable-area { color: black; }
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
     <div class="crt-overlay"></div>
@@ -1221,7 +1225,7 @@ try {
 
                 <div style="margin-bottom: 15px;">
                     <div class="metric-label">EXECUTIVE SUMMARY</div>
-                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${data.executive_summary}</p>
+                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${AdamKit.esc(data.executive_summary)}</p>
                 </div>
 
                 <div class="metric-label">COVENANT ANALYSIS</div>
@@ -1231,8 +1235,8 @@ try {
             for (const [test, result] of Object.entries(data.covenant_analysis)) {
                 const color = result === "PASS" ? "text-green" : "text-red";
                 html += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333; padding-bottom: 2px;">
-                    <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
-                    <span class="${color} font-bold">${result}</span>
+                    <span style="color: #888;">${AdamKit.esc(test.replace('_', ' ').toUpperCase())}</span>
+                    <span class="${color} font-bold">${AdamKit.esc(result)}</span>
                 </li>`;
             }
             html += '</ul>';

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="agents">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,6 +51,10 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-200">
     <div class="scan-line"></div>
@@ -402,7 +406,7 @@
             if(type === 'system') color = "text-emerald-500 border-emerald-900";
 
             div.className = `${color} border-l-2 pl-2 leading-tight`;
-            div.innerHTML = `<span class="opacity-50 mr-2">[${time}]</span>${msg}`;
+            div.innerHTML = `<span class="opacity-50 mr-2">[${time}]</span>${AdamKit.esc(msg)}`;
             
             const container = document.getElementById('log-container');
             container.appendChild(div);

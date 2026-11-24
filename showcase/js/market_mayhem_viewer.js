@@ -1,3 +1,5 @@
+/* _esc: HTML-escape interpolations (uses AdamKit.esc when the showcase kit is loaded). */
+var _esc = (s) => (window.AdamKit ? window.AdamKit.esc(s) : String(s ?? '').replace(/[&<>"'`]/g, (c) => '&#' + c.charCodeAt(0) + ';'));
 // Market Mayhem Viewer - Integrated Runtime
 // Merged functionality: System 2 Audits + Main Interactive Features
 // Priority: Live Runtime > Client Fallback > Mock Simulation
@@ -204,7 +206,7 @@ function toggleSource() {
             const jsonObj = JSON.parse(rawText || "{}");
             content.innerHTML = '<pre style="white-space: pre-wrap;">' + syntaxHighlight(JSON.stringify(jsonObj, null, 2)) + '</pre>';
         } catch (e) {
-            content.innerHTML = '<pre>' + (rawText || "NO DATA") + '</pre>';
+            content.innerHTML = '<pre>' + _esc(rawText || "NO DATA") + '</pre>';
         }
         
         modal.style.display = 'flex'; // Use flex for centering if CSS supports it

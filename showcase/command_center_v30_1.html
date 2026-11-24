@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-adam-role="terminal" data-adam-family="operations">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -506,6 +506,10 @@
     .text-rose { color: #fb7185; }
     .text-cyan { color: #22d3ee; }
   </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
   <header class="topbar">
@@ -1058,7 +1062,7 @@
         line.className = "log-line";
         const ts = new Date().toISOString().split("T")[1].slice(0, 8);
         const cls = tone === "ok" ? "text-emerald" : tone === "warn" ? "text-amber" : tone === "err" ? "text-rose" : "text-cyan";
-        line.innerHTML = '<span class="log-time">[' + ts + ']</span><span class="' + cls + '">' + msg + "</span>";
+        line.innerHTML = '<span class="log-time">[' + ts + ']</span><span class="' + cls + '">' + AdamKit.esc(msg) + "</span>";
         log.prepend(line);
       }
 
