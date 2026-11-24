@@ -23,7 +23,7 @@
   }
 
   function hooks() {
-    return Array.from(document.querySelectorAll("[data-adam-hook]")).map((el) => ({
+    return Array.from(document.querySelectorAll("[data-adam-hook]:not(#adam-operator-view)")).map((el) => ({
       hook: el.dataset.adamHook,
       text: (el.textContent || "").trim().slice(0, 500),
       ...Object.fromEntries(Object.entries(el.dataset).filter(([k]) => k !== "adamHook")),
