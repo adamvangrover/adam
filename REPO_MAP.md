@@ -30,6 +30,7 @@ Companion docs: [README.md](README.md) (overview, diagrams, glossary) · [AGENTS
 | `scripts/` | CLI / maintenance / generators | tooling |
 | `docs/` | Long-form docs, ADRs | docs |
 | `docs/TEMPLATES.md` | Template library catalog: doc, brand/product, newsletter, terminal, prompt and code templates (starting points, not canonical) | docs |
+| `docs/CONTINUATION_PROMPTS.md` | Copy-paste prompts for the next agent sessions (quarantine, edition backfill, terminals, showcase, PR backlog) | docs |
 | `showcase/` | All static HTML (GitHub Pages root). `showcase/dashboards/` = former root-level dashboards; catalog `showcase/dashboards/index.html` + `manifest.json` (rebuild: `scripts/build_dashboard_manifest.py`) | presentation |
 | `data/` | Seed data, ledgers, telemetry | data |
 | `core/zero_trust/` | Zero-trust ingestion gateway, schema bounds, triangulated feed consensus | canonical |
