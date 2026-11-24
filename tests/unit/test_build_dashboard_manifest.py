@@ -132,3 +132,16 @@ def test_apply_kit_sub_root_uses_parent_kit(tmp_path):
     page.write_text('<html lang="en"><head><title>x</title></head><body></body></html>')
     out = kit.apply(page, {"path": "t.html", "role": "terminal", "family": "hub"}, sub)
     assert '<script src="../kit/adam-kit.js"></script>' in out
+
+
+def test_hub_gets_kit_after_render(tmp_path):
+    (tmp_path / "kit").mkdir()
+    (tmp_path / "kit" / "adam-kit.js").write_text("")
+    sub = tmp_path / "dashboards"
+    sub.mkdir()
+    (sub / "index.html").write_text(bdm.render_hub(bdm.build_manifest(sub), "Dashboard Catalog"))
+    (tmp_path / "canonical.json").write_text(json.dumps({"hub": {"canonical": "catalog.html", "members": ["dashboards/index.html"]}}))
+    bdm.apply_hub_kit(sub, "index.html")
+    out = (sub / "index.html").read_text()
+    assert '<script src="../kit/adam-kit.js"></script>' in out
+    assert 'data-adam-role="duplicate" data-adam-family="hub" data-adam-canonical="../catalog.html"' in out

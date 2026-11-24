@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import html
+import importlib.util
 import json
 import os
 import re
@@ -149,6 +150,17 @@ def render_hub(manifest: dict, title: str, root: str = "showcase") -> str:
     return page.replace("__MANIFEST__", embedded)
 
 
+def apply_hub_kit(root: Path, hub: str) -> None:
+    """Give the hub the shared kit (operator JSON view); it is not in its own manifest, so the kit script skips it."""
+    spec = importlib.util.spec_from_file_location("apply_showcase_kit", Path(__file__).with_name("apply_showcase_kit.py"))
+    kit = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(kit)
+    canonical = _canonical_map(root).get(hub)
+    entry = {"role": "duplicate" if canonical else "terminal", "family": "hub", "canonical": canonical}
+    page = root / hub
+    page.write_text(kit.apply(page, entry, root), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default="showcase/dashboards", type=Path)
@@ -160,6 +172,7 @@ def main() -> None:
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     title = "Dashboard Catalog" if root.name == "dashboards" else "Unified Showcase"
     (root / hub).write_text(render_hub(manifest, title, root.as_posix().rstrip("/")), encoding="utf-8")
+    apply_hub_kit(root, hub)
     print(f"Wrote {manifest['count']} pages to {root}/manifest.json and {root}/{hub}")
 
 
