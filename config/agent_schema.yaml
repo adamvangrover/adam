@@ -37,3 +37,28 @@ roles:
     allowed_tools:
       - "divergence_validator"
       - "audit_logger"
+
+# Lifecycle hooks in core/engine/harness/ (h_ctx, h_ctrl, h_act, h_ver) read these values; none are
+# hardcoded in Python. Budget and recursion limits follow CONSTITUTION.md §6.
+harness:
+  context:            # h_ctx — pre-turn
+    observations_key: "observations"
+    keep_last_observations: 3
+    masked_placeholder: "[masked: stale observation]"
+    max_context_tokens: 150000
+    chars_per_token: 4
+  control:            # h_ctrl — pre-turn
+    max_turns: 8
+    max_duplicate_tool_calls: 2
+  action:             # h_act — post-tool
+    max_stdout_chars: 4000
+    truncation_marker: "\n...[truncated {omitted} chars]"
+  verification:       # h_ver — pre-stop
+    abort_confidence: 0.0
+    hitl_impact_levels: ["high", "critical"]
+    high_impact_actions:
+      - "commit_capital"
+      - "sign_advisory_notice"
+      - "modify_ledger_balance"
+      - "submit_regulatory_report"
+      - "execute_trade"
