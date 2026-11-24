@@ -12,7 +12,6 @@ from core.agents.templates.v30_template_agent import TemplateAgentV30
 from core.engine import harness, meta_orchestrator as mo
 from core.engine.harness import HarnessHalt, h_act, h_ctrl, h_ctx, h_ver, load_harness_policy
 from core.engine.harness.policy import POLICY_PATH
-from core.engine.meta_orchestrator import MetaOrchestrator, Route
 from core.schemas.agent_schema import AgentInput, AgentOutput
 from src.pdil.models import ProvenanceHeader, build_provenance_header
 
@@ -46,7 +45,7 @@ def _run(agent, query="q"):
 @pytest.fixture
 def orchestrator():
     with patch.object(mo, "LLMPlugin"):
-        orch = MetaOrchestrator(legacy_orchestrator=MagicMock())
+        orch = mo.MetaOrchestrator(legacy_orchestrator=MagicMock())
     orch.swarm_logger, orch.pot_logger = MagicMock(), MagicMock()
     orch._enrich_context = AsyncMock(side_effect=lambda q, c: dict(c or {}))
     orch.config.reflect_on = ()
@@ -103,9 +102,9 @@ def test_grounded_output_passes_verification():
 
 def test_next_step_handoff_is_dispatched_by_orchestrator(orchestrator):
     surveillance = AsyncMock(return_value=_output(metadata={"source": "surveillance"}))
-    orchestrator._route_registry[Route.ESG] = AsyncMock(
+    orchestrator._route_registry[mo.Route.ESG] = AsyncMock(
         return_value=_output(metadata={"next_step": "invoke_surveillance", "query": "watch ACME"}))
-    orchestrator._route_registry[Route.SURVEILLANCE] = surveillance
+    orchestrator._route_registry[mo.Route.SURVEILLANCE] = surveillance
 
     result = asyncio.run(orchestrator.route_request("esg review", {"force_route": "esg"}))
 
@@ -116,16 +115,16 @@ def test_next_step_handoff_is_dispatched_by_orchestrator(orchestrator):
 
 
 def test_unroutable_next_step_is_left_for_the_caller(orchestrator):
-    orchestrator._route_registry[Route.ESG] = AsyncMock(return_value=_output(metadata={"next_step": "update_hdkg"}))
+    orchestrator._route_registry[mo.Route.ESG] = AsyncMock(return_value=_output(metadata={"next_step": "update_hdkg"}))
     result = asyncio.run(orchestrator.route_request("esg review", {"force_route": "esg"}))
     assert result.metadata["next_step"] == "update_hdkg"
 
 
 def test_hitl_output_is_not_auto_handed_off(orchestrator):
     surveillance = AsyncMock()
-    orchestrator._route_registry[Route.ESG] = AsyncMock(return_value=_output(
+    orchestrator._route_registry[mo.Route.ESG] = AsyncMock(return_value=_output(
         confidence=0.6, metadata={"next_step": "invoke_surveillance"}))
-    orchestrator._route_registry[Route.SURVEILLANCE] = surveillance
+    orchestrator._route_registry[mo.Route.SURVEILLANCE] = surveillance
     result = asyncio.run(orchestrator.route_request("esg review", {"force_route": "esg"}))
     assert result.metadata["hitl_required"] is True
     surveillance.assert_not_awaited()
@@ -197,7 +196,7 @@ def test_orchestrator_terminates_self_handoff_loop(orchestrator):
         calls["n"] += 1
         return _output(metadata={"next_step": "invoke_esg", "query": f"again {calls['n']}"})
 
-    orchestrator._route_registry[Route.ESG] = runaway
+    orchestrator._route_registry[mo.Route.ESG] = runaway
     result = asyncio.run(orchestrator.route_request("esg review", {"force_route": "esg"}))
     assert result["status"] == "harness_halt"
     assert result["reason"] == "turn_cap_exceeded"
