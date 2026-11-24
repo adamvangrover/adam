@@ -71,7 +71,7 @@ class Call(_Estimable):
     rationale: str = ""
 
 
-class Risk(_Model):
+class Risk(_Estimable):
     name: str
     probability: float = Field(..., ge=0.0, le=1.0)
     impact: Literal["low", "medium", "high", "severe"]
@@ -131,7 +131,7 @@ class Edition(_Model):
 
     @model_validator(mode="after")
     def _propagate_estimated(self) -> "Edition":
-        parts = [*self.market_snapshot, *self.calls, *self.price_targets, *self.scenarios]
+        parts = [*self.market_snapshot, *self.calls, *self.price_targets, *self.risks, *self.scenarios]
         if any(p.estimated for p in parts):
             self.estimated = True
         hooks = [s.hook for s in self.sections]

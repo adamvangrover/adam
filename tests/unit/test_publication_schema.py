@@ -80,15 +80,36 @@ def test_markdown_template_renders_fixture(record, family):
     md = render_markdown(_edition(record, family))
     assert md.startswith("# ") and ESTIMATED_LABEL in md
     assert "| MSFT" in md and "## Outlook" in md
+    assert "| 12m |" in md and "spx 7,600.00" in md
+
+
+def test_markdown_list_items_stay_on_separate_lines(record):
+    record["sources"].append({"label": "Second", "ref": "docs/PROVENANCE.md", "as_of": "2026-11-12"})
+    record["risks"].append({"name": "Second risk", "probability": 0.1, "impact": "low", "description": "x"})
+    md = render_markdown(Edition.model_validate(record))
+    lines = md.splitlines()
+    assert "- **Second risk** — p=10%, impact low: x" in lines
+    assert "- Second — `docs/PROVENANCE.md` (as of 2026-11-12)" in lines
+    assert any(line.startswith("- generator `tests/fixtures`") for line in lines)
+
+
+def test_estimated_risk_flags_edition(record):
+    for part in ("market_snapshot", "calls", "price_targets", "scenarios"):
+        for item in record[part]:
+            item["_estimated"] = False
+    record["_estimated"] = False
+    record["risks"][0]["_estimated"] = True
+    edition = Edition.model_validate(record)
+    assert edition.estimated and "Term-premium shock</strong>*" in render_html(edition)
 
 
 @pytest.mark.parametrize("family", FAMILIES)
 def test_rendered_output_escapes_injected_script(record, family):
     edition = _edition(record, family)
     html = render_html(edition)
-    scripts = re.findall(r"<script\b[^>]*>", html)
+    scripts = re.findall(r"<script\b[^>]*>", html, re.IGNORECASE)
     assert all('src="kit/adam-kit.js"' in s or 'id="adam-operator-data"' in s for s in scripts)
-    assert "<script>alert" not in html and "<img src=x" not in html
+    assert "<script>alert" not in html.lower() and "<img src=x" not in html.lower()
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert "<script>" not in render_markdown(edition)
 

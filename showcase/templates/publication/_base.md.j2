@@ -49,10 +49,10 @@
 
 ## Price targets
 
-| Ticker | Method | Bear | Base | Bull | Weighted | Inputs |
-|---|---|---|---|---|---|---|
+| Ticker | Method | Horizon | Bear | Base | Bull | Weighted | Inputs |
+|---|---|---|---|---|---|---|---|
 {% for t in e.price_targets %}
-| {{ t.ticker }}{% if t.estimated %}\*{% endif %} | {{ t.method }} | {{ t.bear|num }} | {{ t.base|num }} | {{ t.bull|num }} | {{ t.weighted|num }} | `{{ t.inputs_ref }}` |
+| {{ t.ticker }}{% if t.estimated %}\*{% endif %} | {{ t.method }} | {{ t.horizon_months }}m | {{ t.bear|num }} | {{ t.base|num }} | {{ t.bull|num }} | {{ t.weighted|num }} | `{{ t.inputs_ref }}` |
 {% endfor %}
 {% endif %}
 {% if e.scenarios %}
@@ -60,7 +60,7 @@
 ## Scenarios
 
 {% for sc in e.scenarios %}
-- **{{ sc.name|title }} ({{ "%.0f"|format(sc.probability * 100) }}%){% if sc.estimated %}\*{% endif %}:** {{ sc.narrative|md }}
+- **{{ sc.name|title }} ({{ "%.0f"|format(sc.probability * 100) }}%){% if sc.estimated %}\*{% endif %}:** {{ sc.narrative|md }}{% if sc.targets %} Targets: {% for k, v in sc.targets.items() %}{{ k|md }} {{ v|num }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif +%}
 {% endfor %}
 {% endif %}
 {% if e.risks %}
@@ -68,15 +68,15 @@
 ## Risk register
 
 {% for r in e.risks %}
-- **{{ r.name|md }}** — p={{ "%.0f"|format(r.probability * 100) }}%, impact {{ r.impact }}{% if r.description %}: {{ r.description|md }}{% endif %}
+- **{{ r.name|md }}**{% if r.estimated %}\*{% endif %} — p={{ "%.0f"|format(r.probability * 100) }}%, impact {{ r.impact }}{% if r.description %}: {{ r.description|md }}{% endif +%}
 {% endfor %}
 {% endif %}
 
 ## Sources & provenance
 
 {% for s in e.sources %}
-- {{ s.label|md }} — `{{ s.ref }}`{% if s.as_of %} (as of {{ s.as_of }}){% endif %}
+- {{ s.label|md }} — `{{ s.ref }}`{% if s.as_of %} (as of {{ s.as_of }}){% endif +%}
 {% endfor %}
 {% for p in e.provenance_trace %}
-- generator `{{ p.generator }}` v{{ p.version }} · {{ p.timestamp }}{% if p.inputs %} · inputs: {{ p.inputs|join(", ") }}{% endif %}
+- generator `{{ p.generator }}` v{{ p.version }} · {{ p.timestamp }}{% if p.inputs %} · inputs: {{ p.inputs|join(", ") }}{% endif +%}
 {% endfor %}
