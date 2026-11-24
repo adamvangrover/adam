@@ -1028,7 +1028,7 @@ The passage of the "One Big Beautiful Bill Act" (OBBBA) mandates the largest str
         // --- App: Briefing ---
         function initBriefingApp() {
             const mdContent = document.getElementById('market-mayhem-md').innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(AdamKit.esc(mdContent));
+            document.getElementById('briefing-content').innerHTML = AdamKit.markdown(mdContent);
         }
 
         // --- App: Macro & Dark Pool ---
@@ -1513,7 +1513,7 @@ The passage of the "One Big Beautiful Bill Act" (OBBBA) mandates the largest str
                                 <span class="text-[10px] font-display font-bold text-theme">A</span>
                             </div>
                             <div class="glass-panel p-4 border-theme text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none">
-                                ${marked.parse(AdamKit.esc(responseHtml))}
+                                ${AdamKit.markdown(responseHtml)}
                             </div>
                         </div>
                     `);

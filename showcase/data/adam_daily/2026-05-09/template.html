@@ -1797,7 +1797,7 @@ root@adam-node:~# _</div>
                 btn.className = "text-left px-3 py-2 rounded text-xs font-mono font-bold transition-colors bg-theme-glow border border-theme text-theme shadow-sm";
             }
             const mdContent = document.getElementById(templateId).innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(AdamKit.esc(mdContent));
+            document.getElementById('briefing-content').innerHTML = AdamKit.markdown(mdContent);
         }
 
         function initBriefingApp() {
@@ -2966,7 +2966,7 @@ root@adam-node:~# _</div>
                                 <span class="text-[10px] font-display font-bold text-theme transition-colors" style="filter: invert(var(--os-invert))">A</span>
                             </div>
                             <div class="glass-panel bg-os-panel p-4 border border-theme text-os-text max-w-[85%] text-xs prose prose-invert rounded-lg rounded-tl-none shadow-lg transition-colors">
-                                ${marked.parse(AdamKit.esc(responseHtml))}
+                                ${AdamKit.markdown(responseHtml)}
                             </div>
                         </div>
                     `);
@@ -3023,7 +3023,7 @@ root@adam-node:~# _</div>
             document.getElementById('artifact-type').innerText = artifact.type;
             document.getElementById('artifact-sector').innerText = artifact.sector;
             document.getElementById('artifact-id').innerText = `IDX: ${index}`;
-            document.getElementById('artifact-content').innerHTML = marked.parse(AdamKit.esc(artifact.content));
+            document.getElementById('artifact-content').innerHTML = AdamKit.markdown(artifact.content);
             
             const addBtn = document.getElementById('artifact-add-btn');
             addBtn.classList.remove('hidden');
@@ -3089,7 +3089,7 @@ root@adam-node:~# _</div>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.sector}</span>
                         </div>
                         <div class="prose prose-sm max-w-none text-gray-800 ai-markdown">
-                            ${marked.parse(AdamKit.esc(item.content))}
+                            ${AdamKit.markdown(item.content)}
                         </div>
                     </div>
                 `;

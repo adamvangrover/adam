@@ -525,7 +525,7 @@
             container.innerHTML = `
                 <div class="flex flex-col h-full">
                     <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-white/10 shrink-0">
-                        ${AdamKit.esc(tickerButtons)}
+                        ${tickerButtons}
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
@@ -793,7 +793,7 @@
                     document.getElementById(typingId).remove();
                     
                     if (success) {
-                        responseHtmlStr = marked.parse(AdamKit.esc(resultText));
+                        responseHtmlStr = AdamKit.markdown(resultText);
                         appendAIResponse(responseHtmlStr);
                     } else {
                          throw lastError || new Error("Failed to connect after multiple retries.");

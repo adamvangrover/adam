@@ -603,7 +603,7 @@
                 `;
             }
 
-            document.getElementById('workbenchOutput').innerHTML = marked.parse(AdamKit.esc(content));
+            document.getElementById('workbenchOutput').innerHTML = AdamKit.markdown(content);
         }
 
         function generateCustomWorkbenchReport() {
@@ -888,7 +888,7 @@
                     chatLog.innerHTML += `
                         <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-neon text-slate-200 shadow-md mr-6 markdown-body !text-xs !bg-transparent !border-none">
                             <div class="text-[9px] text-term-neon font-bold mb-2 flex items-center gap-1.5 uppercase tracking-wider"><i class="fa-solid fa-microchip"></i> QUANT VERDICT</div>
-                            <div class="font-sans text-xs space-y-2 text-slate-300">${marked.parse(AdamKit.esc(reply))}</div>
+                            <div class="font-sans text-xs space-y-2 text-slate-300">${AdamKit.markdown(reply)}</div>
                         </div>
                     `;
                 } else {

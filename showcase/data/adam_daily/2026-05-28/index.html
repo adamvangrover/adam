@@ -1133,7 +1133,7 @@
             // Execute Immediately
             try {
                 const response = await callGeminiAPI(query, "", "chat");
-                updateChatMessage(loadingId, marked.parse(AdamKit.esc(response)));
+                updateChatMessage(loadingId, AdamKit.markdown(response));
             } catch (e) {
                 updateChatMessage(loadingId, '<span class="text-term-red font-bold">⚠️ SYSTEM ERROR.</span>');
             }
@@ -1190,7 +1190,7 @@
                 const outputDiv = document.createElement('div');
                 outputDiv.className = 'mt-4 p-4 bg-term-bg/80 border border-term-cyan/30 rounded text-xs text-term-cyan font-mono relative shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]';
                 outputDiv.innerHTML = `<div class="absolute -top-2 left-3 bg-term-bg px-2 text-[9px] font-bold text-term-cyan tracking-widest border border-term-cyan/30 rounded">ADAM DEEP SCAN</div>` + 
-                                      `<div class="markdown-output leading-relaxed">${marked.parse(AdamKit.esc(result))}</div>`;
+                                      `<div class="markdown-output leading-relaxed">${AdamKit.markdown(result)}</div>`;
                 
                 btn.parentNode.parentNode.appendChild(outputDiv);
                 btn.innerHTML = `✨ SCAN COMPLETE`;
@@ -1217,7 +1217,7 @@
                 const outputDiv = document.createElement('div');
                 outputDiv.className = 'mt-6 p-5 bg-black border-l-4 border-term-red rounded text-xs text-slate-300 font-mono relative overflow-hidden';
                 outputDiv.innerHTML = `<div class="absolute top-0 right-0 p-2 text-[10px] text-term-red opacity-50 animate-pulse">● LIVE SIMULATION</div>` + 
-                                      `<div class="markdown-output">${marked.parse(AdamKit.esc(result))}</div>`;
+                                      `<div class="markdown-output">${AdamKit.markdown(result)}</div>`;
                 
                 btn.parentNode.parentNode.appendChild(outputDiv);
                 btn.style.display = 'none'; 

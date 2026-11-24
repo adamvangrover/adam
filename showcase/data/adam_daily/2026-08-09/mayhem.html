@@ -1030,7 +1030,7 @@ The credit exhibits metrics requiring secondary committee review. Assigned regul
                  content = `### Summary\nGenerated regulatory report for **${borrower}** with facility size $${facility}M. Assigned rating: **<span class="${ratingColor}">${rating}</span>**.\n\n*   **Leverage:** ${leverage}x\n*   **ICR:** ${icr}x\n\nDetailed supervisory review and examiner workpapers compiled automatically by ADAM v30.4.`;
             }
 
-            document.getElementById('workbenchOutput').innerHTML = marked.parse(AdamKit.esc(`# ${title}\n\n${content}`));
+            document.getElementById('workbenchOutput').innerHTML = AdamKit.markdown(`# ${title}\n\n${content}`);
         }
 
         function copyWorkbenchReport() {
@@ -1378,7 +1378,7 @@ The credit exhibits metrics requiring secondary committee review. Assigned regul
                         <div class="text-[9px] text-term-cyan font-bold mb-2 uppercase tracking-widest flex items-center gap-1.5">
                             <i class="fa-solid fa-microchip"></i> ADAM v30.4 SYNTHESIS
                         </div>
-                        <div class="font-sans leading-relaxed text-sm ai-rendered-content">${marked.parse(AdamKit.esc(mockResponse))}</div>
+                        <div class="font-sans leading-relaxed text-sm ai-rendered-content">${AdamKit.markdown(mockResponse)}</div>
                     </div>
                 `;
                 log.insertAdjacentHTML('beforeend', aiMsgHtml);

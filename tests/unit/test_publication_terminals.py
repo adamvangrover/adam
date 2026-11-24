@@ -52,7 +52,9 @@ def test_adam_daily_pages_are_hardened():
     for page in mod.pages():
         text = page.read_text(encoding="utf-8")
         assert mod.unescaped_interpolations(text) == [], page
-        assert not re.search(r"marked\.parse\((?!AdamKit\.esc\()", text), page
+        assert "marked.parse(" not in text, page
+        for name in mod._markup_vars(text):
+            assert "${AdamKit.esc(" + name + ")}" not in text, (page, name)
         assert not re.search(r"\.innerHTML\s*=\s*response\s*;", text), page
         if "</head>" in text:
             assert "<!-- adam-kit -->" in text, page
@@ -67,3 +69,19 @@ def test_harden_escapes_user_input():
     src = "<head></head><script>out.innerHTML += `bash: ${cmd} ${rowsHtml} ${items.map(i => `<b>${i}</b>`).join('')}`;</script>"
     out = mod.harden(src, "../kit")
     assert "${AdamKit.esc(cmd)}" in out and "${rowsHtml}" in out and mod.harden(out, "../kit") == out
+
+
+def test_harden_keeps_markup_variables_and_markdown_fences():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("harden", ROOT / "scripts" / "harden_adam_daily.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    src = ("<head></head><script>let btns = ''; btns += `<button>${t}</button>`;"
+           "const dot = on ? `<i></i>` : '';"
+           "c.innerHTML = `${btns}${dot}${AdamKit.esc(btns)}${name}`; d.innerHTML = marked.parse(AdamKit.esc(md));"
+           "e.innerHTML = marked.parse(raw);</script>")
+    out = mod.harden(src, "../kit")
+    assert "${btns}${dot}${btns}${AdamKit.esc(name)}" in out
+    assert "AdamKit.markdown(md)" in out and "AdamKit.markdown(raw)" in out and "marked.parse" not in out
+    assert mod.harden(out, "../kit") == out
