@@ -4,7 +4,7 @@
   const K = window.AdamKit;
   const $ = (id) => document.getElementById(id);
   const state = { data: null, published: null };
-  const round2 = (v) => Math.round(v * 100) / 100;
+  const round2 = (v) => Number(Math.round(Number(v.toFixed(10) + "e2")) + "e-2"); // half-up, matches PriceTarget.weighted
 
   function weights() {
     const bull = Number($("w-bull").value), bear = Number($("w-bear").value);

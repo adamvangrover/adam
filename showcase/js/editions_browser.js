@@ -56,7 +56,7 @@
     if (state.pick.filter(Boolean).length < 2) { box.hidden = true; K.publish("compare", null); return; }
     const [ea, eb] = state.pick.map((id) => state.editions.find((e) => e.id === id));
     const [a, b] = await Promise.all([loadJson(rel(ea.json)), loadJson(rel(eb.json))]);
-    const pts = (e) => (e.price_targets || []).map((t) => Object.assign({}, t, { weighted: Math.round((t.base * t.weights.base + t.bull * t.weights.bull + t.bear * t.weights.bear) * 100) / 100 }));
+    const pts = (e) => (e.price_targets || []).map((t) => Object.assign({}, t, { weighted: Number(Math.round(Number((t.base * t.weights.base + t.bull * t.weights.bull + t.bear * t.weights.bear).toFixed(10) + "e2")) + "e-2") }));
     const diff = {
       a: ea.id, b: eb.id,
       calls: diffRows(a.calls, b.calls, "subject", ["stance", "conviction"]),
