@@ -121,3 +121,14 @@ def test_duplicates_survive_kit_and_parent_canonical(tmp_path):
             (sub / e["path"]).write_text(kit.apply(sub / e["path"], e, sub))
     assert entries["b_terminal.html"]["canonical"] == "a_terminal.html"
     assert entries["old_os.html"]["canonical"] == "a_terminal.html"
+
+
+def test_apply_kit_sub_root_uses_parent_kit(tmp_path):
+    (tmp_path / "kit").mkdir()
+    (tmp_path / "kit" / "adam-kit.js").write_text("")
+    sub = tmp_path / "dashboards"
+    sub.mkdir()
+    page = sub / "t.html"
+    page.write_text('<html lang="en"><head><title>x</title></head><body></body></html>')
+    out = kit.apply(page, {"path": "t.html", "role": "terminal", "family": "hub"}, sub)
+    assert '<script src="../kit/adam-kit.js"></script>' in out

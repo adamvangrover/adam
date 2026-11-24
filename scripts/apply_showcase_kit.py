@@ -24,8 +24,13 @@ _DATA_ATTR_RE = re.compile(r'\sdata-adam-(?:role|family|canonical)="[^"]*"')
 _ROLES = {"terminal", "duplicate"}
 
 
+def _kit_dir(root: Path) -> Path:
+    """``kit/`` sits in ``showcase/``; a sub-catalog root (e.g. ``showcase/dashboards``) uses its parent's."""
+    return next((d / "kit" for d in (root, *root.parents) if (d / "kit" / "adam-kit.js").exists()), root / "kit")
+
+
 def _kit_block(page: Path, root: Path) -> str:
-    rel = Path(os.path.relpath(root / "kit", page.parent)).as_posix()
+    rel = Path(os.path.relpath(_kit_dir(root), page.parent)).as_posix()
     return (f'<!-- adam-kit -->\n<link rel="stylesheet" href="{rel}/adam-kit.css">\n'
             f'<script src="{rel}/adam-kit.js"></script>\n<!-- /adam-kit -->')
 
