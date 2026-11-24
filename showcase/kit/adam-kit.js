@@ -14,6 +14,8 @@
   const html = (strings, ...values) => strings.reduce((out, s, i) => out + s + (i < values.length ? esc(values[i]) : ""), "");
   const safeUrl = (u) => (/^\s*(javascript|data|vbscript):/i.test(String(u)) ? "#" : String(u));
   const published = {};
+  // Read before inline scripts run: pages like the catalog rewrite the URL with history.replaceState.
+  const wantJson = new URLSearchParams(location.search).get("view") === "json";
 
   function publish(key, data) {
     published[key] = data;
@@ -84,7 +86,7 @@
     btn.addEventListener("click", showJson);
     document.body.appendChild(btn);
     document.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "j" || e.key === "J")) showJson(); });
-    if (new URLSearchParams(location.search).get("view") === "json") showJson();
+    if (wantJson) showJson();
   }
 
   window.AdamKit = { esc, html, safeUrl, publish, snapshot, showJson };
