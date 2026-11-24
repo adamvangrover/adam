@@ -1,0 +1,82 @@
+# {% block kicker %}{{ family_label }}{% endblock %}: {{ e.title|md }}
+
+*{{ e.date.isoformat() }} · edition `{{ e.edition_id }}`*
+{% if e.estimated %}
+
+> **{{ estimated_label }}.** Figures marked \* are synthetic (`_estimated: true`) per docs/PROVENANCE.md.
+{% endif %}
+{% if e.summary %}
+
+{{ e.summary|md }}
+{% endif %}
+{% block before_sections %}{% endblock %}
+{% if e.market_snapshot %}
+
+## Market snapshot
+
+| Instrument | Level | Change |
+|---|---|---|
+{% for s in e.market_snapshot %}
+| {{ s.name|md }}{% if s.estimated %}\*{% endif %} | {{ s.value|num }} {{ s.unit|md }} | {% if s.change is not none %}{{ "%+.2f"|format(s.change) }} {{ s.change_unit|md }}{% else %}—{% endif %} |
+{% endfor %}
+{% endif %}
+{% for s in e.sections %}
+
+## {{ s.title|md }}
+{% if s.body %}
+
+{{ s.body|md }}
+{% endif %}
+{% if s.bullets %}
+
+{% for b in s.bullets %}
+- {{ b|md }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% block after_sections %}{% endblock %}
+{% if e.calls %}
+
+## Calls
+
+| Subject | Stance | Conviction | Rationale |
+|---|---|---|---|
+{% for c in e.calls %}
+| {{ c.subject|md }}{% if c.estimated %}\*{% endif %} | {{ c.stance }} | {{ "%.0f"|format(c.conviction * 100) }}% | {{ c.rationale|md }} |
+{% endfor %}
+{% endif %}
+{% if e.price_targets %}
+
+## Price targets
+
+| Ticker | Method | Bear | Base | Bull | Weighted | Inputs |
+|---|---|---|---|---|---|---|
+{% for t in e.price_targets %}
+| {{ t.ticker }}{% if t.estimated %}\*{% endif %} | {{ t.method }} | {{ t.bear|num }} | {{ t.base|num }} | {{ t.bull|num }} | {{ t.weighted|num }} | `{{ t.inputs_ref }}` |
+{% endfor %}
+{% endif %}
+{% if e.scenarios %}
+
+## Scenarios
+
+{% for sc in e.scenarios %}
+- **{{ sc.name|title }} ({{ "%.0f"|format(sc.probability * 100) }}%){% if sc.estimated %}\*{% endif %}:** {{ sc.narrative|md }}
+{% endfor %}
+{% endif %}
+{% if e.risks %}
+
+## Risk register
+
+{% for r in e.risks %}
+- **{{ r.name|md }}** — p={{ "%.0f"|format(r.probability * 100) }}%, impact {{ r.impact }}{% if r.description %}: {{ r.description|md }}{% endif %}
+{% endfor %}
+{% endif %}
+
+## Sources & provenance
+
+{% for s in e.sources %}
+- {{ s.label|md }} — `{{ s.ref }}`{% if s.as_of %} (as of {{ s.as_of }}){% endif %}
+{% endfor %}
+{% for p in e.provenance_trace %}
+- generator `{{ p.generator }}` v{{ p.version }} · {{ p.timestamp }}{% if p.inputs %} · inputs: {{ p.inputs|join(", ") }}{% endif %}
+{% endfor %}

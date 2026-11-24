@@ -1,0 +1,31 @@
+{
+  "family": "market_mayhem",
+  "date": "2026-11-13",
+  "title": "Fixture edition <script>alert('title')</script>",
+  "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+  "sections": [
+    {"hook": "lead", "title": "Lead", "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>", "bullets": ["10Y moved", "<img src=x onerror=alert(2)>"]},
+    {"hook": "outlook", "title": "Outlook", "body": "Watch the long end."}
+  ],
+  "market_snapshot": [
+    {"name": "S&P 500", "value": 7592.4, "unit": "pts", "change": -0.4, "change_unit": "%", "_estimated": true},
+    {"name": "UST 10Y", "value": 5.10, "unit": "%", "change": 4.0, "change_unit": "bp", "_estimated": true}
+  ],
+  "calls": [{"subject": "Duration", "stance": "underweight", "conviction": 0.6, "rationale": "Term premium rising.", "_estimated": true}],
+  "price_targets": [
+    {"ticker": "MSFT", "method": "scenario_weighted", "base": 450.0, "bull": 520.0, "bear": 360.0,
+     "weights": {"base": 0.5, "bull": 0.25, "bear": 0.25}, "horizon_months": 12,
+     "inputs_ref": "tests/fixtures/publication_edition.json", "_estimated": true}
+  ],
+  "risks": [{"name": "Term-premium shock", "probability": 0.3, "impact": "high", "description": "Long-end auction tails."}],
+  "scenarios": [
+    {"name": "base", "probability": 0.5, "narrative": "Range-bound.", "targets": {"spx": 7600}, "_estimated": true},
+    {"name": "bull", "probability": 0.25, "narrative": "Disinflation resumes.", "_estimated": true},
+    {"name": "bear", "probability": 0.25, "narrative": "Credit spreads gap wider.", "_estimated": true}
+  ],
+  "sources": [{"label": "Fixture", "ref": "tests/fixtures/publication_edition.json"}],
+  "provenance_trace": [{"generator": "tests/fixtures", "inputs": ["tests/fixtures/publication_edition.json"], "timestamp": "2026-11-13T00:00:00Z", "version": "1.0.0"}],
+  "review": {},
+  "_estimated": true,
+  "schema_version": "1.0.0"
+}

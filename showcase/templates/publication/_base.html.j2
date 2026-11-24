@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-adam-role="report" data-adam-family="{{ e.family }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ family_label }} — {{ e.title }} ({{ e.date.isoformat() }})</title>
+<meta name="adam-edition" content="{{ e.edition_id }}">
+<link rel="stylesheet" href="{{ kit_href }}/adam-publication.css">
+<!-- adam-kit -->
+<link rel="stylesheet" href="{{ kit_href }}/adam-kit.css">
+<script src="{{ kit_href }}/adam-kit.js"></script>
+<!-- /adam-kit -->
+</head>
+<body class="adam-pub adam-pub--{{ e.family }}">
+<main class="adam-pub__page">
+{% if e.estimated %}
+<p class="adam-pub__label" role="note" data-adam-hook="estimated-label">{{ estimated_label }}. Figures marked * are synthetic (<code>_estimated: true</code>) per docs/PROVENANCE.md.</p>
+{% endif %}
+<header class="adam-pub__masthead" data-adam-hook="masthead">
+  <p class="adam-pub__kicker">{% block kicker %}{{ family_label }}{% endblock %} · {{ e.date.isoformat() }}</p>
+  <h1>{{ e.title }}</h1>
+  {% if e.summary %}<p class="adam-pub__summary">{{ e.summary }}</p>{% endif %}
+</header>
+{% block before_sections %}{% endblock %}
+{% if e.market_snapshot %}
+<section class="adam-pub__panel" data-adam-hook="market-snapshot">
+  <h2>{% block snapshot_title %}Market snapshot{% endblock %}</h2>
+  <table class="adam-pub__table"><thead><tr><th>Instrument</th><th>Level</th><th>Change</th></tr></thead><tbody>
+  {% for s in e.market_snapshot %}
+    <tr><td>{{ s.name }}{% if s.estimated %}*{% endif %}</td><td>{{ s.value|num }} {{ s.unit }}</td><td>{% if s.change is not none %}{{ "%+.2f"|format(s.change) }} {{ s.change_unit }}{% else %}—{% endif %}</td></tr>
+  {% endfor %}
+  </tbody></table>
+</section>
+{% endif %}
+{% for s in e.sections %}
+<section class="adam-pub__section" data-adam-hook="{{ s.hook }}">
+  <h2>{{ s.title }}</h2>
+  {% for para in s.body.split("\n\n") if para %}<p>{{ para }}</p>{% endfor %}
+  {% if s.bullets %}<ul>{% for b in s.bullets %}<li>{{ b }}</li>{% endfor %}</ul>{% endif %}
+</section>
+{% endfor %}
+{% block after_sections %}{% endblock %}
+{% if e.calls %}
+<section class="adam-pub__panel" data-adam-hook="calls">
+  <h2>{% block calls_title %}Calls{% endblock %}</h2>
+  <table class="adam-pub__table"><thead><tr><th>Subject</th><th>Stance</th><th>Conviction</th><th>Rationale</th></tr></thead><tbody>
+  {% for c in e.calls %}<tr><td>{{ c.subject }}{% if c.estimated %}*{% endif %}</td><td class="adam-pub__stance adam-pub__stance--{{ c.stance }}">{{ c.stance }}</td><td>{{ "%.0f"|format(c.conviction * 100) }}%</td><td>{{ c.rationale }}</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+{% endif %}
+{% if e.price_targets %}
+<section class="adam-pub__panel" data-adam-hook="price-targets">
+  <h2>Price targets ({{ e.price_targets[0].horizon_months }}m)</h2>
+  <table class="adam-pub__table"><thead><tr><th>Ticker</th><th>Method</th><th>Bear</th><th>Base</th><th>Bull</th><th>Weighted</th><th>Inputs</th></tr></thead><tbody>
+  {% for t in e.price_targets %}<tr><td>{{ t.ticker }}{% if t.estimated %}*{% endif %}</td><td>{{ t.method }}</td><td>{{ t.bear|num }}</td><td>{{ t.base|num }}</td><td>{{ t.bull|num }}</td><td>{{ t.weighted|num }}</td><td><code>{{ t.inputs_ref }}</code></td></tr>{% endfor %}
+  </tbody></table>
+</section>
+{% endif %}
+{% if e.scenarios %}
+<section class="adam-pub__panel" data-adam-hook="scenarios">
+  <h2>Scenarios</h2>
+  <div class="adam-pub__grid">
+  {% for sc in e.scenarios %}<article class="adam-pub__card adam-pub__card--{{ sc.name }}" data-adam-hook="scenario-{{ sc.name }}"><h3>{{ sc.name|title }} · {{ "%.0f"|format(sc.probability * 100) }}%{% if sc.estimated %}*{% endif %}</h3><p>{{ sc.narrative }}</p>{% if sc.targets %}<ul>{% for k, v in sc.targets.items() %}<li>{{ k }}: {{ v|num }}</li>{% endfor %}</ul>{% endif %}</article>{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% if e.risks %}
+<section class="adam-pub__panel" data-adam-hook="risks">
+  <h2>Risk register</h2>
+  <ul class="adam-pub__risks">{% for r in e.risks %}<li><strong>{{ r.name }}</strong> — p={{ "%.0f"|format(r.probability * 100) }}%, impact {{ r.impact }}{% if r.description %}: {{ r.description }}{% endif %}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+{% block review %}
+{% if e.review %}
+<section class="adam-pub__panel" data-adam-hook="review">
+  <h2>Review</h2>
+  <pre class="adam-pub__pre">{{ e.review|tojson(indent=2) }}</pre>
+</section>
+{% endif %}
+{% endblock %}
+<footer class="adam-pub__footer" data-adam-hook="provenance">
+  <h2>Sources &amp; provenance</h2>
+  {% if e.sources %}<ul>{% for s in e.sources %}<li>{{ s.label }} — <code>{{ s.ref }}</code>{% if s.as_of %} (as of {{ s.as_of }}){% endif %}</li>{% endfor %}</ul>{% else %}<p>No sources cited.</p>{% endif %}
+  <ul>{% for p in e.provenance_trace %}<li><code>{{ p.generator }}</code> v{{ p.version }} · {{ p.timestamp }}{% if p.inputs %} · inputs: {{ p.inputs|join(", ") }}{% endif %}</li>{% endfor %}</ul>
+  <p>Schema {{ e.schema_version }} · edition <code>{{ e.edition_id }}</code>. Toggle the machine view with Alt+J or <code>?view=json</code>.</p>
+</footer>
+</main>
+<script id="adam-operator-data" type="application/json">{{ record|tojson }}</script>
+</body>
+</html>
