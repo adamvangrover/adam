@@ -44,6 +44,23 @@ HYG:
   (e.g. `MetaOrchestrator._positions_from_allocation` lists them in `_skipped_symbols`).
 - This is a convention, not a lint rule. Reviewers check it.
 
+### 2a. Synthetic scenario path (publication backfill)
+
+`data/scenarios/2026H2_path.json` is a **synthetic** daily path (business days 2026-04-01 → 2026-11-24)
+for S&P 500, Nasdaq 100, UST 2Y/10Y, VIX, HY OAS, Brent, gold, DXY and Bitcoin. It is not market data.
+
+- Built by `scripts/publications/build_scenario_path.py` from `config/scenarios/2026H2_path.yaml`
+  (seeded `random.Random(seed)` Brownian bridge; rerunning reproduces the file byte-for-byte).
+- Pinned to the levels quoted in the committed `newsletters/market_mayhem_2026*.md` narratives (e.g.
+  S&P 500 7,592.40 and UST 10Y 5.102% on 2026-11-12), so backfilled editions agree with them. Those
+  narratives are themselves unverified; their anchors are not treated as real prices.
+- The file and every record derived from it carry `_estimated: true`; rendered pages show
+  "Illustrative scenario — not investment advice". Editions never attribute quotes to real people and
+  never describe events that are not in the path.
+- Price targets (`showcase/data/publications/price_targets_latest.json`) are computed by
+  `core/engine/valuation_utils.py` from the illustrative inputs in `config/valuation/coverage_2026.yaml`
+  (also `_estimated: true`) with the path's 10Y as the risk-free rate.
+
 ## 3. Ledgers
 
 - Immutable decision events: `core/governance/` (hash-chained ledger).

@@ -1,0 +1,24 @@
+# Price-target coverage universe and valuation assumptions for the 2026 publication backfill.
+# Tickers reuse showcase/data/credit_memo_<T>_RAG.json (coverage membership). Those memos carry mock
+# share counts / FCF, so every input below is a hand-picked ILLUSTRATIVE value (_estimated: true),
+# not sourced data. Units: $M for cash flows / debt, M for shares, $ for prices.
+_estimated: true
+horizon_months: 12
+risk_free_series: ust10y          # read from data/scenarios/2026H2_path.json at the edition date
+weights: {base: 0.5, bull: 0.25, bear: 0.25}
+dcf_scenarios:                    # passed as `scenario` overrides to core.engine.valuation_utils.calculate_dcf
+  base: {growth_delta: 0.0,   beta_delta: 0.0,  market_risk_premium: 0.05}
+  bull: {growth_delta: 0.03,  beta_delta: -0.1, market_risk_premium: 0.045}
+  bear: {growth_delta: -0.04, beta_delta: 0.2,  market_risk_premium: 0.06}
+multiples_scenarios: {base: 1.0, bull: 1.15, bear: 0.8}   # applied to the base P/E for banks
+coverage:
+  AAPL:  {method: dcf, memo: showcase/data/credit_memo_AAPL_RAG.json,  fcf: 105000, growth_rate: 0.06, beta: 1.1,  shares_outstanding: 14900, net_debt: 45000,  debt_equity_ratio: 0.05, reference_price: 228.0}
+  AMZN:  {method: dcf, memo: showcase/data/credit_memo_AMZN_RAG.json,  fcf: 60000,  growth_rate: 0.14, beta: 1.25, shares_outstanding: 10600, net_debt: 20000,  debt_equity_ratio: 0.06, reference_price: 212.0}
+  GOOGL: {method: dcf, memo: showcase/data/credit_memo_GOOGL_RAG.json, fcf: 72000,  growth_rate: 0.10, beta: 1.05, shares_outstanding: 12200, net_debt: -80000, debt_equity_ratio: 0.02, reference_price: 182.0}
+  META:  {method: dcf, memo: showcase/data/credit_memo_META_RAG.json,  fcf: 52000,  growth_rate: 0.11, beta: 1.2,  shares_outstanding: 2520,  net_debt: -40000, debt_equity_ratio: 0.03, reference_price: 610.0}
+  MSFT:  {method: dcf, memo: showcase/data/credit_memo_MSFT_RAG.json,  fcf: 74000,  growth_rate: 0.11, beta: 0.95, shares_outstanding: 7430,  net_debt: -10000, debt_equity_ratio: 0.03, reference_price: 445.0}
+  NFLX:  {method: dcf, memo: showcase/data/credit_memo_NFLX_RAG.json,  fcf: 9000,   growth_rate: 0.15, beta: 1.3,  shares_outstanding: 430,   net_debt: 7000,   debt_equity_ratio: 0.04, reference_price: 980.0}
+  NVDA:  {method: dcf, memo: showcase/data/credit_memo_NVDA_RAG.json,  fcf: 95000,  growth_rate: 0.18, beta: 1.6,  shares_outstanding: 24400, net_debt: -45000, debt_equity_ratio: 0.01, reference_price: 166.0}
+  TSLA:  {method: dcf, memo: showcase/data/credit_memo_TSLA_RAG.json,  fcf: 5000,   growth_rate: 0.20, beta: 2.0,  shares_outstanding: 3220,  net_debt: -25000, debt_equity_ratio: 0.02, reference_price: 330.0}
+  GS:    {method: multiples, memo: showcase/data/credit_memo_GS_RAG.json,  eps: 40.0, pe: 14.0, reference_price: 560.0}
+  JPM:   {method: multiples, memo: showcase/data/credit_memo_JPM_RAG.json, eps: 19.0, pe: 13.0, reference_price: 245.0}

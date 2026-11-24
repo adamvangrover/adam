@@ -95,6 +95,11 @@ earlier generations; new editions use these templates.
   so `?view=json` / Alt+J return the rendered data.
 * Jinja autoescape is on; Markdown output escapes raw `<`/`>`. Editions with any `_estimated` part show the
   "Illustrative scenario — not investment advice" label.
+* Regenerate the Apr–Nov 2026 backfill (synthetic, `_estimated`; see `docs/PROVENANCE.md` §2a):
+  `python scripts/publications/build_scenario_path.py && python scripts/publications/backfill_editions.py`,
+  then rebuild the catalogs (`showcase/README.md`). Records land in `showcase/data/publications/<family>/`,
+  HTML at the family paths (`showcase/Daily_Briefing_YYYY_MM_DD.html`, `Market_Mayhem_…`, `Market_Pulse_…`,
+  `House_View_…`, `Equity_Research_…`, `Sector_Outlook_…`); earlier hand-made pages are never overwritten.
 * To add a family: add it to `Family` in the schema, copy one `<family>.{md,html}.j2` pair, and extend
   `tests/unit/test_publication_schema.py` (it renders the fixture through every family).
 

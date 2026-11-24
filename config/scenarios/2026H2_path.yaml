@@ -1,0 +1,23 @@
+# Synthetic macro/market path for the Apr–Nov 2026 publication backfill (docs/PROVENANCE.md §2a).
+# ILLUSTRATIVE SCENARIO — NOT MARKET DATA. Every value is _estimated: true.
+# Anchors are levels quoted in the committed newsletters/market_mayhem_2026*.md narratives so the
+# backfilled timeline stays consistent with them; those narratives are themselves unverified.
+_estimated: true
+seed: 20261112
+start: "2026-04-01"
+end: "2026-11-24"
+series:
+  spx:    {label: "S&P 500", unit: "pts", mode: log, start: 6850.0, daily_vol: 0.0095, decimals: 2,
+           anchors: {"2026-08-28": 7711.76, "2026-10-27": 7722.60, "2026-11-06": 7376.86, "2026-11-12": 7592.40}}
+  ndx:    {label: "Nasdaq 100", unit: "pts", mode: log, start: 24200.0, daily_vol: 0.0125, decimals: 2, anchors: {}}
+  ust10y: {label: "UST 10Y", unit: "%", mode: level, start: 4.35, daily_vol: 0.045, decimals: 3,
+           anchors: {"2026-08-28": 4.73, "2026-10-27": 4.992, "2026-11-12": 5.102}}
+  ust2y:  {label: "UST 2Y", unit: "%", mode: level, start: 3.85, daily_vol: 0.04, decimals: 3, anchors: {}}
+  vix:    {label: "VIX", unit: "", mode: log, start: 17.0, daily_vol: 0.06, decimals: 2,
+           anchors: {"2026-08-28": 14.48, "2026-11-06": 25.64, "2026-11-12": 18.70}}
+  hy_oas: {label: "HY OAS", unit: "bp", mode: log, start: 330.0, daily_vol: 0.02, decimals: 0, anchors: {}}
+  brent:  {label: "Brent", unit: "$/bbl", mode: log, start: 82.0, daily_vol: 0.018, decimals: 2,
+           anchors: {"2026-10-27": 114.0, "2026-10-30": 103.0, "2026-11-06": 98.0}}
+  gold:   {label: "Gold", unit: "$/oz", mode: log, start: 3300.0, daily_vol: 0.01, decimals: 1, anchors: {}}
+  dxy:    {label: "DXY", unit: "", mode: log, start: 101.0, daily_vol: 0.004, decimals: 2, anchors: {}}
+  btc:    {label: "Bitcoin", unit: "$", mode: log, start: 95000.0, daily_vol: 0.03, decimals: 0, anchors: {}}
