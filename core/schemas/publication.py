@@ -9,6 +9,7 @@ Values not computed from a committed dataset carry ``_estimated: true`` (``docs/
 """
 from __future__ import annotations
 
+import math
 from datetime import date as Date
 from typing import Any, Dict, List, Literal, Optional
 
@@ -109,7 +110,7 @@ class PriceTarget(_Estimable):
 
     @property
     def weighted(self) -> float:
-        return round(sum(getattr(self, k) * w for k, w in self.weights.items()), 2)
+        return round(math.fsum(getattr(self, k) * w for k, w in self.weights.items()), 2)
 
 
 class Edition(_Model):
