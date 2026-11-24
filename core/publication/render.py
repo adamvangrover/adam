@@ -28,8 +28,8 @@ FAMILY_LABELS = {
 
 
 def _md_escape(value: object) -> str:
-    """Neutralise raw HTML in Markdown output (Markdown renderers pass inline HTML through)."""
-    return str(value if value is not None else "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    """Neutralise raw HTML tags in Markdown output (Markdown renderers pass inline HTML through)."""
+    return str(value if value is not None else "").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def _fmt(value: Optional[float], digits: int = 2) -> str:
