@@ -1,6 +1,7 @@
 /* ADAM showcase kit: shared escaping helpers and the machine operator surface.
  * Load with <script src=".../kit/adam-kit.js"></script> in <head> so inline scripts can call AdamKit.esc (scripts/apply_showcase_kit.py does this).
  *   AdamKit.esc(value)             -> HTML-escaped string for interpolation into innerHTML
+ *   AdamKit.markdown(src)          -> marked.parse(src) with raw HTML blocks/inline HTML escaped
  *   AdamKit.html`<b>${value}</b>`  -> tagged template that escapes every interpolation
  *   AdamKit.publish(key, data)     -> add page data to the operator JSON view
  *   AdamKit.snapshot()             -> {page, role, family, canonical, hooks, data}
@@ -91,6 +92,15 @@
     if (wantJson) showJson();
   }
 
-  window.AdamKit = { esc, html, safeUrl, publish, snapshot, showJson };
+  // Markdown via window.marked with raw HTML escaped (code fences and formatting kept); plain text without marked.
+  const markdown = (src) => {
+    const m = window.marked;
+    if (!m || !m.Renderer) return esc(src);
+    const renderer = new m.Renderer();
+    renderer.html = (t) => esc(typeof t === "string" ? t : t.text || t.raw || "");
+    return (m.parse || m)(String(src === undefined || src === null ? "" : src), { renderer });
+  };
+
+  window.AdamKit = { esc, html, safeUrl, markdown, publish, snapshot, showJson };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
