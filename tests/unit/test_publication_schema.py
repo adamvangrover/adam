@@ -56,6 +56,11 @@ def test_weighted_target(record):
     assert PriceTarget.model_validate(record["price_targets"][0]).weighted == 445.0
 
 
+def test_weighted_target_rounds_ties_half_up(record):
+    tie = {**record["price_targets"][0], "bear": 67.32, "base": 103.22, "bull": 134.22}
+    assert PriceTarget.model_validate(tie).weighted == 102.0
+
+
 def test_every_family_has_templates():
     for family in FAMILIES:
         assert (TEMPLATE_DIR / f"{family}.html.j2").exists()
