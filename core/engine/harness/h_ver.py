@@ -21,7 +21,7 @@ def confidence_tier(confidence: float, policy: HarnessPolicy) -> str:
 def provenance_violations(output: AgentOutput) -> List[str]:
     if not output.provenance_trace:
         return ["missing_provenance"]
-    if any(not (h.jsonLogic_version or "").strip() for h in output.provenance_trace):
+    if any(not (getattr(h, "jsonLogic_version", None) or "").strip() for h in output.provenance_trace):
         return ["missing_jsonLogic_version"]
     return []
 
