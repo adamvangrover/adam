@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{{ kit_href }}/adam-kit.css">
 <script src="{{ kit_href }}/adam-kit.js"></script>
 <!-- /adam-kit -->
+<script src="{{ kit_href }}/adam-publication.js" defer></script>
 </head>
 <body class="adam-pub adam-pub--{{ e.family }}">
 <main class="adam-pub__page">
@@ -72,9 +73,31 @@
 {% endif %}
 {% block review %}
 {% if e.review %}
-<section class="adam-pub__panel" data-adam-hook="review">
-  <h2>Review</h2>
-  <pre class="adam-pub__pre">{{ e.review|tojson(indent=2) }}</pre>
+{% set rv = e.review %}
+<section class="adam-pub__panel" data-adam-hook="review-panel">
+  <h2>Bull vs. Bear vs. Red Team</h2>
+  <p class="adam-pub__summary" data-adam-hook="review-scores">Judge {{ "%.2f"|format(rv.get("score", 0)) }} ({{ rv.get("judge", {}).get("verdict", "—") }}) · desk verdict {{ rv.get("desk", {}).get("verdict", "—") }} · red-team impact {{ rv.get("red_team", {}).get("impact_score", "—") }} · {{ rv.get("mode", "offline") }} review</p>
+  <div class="adam-pub__grid">
+  {% for side in ("bull", "bear") %}
+    {% set card = rv.get("panel", {}).get(side, {}) %}
+    <article class="adam-pub__card adam-pub__card--{{ side }}" data-adam-hook="review-{{ side }}">
+      <h3>{{ side|title }}</h3>
+      <p>{{ card.get("narrative") or "No " ~ side ~ " scenario in this edition." }}</p>
+      {% if card.get("targets") %}<ul>{% for k, v in card.get("targets").items() %}<li>{{ k }}: {{ v|num }}</li>{% endfor %}</ul>{% endif %}
+      {% if card.get("price_targets") %}<ul>{% for k, v in card.get("price_targets").items() %}<li>{{ k }} {{ v|num }}</li>{% endfor %}</ul>{% endif %}
+    </article>
+  {% endfor %}
+    {% set red = rv.get("panel", {}).get("red_team", {}) %}
+    <article class="adam-pub__card adam-pub__card--red_team" data-adam-hook="review-red-team">
+      <h3>Red Team</h3>
+      <p>{{ red.get("summary", "") }}</p>
+      {% if red.get("challenges") %}<ul>{% for c in red.get("challenges") %}<li>{{ c }}</li>{% endfor %}</ul>{% else %}<p>No challenges raised.</p>{% endif %}
+    </article>
+  </div>
+  {% if rv.get("flags") %}
+  <h3>Review flags</h3>
+  <ul data-adam-hook="review-flags">{% for f in rv.get("flags") %}<li><strong>{{ f.severity }}</strong> {{ f.code }} ({{ f.hook }}): {{ f.message }}</li>{% endfor %}</ul>
+  {% endif %}
 </section>
 {% endif %}
 {% endblock %}

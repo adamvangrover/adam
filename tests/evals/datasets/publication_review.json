@@ -1,0 +1,2710 @@
+{
+ "description": "Seeded publication editions with known flaws; core.publication.review.review_flags must return exactly the expected flag codes (docs/TEMPLATES.md \u00a73a).",
+ "min_accuracy": 1.0,
+ "cases": [
+  {
+   "name": "clean edition",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": []
+  },
+  {
+   "name": "clean with clean prior",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    },
+    "prior": {
+     "family": "market_mayhem",
+     "date": "2026-11-06",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": []
+  },
+  {
+   "name": "no sources",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "missing_sources"
+   ]
+  },
+  {
+   "name": "estimated parts but edition flag false",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": false,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "estimated_unlabelled"
+   ]
+  },
+  {
+   "name": "snapshot value without _estimated and only synthetic sources",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": false
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "unsourced_value"
+   ]
+  },
+  {
+   "name": "price target without _estimated and only synthetic sources",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": false
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "unsourced_value"
+   ]
+  },
+  {
+   "name": "target far from reference price",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true,
+       "reference_price": 200.0
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "target_out_of_range"
+   ]
+  },
+  {
+   "name": "target within reference band",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true,
+       "reference_price": 430.0
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": []
+  },
+  {
+   "name": "base target jumps vs prior",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    },
+    "prior": {
+     "family": "market_mayhem",
+     "date": "2026-11-06",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 300.0,
+       "bull": 350.0,
+       "bear": 250.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "target_jump"
+   ]
+  },
+  {
+   "name": "high-conviction reversal vs prior",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.8,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    },
+    "prior": {
+     "family": "market_mayhem",
+     "date": "2026-11-06",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "overweight",
+       "conviction": 0.8,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "contradicts_prior"
+   ]
+  },
+  {
+   "name": "low-conviction reversal is allowed",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    },
+    "prior": {
+     "family": "market_mayhem",
+     "date": "2026-11-06",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "overweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": []
+  },
+  {
+   "name": "high-conviction call without rationale",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.9,
+       "rationale": "",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "unsupported_call"
+   ]
+  },
+  {
+   "name": "stale source",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-10-01"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "stale_data"
+   ]
+  },
+  {
+   "name": "scenario probabilities do not sum to 1",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.4,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "scenario_probabilities"
+   ]
+  },
+  {
+   "name": "bear-as-base fragility",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 200.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "assumption_fragile"
+   ]
+  },
+  {
+   "name": "no sources and unsupported call",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.95,
+       "rationale": " ",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "missing_sources",
+    "unsupported_call"
+   ]
+  },
+  {
+   "name": "stale and out of range",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true,
+       "reference_price": 900.0
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.5,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-09-30"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": true,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "stale_data",
+    "target_out_of_range"
+   ]
+  },
+  {
+   "name": "unlabelled and probabilities",
+   "query": {
+    "edition": {
+     "family": "market_mayhem",
+     "date": "2026-11-13",
+     "title": "Seeded review case",
+     "summary": "Synthetic fixture used by tests/unit/test_publication_schema.py.",
+     "sections": [
+      {
+       "hook": "lead",
+       "title": "Lead",
+       "body": "Rates repriced higher.\n\nCredit held. <script>alert(1)</script>",
+       "bullets": [
+        "10Y moved",
+        "<img src=x onerror=alert(2)>"
+       ]
+      },
+      {
+       "hook": "outlook",
+       "title": "Outlook",
+       "body": "Watch the long end."
+      }
+     ],
+     "market_snapshot": [
+      {
+       "name": "S&P 500",
+       "value": 7592.4,
+       "unit": "pts",
+       "change": -0.4,
+       "change_unit": "%",
+       "_estimated": true
+      },
+      {
+       "name": "UST 10Y",
+       "value": 5.1,
+       "unit": "%",
+       "change": 4.0,
+       "change_unit": "bp",
+       "_estimated": true
+      }
+     ],
+     "calls": [
+      {
+       "subject": "Duration",
+       "stance": "underweight",
+       "conviction": 0.6,
+       "rationale": "Term premium rising.",
+       "_estimated": true
+      }
+     ],
+     "price_targets": [
+      {
+       "ticker": "MSFT",
+       "method": "scenario_weighted",
+       "base": 450.0,
+       "bull": 520.0,
+       "bear": 360.0,
+       "weights": {
+        "base": 0.5,
+        "bull": 0.25,
+        "bear": 0.25
+       },
+       "horizon_months": 12,
+       "inputs_ref": "tests/fixtures/publication_edition.json",
+       "_estimated": true
+      }
+     ],
+     "risks": [
+      {
+       "name": "Term-premium shock",
+       "probability": 0.3,
+       "impact": "high",
+       "description": "Long-end auction tails."
+      }
+     ],
+     "scenarios": [
+      {
+       "name": "base",
+       "probability": 0.7,
+       "narrative": "Range-bound.",
+       "targets": {
+        "spx": 7600
+       },
+       "_estimated": true
+      },
+      {
+       "name": "bull",
+       "probability": 0.25,
+       "narrative": "Disinflation resumes.",
+       "_estimated": true
+      },
+      {
+       "name": "bear",
+       "probability": 0.25,
+       "narrative": "Credit spreads gap wider.",
+       "_estimated": true
+      }
+     ],
+     "sources": [
+      {
+       "label": "Synthetic path",
+       "ref": "data/scenarios/2026H2_path.json",
+       "as_of": "2026-11-13"
+      }
+     ],
+     "provenance_trace": [
+      {
+       "generator": "tests/fixtures",
+       "inputs": [
+        "tests/fixtures/publication_edition.json"
+       ],
+       "timestamp": "2026-11-13T00:00:00Z",
+       "version": "1.0.0"
+      }
+     ],
+     "review": {},
+     "_estimated": false,
+     "schema_version": "1.0.0"
+    }
+   },
+   "expected": [
+    "estimated_unlabelled",
+    "scenario_probabilities"
+   ]
+  }
+ ]
+}

@@ -50,11 +50,16 @@ def test_index_points_at_existing_files():
 
 
 def test_backfill_is_deterministic():
-    builder = EditionBuilder(ScenarioPath.load(), load_config())
-    for f in (PUB / "house_view").glob("*.json"):
+    from core.publication.review import review_edition
+
+    builder, prior = EditionBuilder(ScenarioPath.load(), load_config()), None
+    for f in sorted((PUB / "house_view").glob("*.json")):
         stored = json.loads(f.read_text())
-        rebuilt = builder.build("house_view", date.fromisoformat(stored["date"])).to_record()
-        assert rebuilt == stored
+        draft = builder.build("house_view", date.fromisoformat(stored["date"]))
+        review = stored.pop("review")
+        assert draft.to_record() | {"review": {}} == stored | {"review": {}}
+        assert review_edition(draft, prior) == review
+        prior = draft
 
 
 def test_manifest_has_no_gap_beyond_twice_cadence_and_reaches_november():

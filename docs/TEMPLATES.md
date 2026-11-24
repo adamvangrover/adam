@@ -100,6 +100,14 @@ earlier generations; new editions use these templates.
   then rebuild the catalogs (`showcase/README.md`). Records land in `showcase/data/publications/<family>/`,
   HTML at the family paths (`showcase/Daily_Briefing_YYYY_MM_DD.html`, `Market_Mayhem_…`, `Market_Pulse_…`,
   `House_View_…`, `Equity_Research_…`, `Sector_Outlook_…`); earlier hand-made pages are never overwritten.
+* Review layer (`core/publication/review/`, thresholds in `config/publication_review.yaml`): every
+  backfilled edition carries `review` = deterministic critics (missing sources, unlabelled `_estimated`,
+  unsourced values, targets vs. reference / prior, reversals, unsupported calls, stale data, scenario
+  probabilities), an expert-desk verdict, a red-team pass through `core/system/red_teaming_framework.py`
+  (flipped scenario, fragile targets) and a weighted `CleanRoomLLMJudge` score. Pages render a
+  "Bull vs. Bear vs. Red Team" panel and `showcase/kit/adam-publication.js` publishes the scores via
+  `AdamKit.publish("review_scores", …)`. LLM prompts: `prompt_library/publication_review/`; the LLM path is
+  off by default (`llm.enabled: false`). Seeded flawed editions: `tests/evals/datasets/publication_review.json`.
 * To add a family: add it to `Family` in the schema, copy one `<family>.{md,html}.j2` pair, and extend
   `tests/unit/test_publication_schema.py` (it renders the fixture through every family).
 

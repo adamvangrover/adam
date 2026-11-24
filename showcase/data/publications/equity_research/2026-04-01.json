@@ -377,7 +377,177 @@
       "content_hash": null
     }
   ],
-  "review": {},
+  "review": {
+    "version": "1.0.0",
+    "mode": "offline",
+    "config": "config/publication_review.yaml",
+    "flags": [
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "AAPL weighted target 113.66 is -50% vs reference 228.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "NFLX weighted target 417.57 is -57% vs reference 980.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "NVDA weighted target 75.98 is -54% vs reference 166.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "TSLA weighted target 34.01 is -90% vs reference 330.00."
+      }
+    ],
+    "desk": {
+      "persona": "expert_desk",
+      "prompt": "prompt_library/publication_review/expert_desk.md",
+      "verdict": "revise",
+      "concerns": [
+        {
+          "hook": "price-targets",
+          "issue": "AAPL weighted target 113.66 is -50% vs reference 228.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "NFLX weighted target 417.57 is -57% vs reference 980.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "NVDA weighted target 75.98 is -54% vs reference 166.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "TSLA weighted target 34.01 is -90% vs reference 330.00.",
+          "severity": "warning"
+        }
+      ]
+    },
+    "red_team": {
+      "agent": "PublicationRedTeam",
+      "report": "=== Red Team Exercise Report ===\nTarget System: equity_research/2026-04-01\nScenario Generated: No scenario set; challenge the calls and targets directly.\nFinal Impact Score: 8.0\nStandards Met: False\nStatus: 4 challenge(s) raised",
+      "impact_score": 8.0,
+      "challenges": [
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "AAPL weighted target 113.66 is -50% vs reference 228.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "NFLX weighted target 417.57 is -57% vs reference 980.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "NVDA weighted target 75.98 is -54% vs reference 166.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "TSLA weighted target 34.01 is -90% vs reference 330.00."
+        }
+      ],
+      "flipped_scenario": {}
+    },
+    "judge": {
+      "overall_score": 0.8709,
+      "passed": true,
+      "verdict": "PASS",
+      "weights": {
+        "correctness": 0.4,
+        "faithfulness": 0.3,
+        "reasoning_coherence": 0.2,
+        "provenance_citation": 0.1
+      },
+      "dimensions": [
+        {
+          "name": "correctness",
+          "score": 1.0,
+          "weight": 0.4,
+          "reasoning": "Exact string/phrase match with golden answer."
+        },
+        {
+          "name": "faithfulness",
+          "score": 0.6364,
+          "weight": 0.3,
+          "reasoning": "Context keyword overlap ratio: 0.42"
+        },
+        {
+          "name": "reasoning_coherence",
+          "score": 0.9,
+          "weight": 0.2,
+          "reasoning": "Answer demonstrates structured reasoning indicators."
+        },
+        {
+          "name": "provenance_citation",
+          "score": 1.0,
+          "weight": 0.1,
+          "reasoning": "Explicit provenance or source citation present."
+        }
+      ]
+    },
+    "score": 0.8709,
+    "panel": {
+      "bull": {
+        "narrative": "",
+        "targets": {},
+        "price_targets": {
+          "AAPL": 151.8,
+          "AMZN": 154.02,
+          "GOOGL": 162.16,
+          "META": 527.54,
+          "MSFT": 299.08,
+          "NFLX": 555.82,
+          "NVDA": 99.06,
+          "TSLA": 41.95,
+          "GS": 644.0,
+          "JPM": 284.05
+        }
+      },
+      "bear": {
+        "narrative": "",
+        "targets": {},
+        "price_targets": {
+          "AAPL": 73.08,
+          "AMZN": 75.79,
+          "GOOGL": 82.36,
+          "META": 269.05,
+          "MSFT": 144.93,
+          "NFLX": 269.27,
+          "NVDA": 51.17,
+          "TSLA": 25.45,
+          "GS": 448.0,
+          "JPM": 197.6
+        }
+      },
+      "red_team": {
+        "summary": "Scenario Generated: No scenario set; challenge the calls and targets directly.",
+        "challenges": [
+          "AAPL weighted target 113.66 is -50% vs reference 228.00.",
+          "NFLX weighted target 417.57 is -57% vs reference 980.00.",
+          "NVDA weighted target 75.98 is -54% vs reference 166.00.",
+          "TSLA weighted target 34.01 is -90% vs reference 330.00."
+        ]
+      }
+    }
+  },
   "_estimated": true,
   "schema_version": "1.0.0"
 }

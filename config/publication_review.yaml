@@ -1,0 +1,30 @@
+# Review layer for publication editions (core/publication/review). Thresholds live here, not in Python.
+llm:
+  enabled: false                      # offline default: deterministic critics only
+  desk_prompt: prompt_library/publication_review/expert_desk.md
+  red_team_prompt: prompt_library/publication_review/red_team.md
+  judge_prompt: prompt_library/publication_review/judge.md
+critics:
+  max_target_vs_reference: 0.50       # |weighted / reference_price - 1| above this -> target_out_of_range
+  max_target_jump_vs_prior: 0.25      # base target move vs prior edition above this -> target_jump
+  contradiction_min_conviction: 0.70  # opposite stances vs prior edition, both above this -> contradicts_prior
+  unsupported_min_conviction: 0.70    # high-conviction call with no rationale -> unsupported_call
+  stale_after_days: 7                 # newest source as_of older than this vs edition date -> stale_data
+  probability_tolerance: 0.001        # scenario probabilities must sum to 1 +/- this
+  synthetic_source_prefixes: ["data/scenarios/", "config/"]
+red_team:
+  bear_as_base_max_drawdown: 0.40     # bear target vs weighted target below -this -> assumption_fragile
+severity:                             # flags at "error" fail the edition review
+  missing_sources: error
+  estimated_unlabelled: error
+  unsourced_value: error
+  target_out_of_range: warning
+  target_jump: warning
+  contradicts_prior: warning
+  unsupported_call: warning
+  stale_data: warning
+  scenario_probabilities: error
+  assumption_fragile: info
+judge:
+  pass_threshold: 0.70
+  weights: {correctness: 0.4, faithfulness: 0.3, reasoning_coherence: 0.2, provenance_citation: 0.1}
