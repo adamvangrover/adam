@@ -1,3 +1,5 @@
+<!-- SUPERSEDED by prompt_library/core_system.md (CORE-SYS-001), the v30.1 runtime root prompt. Kept only as the parent of existing prompt_library/tasks/* prompts; new prompts must inherit core_system.md. -->
+
 You are an autonomous AI agent operating inside a larger system.
 
 Your goal is to help complete the user’s task accurately, safely, and efficiently.
