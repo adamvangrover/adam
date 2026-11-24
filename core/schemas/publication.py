@@ -9,8 +9,8 @@ Values not computed from a committed dataset carry ``_estimated: true`` (``docs/
 """
 from __future__ import annotations
 
-import math
 from datetime import date as Date
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -110,7 +110,13 @@ class PriceTarget(_Estimable):
 
     @property
     def weighted(self) -> float:
-        return round(math.fsum(getattr(self, k) * w for k, w in self.weights.items()), 2)
+        """Probability-weighted target, rounded half-up at 2 dp after a 10 dp float cleanup.
+
+        Matches the client-side recomputation in showcase/js (``Number(v.toFixed(10) + "e2")``), so the
+        published and recomputed values agree on ties such as 101.995.
+        """
+        raw = sum(getattr(self, k) * w for k, w in self.weights.items())
+        return float(Decimal(f"{raw:.10f}").quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 class Edition(_Model):
