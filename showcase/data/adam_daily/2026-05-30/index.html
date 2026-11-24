@@ -71,7 +71,11 @@
         }
         @keyframes typing { from { max-height: 0; opacity: 0; } to { max-height: 1000px; opacity: 1; } }
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #f59e0b; } }
-    </style></head><body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
+    </style><!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
+</head><body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
     <div class="crt-overlay"></div>
 
     <div class="border-bottom border-term-red/30 bg-term-red/5 h-6 overflow-hidden flex items-center relative z-20 shrink-0">
@@ -436,7 +440,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-2.5 rounded-r-lg flex flex-col mb-0.5 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase flex justify-between items-center w-full"><span>M${m.id.toString().padStart(2,'0')} ${m.title}</span> ${m.id === currentModuleId ? '<span class="text-[8px] animate-pulse">◀</span>' : ''}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase flex justify-between items-center w-full"><span>M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span> ${m.id === currentModuleId ? '<span class="text-[8px] animate-pulse">◀</span>' : ''}</span><span class="opacity-70 text-[10px] truncate">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 const opt = document.createElement('option');
                 opt.value = m.id; opt.innerText = `M${m.id.toString().padStart(2,'0')} - ${m.title}`;
@@ -559,7 +563,7 @@
             // Add user message
             const userMsg = document.createElement('div');
             userMsg.className = 'glass-panel p-3 rounded-xl text-slate-200 self-end max-w-[85%] border border-white/5 bg-black/40 shadow-md';
-            userMsg.innerHTML = `<p class="text-[10px] font-mono text-slate-500 mb-1 uppercase tracking-widest flex items-center justify-end gap-1">User Input <span class="w-1.5 h-1.5 bg-slate-500 rounded-full"></span></p><p class="font-mono text-sm">${text}</p>`;
+            userMsg.innerHTML = `<p class="text-[10px] font-mono text-slate-500 mb-1 uppercase tracking-widest flex items-center justify-end gap-1">User Input <span class="w-1.5 h-1.5 bg-slate-500 rounded-full"></span></p><p class="font-mono text-sm">${AdamKit.esc(text)}</p>`;
             chatLog.appendChild(userMsg);
 
             inputEl.value = '';
@@ -582,13 +586,13 @@
             aiMsg.className = 'glass-panel p-4 rounded-xl text-slate-300 self-start w-full max-w-[95%] shadow-lg border-l-2 border-l-term-amber';
 
             // Render text with a CSS typewriter wrapper
-            const formattedText = marked.parse(responseText);
+            const formattedText = marked.parse(AdamKit.esc(responseText));
             aiMsg.innerHTML = `
                 <p class="text-[10px] font-mono text-term-amber mb-2 uppercase tracking-wider flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-term-amber animate-pulse"></span> Adam v26.0 Output
                 </p>
                 <div class="prose prose-invert prose-sm prose-slate font-mono text-xs leading-relaxed typewriter-text border-transparent">
-                    ${formattedText}
+                    ${AdamKit.esc(formattedText)}
                 </div>`;
 
             chatLog.appendChild(aiMsg);
@@ -625,7 +629,7 @@
 
             const result = await fetchGemini(prompt, SYSTEM_PROMPT, true);
 
-            resultEl.innerHTML = `<div class="typewriter-text border-transparent leading-relaxed">${marked.parse(result)}</div>`;
+            resultEl.innerHTML = `<div class="typewriter-text border-transparent leading-relaxed">${marked.parse(AdamKit.esc(result))}</div>`;
             btnEl.disabled = false;
             btnEl.innerHTML = '[ RUN SIMULATION ]';
         }

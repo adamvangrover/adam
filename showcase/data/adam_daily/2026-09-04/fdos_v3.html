@@ -53,6 +53,10 @@
         .progress-track { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 6px; }
         .progress-fill { height: 100%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 
 <body class="theme-adam-os flex flex-col h-screen overflow-hidden text-sm" data-system-state="ONLINE" data-active-users="1">
@@ -706,19 +710,19 @@
                 div.innerHTML = `
                     <span class="text-[9px] text-gray-400 font-bold mono text-right">USER</span>
                     <div class="bg-gray-800 border border-gray-700 p-3 rounded-l rounded-br text-gray-200 self-end ml-4">
-                        ${text}
+                        ${AdamKit.esc(text)}
                     </div>`;
             } else if (isSystem) {
                  div.innerHTML = `
                     <span class="text-[9px] text-amber-500 font-bold mono">SYSTEM</span>
                     <div class="bg-amber-900/20 border border-amber-800/50 p-3 rounded-r rounded-bl text-amber-200/80 italic text-[11px]">
-                        ${text}
+                        ${AdamKit.esc(text)}
                     </div>`;
             } else {
                 div.innerHTML = `
                     <span class="text-[9px] text-cyan-500 font-bold mono">FDOS ORCHESTRATOR</span>
                     <div class="bg-cyan-900/20 border border-cyan-800/50 p-3 rounded-r rounded-bl text-gray-300">
-                        ${text}
+                        ${AdamKit.esc(text)}
                     </div>`;
             }
             
@@ -966,7 +970,7 @@
                 
                 if (part && part.inlineData) {
                     const imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                    container.innerHTML = `<img src="${imageUrl}" alt="AI Infographic" class="w-full h-full object-cover transition-opacity duration-500 opacity-0" onload="this.style.opacity=1" />`;
+                    container.innerHTML = `<img src="${AdamKit.esc(imageUrl)}" alt="AI Infographic" class="w-full h-full object-cover transition-opacity duration-500 opacity-0" onload="this.style.opacity=1" />`;
                 } else {
                     throw new Error("No image data returned");
                 }

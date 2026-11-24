@@ -69,6 +69,10 @@
       background: #94a3b8;
     }
   </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
@@ -811,18 +815,18 @@
       detailCard.innerHTML = `
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-3">
           <div>
-            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Stage ${data.stage}</span>
-            <h4 class="text-lg font-bold text-slate-900">${data.title}</h4>
+            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Stage ${AdamKit.esc(data.stage)}</span>
+            <h4 class="text-lg font-bold text-slate-900">${AdamKit.esc(data.title)}</h4>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="text-xs font-mono bg-slate-200 text-slate-800 px-2.5 py-1 rounded-full font-semibold">${data.system}</span>
-            <span class="text-xs font-mono bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-semibold">${data.tech}</span>
+            <span class="text-xs font-mono bg-slate-200 text-slate-800 px-2.5 py-1 rounded-full font-semibold">${AdamKit.esc(data.system)}</span>
+            <span class="text-xs font-mono bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-semibold">${AdamKit.esc(data.tech)}</span>
           </div>
         </div>
-        <p class="text-xs text-slate-600 leading-relaxed mb-4">${data.desc}</p>
+        <p class="text-xs text-slate-600 leading-relaxed mb-4">${AdamKit.esc(data.desc)}</p>
         <div>
           <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Execution Schema / Logic</span>
-          <pre class="bg-slate-900 text-emerald-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">${data.codeSnippet}</pre>
+          <pre class="bg-slate-900 text-emerald-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">${AdamKit.esc(data.codeSnippet)}</pre>
         </div>
       `;
     }
@@ -1063,20 +1067,20 @@
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold font-mono px-2 py-0.5 rounded ${catBadge}">${agent.layer}</span>
+              <span class="text-xs font-bold font-mono px-2 py-0.5 rounded ${catBadge}">${AdamKit.esc(agent.layer)}</span>
               <span class="text-xs text-slate-400 font-mono">MCP Tool Active</span>
             </div>
-            <h4 class="font-bold text-slate-900 text-sm mb-1">${agent.name}</h4>
-            <p class="text-xs text-slate-600 leading-relaxed mb-3">${agent.purpose}</p>
+            <h4 class="font-bold text-slate-900 text-sm mb-1">${AdamKit.esc(agent.name)}</h4>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">${AdamKit.esc(agent.purpose)}</p>
           </div>
           <div class="border-t border-slate-100 pt-2 space-y-1 text-xs">
             <div class="flex justify-between text-slate-500">
               <span>Inputs:</span>
-              <span class="font-mono text-slate-700 truncate max-w-[150px]">${agent.inputs}</span>
+              <span class="font-mono text-slate-700 truncate max-w-[150px]">${AdamKit.esc(agent.inputs)}</span>
             </div>
             <div class="flex justify-between text-slate-500">
               <span>Outputs:</span>
-              <span class="font-mono text-slate-700 truncate max-w-[150px]">${agent.outputs}</span>
+              <span class="font-mono text-slate-700 truncate max-w-[150px]">${AdamKit.esc(agent.outputs)}</span>
             </div>
           </div>
         `;

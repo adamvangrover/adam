@@ -71,6 +71,10 @@
         .ticker-move { display: inline-block; animation: ticker 40s linear infinite; }
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden">
     <div class="crt-scanlines"></div>
@@ -342,7 +346,7 @@ Strategy requires a "Barbell" approach to navigate the yield plateau.
 
         function loadDossier(id) {
             const dossier = reportData.find(d => d.id === id);
-            document.getElementById('markdownContent').innerHTML = marked.parse(dossier.markdown);
+            document.getElementById('markdownContent').innerHTML = marked.parse(AdamKit.esc(dossier.markdown));
         }
 
         function initCharts() {

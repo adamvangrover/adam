@@ -19,6 +19,8 @@
 
   function publish(key, data) {
     published[key] = data;
+    const panel = document.getElementById("adam-operator-view");
+    if (panel) panel.textContent = JSON.stringify(snapshot(), null, 2);
     document.dispatchEvent(new CustomEvent("adam:data", { detail: { key } }));
   }
 

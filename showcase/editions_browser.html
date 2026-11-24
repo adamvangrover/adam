@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-adam-role="terminal" data-adam-family="publications">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADAM Publications — Editions Browser</title>
+<link rel="stylesheet" href="kit/adam-terminal.css">
+<script src="js/editions_browser.js" defer></script>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
+</head>
+<body class="adam-term">
+<header class="adam-term__bar" data-adam-hook="terminal-header">
+  <h1>Editions Browser</h1>
+  <nav data-adam-hook="terminal-nav">
+    <a href="editions_browser.html" aria-current="page">Editions</a><a href="price_target_explorer.html">Price targets</a><a href="review_panel.html">Review</a><a href="catalog.html">Catalog</a>
+  </nav>
+  <span class="adam-term__muted" id="status" data-adam-hook="load-status" role="status">Loading showcase/data/publications…</span>
+</header>
+<p class="adam-term__label" role="note" data-adam-hook="estimated-label">Illustrative scenario — not investment advice. All figures are synthetic (<code>_estimated: true</code>, docs/PROVENANCE.md §2a). Machine view: <code>?view=json</code> or Alt+J.</p>
+<main class="adam-term__main">
+  <aside>
+    <section class="adam-term__panel" data-adam-hook="filters">
+      <h2>Filters</h2>
+      <label for="f-family">Family</label><select id="f-family" data-adam-hook="filter-family"><option value="">All families</option></select>
+      <label for="f-from">From</label><input id="f-from" type="date" data-adam-hook="filter-date-from">
+      <label for="f-to">To</label><input id="f-to" type="date" data-adam-hook="filter-date-to">
+      <label for="f-ticker">Ticker</label><select id="f-ticker" data-adam-hook="filter-ticker"><option value="">Any ticker</option></select>
+      <label for="f-q">Title contains</label><input id="f-q" type="search" data-adam-hook="filter-text">
+      <p class="adam-term__muted" id="count" data-adam-hook="result-count"></p>
+    </section>
+    <section class="adam-term__panel" data-adam-hook="compare-picker">
+      <h2>Compare</h2>
+      <p class="adam-term__muted">Pick A and B in the list, then the diff of calls and targets appears on the right.</p>
+      <p id="pick" data-adam-hook="compare-selection">A: — · B: —</p>
+      <button type="button" id="clear" data-adam-hook="compare-clear">Clear</button>
+    </section>
+  </aside>
+  <div>
+    <section class="adam-term__panel" data-adam-hook="compare-diff" id="diff" hidden></section>
+    <section class="adam-term__panel" data-adam-hook="editions-table">
+      <h2>Editions</h2>
+      <div class="adam-term__scroll"><table><thead><tr><th>Date</th><th>Family</th><th>Title</th><th>Review</th><th>Compare</th></tr></thead><tbody id="rows" data-adam-hook="editions-rows"></tbody></table></div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

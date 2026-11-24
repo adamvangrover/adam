@@ -116,6 +116,10 @@
         .prose-custom ul { margin-top: 0.25em; margin-bottom: 0.25em; }
         .prose-custom li { margin-top: 0; margin-bottom: 0; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col font-sans">
     <div class="crt-overlay"></div>
@@ -521,7 +525,7 @@
             container.innerHTML = `
                 <div class="flex flex-col h-full">
                     <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-white/10 shrink-0">
-                        ${tickerButtons}
+                        ${AdamKit.esc(tickerButtons)}
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
@@ -789,7 +793,7 @@
                     document.getElementById(typingId).remove();
                     
                     if (success) {
-                        responseHtmlStr = marked.parse(resultText);
+                        responseHtmlStr = marked.parse(AdamKit.esc(resultText));
                         appendAIResponse(responseHtmlStr);
                     } else {
                          throw lastError || new Error("Failed to connect after multiple retries.");

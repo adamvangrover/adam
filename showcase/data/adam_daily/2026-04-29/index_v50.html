@@ -204,6 +204,10 @@
         .bento-widget { resize: both; overflow: auto; min-width: 150px; min-height: 80px; }
         .bento-widget::-webkit-scrollbar { display: none; } /* Hide scrollbar on resizable boxes for cleaner UI */
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative theme-cyan text-sm" id="appBody">
     
@@ -1926,8 +1930,8 @@
                             card.onclick = () => loadModule(m.id);
                             card.innerHTML = `
                                 <div>
-                                    <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">MOD ${m.id.toString().padStart(2,'0')} // ${m.group}</span>
-                                    <h4 class="font-display text-white text-sm tracking-wide m-0">${m.title}</h4>
+                                    <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">MOD ${m.id.toString().padStart(2,'0')} // ${AdamKit.esc(m.group)}</span>
+                                    <h4 class="font-display text-white text-sm tracking-wide m-0">${AdamKit.esc(m.title)}</h4>
                                 </div>
                                 <span class="text-primary text-[10px] font-mono mt-3">Load ➔</span>
                             `;
@@ -2113,11 +2117,11 @@
                 function addLog(custom=false) {
                     const p = document.createElement('p');
                     p.className = 'animate-[slideUpFade_0.3s_ease-out] m-0 border-b border-white/5 pb-1 text-slate-400';
-                    if(custom) { p.innerHTML = `> EPOCH ${ep}: Checkpoint ... <span class="text-white">SAVED</span>`; }
+                    if(custom) { p.innerHTML = `> EPOCH ${AdamKit.esc(ep)}: Checkpoint ... <span class="text-white">SAVED</span>`; }
                     else {
                         const l = telemetryLogs[Math.floor(Math.random() * telemetryLogs.length)];
                         let vc = `text-${l[3]}`; if(l[3]==='accent') vc += " animate-glitch";
-                        p.innerHTML = `> ${l[0]}: ${l[1]} ... <span class="${vc}">${l[2]}</span>`;
+                        p.innerHTML = `> ${AdamKit.esc(l[0])}: ${AdamKit.esc(l[1])} ... <span class="${AdamKit.esc(vc)}">${AdamKit.esc(l[2])}</span>`;
                     }
                     tbox.appendChild(p);
                     if(tbox.children.length > 20) tbox.removeChild(tbox.firstChild);
@@ -2294,9 +2298,9 @@
                 btn.innerHTML = `
                     <div class="pl-2 transition-all duration-200 w-full">
                         <span class="font-bold text-[13px] font-display tracking-wide uppercase group-hover:text-white block">
-                            <span class="text-[10px] font-mono opacity-50 group-hover:text-primary transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${m.title}
+                            <span class="text-[10px] font-mono opacity-50 group-hover:text-primary transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${AdamKit.esc(m.title)}
                         </span>
-                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${m.subtitle}</span>
+                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${AdamKit.esc(m.subtitle)}</span>
                     </div>`;
                 navEl.appendChild(btn);
                 

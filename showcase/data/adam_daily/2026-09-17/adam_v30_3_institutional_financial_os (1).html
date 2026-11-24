@@ -408,6 +408,10 @@ input[type=range]::-webkit-slider-runnable-track {
   .tab-btn { padding: 9px 12px; font-size: 0.7rem; }
 }
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 <canvas id="particle-canvas"></canvas>
@@ -1086,27 +1090,27 @@ function initCommandCenter() {
     <div class="metric-grid metric-grid-5" style="margin-bottom:20px;">
       <div class="metric-card" style="border-top:2px solid var(--cyan);">
         <div class="metric-label">Rated Entities</div>
-        <div class="metric-value" style="color:var(--cyan)">${ENTITIES.length}</div>
+        <div class="metric-value" style="color:var(--cyan)">${AdamKit.esc(ENTITIES.length)}</div>
         <div class="metric-delta delta-up">Universe Active (Deterministic)</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--emerald);">
         <div class="metric-label">Active Agents</div>
-        <div class="metric-value" style="color:var(--emerald)">${AGENTS.filter(a=>a.status==='ACTIVE').length} / ${AGENTS.length}</div>
+        <div class="metric-value" style="color:var(--emerald)">${AGENTS.filter(a=>a.status==='ACTIVE').length} / ${AdamKit.esc(AGENTS.length)}</div>
         <div class="metric-delta delta-up">100% PROV-O Verified</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--blue);">
         <div class="metric-label">IG / HY Split</div>
-        <div class="metric-value" style="color:var(--blue)">${igCount} / ${ENTITIES.length - igCount}</div>
+        <div class="metric-value" style="color:var(--blue)">${AdamKit.esc(igCount)} / ${ENTITIES.length - igCount}</div>
         <div class="metric-delta">${(igCount / ENTITIES.length * 100).toFixed(0)}% Investment Grade</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--amber);">
         <div class="metric-label">Average 1Y PD</div>
-        <div class="metric-value" style="color:var(--amber)">${avgPD}%</div>
+        <div class="metric-value" style="color:var(--amber)">${AdamKit.esc(avgPD)}%</div>
         <div class="metric-delta">ICE HY OAS: 276 bps</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--rose);">
         <div class="metric-label">Distressed Issuers</div>
-        <div class="metric-value" style="color:var(--rose)">${distressedCount}</div>
+        <div class="metric-value" style="color:var(--rose)">${AdamKit.esc(distressedCount)}</div>
         <div class="metric-delta delta-down">${(distressedCount / ENTITIES.length * 100).toFixed(1)}% Flagged</div>
       </div>
     </div>
@@ -2021,22 +2025,22 @@ function initDigitalTwin() {
     <div class="metric-grid metric-grid-4" style="margin-bottom:18px;">
       <div class="metric-card" style="border-top:2px solid var(--blue);">
         <div class="metric-label">Avg Alpha PD (Market)</div>
-        <div class="metric-value" style="color:var(--blue)">${avgAlpha}%</div>
+        <div class="metric-value" style="color:var(--blue)">${AdamKit.esc(avgAlpha)}%</div>
         <div class="metric-delta">System 1 Pricing Swarm</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--rose);">
         <div class="metric-label">Avg Beta PD (Controller)</div>
-        <div class="metric-value" style="color:var(--rose)">${avgBeta}%</div>
+        <div class="metric-value" style="color:var(--rose)">${AdamKit.esc(avgBeta)}%</div>
         <div class="metric-delta">System 2 Fiduciary Discriminator</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--amber);">
         <div class="metric-label">Divergent Issuers</div>
-        <div class="metric-value" style="color:var(--amber)">${highDivergence}</div>
+        <div class="metric-value" style="color:var(--amber)">${AdamKit.esc(highDivergence)}</div>
         <div class="metric-delta delta-down">Divergence > 3.0%</div>
       </div>
       <div class="metric-card" style="border-top:2px solid var(--cyan);">
         <div class="metric-label">Universe Monitored</div>
-        <div class="metric-value" style="color:var(--cyan)">${ENTITIES.length}</div>
+        <div class="metric-value" style="color:var(--cyan)">${AdamKit.esc(ENTITIES.length)}</div>
         <div class="metric-delta delta-up">100% Deterministic Tracing</div>
       </div>
     </div>
@@ -2208,7 +2212,7 @@ function initAgentGallery() {
   el.innerHTML = `
     <div class="section-header">
       <div><span>🤖</span> AGENT SWARM REGISTRY & DELIBERATION SANDBOX</div>
-      <div style="font-size:0.7rem;color:var(--cyan);">${AGENTS.length} SPECIALIZED AUTONOMOUS AGENTS</div>
+      <div style="font-size:0.7rem;color:var(--cyan);">${AdamKit.esc(AGENTS.length)} SPECIALIZED AUTONOMOUS AGENTS</div>
     </div>
     <div class="section-desc">Bicameral architectural separation: System 1 (High-frequency perceptual swarms) and System 2 (Formal verification, deterministic covenant evaluators).</div>
 
@@ -2233,7 +2237,7 @@ function initAgentGallery() {
     <!-- AGENT DIRECTORY -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div style="display:flex;gap:6px;" id="agent-filter-btns">
-        <button class="btn active btn-sm" onclick="filterAgents('ALL', this)">All (${AGENTS.length})</button>
+        <button class="btn active btn-sm" onclick="filterAgents('ALL', this)">All (${AdamKit.esc(AGENTS.length)})</button>
         <button class="btn btn-sm" onclick="filterAgents('System 1', this)">System 1</button>
         <button class="btn btn-sm" onclick="filterAgents('System 2', this)">System 2</button>
         <button class="btn btn-sm" onclick="filterAgents('Governance', this)">Governance</button>
@@ -2619,12 +2623,12 @@ function initIntelHub() {
   el.innerHTML = `
     <div class="section-header">
       <div><span>📊</span> INTELLIGENCE HUB // INSTITUTIONAL RESEARCH REPOSITORY</div>
-      <div style="font-size:0.7rem;color:var(--cyan);">${INTEL_REPORTS.length} CURATED MEMORANDA</div>
+      <div style="font-size:0.7rem;color:var(--cyan);">${AdamKit.esc(INTEL_REPORTS.length)} CURATED MEMORANDA</div>
     </div>
     <div class="section-desc">Autonomous synthesis of macroeconomic developments, sovereign risk assessments, and credit reviews generated across the ADAM lifecycle.</div>
 
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="intel-filter-container">
-      <button class="btn active" onclick="intelFilter('all', this)">All Documents (${INTEL_REPORTS.length})</button>
+      <button class="btn active" onclick="intelFilter('all', this)">All Documents (${AdamKit.esc(INTEL_REPORTS.length)})</button>
       ${types.map(t => `<button class="btn" onclick="intelFilter('${t}', this)">${t}</button>`).join('')}
     </div>
 
@@ -2680,13 +2684,13 @@ function initBenchmark() {
   el.innerHTML = `
     <div class="section-header">
       <div><span>🔬</span> BENCHMARK HARNESS // EMPIRICAL SOURCE AUDIT & VERIFICATION</div>
-      <div style="font-size:0.7rem;color:var(--emerald);">FIDUCIARY GRADE AUDIT PASS: ${b.overallScore}%</div>
+      <div style="font-size:0.7rem;color:var(--emerald);">FIDUCIARY GRADE AUDIT PASS: ${AdamKit.esc(b.overallScore)}%</div>
     </div>
     <div class="section-desc">Test harness auditing mathematical determinism, disparate impact avoidance, and real-world empirical market benchmarks.</div>
 
     <div class="metric-grid metric-grid-4" style="margin-bottom:18px;">
-      <div class="metric-card" style="border-top:3px solid var(--emerald);"><div class="metric-label">Constitutional Score</div><div class="metric-value" style="color:var(--emerald)">${b.overallScore}%</div><div class="metric-delta delta-up">COMPLIANT (Tier 1 G-SIB)</div></div>
-      <div class="metric-card" style="border-top:3px solid var(--cyan);"><div class="metric-label">Entities Evaluated</div><div class="metric-value" style="color:var(--cyan)">${b.entityCount}</div><div class="metric-delta">Full Active Universe</div></div>
+      <div class="metric-card" style="border-top:3px solid var(--emerald);"><div class="metric-label">Constitutional Score</div><div class="metric-value" style="color:var(--emerald)">${AdamKit.esc(b.overallScore)}%</div><div class="metric-delta delta-up">COMPLIANT (Tier 1 G-SIB)</div></div>
+      <div class="metric-card" style="border-top:3px solid var(--cyan);"><div class="metric-label">Entities Evaluated</div><div class="metric-value" style="color:var(--cyan)">${AdamKit.esc(b.entityCount)}</div><div class="metric-delta">Full Active Universe</div></div>
       <div class="metric-card" style="border-top:3px solid var(--blue);"><div class="metric-label">Verified Citations</div><div class="metric-value" style="color:var(--blue)">17 / 17 Active</div><div class="metric-delta">100% Primary Sources</div></div>
       <div class="metric-card" style="border-top:3px solid var(--gold);"><div class="metric-label">Disparate Impact (DIR)</div><div class="metric-value" style="color:var(--gold)">1.02</div><div class="metric-delta">Bound [0.80 - 1.25]</div></div>
     </div>
@@ -2806,21 +2810,21 @@ window.showSourceModal = function(key) {
     <div style="background:rgba(0, 243, 255, 0.05);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span class="mono" style="font-size:0.75rem;color:var(--text-muted);">${b.category.toUpperCase()} • PRIMARY CITATION</span>
-        <span class="badge badge-pass">${b.citationId}</span>
+        <span class="badge badge-pass">${AdamKit.esc(b.citationId)}</span>
       </div>
-      <div style="font-size:1.6rem;font-weight:800;color:var(--cyan);margin-bottom:4px;">${b.current}</div>
-      <div class="mono" style="font-size:0.75rem;color:var(--text-secondary);">Daily Movement: ${b.dailyChange} | Trading Band: ${b.dayRange}</div>
+      <div style="font-size:1.6rem;font-weight:800;color:var(--cyan);margin-bottom:4px;">${AdamKit.esc(b.current)}</div>
+      <div class="mono" style="font-size:0.75rem;color:var(--text-secondary);">Daily Movement: ${AdamKit.esc(b.dailyChange)} | Trading Band: ${AdamKit.esc(b.dayRange)}</div>
     </div>
 
     <table class="data-table" style="margin-bottom:14px;">
-      <tr><td>Reporting Authority</td><td class="mono" style="color:var(--text);font-weight:600;">${b.source}</td></tr>
-      <tr><td>Publication Date</td><td class="mono">${b.publicationDate}</td></tr>
+      <tr><td>Reporting Authority</td><td class="mono" style="color:var(--text);font-weight:600;">${AdamKit.esc(b.source)}</td></tr>
+      <tr><td>Publication Date</td><td class="mono">${AdamKit.esc(b.publicationDate)}</td></tr>
       <tr><td>Verification Method</td><td class="mono" style="color:var(--emerald);">Fixed-Point Primary Feed Consensus</td></tr>
       <tr><td>Cryptographic Hash</td><td class="mono" style="font-size:0.65rem;color:var(--text-dim);">SHA256-${Math.random().toString(16).substr(2, 12).toUpperCase()}</td></tr>
     </table>
 
     <div style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;background:var(--bg-glass);padding:10px 14px;border-radius:4px;margin-bottom:16px;">
-      <strong>Analytical Context:</strong> ${b.notes}
+      <strong>Analytical Context:</strong> ${AdamKit.esc(b.notes)}
     </div>
 
     <div style="display:flex;justify-content:flex-end;">
@@ -2843,10 +2847,10 @@ window.openDossier = function(id) {
 
   document.getElementById('dossier-body').innerHTML = `
     <div class="metric-grid metric-grid-4" style="margin-bottom:16px;">
-      <div class="metric-card"><div class="metric-label">Sector</div><div class="metric-value" style="font-size:1.1rem;color:var(--cyan);">${ent.sector}</div></div>
-      <div class="metric-card"><div class="metric-label">Current Rating</div><div class="metric-value" style="font-size:1.1rem;color:${ent.isIG ? 'var(--emerald)' : 'var(--amber)'};">${ent.rating}</div></div>
+      <div class="metric-card"><div class="metric-label">Sector</div><div class="metric-value" style="font-size:1.1rem;color:var(--cyan);">${AdamKit.esc(ent.sector)}</div></div>
+      <div class="metric-card"><div class="metric-label">Current Rating</div><div class="metric-value" style="font-size:1.1rem;color:${ent.isIG ? 'var(--emerald)' : 'var(--amber)'};">${AdamKit.esc(ent.rating)}</div></div>
       <div class="metric-card"><div class="metric-label">Enterprise Value</div><div class="metric-value" style="font-size:1.1rem;">$${ent.ev.toLocaleString()}M</div></div>
-      <div class="metric-card"><div class="metric-label">CDS Spread</div><div class="metric-value" style="font-size:1.1rem;color:var(--rose);">${ent.cdsSpread} bps</div></div>
+      <div class="metric-card"><div class="metric-label">CDS Spread</div><div class="metric-value" style="font-size:1.1rem;color:var(--rose);">${AdamKit.esc(ent.cdsSpread)} bps</div></div>
     </div>
 
     <div class="grid grid-2" style="margin-bottom:16px;">
@@ -2858,9 +2862,9 @@ window.openDossier = function(id) {
             <tr><td>Cash & Equivalents</td><td class="mono">$${ent.cash.toLocaleString()}M</td></tr>
             <tr><td>Net Debt</td><td class="mono">$${ent.netDebt.toLocaleString()}M</td></tr>
             <tr><td>LTM EBITDA</td><td class="mono">$${ent.ebitda.toLocaleString()}M</td></tr>
-            <tr><td>Net Leverage</td><td class="mono" style="font-weight:700;">${ent.leverage}x</td></tr>
-            <tr><td>Fixed Charge Coverage (FCCR)</td><td class="mono">${ent.fccr}x</td></tr>
-            <tr><td>Asset Tangibility</td><td class="mono">${ent.tangibility}%</td></tr>
+            <tr><td>Net Leverage</td><td class="mono" style="font-weight:700;">${AdamKit.esc(ent.leverage)}x</td></tr>
+            <tr><td>Fixed Charge Coverage (FCCR)</td><td class="mono">${AdamKit.esc(ent.fccr)}x</td></tr>
+            <tr><td>Asset Tangibility</td><td class="mono">${AdamKit.esc(ent.tangibility)}%</td></tr>
           </table>
         </div>
       </div>
@@ -2869,20 +2873,20 @@ window.openDossier = function(id) {
         <div class="card-header"><span class="card-title">Adversarial Agent Verification</span></div>
         <div class="card-body">
           <table class="data-table">
-            <tr><td>Alpha PD (Market Swarm)</td><td class="mono" style="color:var(--blue);">${ent.alphaPD}%</td></tr>
-            <tr><td>Beta PD (Risk Discriminator)</td><td class="mono" style="color:var(--rose);">${ent.betaPD}%</td></tr>
-            <tr><td>Adversarial Divergence</td><td class="mono" style="font-weight:700;">${ent.divergence}%</td></tr>
-            <tr><td>Autonomous Policy</td><td class="mono" style="color:var(--cyan);">${ent.agentPolicy}</td></tr>
-            <tr><td>Agent Health State</td><td><span class="badge ${ent.agentState === 'OPTIMAL' ? 'badge-pass' : 'badge-warn'}">${ent.agentState}</span></td></tr>
-            <tr><td>Leverage Covenant Cap</td><td class="mono">${ent.covenants.maxLeverage}</td></tr>
-            <tr><td>Covenant Compliance</td><td><span class="badge ${ent.covenants.status === 'COMPLIANT' ? 'badge-pass' : 'badge-fail'}">${ent.covenants.status}</span></td></tr>
+            <tr><td>Alpha PD (Market Swarm)</td><td class="mono" style="color:var(--blue);">${AdamKit.esc(ent.alphaPD)}%</td></tr>
+            <tr><td>Beta PD (Risk Discriminator)</td><td class="mono" style="color:var(--rose);">${AdamKit.esc(ent.betaPD)}%</td></tr>
+            <tr><td>Adversarial Divergence</td><td class="mono" style="font-weight:700;">${AdamKit.esc(ent.divergence)}%</td></tr>
+            <tr><td>Autonomous Policy</td><td class="mono" style="color:var(--cyan);">${AdamKit.esc(ent.agentPolicy)}</td></tr>
+            <tr><td>Agent Health State</td><td><span class="badge ${ent.agentState === 'OPTIMAL' ? 'badge-pass' : 'badge-warn'}">${AdamKit.esc(ent.agentState)}</span></td></tr>
+            <tr><td>Leverage Covenant Cap</td><td class="mono">${AdamKit.esc(ent.covenants.maxLeverage)}</td></tr>
+            <tr><td>Covenant Compliance</td><td><span class="badge ${ent.covenants.status === 'COMPLIANT' ? 'badge-pass' : 'badge-fail'}">${AdamKit.esc(ent.covenants.status)}</span></td></tr>
           </table>
         </div>
       </div>
     </div>
 
     <div style="display:flex;justify-content:flex-end;gap:8px;">
-      <button class="btn" onclick="copyDossierNonce('${ent.id}')">📋 Copy Nonce & JSON</button>
+      <button class="btn" onclick="copyDossierNonce('${AdamKit.esc(ent.id)}')">📋 Copy Nonce & JSON</button>
       <button class="btn btn-primary" onclick="closeDossier()">Close Dossier</button>
     </div>
   `;
@@ -2915,21 +2919,21 @@ window.openReportModal = function(id) {
   document.getElementById('report-body').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px;">
       <div>
-        <span class="badge badge-info" style="margin-right:8px;">${rep.type}</span>
-        <span class="mono" style="font-size:0.75rem;color:var(--text-muted);">${rep.date}</span>
+        <span class="badge badge-info" style="margin-right:8px;">${AdamKit.esc(rep.type)}</span>
+        <span class="mono" style="font-size:0.75rem;color:var(--text-muted);">${AdamKit.esc(rep.date)}</span>
       </div>
-      <div class="mono" style="font-size:0.75rem;color:var(--cyan);">Author: ${rep.author}</div>
+      <div class="mono" style="font-size:0.75rem;color:var(--cyan);">Author: ${AdamKit.esc(rep.author)}</div>
     </div>
 
-    <h3 style="font-size:1.15rem;font-weight:800;margin-bottom:12px;color:var(--text);">${rep.title}</h3>
+    <h3 style="font-size:1.15rem;font-weight:800;margin-bottom:12px;color:var(--text);">${AdamKit.esc(rep.title)}</h3>
 
     <div style="background:var(--bg-glass);border-left:3px solid var(--cyan);padding:12px 16px;border-radius:4px;margin-bottom:16px;">
       <div style="font-size:0.7rem;font-weight:700;color:var(--cyan);text-transform:uppercase;margin-bottom:4px;">Executive Summary</div>
-      <p style="font-size:0.8rem;line-height:1.5;">${rep.summary}</p>
+      <p style="font-size:0.8rem;line-height:1.5;">${AdamKit.esc(rep.summary)}</p>
     </div>
 
     <div style="font-size:0.82rem;line-height:1.65;color:var(--text-secondary);white-space:pre-wrap;margin-bottom:20px;">
-${rep.body}
+${AdamKit.esc(rep.body)}
     </div>
 
     <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:12px;">

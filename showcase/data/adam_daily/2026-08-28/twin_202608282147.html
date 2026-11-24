@@ -371,6 +371,10 @@
     100% { box-shadow: 0 0 24px rgba(6, 182, 212, 0.5); }
   }
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -1547,7 +1551,7 @@ function triggerContagionShock() {
       }
     });
     logBox.innerHTML += `<div style="color:var(--accent-amber);font-weight:700;margin-top:6px;margin-bottom:3px">[ROUND 2] Eisenberg-Noe Direct Clearing Vector</div>
-    <div style="color:var(--text-secondary);font-size:10px">${infected.length} direct counterparties impaired. Write-downs cascade across Tier 2 aggregators.</div>`;
+    <div style="color:var(--text-secondary);font-size:10px">${AdamKit.esc(infected.length)} direct counterparties impaired. Write-downs cascade across Tier 2 aggregators.</div>`;
     drawContagionNetwork();
     updateContagionKPIs(2, destroyedCap, 4.8, 0.22, 0.12);
 
@@ -1566,7 +1570,7 @@ function triggerContagionShock() {
         }
       });
       logBox.innerHTML += `<div style="color:var(--accent-rose);font-weight:700;margin-top:6px;margin-bottom:3px">[ROUND 3] Secondary Fire-Sale & Liquidity Feedback Loop</div>
-      <div style="color:var(--text-secondary);font-size:10px">${secondaryCount} additional nodes breached covenant constraints. Network reached clearing equilibrium.</div>`;
+      <div style="color:var(--text-secondary);font-size:10px">${AdamKit.esc(secondaryCount)} additional nodes breached covenant constraints. Network reached clearing equilibrium.</div>`;
       drawContagionNetwork();
       updateContagionKPIs(3, destroyedCap, 6.2, 0.42, 0.24);
 
@@ -1660,12 +1664,12 @@ function executeRatingCalculator() {
   const nonce = '0x' + Math.floor(rng.next() * 16777215).toString(16).padStart(6, '0') + Math.floor(rng.next() * 16777215).toString(16).padStart(6, '0');
   document.getElementById('calcMemo').innerHTML = `
     <div style="margin-bottom:8px;color:var(--accent-cyan);font-weight:700">=== DETERMINISTIC CREDIT UNDERWRITING MEMORANDUM ===</div>
-    <div>Composite Credit Score: <span style="color:var(--text-primary);font-weight:700">${score}/100</span> | Resulting Grade: <span style="color:var(--accent-emerald);font-weight:700">${rating}</span></div>
+    <div>Composite Credit Score: <span style="color:var(--text-primary);font-weight:700">${AdamKit.esc(score)}/100</span> | Resulting Grade: <span style="color:var(--accent-emerald);font-weight:700">${AdamKit.esc(rating)}</span></div>
     <div>Debt-to-EBITDA: <span style="color:var(--text-primary)">${leverage.toFixed(2)}x</span> (Limit: 4.75x, Headroom: ${(levHeadroomPct*100).toFixed(1)}%)</div>
     <div>Interest Coverage (ICR): <span style="color:var(--text-primary)">${icr.toFixed(2)}x</span> (Limit: 2.50x, Headroom: ${(icrHeadroomPct*100).toFixed(1)}%)</div>
     <div>Free Cash Flow: <span style="color:var(--text-primary)">$${fcf.toFixed(1)}M</span> | Revolver Utilization: <span style="color:var(--text-primary)">${(revUtil*100).toFixed(1)}%</span></div>
     <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-glass)">
-      <div>W3C PROV-O Nonce: <span style="color:var(--accent-violet)">${nonce}</span> | jsonLogic: <span style="color:var(--accent-emerald)">v2.0.0 (100% Deterministic)</span></div>
+      <div>W3C PROV-O Nonce: <span style="color:var(--accent-violet)">${AdamKit.esc(nonce)}</span> | jsonLogic: <span style="color:var(--accent-emerald)">v2.0.0 (100% Deterministic)</span></div>
       <div>Disparate Impact Ratio Check: <span style="color:var(--accent-emerald)">0.984 ∈ [0.80, 1.25] (PASS)</span></div>
     </div>
   `;
@@ -1833,7 +1837,7 @@ function renderEntTable() {
 
   const tp = Math.ceil(fEnt.length / PS), p = document.getElementById('entityPagination');
   if (tp > 1) {
-    p.innerHTML = `<button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage + 1} / ${tp}</span><button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage=${tp - 1};renderEntTable()">»</button>`;
+    p.innerHTML = `<button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage + 1} / ${AdamKit.esc(tp)}</span><button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage=${tp - 1};renderEntTable()">»</button>`;
   } else { p.innerHTML = ''; }
 }
 
@@ -1844,22 +1848,22 @@ function showDetail(id) {
     <button class="modal-close" onclick="document.getElementById('entityModal').classList.remove('show')">✕</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
       ${e.ticker ? `<span class="ticker-badge" style="font-size:12px;padding:3px 8px">${e.ticker}</span>` : ''}
-      <h2 style="font-size:18px;font-weight:800">${e.name}</h2>
-      <span class="agent-state-pill state-${e.agentState.toLowerCase()}">${e.agentState}</span>
+      <h2 style="font-size:18px;font-weight:800">${AdamKit.esc(e.name)}</h2>
+      <span class="agent-state-pill state-${e.agentState.toLowerCase()}">${AdamKit.esc(e.agentState)}</span>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
-      <span class="sector-tag">${e.sector}</span>
-      <span style="font-size:11px;color:var(--text-muted)">${e.region}</span>
+      <span class="sector-tag">${AdamKit.esc(e.sector)}</span>
+      <span style="font-size:11px;color:var(--text-muted)">${AdamKit.esc(e.region)}</span>
       ${e.marketCap ? `<span style="font-size:11px;color:var(--accent-cyan);font-weight:700">Mkt Cap: $${e.marketCap}B</span>` : ''}
-      <span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : 'rating-hy'}">${e.rating}</span>
+      <span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : 'rating-hy'}">${AdamKit.esc(e.rating)}</span>
       <span style="font-size:11px;color:var(--text-muted)">→ 12M Forward:</span>
-      <span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : 'rating-hy'}">${e.fwdRating}</span>
+      <span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : 'rating-hy'}">${AdamKit.esc(e.fwdRating)}</span>
     </div>
     <div class="stat-row">
       <div class="stat-item"><div class="stat-label">Revenue</div><div class="stat-value">$${e.revenue.toLocaleString()}M</div></div>
       <div class="stat-item"><div class="stat-label">EBITDA</div><div class="stat-value">$${e.ebitda.toLocaleString()}M</div></div>
-      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value">${e.leverage}x</div></div>
-      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value">${e.icr}x</div></div>
+      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value">${AdamKit.esc(e.leverage)}x</div></div>
+      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value">${AdamKit.esc(e.icr)}x</div></div>
     </div>
     <div class="stat-row">
       <div class="stat-item"><div class="stat-label">Liquidity Buffer</div><div class="stat-value" style="color:var(--accent-cyan)">$${e.liquidityBuffer.toLocaleString()}M</div></div>
@@ -1869,12 +1873,12 @@ function showDetail(id) {
     </div>
     <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border-glass)">
       <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Active Autonomous Reflex Policy</div>
-      <div style="font-size:12px;color:var(--accent-amber);font-weight:700;margin-top:2px">${e.activeAction} (${e.agentPolicy})</div>
+      <div style="font-size:12px;color:var(--accent-amber);font-weight:700;margin-top:2px">${AdamKit.esc(e.activeAction)} (${AdamKit.esc(e.agentPolicy)})</div>
     </div>
     <div style="margin-top:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border-glass)">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:10px;font-weight:700;color:var(--text-muted)">W3C PROV-O Cryptographic Record</span>
-        <span class="font-mono" style="font-size:10px;color:var(--accent-cyan)">Nonce: ${e.provONonce}</span>
+        <span class="font-mono" style="font-size:10px;color:var(--accent-cyan)">Nonce: ${AdamKit.esc(e.provONonce)}</span>
       </div>
       <pre style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-secondary);white-space:pre-wrap">${JSON.stringify({
         entity: (e.ticker ? e.ticker + '_' : '') + 'node_' + e.id,

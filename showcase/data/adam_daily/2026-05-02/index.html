@@ -142,6 +142,10 @@
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #1e2532; border-radius: 2px; }
         input[type=range]:focus { outline: none; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -726,8 +730,8 @@
             forecastChartInst.update();
 
             document.getElementById('forecast-narrative').innerHTML = `
-                <span class="text-accent font-bold">CONFIDENCE: ${data.confidence}</span><br>
-                ${data.narrative}
+                <span class="text-accent font-bold">CONFIDENCE: ${AdamKit.esc(data.confidence)}</span><br>
+                ${AdamKit.esc(data.narrative)}
             `;
         }
 
@@ -1023,7 +1027,7 @@
                                 <span class="text-[10px] font-display font-bold text-accent">A</span>
                             </div>
                             <div class="glass-panel p-4 border-accent/30 text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none">
-                                ${marked.parse(response)}
+                                ${marked.parse(AdamKit.esc(response))}
                             </div>
                         </div>
                     `);

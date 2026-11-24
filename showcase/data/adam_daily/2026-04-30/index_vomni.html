@@ -156,6 +156,10 @@
         .depletion-bg { width: 100%; background-color: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden;}
         .depletion-fill { height: 100%; transition: width 1.5s ease-out; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -873,7 +877,7 @@
             const val = input.value.trim();
             if(!val) return;
 
-            log.innerHTML += `<div class="text-white">> ${val}</div>`;
+            log.innerHTML += `<div class="text-white">> ${AdamKit.esc(val)}</div>`;
             input.value = '';
             log.scrollTop = log.scrollHeight;
 

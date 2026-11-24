@@ -235,6 +235,10 @@
         .node-ping { position: absolute; width: 10px; height: 10px; background: var(--theme-primary); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px var(--theme-primary); }
         .node-ping::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid var(--theme-primary); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="theme-cyan">
 
@@ -875,7 +879,7 @@ The passage of the "One Big Beautiful Bill Act" (OBBBA) mandates the largest str
 
             let delay = 0;
             messages.forEach(msg => {
-                setTimeout(() => { bootLogs.innerHTML += `<div>> ${msg}</div>`; }, delay);
+                setTimeout(() => { bootLogs.innerHTML += `<div>> ${AdamKit.esc(msg)}</div>`; }, delay);
                 delay += 150 + Math.random() * 150;
             });
 
@@ -1024,7 +1028,7 @@ The passage of the "One Big Beautiful Bill Act" (OBBBA) mandates the largest str
         // --- App: Briefing ---
         function initBriefingApp() {
             const mdContent = document.getElementById('market-mayhem-md').innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(mdContent);
+            document.getElementById('briefing-content').innerHTML = marked.parse(AdamKit.esc(mdContent));
         }
 
         // --- App: Macro & Dark Pool ---
@@ -1509,7 +1513,7 @@ The passage of the "One Big Beautiful Bill Act" (OBBBA) mandates the largest str
                                 <span class="text-[10px] font-display font-bold text-theme">A</span>
                             </div>
                             <div class="glass-panel p-4 border-theme text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none">
-                                ${marked.parse(responseHtml)}
+                                ${marked.parse(AdamKit.esc(responseHtml))}
                             </div>
                         </div>
                     `);

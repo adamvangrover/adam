@@ -94,6 +94,10 @@
 
         .math-block { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 6px; border: 1px solid #1f2937; color: #06b6d4; font-size: 0.85rem; line-height: 1.5; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black relative">
 
@@ -808,7 +812,7 @@
             else if (type === 'error') { colorClass = 'border-term-red text-term-red'; iconClass = 'fa-circle-xmark'; }
 
             toast.className = `glass-panel border-l-4 ${colorClass} px-4 py-3 rounded shadow-xl font-mono text-xs transform transition-all duration-300 translate-y-8 opacity-0 flex items-center justify-between gap-3 min-w-[300px]`;
-            toast.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${iconClass}"></i><span class="text-white">${message}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+            toast.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${iconClass}"></i><span class="text-white">${AdamKit.esc(message)}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
 
             container.appendChild(toast);
             requestAnimationFrame(() => setTimeout(() => toast.classList.remove('translate-y-8', 'opacity-0'), 10));
@@ -945,9 +949,9 @@
           const kernelStatusEl = document.getElementById("aiKernelStatus");
           if (kernelStatusEl) {
             kernelStatusEl.innerHTML = `
-              <strong>ACTIVE ASSET LOADED:</strong> ${loan.borrower} [CUSIP: ${loan.cusip}]<br>
-              <strong>SECTOR:</strong> ${loan.sector} | <strong>FACILITY:</strong> $${loan.facilitySize}M<br>
-              <strong>LEVERAGE:</strong> ${loan.leverage}x | <strong>ICR:</strong> ${loan.icr}x | <strong>RATING:</strong> ${loan.rating}
+              <strong>ACTIVE ASSET LOADED:</strong> ${AdamKit.esc(loan.borrower)} [CUSIP: ${AdamKit.esc(loan.cusip)}]<br>
+              <strong>SECTOR:</strong> ${AdamKit.esc(loan.sector)} | <strong>FACILITY:</strong> $${AdamKit.esc(loan.facilitySize)}M<br>
+              <strong>LEVERAGE:</strong> ${AdamKit.esc(loan.leverage)}x | <strong>ICR:</strong> ${AdamKit.esc(loan.icr)}x | <strong>RATING:</strong> ${AdamKit.esc(loan.rating)}
             `;
           }
         }
@@ -1026,7 +1030,7 @@ The credit exhibits metrics requiring secondary committee review. Assigned regul
                  content = `### Summary\nGenerated regulatory report for **${borrower}** with facility size $${facility}M. Assigned rating: **<span class="${ratingColor}">${rating}</span>**.\n\n*   **Leverage:** ${leverage}x\n*   **ICR:** ${icr}x\n\nDetailed supervisory review and examiner workpapers compiled automatically by ADAM v30.4.`;
             }
 
-            document.getElementById('workbenchOutput').innerHTML = marked.parse(`# ${title}\n\n${content}`);
+            document.getElementById('workbenchOutput').innerHTML = marked.parse(AdamKit.esc(`# ${title}\n\n${content}`));
         }
 
         function copyWorkbenchReport() {
@@ -1374,7 +1378,7 @@ The credit exhibits metrics requiring secondary committee review. Assigned regul
                         <div class="text-[9px] text-term-cyan font-bold mb-2 uppercase tracking-widest flex items-center gap-1.5">
                             <i class="fa-solid fa-microchip"></i> ADAM v30.4 SYNTHESIS
                         </div>
-                        <div class="font-sans leading-relaxed text-sm ai-rendered-content">${marked.parse(mockResponse)}</div>
+                        <div class="font-sans leading-relaxed text-sm ai-rendered-content">${marked.parse(AdamKit.esc(mockResponse))}</div>
                     </div>
                 `;
                 log.insertAdjacentHTML('beforeend', aiMsgHtml);

@@ -150,6 +150,10 @@
             text-shadow: 0 0 10px var(--fdos-accent-glow);
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 
 <body class="theme-adam-os flex flex-col h-screen overflow-hidden text-sm">
@@ -958,7 +962,7 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
             subnavItems.forEach(item => {
                 const btn = document.createElement('button');
                 btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-gray-400 hover:bg-gray-800/80 hover:text-white transition-all text-left mb-1 border border-transparent hover:border-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-600";
-                btn.innerHTML = `<span class="text-base">${item.icon}</span> <span class="hidden md:inline font-semibold tracking-wide">${item.label}</span>`;
+                btn.innerHTML = `<span class="text-base">${item.icon}</span> <span class="hidden md:inline font-semibold tracking-wide">${AdamKit.esc(item.label)}</span>`;
                 // Implement functional anchor scrolling
                 btn.onclick = () => {
                     const targetEl = document.getElementById(item.target);
@@ -1034,11 +1038,11 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
                 grid.innerHTML += `
                     <div class="p-4 rounded border border-gray-800 bg-black/40 hover:border-cyan-900/50 hover:bg-black/60 transition-all group">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-white text-xs block">${agent.name}</span>
-                            <span class="text-[9px] mono px-2 py-0.5 rounded bg-green-950/80 text-green-400 border border-green-800">${agent.status}</span>
+                            <span class="font-bold text-white text-xs block">${AdamKit.esc(agent.name)}</span>
+                            <span class="text-[9px] mono px-2 py-0.5 rounded bg-green-950/80 text-green-400 border border-green-800">${AdamKit.esc(agent.status)}</span>
                         </div>
-                        <span class="text-[10px] accent-text block mono mb-2">${agent.role}</span>
-                        <p class="text-[11px] text-gray-400 leading-relaxed">${agent.desc}</p>
+                        <span class="text-[10px] accent-text block mono mb-2">${AdamKit.esc(agent.role)}</span>
+                        <p class="text-[11px] text-gray-400 leading-relaxed">${AdamKit.esc(agent.desc)}</p>
                     </div>`;
             });
         }
@@ -1061,9 +1065,9 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
             whaleData.forEach(item => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-green-900/10 transition-colors">
-                        <td class="p-4 font-bold text-white border-l-2 border-transparent hover:border-green-500">${item.ticker}</td>
-                        <td class="p-4 text-gray-400">${item.signal}</td>
-                        <td class="p-4 font-bold text-green-400">${item.delta}</td>
+                        <td class="p-4 font-bold text-white border-l-2 border-transparent hover:border-green-500">${AdamKit.esc(item.ticker)}</td>
+                        <td class="p-4 text-gray-400">${AdamKit.esc(item.signal)}</td>
+                        <td class="p-4 font-bold text-green-400">${AdamKit.esc(item.delta)}</td>
                     </tr>`;
             });
         }
@@ -1076,12 +1080,12 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
                     <div class="p-5 rounded-lg border border-gray-800 bg-black/40 flex flex-col sm:flex-row justify-between items-start gap-4 hover:border-purple-500/50 transition-colors">
                         <div class="space-y-2 flex-1">
                             <div class="flex items-center gap-3">
-                                <span class="text-[10px] mono px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-800 font-bold">${log.tag}</span>
-                                <span class="font-bold text-white text-sm">${log.title}</span>
+                                <span class="text-[10px] mono px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-800 font-bold">${AdamKit.esc(log.tag)}</span>
+                                <span class="font-bold text-white text-sm">${AdamKit.esc(log.title)}</span>
                             </div>
-                            <p class="text-xs text-gray-400 leading-relaxed max-w-2xl">${log.text}</p>
+                            <p class="text-xs text-gray-400 leading-relaxed max-w-2xl">${AdamKit.esc(log.text)}</p>
                         </div>
-                        <span class="text-[10px] mono text-gray-500 shrink-0 bg-gray-900 px-2 py-1 rounded border border-gray-800">${log.date}</span>
+                        <span class="text-[10px] mono text-gray-500 shrink-0 bg-gray-900 px-2 py-1 rounded border border-gray-800">${AdamKit.esc(log.date)}</span>
                     </div>`;
             });
         }
@@ -1170,7 +1174,7 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
             if(!container) return;
             const entry = document.createElement('div');
             entry.className = "border-l-2 border-gray-700 pl-3 py-1 bg-black/30 rounded-r text-[10px] opacity-0 transition-opacity duration-500 ease-in";
-            entry.innerHTML = `<span class="text-gray-600 block mb-0.5">[${new Date().toLocaleTimeString('en-US', { hour12: false })}.2${Math.floor(Math.random()*99)}]</span> <span class="text-green-500">></span> ${msg}`;
+            entry.innerHTML = `<span class="text-gray-600 block mb-0.5">[${new Date().toLocaleTimeString('en-US', { hour12: false })}.2${Math.floor(Math.random()*99)}]</span> <span class="text-green-500">></span> ${AdamKit.esc(msg)}`;
             container.prepend(entry);
             setTimeout(() => entry.style.opacity = 1, 50);
             if (container.children.length > 25) container.removeChild(container.lastChild);
@@ -1221,7 +1225,7 @@ Failure to adhere to this deterministic JSONL schema triggers a fatal swarm over
                 const line = document.createElement('div');
                 line.className = 'border-l-2 border-gray-700 pl-2 mb-1.5 opacity-0 transition-opacity duration-300';
 
-                line.innerHTML = `<span class="text-gray-600">[EVAL_${Math.floor(Math.random() * 9000)+1000}]</span> <span class="${colorClass}">${JSON.stringify(outputObj)}</span>`;
+                line.innerHTML = `<span class="text-gray-600">[EVAL_${Math.floor(Math.random() * 9000)+1000}]</span> <span class="${AdamKit.esc(colorClass)}">${JSON.stringify(outputObj)}</span>`;
 
                 terminal.appendChild(line);
 

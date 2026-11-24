@@ -123,6 +123,10 @@
         .prob-bar-container { width: 100%; background-color: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; height: 1.5rem; display: flex; }
         .prob-bar-fill { height: 100%; display: flex; align-items: center; padding-left: 0.5rem; font-size: 0.65rem; font-family: 'Fira Code', monospace; color: #000; font-weight: bold; transition: width 1s ease-in-out; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-core-cyan selection:text-black relative text-sm">
     <div class="crt-overlay"></div>
@@ -1018,9 +1022,9 @@
                 btn.innerHTML = `
                     <div class="pl-2 transition-all duration-200 w-full">
                         <span class="font-bold text-[13px] font-display tracking-wide uppercase group-hover:text-white block">
-                            <span class="text-[10px] font-mono opacity-50 group-hover:text-core-cyan transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${m.title}
+                            <span class="text-[10px] font-mono opacity-50 group-hover:text-core-cyan transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${AdamKit.esc(m.title)}
                         </span>
-                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${m.subtitle}</span>
+                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${AdamKit.esc(m.subtitle)}</span>
                     </div>`;
                 navEl.appendChild(btn);
                 

@@ -67,6 +67,10 @@
         .nav-active { border-bottom: 2px solid #D97706; color: #D97706; }
         .tab-active { background-color: #1E293B; color: white; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased overflow-x-hidden">
 
@@ -695,12 +699,12 @@
                 
                 div.innerHTML = `
                     <div>
-                        <div class="font-bold text-brand-text group-hover:text-brand-hunt">${item.ticker}</div>
-                        <div class="text-[11px] text-brand-muted line-clamp-1">${item.company}</div>
+                        <div class="font-bold text-brand-text group-hover:text-brand-hunt">${AdamKit.esc(item.ticker)}</div>
+                        <div class="text-[11px] text-brand-muted line-clamp-1">${AdamKit.esc(item.company)}</div>
                     </div>
                     <div class="text-right flex flex-col items-end gap-1">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${badgeClass}">${item.signal}</span>
-                        <span class="text-[10px] font-mono text-brand-muted">${item.price}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${badgeClass}">${AdamKit.esc(item.signal)}</span>
+                        <span class="text-[10px] font-mono text-brand-muted">${AdamKit.esc(item.price)}</span>
                     </div>
                 `;
                 listContainer.appendChild(div);

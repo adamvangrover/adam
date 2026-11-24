@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-adam-role="terminal" data-adam-family="publications">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADAM Publications — Price-Target Explorer</title>
+<link rel="stylesheet" href="kit/adam-terminal.css">
+<script src="js/price_target_explorer.js" defer></script>
+<!-- adam-kit -->
+<link rel="stylesheet" href="kit/adam-kit.css">
+<script src="kit/adam-kit.js"></script>
+<!-- /adam-kit -->
+</head>
+<body class="adam-term">
+<header class="adam-term__bar" data-adam-hook="terminal-header">
+  <h1>Price-Target Explorer</h1>
+  <nav data-adam-hook="terminal-nav">
+    <a href="editions_browser.html">Editions</a><a href="price_target_explorer.html" aria-current="page">Price targets</a><a href="review_panel.html">Review</a><a href="catalog.html">Catalog</a>
+  </nav>
+  <span class="adam-term__muted" id="status" data-adam-hook="load-status" role="status">Loading showcase/data/publications…</span>
+</header>
+<p class="adam-term__label" role="note" data-adam-hook="estimated-label">Illustrative scenario — not investment advice. All figures are synthetic (<code>_estimated: true</code>, docs/PROVENANCE.md §2a). Machine view: <code>?view=json</code> or Alt+J.</p>
+<main class="adam-term__main">
+  <aside>
+    <section class="adam-term__panel" data-adam-hook="scenario-sliders">
+      <h2>Scenario weights</h2>
+      <label for="w-bull">Bull weight <output id="o-bull" data-adam-hook="weight-bull-value"></output></label>
+      <input id="w-bull" type="range" min="0" max="1" step="0.05" data-adam-hook="weight-bull">
+      <label for="w-bear">Bear weight <output id="o-bear" data-adam-hook="weight-bear-value"></output></label>
+      <input id="w-bear" type="range" min="0" max="1" step="0.05" data-adam-hook="weight-bear">
+      <p>Base weight <strong id="o-base" data-adam-hook="weight-base-value"></strong> (= 1 − bull − bear)</p>
+      <button type="button" id="reset" data-adam-hook="weights-reset">Reset to published weights</button>
+      <p class="adam-term__muted" id="meta" data-adam-hook="targets-meta"></p>
+    </section>
+  </aside>
+  <div>
+    <section class="adam-term__panel" data-adam-hook="targets-table">
+      <h2>Probability-weighted targets</h2>
+      <div class="adam-term__scroll"><table><thead><tr><th>Ticker</th><th>Method</th><th>Bear</th><th>Base</th><th>Bull</th><th>Published</th><th>Your weights</th><th>Reference</th><th>vs ref.</th></tr></thead><tbody id="rows" data-adam-hook="targets-rows"></tbody></table></div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

@@ -56,6 +56,10 @@
         .fade-enter { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
 
@@ -530,8 +534,8 @@
                 btn.className = `nav-item text-left px-4 py-3 rounded-r flex flex-col mb-1 border border-transparent text-term-muted`;
                 btn.onclick = () => switchModule(item.id);
                 btn.innerHTML = `
-                    <span class="font-bold text-[12px] mb-1 font-mono tracking-wide text-term-textMain">M${item.id.toString().padStart(2,'0')} // ${item.group}</span>
-                    <span class="opacity-80 text-[10px] truncate w-full font-sans">${item.title}</span>
+                    <span class="font-bold text-[12px] mb-1 font-mono tracking-wide text-term-textMain">M${item.id.toString().padStart(2,'0')} // ${AdamKit.esc(item.group)}</span>
+                    <span class="opacity-80 text-[10px] truncate w-full font-sans">${AdamKit.esc(item.title)}</span>
                 `;
                 navEl.appendChild(btn);
 

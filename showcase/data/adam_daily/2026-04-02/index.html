@@ -94,6 +94,10 @@
         .progress-container { width: 100%; background-color: #1e293b; border-radius: 9999px; overflow: hidden; height: 0.5rem; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b); transition: width 1s ease-in-out; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
     <div class="crt-overlay"></div>
@@ -846,7 +850,7 @@ graph TD
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-3 rounded-r-lg flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active shadow-sm border border-term-neon/20' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-60 text-[10px] truncate">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span><span class="opacity-60 text-[10px] truncate">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 
                 const opt = document.createElement('option');
@@ -926,7 +930,7 @@ graph TD
                 title.innerText = 'ADAM V26.0';
                 div.appendChild(title);
                 const content = document.createElement('div');
-                content.innerHTML = marked.parse(text);
+                content.innerHTML = marked.parse(AdamKit.esc(text));
                 div.appendChild(content);
             } else { 
                 div.innerText = text; 

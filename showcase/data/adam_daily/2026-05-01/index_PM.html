@@ -177,6 +177,10 @@
         .prose th { text-align: left; padding: 0.5rem; background: #21262d; color: #fff; border-bottom: 2px solid #30363d; }
         .prose td { padding: 0.5rem; border-bottom: 1px solid #21262d; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -994,7 +998,7 @@
         function initBriefingApp() {
             const container = document.getElementById('briefing-content');
             // Using Marked.js to parse the markdown from our JSON payload
-            container.innerHTML = marked.parse(payload.briefing.markdown);
+            container.innerHTML = marked.parse(AdamKit.esc(payload.briefing.markdown));
         }
 
         // --- App: Macro ---
@@ -1307,7 +1311,7 @@
                 });
                 const data = await response.json();
                 const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "NO DATA RETURNED.";
-                const parsedHtml = marked.parse(resultText);
+                const parsedHtml = marked.parse(AdamKit.esc(resultText));
 
                 document.getElementById(typingId).remove();
                 chatLog.insertAdjacentHTML('beforeend', `

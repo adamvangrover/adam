@@ -58,6 +58,10 @@
         .bento-widget { resize: both; overflow: auto; min-width: 150px; min-height: 80px; }
         .bento-widget::-webkit-scrollbar { display: none; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative theme-cyan text-sm" id="appBody">
     
@@ -176,7 +180,7 @@
                 }
                 const navItem = document.createElement('div');
                 navItem.className = 'nav-item p-2 rounded hover:bg-white/5 cursor-pointer text-xs font-sans text-slate-300 border-l-2 border-transparent hover:border-primary flex flex-col gap-1';
-                navItem.innerHTML = `<span class="font-bold text-white">${m.title}</span><span class="text-[10px] text-slate-500 font-mono">${m.subtitle}</span>`;
+                navItem.innerHTML = `<span class="font-bold text-white">${AdamKit.esc(m.title)}</span><span class="text-[10px] text-slate-500 font-mono">${AdamKit.esc(m.subtitle)}</span>`;
                 navItem.onclick = () => loadModule(m.id);
                 nav.appendChild(navItem);
             });

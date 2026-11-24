@@ -108,6 +108,10 @@
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
     <div class="crt-overlay"></div>
@@ -619,7 +623,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-3 rounded-r-lg flex flex-col mb-0.5 cursor-pointer ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] font-mono truncate">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span><span class="opacity-70 text-[10px] font-mono truncate">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 
                 const opt = document.createElement('option');

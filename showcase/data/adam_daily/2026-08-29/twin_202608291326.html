@@ -607,6 +607,10 @@
   .gauge-val { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
   .gauge-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 4px; }
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -1680,7 +1684,7 @@ function renderEntTable(){
   }).join('');
 
   const tp=Math.ceil(fEnt.length/PS),p=document.getElementById('entityPagination');
-  if(tp>1){p.innerHTML=`<button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage+1} / ${tp}</span><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage=${tp-1};renderEntTable()">»</button>`;}else{p.innerHTML='';}
+  if(tp>1){p.innerHTML=`<button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage+1} / ${AdamKit.esc(tp)}</span><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage=${tp-1};renderEntTable()">»</button>`;}else{p.innerHTML='';}
 }
 
 function showDetail(id){
@@ -1698,17 +1702,17 @@ function showDetail(id){
     <div style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:10px">
         ${e.ticker?`<span class="ticker-badge">${e.ticker}</span>`:''}
-        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${e.name}</h2>
-        <span class="agent-state-pill state-${e.agentState.toLowerCase()}">${e.agentState}</span>
+        <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${AdamKit.esc(e.name)}</h2>
+        <span class="agent-state-pill state-${e.agentState.toLowerCase()}">${AdamKit.esc(e.agentState)}</span>
       </div>
       <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
-        <span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${e.sector}</span>
-        <span style="font-size:11px;color:var(--text-muted)">${e.region}</span>
+        <span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${AdamKit.esc(e.sector)}</span>
+        <span style="font-size:11px;color:var(--text-muted)">${AdamKit.esc(e.region)}</span>
         ${e.marketCap?`<span style="font-size:11px;color:var(--accent-cyan);font-weight:700">Mkt Cap: $${e.marketCap}B</span>`:''}
-        <span class="rating-badge ${e.ratingIdx<=IG_BOUND?'rating-ig':(e.ratingIdx>=20?'rating-dist':'rating-hy')}">${e.rating}</span>
-        <span style="color:${mc2};font-weight:700;font-size:12px">${mi} (${Math.abs(e.migN)}n)</span>
-        <span class="rating-badge ${e.fwdRatingIdx<=IG_BOUND?'rating-ig':(e.fwdRatingIdx>=20?'rating-dist':'rating-hy')}">${e.fwdRating}</span>
-        <span style="font-size:11px;color:var(--accent-violet);font-weight:600">Policy: ${e.agentPolicy}</span>
+        <span class="rating-badge ${e.ratingIdx<=IG_BOUND?'rating-ig':(e.ratingIdx>=20?'rating-dist':'rating-hy')}">${AdamKit.esc(e.rating)}</span>
+        <span style="color:${AdamKit.esc(mc2)};font-weight:700;font-size:12px">${AdamKit.esc(mi)} (${Math.abs(e.migN)}n)</span>
+        <span class="rating-badge ${e.fwdRatingIdx<=IG_BOUND?'rating-ig':(e.fwdRatingIdx>=20?'rating-dist':'rating-hy')}">${AdamKit.esc(e.fwdRating)}</span>
+        <span style="font-size:11px;color:var(--accent-violet);font-weight:600">Policy: ${AdamKit.esc(e.agentPolicy)}</span>
       </div>
     </div>
     <div class="stat-row">
@@ -1718,29 +1722,29 @@ function showDetail(id){
       <div class="stat-item"><div class="stat-label">EV</div><div class="stat-value">$${e.ev.toLocaleString()}M</div></div>
     </div>
     <div class="stat-row">
-      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage>5?'var(--accent-rose)':(e.leverage>4?'var(--accent-amber)':'var(--accent-emerald)')}">${e.leverage}x</div></div>
-      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr<2?'var(--accent-rose)':(e.icr<3?'var(--accent-amber)':'var(--accent-emerald)')}">${e.icr}x</div></div>
+      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage>5?'var(--accent-rose)':(e.leverage>4?'var(--accent-amber)':'var(--accent-emerald)')}">${AdamKit.esc(e.leverage)}x</div></div>
+      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr<2?'var(--accent-rose)':(e.icr<3?'var(--accent-amber)':'var(--accent-emerald)')}">${AdamKit.esc(e.icr)}x</div></div>
       <div class="stat-item"><div class="stat-label">Liquidity Buffer</div><div class="stat-value" style="color:var(--accent-cyan)">$${e.liquidityBuffer.toLocaleString()}M</div></div>
       <div class="stat-item"><div class="stat-label">Forward PD</div><div class="stat-value" style="color:var(--accent-rose)">${e.pd.toFixed(1)} bps</div></div>
     </div>
     <div class="stat-row">
       <div class="stat-item"><div class="stat-label">LGD</div><div class="stat-value">${(e.lgd*100).toFixed(1)}%</div></div>
       <div class="stat-item"><div class="stat-label">Expected Loss</div><div class="stat-value">${(e.el*10000).toFixed(1)} bps</div></div>
-      <div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${e.cov.status}" style="text-transform:uppercase;font-size:14px">${e.cov.status}</div></div>
+      <div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${AdamKit.esc(e.cov.status)}" style="text-transform:uppercase;font-size:14px">${AdamKit.esc(e.cov.status)}</div></div>
       <div class="stat-item"><div class="stat-label">Lev Headroom</div><div class="stat-value" style="color:${e.cov.lh<0?'var(--accent-rose)':(e.cov.lh<0.1?'var(--accent-amber)':'var(--accent-emerald)')}">${(e.cov.lh*100).toFixed(1)}%</div></div>
     </div>
     <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border-glass)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px">Active Autonomous Swarm Action</div>
-      <div style="font-size:12px;color:var(--accent-amber);font-weight:700">${e.activeAction}</div>
+      <div style="font-size:12px;color:var(--accent-amber);font-weight:700">${AdamKit.esc(e.activeAction)}</div>
     </div>
     <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border-glass)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Direct Counterparty Exposure Graph Links</div>
-      <div>${cpList}</div>
+      <div>${AdamKit.esc(cpList)}</div>
     </div>
     <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid var(--border-glass)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)">W3C PROV-O Cryptographic Record</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent-cyan)">Nonce: ${e.provONonce}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent-cyan)">Nonce: ${AdamKit.esc(e.provONonce)}</span>
       </div>
       <pre style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-secondary);white-space:pre-wrap">${JSON.stringify({
         source_data_object: (e.ticker ? e.ticker + '_' : '') + 'entity_' + e.id,
@@ -2143,7 +2147,7 @@ function selectAdvNode(id) {
     .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
     .replace(/: ([0-9.]+)/g, ': <span class="json-number">$1</span>');
 
-  document.getElementById('llmContextWindow').innerHTML = `<pre style="margin:0;white-space:pre-wrap">${formatted}</pre>`;
+  document.getElementById('llmContextWindow').innerHTML = `<pre style="margin:0;white-space:pre-wrap">${AdamKit.esc(formatted)}</pre>`;
   logT('LLMContext', `Context extracted for ${d.name} [Δ ${(d.spread * 100).toFixed(1)}%]`, 'info');
 }
 
@@ -2778,7 +2782,7 @@ function triggerContagionShock() {
     });
 
     logBox.innerHTML += `<div style="color:var(--accent-amber);font-weight:700;margin-top:8px;margin-bottom:4px">[ROUND 2] Eisenberg-Noe Direct Clearing Shock</div>
-    <div style="color:var(--text-secondary);font-size:10px">${infected.length} direct counterparties impaired. Write-downs spread across Tier 2 suppliers.</div>`;
+    <div style="color:var(--text-secondary);font-size:10px">${AdamKit.esc(infected.length)} direct counterparties impaired. Write-downs spread across Tier 2 suppliers.</div>`;
 
     drawContagionNetwork();
     updateContagionKPIs(2, destroyedCap, 4.8, 0.22, 0.12);
@@ -2802,7 +2806,7 @@ function triggerContagionShock() {
       });
 
       logBox.innerHTML += `<div style="color:var(--accent-rose);font-weight:700;margin-top:8px;margin-bottom:4px">[ROUND 3] Secondary Fire-Sale & Liquidity Freezes</div>
-      <div style="color:var(--text-secondary);font-size:10px">${secondaryCount} additional nodes breached covenant limits. Systemic equilibrium reached.</div>`;
+      <div style="color:var(--text-secondary);font-size:10px">${AdamKit.esc(secondaryCount)} additional nodes breached covenant limits. Systemic equilibrium reached.</div>`;
 
       drawContagionNetwork();
       updateContagionKPIs(3, destroyedCap, 6.2, 0.42, 0.24);

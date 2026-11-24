@@ -34,6 +34,7 @@ _KINDS = (
 )
 # Ordered: first match wins, so specific families precede broad ones.
 _FAMILIES = tuple((name, re.compile(rx)) for name, rx in (
+    ("publications", r"editions_browser|price_target_explorer|review_panel"),
     ("market_mayhem", r"market_mayhem|mkt_myhm|^mm(\d|_|$)"),
     ("daily_briefing", r"daily_briefing|adam_daily|^brief$"),
     ("market_pulse", r"market_pulse|macro_pulse"),
@@ -43,11 +44,20 @@ _FAMILIES = tuple((name, re.compile(rx)) for name, rx in (
     ("adam_os", r"adam_v\d|(^|_)os($|_)|terminal"),
     ("credit", r"credit|snc|covenant|lending|banking|distress"),
     ("scenario", r"counterfactual|crisis|scenario|wargame|war_room|simulat|monte_carlo|stress"),
-    ("research", r"report|review|outlook|thematic|tech_watch|conviction|macro_update|geopolitic|equity_research|deep_dive|sector"),
+    ("research", r"report|review|outlook|thematic|tech_watch|conviction|macro_update|geopolitic|equity_research|deep_dive|sector|^research$|_cras_"),
     ("eval_governance", r"eval|governance|policy|adversarial|harness|audit|provenance"),
     ("agents", r"agent|swarm|neural|brain|cortex|nexus"),
     ("operations", r"mission_control|command_center|sentinel|monitor|radar|risk"),
     ("hub", r"hub|index|landing|navigator|archive|library|catalog"),
+    ("valuation", r"black_scholes|bond_pricer|capital_stack|(^|_)comps($|_)|(^|_)dcf($|_)|(^|_)lbo($|_)|(^|_)loan($|_)"
+                  r"|ma_model|ratios|wacc|pricing|financial_engineering|parametric|financial_twin|^fe\d*$"),
+    ("markets", r"market|13f|meme|trading|alpha|liquidity|macro|sovereign|retail|robo|portfolio|strategy|fiduciary"
+                r"|fraud|leak|future_lens|hedge_fund|private_equity|settlement|analytics|intelligence|vertical"),
+    ("knowledge", r"graph|network_map|knowledge|topography|codex|trust_explorer|search"),
+    ("platform", r"workflow|deploy|bridge|system|evolution|changelog|api_docs|readme|jules|(^|_)ide($|_)|studio|repository"
+                 r"|prompt|data|json|file_explorer|distribution|fallback|omega|holodeck|dream|chronos|chat|pocket|antigravity"
+                 r"|quantum|oswm|modular|unified|enterprise|dashboard|prototype|digital_twin|world_model|memo_synthesizer"
+                 r"|strategic_command|schedule"),
 ))
 _MONTHS = {m: i for i, m in enumerate(
     ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1)}

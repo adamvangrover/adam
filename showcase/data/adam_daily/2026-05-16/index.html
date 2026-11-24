@@ -96,6 +96,10 @@
         .heatmap-cell:hover { transform: translateY(-3px); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.3); }
         .heatmap-value { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg bg-grid-pattern text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-black">
     <div class="crt-overlay"></div>
@@ -750,10 +754,10 @@
                         const cell = document.createElement('div');
                         cell.className = `heatmap-cell ${bgClass} ${borderClass}`;
                         cell.innerHTML = `
-                            <div class="text-xs font-mono text-slate-300 mb-4">${item.sector}</div>
+                            <div class="text-xs font-mono text-slate-300 mb-4">${AdamKit.esc(item.sector)}</div>
                             <div>
-                                <div class="heatmap-value ${textClass}">${sign}${item.impact}</div>
-                                <div class="text-[10px] font-mono uppercase text-slate-400 mt-1">${item.label}</div>
+                                <div class="heatmap-value ${AdamKit.esc(textClass)}">${AdamKit.esc(sign)}${AdamKit.esc(item.impact)}</div>
+                                <div class="text-[10px] font-mono uppercase text-slate-400 mt-1">${AdamKit.esc(item.label)}</div>
                             </div>
                         `;
                         container.appendChild(cell);
@@ -1397,7 +1401,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-2.5 rounded-r-md flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate font-sans">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span><span class="opacity-70 text-[10px] truncate font-sans">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 
                 // Mobile Select Setup

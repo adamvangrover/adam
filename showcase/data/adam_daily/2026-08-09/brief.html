@@ -63,6 +63,10 @@
         ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="antialiased">
 
@@ -424,11 +428,11 @@
                 <div class="w-full space-y-6">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h2 class="text-3xl font-bold text-stone-900">${e.name}</h2>
-                            <p class="text-stone-500">${e.sector} • Deterministic Audit</p>
+                            <h2 class="text-3xl font-bold text-stone-900">${AdamKit.esc(e.name)}</h2>
+                            <p class="text-stone-500">${AdamKit.esc(e.sector)} • Deterministic Audit</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-4xl font-bold ${e.pd > 0.1 ? 'text-red-600' : 'text-stone-900'}">${e.rating}</span>
+                            <span class="text-4xl font-bold ${e.pd > 0.1 ? 'text-red-600' : 'text-stone-900'}">${AdamKit.esc(e.rating)}</span>
                             <p class="text-xs uppercase font-bold tracking-widest text-stone-400">Engine Implied</p>
                         </div>
                     </div>
@@ -450,14 +454,14 @@
 
                     <div class="bg-amber-50 border border-amber-200 p-6 rounded-xl">
                         <h4 class="font-bold text-amber-900 mb-2">Entity Diagnostic</h4>
-                        <p class="text-amber-800 text-sm leading-relaxed">${e.diagnostic}</p>
+                        <p class="text-amber-800 text-sm leading-relaxed">${AdamKit.esc(e.diagnostic)}</p>
                     </div>
 
                     <div class="space-y-4">
                         <h4 class="font-bold text-stone-900 border-b pb-2">ADAM v30.2 Logistic Audit</h4>
                         <div class="formula-box text-sm">
                             <p class="mb-2 text-stone-400 font-bold">z-equation:</p>
-                            <code class="mono">z = -2.50 + 0.85(${e.lev}) - 0.45(${e.icr}) - 0.05(${e.margin}) = ${e.z.toFixed(3)}</code>
+                            <code class="mono">z = -2.50 + 0.85(${AdamKit.esc(e.lev)}) - 0.45(${AdamKit.esc(e.icr)}) - 0.05(${AdamKit.esc(e.margin)}) = ${e.z.toFixed(3)}</code>
                             <p class="mt-4 mb-2 text-stone-400 font-bold">pd-calculation:</p>
                             <code class="mono">PD = 1 / (1 + e^-(${e.z.toFixed(3)})) = ${(e.pd * 100).toFixed(4)}%</code>
                         </div>
@@ -471,7 +475,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-bold text-stone-400 uppercase">Loss Given Default</p>
-                                <p class="text-lg font-bold text-stone-900">${e.lgd}%</p>
+                                <p class="text-lg font-bold text-stone-900">${AdamKit.esc(e.lgd)}%</p>
                             </div>
                         </div>
                         <div class="text-xs bg-stone-100 px-3 py-1 rounded text-stone-600">

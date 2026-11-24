@@ -109,6 +109,10 @@
       border: 1px solid rgba(51, 65, 85, 0.8);
     }
   </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
 
@@ -1212,7 +1216,7 @@
 
         tr.innerHTML = `
           <td class="py-3 px-3 font-bold text-white flex items-center gap-1.5">
-            <span>${tk}</span>
+            <span>${AdamKit.esc(tk)}</span>
             <span class="text-[10px] text-slate-500 font-normal">(${data.name.split(' ')[0]})</span>
           </td>
           <td class="py-3 px-2 text-slate-400 text-[11px]">${data.layer.split(':')[0]}</td>
@@ -1220,9 +1224,9 @@
           <td class="py-3 px-2 text-right text-slate-400">$${(m.D).toFixed(1)}B</td>
           <td class="py-3 px-2 text-right text-slate-300">${(data.assetVol * 100).toFixed(1)}%</td>
           <td class="py-3 px-2 text-right font-bold ${m.DD > 8 ? 'text-emerald-400' : m.DD > 5 ? 'text-sky-400' : 'text-amber-400'}">${m.DD.toFixed(1)}σ</td>
-          <td class="py-3 px-2 text-right font-semibold ${m.PD > 0.002 ? 'text-rose-400' : 'text-slate-300'}">${pdFormatted}</td>
+          <td class="py-3 px-2 text-right font-semibold ${m.PD > 0.002 ? 'text-rose-400' : 'text-slate-300'}">${AdamKit.esc(pdFormatted)}</td>
           <td class="py-3 px-2 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${ratingColor}">${m.rating}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${AdamKit.esc(ratingColor)}">${AdamKit.esc(m.rating)}</span>
           </td>
         `;
         mertonTbody.appendChild(tr);
@@ -1352,12 +1356,12 @@
 
         btn.innerHTML = `
           <div class="flex justify-between items-center mb-1">
-            <span class="font-black font-mono text-sm ${isSelected ? 'text-sky-400' : 'text-white'}">${tk}</span>
+            <span class="font-black font-mono text-sm ${isSelected ? 'text-sky-400' : 'text-white'}">${AdamKit.esc(tk)}</span>
             <span class="text-[10px] px-1.5 py-0.5 rounded ${val.upside >= 0 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'} font-mono font-bold">
               ${val.upside >= 0 ? '+' : ''}${val.upside.toFixed(0)}%
             </span>
           </div>
-          <div class="text-[11px] text-slate-400 truncate">${d.name}</div>
+          <div class="text-[11px] text-slate-400 truncate">${AdamKit.esc(d.name)}</div>
           <div class="text-xs font-mono font-bold text-slate-200 mt-1">$${val.targetPrice.toFixed(0)} <span class="text-[10px] text-slate-500 font-normal">tgt</span></div>
         `;
         grid.appendChild(btn);

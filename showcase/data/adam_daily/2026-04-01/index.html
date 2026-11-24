@@ -73,6 +73,10 @@
         .ai-message p { margin-bottom: 0.5rem; }
         .ai-message pre { background: #030712; padding: 0.5rem; border-radius: 4px; overflow-x: auto; border: 1px solid #334155; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-cyan selection:text-white">
     <div class="crt-overlay"></div>
@@ -450,7 +454,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-3 rounded-r-lg flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active shadow-sm border border-term-neon/20' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-60 text-[10px] truncate">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5">M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span><span class="opacity-60 text-[10px] truncate">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 
                 // Mobile
@@ -559,7 +563,7 @@
                 div.appendChild(title);
                 
                 const content = document.createElement('div');
-                content.innerHTML = marked.parse(text);
+                content.innerHTML = marked.parse(AdamKit.esc(text));
                 div.appendChild(content);
             } else {
                 div.innerText = text;
@@ -624,7 +628,7 @@
                 const apiKey = ""; 
                 let response = await fetchGeminiWithBackoff(prompt, systemInstruction, apiKey);
                 response = response.replace(/\`\`\`html/g, '').replace(/\`\`\`/g, '');
-                content.innerHTML = response;
+                content.textContent = response;
             } catch (e) {
                 content.innerHTML = "<span class='text-term-red'>Error communicating with Adam v26.0 core.</span>";
             } finally {

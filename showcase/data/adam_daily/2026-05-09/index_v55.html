@@ -293,6 +293,10 @@
         .text-os-text { color: var(--os-text); }
         .text-os-muted { color: var(--os-muted); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="theme-cyan">
 
@@ -1482,7 +1486,7 @@ root@adam-node:~# _</div>
             let delay = 0;
             messages.forEach((line, i) => {
                 setTimeout(() => {
-                    bootLogs.innerHTML += `<div class="mb-1 font-bold">> ${line}</div>`;
+                    bootLogs.innerHTML += `<div class="mb-1 font-bold">> ${AdamKit.esc(line)}</div>`;
                 }, delay);
                 delay += 150 + Math.random() * 200;
             });
@@ -1693,7 +1697,7 @@ root@adam-node:~# _</div>
                 if(cmd === '') return;
 
                 const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-primary').trim() || '#00e5ff';
-                output.innerHTML += `\n<span style="color:${themeColor}">root@adam-node:~#</span> <span class="text-os-text font-bold">${cmd}</span>\n`;
+                output.innerHTML += `\n<span style="color:${AdamKit.esc(themeColor)}">root@adam-node:~#</span> <span class="text-os-text font-bold">${AdamKit.esc(cmd)}</span>\n`;
                 
                 if(cmd === 'help') {
                     output.innerHTML += "AVAILABLE MODULES:\n- status: Get system metrics\n- clear: Purge buffer\n- reboot: Full kernel restart\n- open [app_id]: Launch GUI module\n- theme [color]: Update UI (cyan, matrix, crimson, purple, gold)\n- toggle_mode: Switch Light/Dark visual mode";
@@ -1711,7 +1715,7 @@ root@adam-node:~# _</div>
                     const validThemes = ['cyan', 'matrix', 'crimson', 'purple', 'gold'];
                     if(validThemes.includes(themeArg)) {
                         setTheme(themeArg);
-                        output.innerHTML += `[OK] Theme updated to ${themeArg}`;
+                        output.innerHTML += `[OK] Theme updated to ${AdamKit.esc(themeArg)}`;
                     } else {
                         output.innerHTML += `[ERROR] Invalid theme. Available: ${validThemes.join(', ')}`;
                     }
@@ -1725,12 +1729,12 @@ root@adam-node:~# _</div>
                     };
                     if (map[appName]) {
                         openApp(map[appName]);
-                        output.innerHTML += `[OK] Launched ${appName}`;
+                        output.innerHTML += `[OK] Launched ${AdamKit.esc(appName)}`;
                     } else {
                         output.innerHTML += `[ERROR] App not found.`;
                     }
                 } else {
-                    output.innerHTML += `bash: ${cmd}: command not found. Type 'help'.`;
+                    output.innerHTML += `bash: ${AdamKit.esc(cmd)}: command not found. Type 'help'.`;
                 }
                 
                 input.value = '';
@@ -1845,7 +1849,7 @@ root@adam-node:~# _</div>
                 btn.className = "text-left px-3 py-2 rounded text-xs font-mono font-bold transition-colors bg-theme-glow border border-theme text-theme shadow-sm";
             }
             const mdContent = document.getElementById(templateId).innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(mdContent);
+            document.getElementById('briefing-content').innerHTML = marked.parse(AdamKit.esc(mdContent));
         }
 
         function initBriefingApp() {
@@ -2710,9 +2714,9 @@ root@adam-node:~# _</div>
                     tr.onclick = () => toggleSyslogRow(item.event_id);
                     
                     tr.innerHTML = `
-                        <td class="text-os-muted font-bold py-3 px-2">${timeStr}</td>
-                        <td class="text-os-text font-bold py-3 px-2">${item.agent_id}</td>
-                        <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border ${getEventStyles(item.event_type)} text-[8px] font-bold">${item.event_type}</span></td>
+                        <td class="text-os-muted font-bold py-3 px-2">${AdamKit.esc(timeStr)}</td>
+                        <td class="text-os-text font-bold py-3 px-2">${AdamKit.esc(item.agent_id)}</td>
+                        <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border ${getEventStyles(item.event_type)} text-[8px] font-bold">${AdamKit.esc(item.event_type)}</span></td>
                         <td class="truncate max-w-md py-3 px-2 text-os-text">${getEventSummary(item)}</td>
                     `;
                     tbody.appendChild(tr);
@@ -3014,7 +3018,7 @@ root@adam-node:~# _</div>
                                 <span class="text-[10px] font-display font-bold text-theme transition-colors" style="filter: invert(var(--os-invert))">A</span>
                             </div>
                             <div class="glass-panel bg-os-panel p-4 border border-theme text-os-text max-w-[85%] text-xs prose prose-invert rounded-lg rounded-tl-none shadow-lg transition-colors">
-                                ${marked.parse(responseHtml)}
+                                ${marked.parse(AdamKit.esc(responseHtml))}
                             </div>
                         </div>
                     `);
@@ -3071,7 +3075,7 @@ root@adam-node:~# _</div>
             document.getElementById('artifact-type').innerText = artifact.type;
             document.getElementById('artifact-sector').innerText = artifact.sector;
             document.getElementById('artifact-id').innerText = `IDX: ${index}`;
-            document.getElementById('artifact-content').innerHTML = marked.parse(artifact.content);
+            document.getElementById('artifact-content').innerHTML = marked.parse(AdamKit.esc(artifact.content));
             
             const addBtn = document.getElementById('artifact-add-btn');
             addBtn.classList.remove('hidden');
@@ -3123,8 +3127,8 @@ root@adam-node:~# _</div>
                 const el = document.createElement('div');
                 el.className = 'bg-os-bg p-2 rounded border border-os-border text-xs font-mono flex justify-between items-center';
                 el.innerHTML = `
-                    <div class="truncate flex-1 pr-2"><span class="text-theme font-bold transition-colors">${i+1}.</span> <span class="text-os-text font-bold">${item.title}</span></div>
-                    <button onclick="removeNewsletterItem(${i})" class="text-[#ff1e38] hover:opacity-70 px-1 cursor-pointer font-bold">✕</button>
+                    <div class="truncate flex-1 pr-2"><span class="text-theme font-bold transition-colors">${i+1}.</span> <span class="text-os-text font-bold">${AdamKit.esc(item.title)}</span></div>
+                    <button onclick="removeNewsletterItem(${AdamKit.esc(i)})" class="text-[#ff1e38] hover:opacity-70 px-1 cursor-pointer font-bold">✕</button>
                 `;
                 queueEl.appendChild(el);
                 
@@ -3137,7 +3141,7 @@ root@adam-node:~# _</div>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-gray-100 text-gray-700 border border-gray-300 rounded">${item.sector}</span>
                         </div>
                         <div class="prose prose-sm max-w-none text-gray-800 ai-markdown">
-                            ${marked.parse(item.content)}
+                            ${marked.parse(AdamKit.esc(item.content))}
                         </div>
                     </div>
                 `;

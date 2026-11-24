@@ -87,6 +87,10 @@
             image-rendering: crisp-edges;
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 
 <body class="h-screen w-screen flex flex-col font-sans text-sm">
@@ -513,10 +517,10 @@
             
             logEntry.innerHTML = `
                 <div class="flex items-start mb-1">
-                    <span class="text-brand-accent mr-2">[${time}]</span>
+                    <span class="text-brand-accent mr-2">[${AdamKit.esc(time)}]</span>
                     <div>
-                        <span class="text-blue-300 font-bold">${agent}</span>: 
-                        <span class="text-gray-300">${message}</span>
+                        <span class="text-blue-300 font-bold">${AdamKit.esc(agent)}</span>: 
+                        <span class="text-gray-300">${AdamKit.esc(message)}</span>
                         <div class="text-[9px] text-gray-500 mt-0.5">
                             { "w3c_prov_o": true, "schema": "ProvenanceHeader", "conf": ${confidence.toFixed(2)} }
                         </div>

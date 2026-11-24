@@ -56,6 +56,10 @@
             .chart-container { height: 380px; }
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="p-0 m-0 overflow-x-hidden">
 
@@ -432,7 +436,7 @@ Confirming NO SVG/Mermaid. -->
         traces.forEach(log => {
             const div = document.createElement('div');
             const color = log.level === 'ERROR' ? 'text-red-400' : (log.level === 'CRIT' ? 'text-amber-500 font-bold' : 'text-stone-400');
-            div.innerHTML = `<span class="text-stone-600">[${log.timestamp.split('T')[1].replace('Z','')}]</span> <span class="text-blue-400 uppercase text-[10px]">[${log.level}]</span> <span class="${color}">${log.event}</span> ${log.error ? `<br><span class="ml-16 text-red-800 text-xs">— ${log.error}</span>` : ''}`;
+            div.innerHTML = `<span class="text-stone-600">[${log.timestamp.split('T')[1].replace('Z','')}]</span> <span class="text-blue-400 uppercase text-[10px]">[${AdamKit.esc(log.level)}]</span> <span class="${AdamKit.esc(color)}">${AdamKit.esc(log.event)}</span> ${log.error ? `<br><span class="ml-16 text-red-800 text-xs">— ${log.error}</span>` : ''}`;
             term.appendChild(div);
         });
     }

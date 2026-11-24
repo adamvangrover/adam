@@ -121,6 +121,10 @@
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-core-cyan selection:text-black relative">
     <div class="crt-overlay"></div>
@@ -928,9 +932,9 @@
                 btn.innerHTML = `
                     <div class="pl-2 transition-all duration-200 w-full">
                         <span class="font-bold text-[13px] font-display tracking-wide uppercase group-hover:text-white block">
-                            <span class="text-[10px] font-mono opacity-50 group-hover:text-core-cyan transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${m.title}
+                            <span class="text-[10px] font-mono opacity-50 group-hover:text-core-cyan transition-colors pr-1">${m.id.toString().padStart(2,'0')}</span> ${AdamKit.esc(m.title)}
                         </span>
-                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${m.subtitle}</span>
+                        <span class="opacity-60 text-[10px] truncate block font-mono mt-0.5">${AdamKit.esc(m.subtitle)}</span>
                     </div>`;
                 navEl.appendChild(btn);
                 
