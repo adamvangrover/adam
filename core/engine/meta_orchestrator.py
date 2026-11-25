@@ -41,6 +41,7 @@ from core.engine.autonomous_self_improvement import CodeAlchemist
 from core.engine.crisis_simulation_graph import crisis_simulation_app
 from core.engine.deep_dive_graph import deep_dive_app
 from core.engine.esg_graph import esg_graph_app
+from core.engine.harness import HarnessHalt, h_act, h_ctrl, h_ctx, h_ver, load_harness_policy
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 
 # --- Graph Applications ---
@@ -62,6 +63,7 @@ from core.engine.swarm.mirofish_engine import MiroFishSwarmEngine
 from core.llm_plugin import LLMPlugin
 from core.market_data.service import MarketDataService
 from core.mcp.registry import MCPRegistry
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 # --- Schemas ---
 from core.schemas.v23_5_schema import (
@@ -220,6 +222,8 @@ class MetaOrchestrator:
         """
         self.config = self._resolve_config(config or OrchestratorConfig())
 
+        self.harness_policy = load_harness_policy()
+
         self.swarm_logger = SwarmLogger()
         self.swarm_logger.log_event("SYSTEM_BOOT", "MetaOrchestrator", {"version": "v26.0.0-Beta"})
 
@@ -312,13 +316,21 @@ class MetaOrchestrator:
         self.swarm_logger.log_thought("MetaOrchestrator", f"Assessed complexity as {route.value}. Dispatching to engine.")
         self.pot_logger.log_thought("MetaOrchestrator", f"ROUTING_DECISION: {route.value}", metadata={"query": query})
 
-        # 3. Execution via Registry
-        handler = self._route_registry[route]
+        # 3. Execution via Registry, bounded by the harness (h_ctx/h_ctrl pre-turn; next_step handoffs)
+        turn_state = h_ctrl.TurnState()
         try:
-            result = await handler(query, context)
-        except Exception as e:
-            logger.critical(f"Routing Execution Failed for {route.value}: {e}", exc_info=True)
-            result = {"error": str(e), "status": "Routing Failed", "fallback": "Manual Intervention Required"}
+            agent_input, _ = h_ctx.pre_turn(AgentInput(query=query, context=context), self.harness_policy.context)
+            context = agent_input.context
+            h_ctrl.pre_turn(turn_state, self.harness_policy.control)
+            result = await self._run_route(route, query, context)
+            result = await h_ctrl.follow_handoffs(
+                result, lambda step, metadata: self._dispatch_handoff(step, metadata, query, context),
+                turn_state, self.harness_policy.control,
+            )
+        except HarnessHalt as halt:
+            logger.warning(f"Harness halted {route.value}: {halt.reason} {halt.details}")
+            self.pot_logger.log_thought("MetaOrchestrator", "HARNESS_HALT", metadata={"reason": halt.reason})
+            return halt.as_result()
 
         # 4. Meta-Cognition (Reflection)
         # Only reflect on complex outputs or if explicitly requested
@@ -329,6 +341,29 @@ class MetaOrchestrator:
         self.pot_logger.log_thought("MetaOrchestrator", "EXECUTION_COMPLETE", metadata={"status": "success", "complexity": route.value})
 
         return result
+
+    async def _run_route(self, route: Route, query: str, context: Dict[str, Any]) -> Any:
+        """Run one registry handler; errors are normalized (h_act), AgentOutputs verified (h_ver)."""
+        try:
+            result = await self._route_registry[route](query, context)
+        except HarnessHalt:
+            raise
+        except Exception as e:
+            logger.critical(f"Routing Execution Failed for {route.value}: {e}", exc_info=True)
+            return {"error": str(e), "error_detail": h_act.normalize_error(e, self.harness_policy.action),
+                    "status": "Routing Failed", "fallback": "Manual Intervention Required"}
+        if isinstance(result, AgentOutput):
+            result = h_ver.pre_stop(result, self.harness_policy)
+        return result
+
+    async def _dispatch_handoff(self, step: str, metadata: Dict[str, Any], query: str,
+                                context: Dict[str, Any]) -> Any:
+        """Route a ``metadata.next_step`` request (e.g. ``invoke_surveillance``); ``None`` if not routable."""
+        route = Route.coerce(step.removeprefix("invoke_"))
+        if route is None:
+            return None
+        handoff_context = {**context, "handoff_from": step, "handoff_payload": metadata.get("payload", {})}
+        return await self._run_route(route, metadata.get("query") or query, handoff_context)
 
     async def _enrich_context(self, query: str, context: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         """

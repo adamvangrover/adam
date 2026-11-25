@@ -6,6 +6,11 @@ Welcome to the **AOPL Master Catalog & Prompt Registry**. This registry indexes 
 
 ## 🗂️ Catalog Index by Functional Domain
 
+### 0. Runtime Root (`prompt_library/core_system.md`)
+The lean root prompt every v30.1 System 2 agent runs under. Authority: `CONSTITUTION.md`.
+- **[core_system.md](core_system.md)** (`CORE-SYS-001`): Path A isolation, PDIL boundary (LLM proposes, JSONLogic/Rust/MCP computes), 0.85/0.50 confidence tiers with mandatory HITL overrides, and the canonical `AgentOutput` contract with `provenance_trace`. Supersedes `system/agent_core.md`.
+- **Runtime enforcement:** `core/engine/harness/` lifecycle hooks (`h_ctx` pre-turn context, `h_ctrl` pre-turn control, `h_act` post-tool, `h_ver` pre-stop verification), configured by the `harness:` block of `config/agent_schema.yaml`.
+
 ### 1. Spec-It Kits (`prompt_library/spec_kits/`)
 Pre-flight deterministic blueprint specifiers converting vague goals into rigid specifications before code generation.
 - **[SPEC_KIT_ENGINEERING_CORE.md](spec_kits/SPEC_KIT_ENGINEERING_CORE.md)** (`SPEC-KIT-ENG-001`): Engineering core architecture, interface contracts, memory models, and zero-copy validation.

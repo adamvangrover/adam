@@ -103,6 +103,9 @@ Thresholds live in `config/agent_schema.yaml` (`TemplateAgentV30` reads them; do
 * **Autonomous (>= 0.85):** execution permitted for low/medium-impact actions.
 * **HITL Required (0.50 - 0.8499):** paused for human approval.
 * **Hard Abort (< 0.50):** halt and record the failure.
+* **Mandatory HITL:** high-impact actions (`harness.verification.high_impact_actions`, e.g. committing
+  capital, executing trades) set `metadata.hitl_required` even at >= 0.85; an output missing
+  `provenance_trace` or `jsonLogic_version` is hard-aborted (`core/engine/harness/h_ver.py`).
 
 ---
 
@@ -238,6 +241,25 @@ class CovenantHeadroomAgent(TemplateAgentV30):
         # deterministic math via engines/Rust, thresholds from config/*.yaml
         return answer, sources, confidence, {"next_step": "invoke_surveillance"}
 ```
+
+### Runtime root prompt and lifecycle harness
+
+* **Root prompt:** [`prompt_library/core_system.md`](prompt_library/core_system.md) (`CORE-SYS-001`) is the
+  lean runtime root for System 2 agents; new prompts use `# INHERITS: prompt_library/core_system.md`.
+  `prompt_library/system/agent_core.md` is superseded. `CONSTITUTION.md` stays the authority.
+* **Harness:** `core/engine/harness/` holds four lifecycle hooks, run by `TemplateAgentV30.execute_pydantic`
+  and `MetaOrchestrator.route_request`. Every limit is read from the `harness:` block of
+  `config/agent_schema.yaml` (`policy.py::load_harness_policy`).
+
+| Hook | Stage | Does |
+|---|---|---|
+| `h_ctx.py` | pre-turn | Masks stale observations; halts when the context token budget is exceeded. |
+| `h_ctrl.py` | pre-turn | Turn cap, duplicate tool-call breaker, bounded `metadata.next_step` handoffs. |
+| `h_act.py` | post-tool | Truncates tool stdout; normalizes errors into `ToolResult`. |
+| `h_ver.py` | pre-stop | Hard-aborts outputs without provenance / `jsonLogic_version`; forces HITL on high-impact actions. |
+
+Tools called by a `TemplateAgentV30` subclass go through `self.run_tool(name, arguments, call)` so that
+`h_ctrl` and `h_act` apply.
 
 ### Swarm protocol
 
