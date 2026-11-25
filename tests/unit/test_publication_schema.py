@@ -113,7 +113,8 @@ def test_rendered_output_escapes_injected_script(record, family):
     edition = _edition(record, family)
     html = render_html(edition)
     scripts = re.findall(r"<script\b[^>]*>", html, re.IGNORECASE)
-    assert all('src="kit/adam-kit.js"' in s or 'id="adam-operator-data"' in s for s in scripts)
+    allowed = ('src="kit/adam-kit.js"', 'src="kit/adam-publication.js"', 'id="adam-operator-data"')
+    assert all(any(a in s for a in allowed) for s in scripts)
     assert "<script>alert" not in html.lower() and "<img src=x" not in html.lower()
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert "<script>" not in render_markdown(edition)

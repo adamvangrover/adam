@@ -27,6 +27,7 @@ from core.publication.backfill import (  # noqa: E402
     GENERATOR, PATH_FILE, VERSION, EditionBuilder, ScenarioPath, edition_dates, load_config,
 )
 from core.publication.render import write_edition  # noqa: E402
+from core.publication.review import load_review_config, review_edition  # noqa: E402
 from core.publication.valuation import COVERAGE_CONFIG, compute_targets  # noqa: E402
 from core.schemas.publication import ESTIMATED_LABEL  # noqa: E402
 
@@ -58,10 +59,14 @@ def main() -> int:
     args = ap.parse_args()
     path = ScenarioPath.load()
     builder = EditionBuilder(path, cfg, mm_narratives())
+    review_cfg = load_review_config()
     index, skipped = [], []
     for family in args.families:
+        prior = None
         for d in edition_dates(family, cfg, path):
-            edition = builder.build(family, d)
+            draft = builder.build(family, d)
+            edition = draft.model_copy(update={"review": review_edition(draft, prior, review_cfg)})
+            prior = draft
             base = OUT / family / d.isoformat()
             html = html_path(cfg["families"][family]["html"], d)
             if html.exists() and 'name="adam-edition"' not in html.read_text(errors="ignore"):
@@ -71,7 +76,9 @@ def main() -> int:
             index.append({"id": edition.edition_id, "family": family, "date": d.isoformat(), "title": edition.title,
                           "json": _rel(base.with_suffix(".json")), "md": _rel(base.with_suffix(".md")),
                           "html": _rel(html) if html else None, "_estimated": edition.estimated,
-                          "tickers": [t.ticker for t in edition.price_targets]})
+                          "tickers": [t.ticker for t in edition.price_targets],
+                          "review_score": edition.review["score"], "review_verdict": edition.review["desk"]["verdict"],
+                          "flags": [f["code"] for f in edition.review["flags"]]})
     end = max(path.dates)
     trace = {"generator": GENERATOR, "inputs": [PATH_FILE, COVERAGE_CONFIG], "timestamp": f"{end.isoformat()}T21:00:00Z",
              "version": VERSION}

@@ -377,7 +377,195 @@
       "content_hash": null
     }
   ],
-  "review": {},
+  "review": {
+    "version": "1.0.0",
+    "mode": "offline",
+    "config": "config/publication_review.yaml",
+    "flags": [
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "AAPL weighted target 109.38 is -52% vs reference 228.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "MSFT weighted target 215.18 is -52% vs reference 445.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "NFLX weighted target 402.88 is -59% vs reference 980.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "NVDA weighted target 73.78 is -56% vs reference 166.00."
+      },
+      {
+        "code": "target_out_of_range",
+        "severity": "warning",
+        "hook": "price-targets",
+        "message": "TSLA weighted target 33.35 is -90% vs reference 330.00."
+      }
+    ],
+    "desk": {
+      "persona": "expert_desk",
+      "prompt": "prompt_library/publication_review/expert_desk.md",
+      "verdict": "revise",
+      "concerns": [
+        {
+          "hook": "price-targets",
+          "issue": "AAPL weighted target 109.38 is -52% vs reference 228.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "MSFT weighted target 215.18 is -52% vs reference 445.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "NFLX weighted target 402.88 is -59% vs reference 980.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "NVDA weighted target 73.78 is -56% vs reference 166.00.",
+          "severity": "warning"
+        },
+        {
+          "hook": "price-targets",
+          "issue": "TSLA weighted target 33.35 is -90% vs reference 330.00.",
+          "severity": "warning"
+        }
+      ]
+    },
+    "red_team": {
+      "agent": "PublicationRedTeam",
+      "report": "=== Red Team Exercise Report ===\nTarget System: equity_research/2026-06-01\nScenario Generated: No scenario set; challenge the calls and targets directly.\nFinal Impact Score: 10.0\nStandards Met: False\nStatus: 5 challenge(s) raised",
+      "impact_score": 10.0,
+      "challenges": [
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "AAPL weighted target 109.38 is -52% vs reference 228.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "MSFT weighted target 215.18 is -52% vs reference 445.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "NFLX weighted target 402.88 is -59% vs reference 980.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "NVDA weighted target 73.78 is -56% vs reference 166.00."
+        },
+        {
+          "code": "target_out_of_range",
+          "severity": "warning",
+          "hook": "price-targets",
+          "message": "TSLA weighted target 33.35 is -90% vs reference 330.00."
+        }
+      ],
+      "flipped_scenario": {}
+    },
+    "judge": {
+      "overall_score": 0.8808,
+      "passed": true,
+      "verdict": "PASS",
+      "weights": {
+        "correctness": 0.4,
+        "faithfulness": 0.3,
+        "reasoning_coherence": 0.2,
+        "provenance_citation": 0.1
+      },
+      "dimensions": [
+        {
+          "name": "correctness",
+          "score": 1.0,
+          "weight": 0.4,
+          "reasoning": "Exact string/phrase match with golden answer."
+        },
+        {
+          "name": "faithfulness",
+          "score": 0.6692,
+          "weight": 0.3,
+          "reasoning": "Context keyword overlap ratio: 0.45"
+        },
+        {
+          "name": "reasoning_coherence",
+          "score": 0.9,
+          "weight": 0.2,
+          "reasoning": "Answer demonstrates structured reasoning indicators."
+        },
+        {
+          "name": "provenance_citation",
+          "score": 1.0,
+          "weight": 0.1,
+          "reasoning": "Explicit provenance or source citation present."
+        }
+      ]
+    },
+    "score": 0.8808,
+    "panel": {
+      "bull": {
+        "narrative": "",
+        "targets": {},
+        "price_targets": {
+          "AAPL": 145.31,
+          "AMZN": 147.91,
+          "GOOGL": 155.25,
+          "META": 506.89,
+          "MSFT": 284.91,
+          "NFLX": 533.82,
+          "NVDA": 95.79,
+          "TSLA": 40.98,
+          "GS": 644.0,
+          "JPM": 284.05
+        }
+      },
+      "bear": {
+        "narrative": "",
+        "targets": {},
+        "price_targets": {
+          "AAPL": 71.0,
+          "AMZN": 73.75,
+          "GOOGL": 80.16,
+          "META": 262.29,
+          "MSFT": 140.48,
+          "NFLX": 261.91,
+          "NVDA": 50.04,
+          "TSLA": 25.1,
+          "GS": 448.0,
+          "JPM": 197.6
+        }
+      },
+      "red_team": {
+        "summary": "Scenario Generated: No scenario set; challenge the calls and targets directly.",
+        "challenges": [
+          "AAPL weighted target 109.38 is -52% vs reference 228.00.",
+          "MSFT weighted target 215.18 is -52% vs reference 445.00.",
+          "NFLX weighted target 402.88 is -59% vs reference 980.00.",
+          "NVDA weighted target 73.78 is -56% vs reference 166.00.",
+          "TSLA weighted target 33.35 is -90% vs reference 330.00."
+        ]
+      }
+    }
+  },
   "_estimated": true,
   "schema_version": "1.0.0"
 }

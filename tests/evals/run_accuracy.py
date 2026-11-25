@@ -1,4 +1,4 @@
-"""Accuracy runner for routing/entity eval datasets.
+"""Accuracy runner for routing/entity and publication-review eval datasets.
 
     python tests/evals/run_accuracy.py            # prints per-dataset accuracy + misses
 """
@@ -21,11 +21,18 @@ def _orchestrator():
     return orch
 
 
-def predictors() -> Dict[str, Callable[[str], Optional[str]]]:
+def _publication_flags(case: Dict[str, Any]) -> List[str]:
+    from core.publication.review import review_flags
+
+    return sorted(f["code"] for f in review_flags(case["edition"], case.get("prior")))
+
+
+def predictors() -> Dict[str, Callable[[Any], Any]]:
     orch = _orchestrator()
     return {
         "query_route": lambda q: orch._assess_complexity(q, {}).value,
         "query_entity": lambda q: orch.resolve_entity(q, {}),
+        "publication_review": _publication_flags,
     }
 
 
@@ -45,7 +52,7 @@ def main() -> int:
         failed |= acc < floor
         print(f"{name}: {acc:.1%} (floor {floor:.0%})")
         for m in misses:
-            print(f"  MISS {m['query']!r}: expected {m['expected']!r}, got {m['got']!r}")
+            print(f"  MISS {m.get('name', m['query'])!r}: expected {m['expected']!r}, got {m['got']!r}")
     return int(failed)
 
 
