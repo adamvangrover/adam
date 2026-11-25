@@ -69,6 +69,35 @@ Generators that produce or update these: `scripts/update_daily_briefings.py`, `s
 `market-mayhem/standalone/generate_standalone_publication.py`. Generated HTML should be regenerated, not
 hand-edited, when a generator exists for it.
 
+### 3a. Schema-rendered publication templates (current)
+
+Every edition is first an `Edition` record ([`core/schemas/publication.py`](../core/schemas/publication.py),
+Pydantic) written as JSON, then rendered to Markdown and HTML by
+[`core/publication/render.py`](../core/publication/render.py). The HTML pages above (3) are kept as copyable
+earlier generations; new editions use these templates.
+
+| Family | Templates (`showcase/templates/publication/`) | Cadence |
+|---|---|---|
+| Market Mayhem | `market_mayhem.{md,html}.j2` | Weekly |
+| Daily Briefing | `daily_briefing.{md,html}.j2` | Business-daily |
+| Market Pulse | `market_pulse.{md,html}.j2` | Weekly |
+| House View | `house_view.{md,html}.j2` | Monthly |
+| Equity Research | `equity_research.{md,html}.j2` | Monthly / on event |
+| Sector Outlook | `sector_outlook.{md,html}.j2` | Quarterly |
+| Credit Memo | `credit_memo.{md,html}.j2` | On event |
+| Deep Dive | `deep_dive.{md,html}.j2` | On event |
+
+* Shared layout: `_base.{md,html}.j2`. Family files extend it and override blocks `kicker`,
+  `snapshot_title`, `calls_title`, `before_sections`, `after_sections`, `review`.
+* HTML pages load `showcase/kit/adam-kit.{css,js}` (inside the `<!-- adam-kit -->` block, so
+  `scripts/apply_showcase_kit.py` stays idempotent) plus `showcase/kit/adam-publication.css`; every section
+  has a `data-adam-hook`; the full record is embedded as `<script id="adam-operator-data" type="application/json">`
+  so `?view=json` / Alt+J return the rendered data.
+* Jinja autoescape is on; Markdown output escapes raw `<`/`>`. Editions with any `_estimated` part show the
+  "Illustrative scenario — not investment advice" label.
+* To add a family: add it to `Family` in the schema, copy one `<family>.{md,html}.j2` pair, and extend
+  `tests/unit/test_publication_schema.py` (it renders the fixture through every family).
+
 ## 4. Terminal variants
 
 | Variant | Path | Style | Copy | Customize |
