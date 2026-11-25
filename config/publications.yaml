@@ -1,0 +1,55 @@
+# Publication backfill: cadence, call rules and narrative phrasing (consumed by core/publication/backfill.py).
+# Thresholds and phrasing live here, not in Python. All generated numbers are _estimated (synthetic path).
+window: {start: "2026-04-01", end: "2026-11-24"}
+families:
+  market_mayhem:  {cadence: weekly,   weekday: 4, cadence_days: 7,  html: "showcase/Market_Mayhem_{Y}_{m}_{d}.html", title: "Week in review: {lead}"}
+  daily_briefing: {cadence: daily,    cadence_days: 3, html: "showcase/Daily_Briefing_{Y}_{m}_{d}.html", title: "Daily briefing: {lead}"}
+  market_pulse:   {cadence: weekly,   weekday: 4, cadence_days: 7,  html: "showcase/Market_Pulse_{Y}_{m}_{d}.html", title: "Pulse: {regime} regime"}
+  house_view:     {cadence: monthly,  cadence_days: 31, html: "showcase/House_View_{Y}_{m}_{d}.html", title: "House view, {month}: {regime} regime"}
+  equity_research: {cadence: monthly, cadence_days: 31, html: "showcase/Equity_Research_{Y}_{m}_{d}.html", title: "Coverage price targets, {month}"}
+  sector_outlook: {cadence: quarterly, cadence_days: 92, html: "showcase/Sector_Outlook_{Y}_{m}_{d}.html", title: "Sector outlook, {quarter}"}
+lookback_days: {daily: 1, weekly: 5, monthly: 21, quarterly: 63}
+snapshot_series: [spx, ndx, ust10y, ust2y, vix, hy_oas, brent, gold, dxy, btc]
+change_units: {log: "%", level: "bp"}
+regimes:            # first match wins; evaluated on the edition-date VIX level
+  - {name: stressed, vix_min: 25}
+  - {name: cautious, vix_min: 18}
+  - {name: calm,     vix_min: 0}
+call_rules:         # stance from the lookback change of a series (pct for log series, bp for level series)
+  - {subject: "US equities (S&P 500)", series: spx,    up: 2.0,  down: -2.0, if_up: overweight, if_down: underweight}
+  - {subject: "Duration (UST 10Y)",    series: ust10y, up: 15.0, down: -15.0, if_up: underweight, if_down: overweight}
+  - {subject: "High-yield credit",     series: hy_oas, up: 5.0,  down: -5.0, if_up: underweight, if_down: overweight}
+  - {subject: "Energy (Brent)",        series: brent,  up: 5.0,  down: -5.0, if_up: overweight, if_down: underweight}
+  - {subject: "Gold",                  series: gold,   up: 3.0,  down: -3.0, if_up: overweight, if_down: neutral}
+conviction: {base: 0.45, per_threshold: 0.15, max: 0.85}
+scenarios:          # SPX targets over the horizon = level * (1 + drift +/- k * vol * sqrt(horizon_days))
+  horizon_days: 63
+  base: {probability: 0.5,  k: 0.0}
+  bull: {probability: 0.25, k: 1.0}
+  bear: {probability: 0.25, k: -1.25}
+  narrative:
+    base: "Path-consistent drift; rates and spreads stay inside their recent ranges."
+    bull: "Volatility compresses and equities extend; long-end yields ease."
+    bear: "Volatility re-prices higher; credit spreads widen and equities give back recent gains."
+risks:              # probability = base * clamp(vix / 20, 0.5, 1.6)
+  - {name: "Long-end rates shock", base: 0.25, impact: high, description: "10Y breaks the upper end of its synthetic range."}
+  - {name: "Credit spread gap", base: 0.2, impact: high, description: "HY OAS widens faster than equity volatility implies."}
+  - {name: "Energy supply shock", base: 0.15, impact: medium, description: "Brent re-tests the late-October synthetic high."}
+sectors:            # sector outlook: sector -> driver series and sign (+1: rising series is positive)
+  Technology: {series: ndx, sign: 1}
+  Financials: {series: ust2y, sign: 1}
+  Energy: {series: brent, sign: 1}
+  Real Estate: {series: ust10y, sign: -1}
+  Utilities: {series: vix, sign: 1}
+phrases:
+  up: "rose"
+  down: "fell"
+  flat: "was little changed"
+  move: "{label} {verb} {chg} to {value}"
+  lead_section: "Over the {window}, {moves}."
+  regime_section: "VIX at {vix} puts the synthetic tape in a {regime} regime."
+  window: {daily: "session", weekly: "week", monthly: "month", quarterly: "quarter"}
+  pt_section: "Targets are computed by core/engine/valuation_utils.py from config/valuation/coverage_2026.yaml with the {rfr}% synthetic 10Y as the risk-free rate."
+  narrative_ref: "Narrative for this week is in {ref} (unverified, kept as written)."
+  disclaimer: "Synthetic scenario path (data/scenarios/2026H2_path.json); no live market data. Illustrative scenario — not investment advice."
+pt_calls: {overweight_upside: 0.10, underweight_downside: -0.10}   # weighted target vs reference price
