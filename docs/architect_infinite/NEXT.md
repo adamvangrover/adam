@@ -1,3 +1,8 @@
+Below is **`ADAM_V30_NEXT_GENESIS_CAPSULE.md`**—a single, self-contained, additive, portable artifact designed to drop directly into `adamvangrover/adam` (or execute verbatim in Devin, Gemini, Claude, or a local terminal). It unifies the **README**, **System Constitution**, **ADR-0001**, **Research Specification**, **Polymorphic Output Contract**, and **Repaired Executable Verification Engine** into one verifiable unit.
+
+---
+
+```markdown
 ---
 artifact_id: "ADAM-V30-NEXT-GENESIS-2026-11-25"
 schema_version: "EvidenceEnvelope.v2.0"
@@ -110,3 +115,229 @@ Every ADAM deliverable—whether a **Forward Price Target**, **Credit Rating / S
     "artifact_sha256": "PENDING_LOCAL_INGEST_HASH"
   }
 }
+
+```
+
+---
+
+## 5. STEP-BY-STEP EXECUTION ROADMAP (FOR DEVIN / FRONTIER MODELS)
+
+Execute strictly in sequence on `release/v30.next` (NEVER force-push or merge directly to `main`):
+
+1. **Phase 0 — Unified Runtime & Doc Fabric:** Lock root `uv` + `Cargo` + `pnpm` workspaces, composable `deploy/compose.yml` profiles (`core`, `infra`, `swarm`, `ui`, `lab`), `scripts/boot_sec_check.sh` (POSIX exit 0–4), `.adam_halt` / Redis kill latch, and Tier 1 canonical docs (`LLM_README.md` -> `AGENTS.md` -> `CONSTITUTION.md` -> `AGENT_CATALOG.md`).
+2. **Phase 1 — Non-Destructive Branch Harvest (204 PRs):** Run `scripts/triage_branches.py` to classify all open PRs into Plane A1 (Kernel/Security), Plane A2 (Domains/Swarms), Plane B (`lab/`), and Superseded. Emit `docs/V30_NEXT_TRIAGE_REPORT.md`, `MERGE_LEDGER.jsonl`, and non-executed `scripts/cleanup_stale_prs.sh`. Enforce CI AST Import Firewall.
+3. **Phase 2 — 50+ Agent Async Swarm & Rust Hot Path:** Wire NATS JetStream (System 1) + Temporal (System 2) + `rust/adam_core/` (PyO3) + 4 harness hooks (`h_ctx`, `h_ctrl`, `h_act`, `h_ver`). Prove scale with `scripts/bench_swarm_100.py` (100 concurrent agents, p50/p95/p99/p99.9 latency, zero deadlocks, mid-flight `.adam_halt`).
+4. **Phase 3 — Self-Reporting Consensus & Calibration Registry:** Wire `SelfReportTelemetry`, read-only `schemas/calibration_registry.json`, calibration-weighted `Nexus` arbiter, and asymmetric `AFOS-SNT-01` veto.
+5. **Phase 4 — Expert Human Bottleneck Console:** Wire VoI Escalation Router + thin `apps/studio/` 6-Dimension Review Console + append-only `EXPERIENCE.md` one-way safety ratchet.
+6. **Phase 5 — Isomorphic Data Plane & Market Mayhem Acceptance Gate:** Wire `EvidenceEnvelope v2` + `config/data_adapters.yaml` + `lab/calibration/shadow_reconcile.py`. Pass all 8 Adversarial Red-Team tests (Sybil collusion, self-report gaming, 100-agent latency storm, epistemic laundering, evaluator tamper, PDIL bypass, kill latch, Path B firewall) and open a single HITL PR (`release/v30.next -> main`) with `V30_NEXT_DECISION_PACKET.md`.
+
+---
+
+## 6. EMBEDDED EXECUTABLE VERIFIER (REPAIRED PDIL + LAYER 3 EVALUATOR)
+
+The two blocks below repair the stripped operators in `market_mayhem_pdil_v30_next.json` (`==` and `*`) and provide a zero-dependency Python 3.11+ verifier (`adam_verify.py`) that validates any polymorphic ADAM artifact, enforces anti-laundering, executes PDIL rules, seals SHA-256 hashes, and appends W3C PROV-O records to `MERGE_LEDGER.jsonl`.
+
+### 6.1 Repaired `pdil_v30_next.json`
+
+```json
+{
+  "jsonLogic_version": "pdil_v30.next.2026-11-25",
+  "owner": "2LoD Credit Risk Control / AFOS-SNT-01",
+  "read_only_runtime": true,
+  "rules": {
+    "credit_regime_classification": {
+      "if": [
+        { ">=": [{ "var": "hy_oas_bps" }, 450] }, "DISTRESSED_FREEZE",
+        {
+          "or": [
+            { ">=": [{ "var": "hy_oas_bps" }, 375] },
+            { ">=": [{ "var": "hy_5d_widening_bps" }, 50] }
+          ]
+        }, "ELEVATED_STRESS",
+        "NORMAL_MONITORING"
+      ]
+    },
+    "bidirectional_divergence_alert": {
+      "and": [
+        { ">=": [{ "var": "hy_5d_widening_bps" }, 40] },
+        { ">": [{ "var": "dow_close_pct" }, 0] },
+        { ">=": [{ "var": "vix" }, 25] }
+      ]
+    },
+    "snc_grade_from_icr": {
+      "if": [
+        { "<": [{ "var": "stressed_icr" }, 1.1] }, "DOUBTFUL",
+        { "<": [{ "var": "stressed_icr" }, 1.5] }, "SUBSTANDARD",
+        { "<": [{ "var": "stressed_icr" }, 1.85] }, "SPECIAL_MENTION",
+        "PASS_WATCH"
+      ]
+    },
+    "layer0_gate_status": {
+      "if": [
+        {
+          "or": [
+            { ">": [{ "var": "epistemic_laundering_violations" }, 0] },
+            { "==": [{ "var": "pdil_version_present" }, false] },
+            { "==": [{ "var": "evaluator_integrity_ok" }, false] }
+          ]
+        }, "FAIL",
+        {
+          "or": [
+            { ">": [{ "var": "max_series_lag_days" }, 1] },
+            { ">": [{ "var": "unsealed_hash_count" }, 0] },
+            { "==": [{ "var": "is_tier2_publication" }, true] },
+            { "==": [{ "var": "sentinel_veto_triggered" }, true] }
+          ]
+        }, "HOLD",
+        "PASS"
+      ]
+    },
+    "layer1_weighted_score": {
+      "+": [
+        { "*": [{ "var": "analytical_accuracy" }, 0.45] },
+        { "*": [{ "var": "epistemic_governance" }, 0.35] },
+        { "*": [{ "var": "actionability_pareto" }, 0.20] }
+      ]
+    },
+    "effective_autonomous_score": {
+      "if": [
+        { "==": [{ "var": "layer0_status" }, "PASS"] },
+        { "var": "layer1_score" },
+        0.0
+      ]
+    }
+  }
+}
+
+```
+
+### 6.2 Zero-Dependency Verifier (`adam_verify.py`)
+
+```python
+#!/usr/bin/env python3
+"""ADAM v30.next Portable Layer 3 Verifier (POSIX Exit: 0=PASS, 2=HOLD, 4=FAIL)."""
+from __future__ import annotations
+import argparse, hashlib, json, sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+ALLOWED_EPISTEMIC = {
+    "OBSERVED", "CALCULATED", "SYNTHETIC_CALIBRATED",
+    "STATIC_FIXTURE", "MODEL_EST", "PENDING", "REJECTED",
+}
+
+def eval_jl(expr: Any, data: dict[str, Any]) -> Any:
+    if not isinstance(expr, dict) or len(expr) != 1:
+        return expr
+    op, args = next(iter(expr.items()))
+    args = args if isinstance(args, list) else [args]
+    if op == "var":
+        return data.get(args[0], args[1] if len(args) > 1 else None)
+    if op == "if":
+        for i in range(0, len(args) - 1, 2):
+            if eval_jl(args[i], data):
+                return eval_jl(args[i + 1], data)
+        return eval_jl(args[-1], data) if len(args) % 2 == 1 else None
+    v = [eval_jl(a, data) for a in args]
+    ops = {
+        "==": lambda: v[0] == v[1], "!=": lambda: v[0] != v[1],
+        ">": lambda: v[0] > v[1], ">=": lambda: v[0] >= v[1],
+        "<": lambda: v[0] < v[1], "<=": lambda: v[0] <= v[1],
+        "and": lambda: all(bool(x) for x in v),
+        "or": lambda: any(bool(x) for x in v),
+        "+": lambda: sum(v),
+        "*": lambda: v[0] * v[1] if len(v) == 2 else eval_jl({"*": [v[0] * v[1], *v[2:]]}, data),
+    }
+    if op not in ops:
+        raise ValueError(f"Unsupported jsonLogic operator: {op}")
+    return ops[op]()
+
+def sha256_canonical(obj: Any) -> str:
+    return hashlib.sha256(json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+def verify_bundle(prov_path: Path, pdil_path: Path, seal: bool, human_approved: bool) -> int:
+    root = prov_path.parent.resolve()
+    for p in (prov_path.resolve(), pdil_path.resolve()):
+        if not p.is_relative_to(root):
+            print(f"FATAL: Path traversal blocked: {p}", file=sys.stderr)
+            return 4
+
+    prov = json.loads(prov_path.read_text(encoding="utf-8"))
+    pdil = json.loads(pdil_path.read_text(encoding="utf-8"))
+    rules = pdil["rules"]
+    envelopes = prov.get("evidence_envelopes", [])
+
+    if seal:
+        for env in envelopes:
+            env["artifact_sha256"] = sha256_canonical({
+                k: env.get(k) for k in ("envelope_id", "epistemic_class", "canonical_uri", "valid_time", "payload")
+            })
+            if "calibration_snapshot_sha256" in env:
+                env["calibration_snapshot_sha256"] = sha256_canonical(pdil)
+        prov_path.write_text(json.dumps(prov, indent=2) + "\n", encoding="utf-8")
+
+    laundering, unsealed, max_lag, findings = 0, 0, 0, []
+    for env in envelopes:
+        eid, ec, uri, dig = env.get("envelope_id", "?"), env.get("epistemic_class"), str(env.get("canonical_uri", "")), env.get("artifact_sha256", "")
+        if ec not in ALLOWED_EPISTEMIC:
+            laundering += 1; findings.append(f"FAIL [{eid}]: invalid epistemic_class '{ec}'")
+        if ec == "OBSERVED" and (not uri.startswith("https://") or uri.startswith(("sim://", "pdil://"))):
+            laundering += 1; findings.append(f"FAIL [{eid}]: epistemic laundering on OBSERVED URI '{uri}'")
+        if not isinstance(dig, str) or len(dig) != 64 or dig == "PENDING_LOCAL_INGEST_HASH":
+            unsealed += 1
+        max_lag = max(max_lag, int(env.get("lag_business_days", 0) or 0))
+
+    l1_scores = prov["governance_gate"]["layer1_component_scores"]
+    l1 = round(eval_jl(rules["layer1_weighted_score"], l1_scores), 2)
+    l0 = eval_jl(rules["layer0_gate_status"], {
+        "epistemic_laundering_violations": laundering,
+        "pdil_version_present": bool(pdil.get("jsonLogic_version")),
+        "evaluator_integrity_ok": bool(pdil.get("read_only_runtime", False)),
+        "max_series_lag_days": max_lag,
+        "unsealed_hash_count": unsealed,
+        "is_tier2_publication": not human_approved,
+        "sentinel_veto_triggered": False if human_approved else any(
+            e.get("payload", {}).get("sentinel_veto_triggered") for e in envelopes
+        ),
+    })
+    eff = eval_jl(rules["effective_autonomous_score"], {"layer0_status": l0, "layer1_score": l1})
+
+    record = {
+        "@context": {"prov": "[http://www.w3.org/ns/prov#](http://www.w3.org/ns/prov#)"},
+        "prov:Entity": prov.get("issue_id"),
+        "prov:wasGeneratedBy": "adam_verify.py",
+        "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "pdil_version": pdil.get("jsonLogic_version"),
+        "layer0_status": l0,
+        "layer1_composite_score": l1,
+        "effective_autonomous_score": eff,
+        "laundering_violations": laundering,
+        "unsealed_hashes": unsealed,
+        "max_lag_days": max_lag,
+        "findings": findings,
+    }
+    if seal:
+        ledger = (root / "MERGE_LEDGER.jsonl").resolve()
+        if ledger.is_relative_to(root):
+            with ledger.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(record, sort_keys=True) + "\n")
+    print(json.dumps(record, indent=2))
+    return 0 if l0 == "PASS" else (2 if l0 == "HOLD" else 4)
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--prov", type=Path, default=Path("market_mayhem_2026_11_25.prov.json"))
+    ap.add_argument("--pdil", type=Path, default=Path("pdil_v30_next.json"))
+    ap.add_argument("--seal-hashes", action="store_true")
+    ap.add_argument("--human-approved", action="store_true")
+    a = ap.parse_args()
+    sys.exit(verify_bundle(a.prov, a.pdil, a.seal_hashes, a.human_approved))
+
+```
+
+```
+
+<FollowUp label="Want me to generate the companion scripts/triage_branches.py and CI AST Import Firewall script to drop alongside this Genesis Capsule?" query="Generate the self-contained scripts/triage_branches.py (for classifying all 204 open PRs into Plane A1/A2/B/Superseded) and the CI AST Import Firewall script (enforcing Path A/B isolation and P0 security hygiene) ready to drop into adamvangrover/adam on release/v30.next."/>
+
+```
