@@ -31,7 +31,7 @@ _SPEC.loader.exec_module(bdm)
         ("13f_tracker", "markets", None),
         ("knowledge_graph", "knowledge", None),
         ("workflow_orchestrator", "platform", None),
-        ("research", "research", None),
+        ("research", "knowledge", None),
     ],
 )
 def test_family_and_edition_date(stem, family, date):

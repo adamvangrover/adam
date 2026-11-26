@@ -4,7 +4,7 @@ Idempotent rewrite, re-run after adding a page:
 * inserts the shared kit (``<!-- adam-kit -->`` block) so pages can call ``AdamKit.esc``;
 * wraps simple ``${name}`` / ``${obj.field}`` interpolations inside ``.innerHTML = `...` `` /
   ``+= `...` `` template literals with ``AdamKit.esc(...)`` (names that carry pre-built markup, e.g.
-  ``rowsHtml``, or variables assigned a ``<...>`` string literal, are left alone);
+  ``rowsHtml``, or variables holding an HTML literal, rendered Markdown or a ``.map`` of HTML, are left alone);
 * renders Markdown through ``AdamKit.markdown(...)`` (raw HTML escaped, fences kept) and writes raw LLM
   ``response`` strings as text.
 
@@ -26,6 +26,8 @@ _SIMPLE_RE = re.compile(r"^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\[\d+\])*\s*
 _MARKUP_RE = re.compile(r"html|svg|icon|badge|rows?$|cells|markup|tpl|template|spark|bars?$", re.IGNORECASE)
 _MARKED_RE = re.compile(r"marked\.parse\(AdamKit\.esc\(([^()]*(?:\([^()]*\))?[^()]*)\)\)|marked\.parse\(")
 _MARKUP_ASSIGN_RE = re.compile(r"\b([A-Za-z_$][\w$]*)\s*\+?=\s*(?:[^;`'\"]*\?\s*)?[`'\"]\s*<")
+_RENDERED_RE = re.compile(r"\b([A-Za-z_$][\w$]*)\s*=\s*(?:AdamKit\.markdown|marked\.parse|DOMPurify\.sanitize)\(")
+_MAP_ASSIGN_RE = re.compile(r"\b([A-Za-z_$][\w$]*)\s*=\s*[^;\n]*?\.map\(")
 _RESPONSE_RE = re.compile(r"\.innerHTML\s*=\s*response\s*;")
 
 
@@ -57,8 +59,13 @@ def _literal_end(text: str, start: int) -> tuple[int, list[tuple[int, int]]]:
 
 
 def _markup_vars(text: str) -> set[str]:
-    """Variables the page assigns an HTML string literal to (pre-built markup, not data)."""
-    return set(_MARKUP_ASSIGN_RE.findall(text))
+    """Variables holding pre-built markup: assigned an HTML literal, rendered Markdown, or a ``.map`` of HTML."""
+    names = set(_MARKUP_ASSIGN_RE.findall(text)) | set(_RENDERED_RE.findall(text))
+    for m in _MAP_ASSIGN_RE.finditer(text):
+        end = text.find(".join(", m.end())
+        if end != -1 and end - m.end() < 2000 and re.search(r"[`'\"]\s*<", text[m.end():end]):
+            names.add(m.group(1))
+    return names
 
 
 def _is_data(expr: str, markup: set[str]) -> bool:

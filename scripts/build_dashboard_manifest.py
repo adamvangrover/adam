@@ -44,7 +44,7 @@ _FAMILIES = tuple((name, re.compile(rx)) for name, rx in (
     ("adam_os", r"adam_v\d|(^|_)os($|_)|terminal"),
     ("credit", r"credit|snc|covenant|lending|banking|distress"),
     ("scenario", r"counterfactual|crisis|scenario|wargame|war_room|simulat|monte_carlo|stress"),
-    ("research", r"report|review|outlook|thematic|tech_watch|conviction|macro_update|geopolitic|equity_research|deep_dive|sector|^research$|_cras_"),
+    ("research", r"report|review|outlook|thematic|tech_watch|conviction|macro_update|geopolitic|equity_research|deep_dive|sector|_cras_"),
     ("eval_governance", r"eval|governance|policy|adversarial|harness|audit|provenance"),
     ("agents", r"agent|swarm|neural|brain|cortex|nexus"),
     ("operations", r"mission_control|command_center|sentinel|monitor|radar|risk"),
@@ -53,7 +53,7 @@ _FAMILIES = tuple((name, re.compile(rx)) for name, rx in (
                   r"|ma_model|ratios|wacc|pricing|financial_engineering|parametric|financial_twin|^fe\d*$"),
     ("markets", r"market|13f|meme|trading|alpha|liquidity|macro|sovereign|retail|robo|portfolio|strategy|fiduciary"
                 r"|fraud|leak|future_lens|hedge_fund|private_equity|settlement|analytics|intelligence|vertical"),
-    ("knowledge", r"graph|network_map|knowledge|topography|codex|trust_explorer|search"),
+    ("knowledge", r"graph|network_map|knowledge|topography|codex|trust_explorer|search|^research$"),
     ("platform", r"workflow|deploy|bridge|system|evolution|changelog|api_docs|readme|jules|(^|_)ide($|_)|studio|repository"
                  r"|prompt|data|json|file_explorer|distribution|fallback|omega|holodeck|dream|chronos|chat|pocket|antigravity"
                  r"|quantum|oswm|modular|unified|enterprise|dashboard|prototype|digital_twin|world_model|memo_synthesizer"
