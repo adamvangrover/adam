@@ -79,9 +79,10 @@ def test_harden_keeps_markup_variables_and_markdown_fences():
     spec.loader.exec_module(mod)
     src = ("<head></head><script>let btns = ''; btns += `<button>${t}</button>`;"
            "const dot = on ? `<i></i>` : '';"
-           "c.innerHTML = `${btns}${dot}${AdamKit.esc(btns)}${name}`; d.innerHTML = marked.parse(AdamKit.esc(md));"
+           "const md2 = AdamKit.markdown(x); const lst = xs.map(v => {\n const t = v; return `<b>${t}</b>`;\n}).join('');"
+           "c.innerHTML = `${btns}${dot}${AdamKit.esc(btns)}${name}${AdamKit.esc(md2)}${lst}`; d.innerHTML = marked.parse(AdamKit.esc(md));"
            "e.innerHTML = marked.parse(raw);</script>")
     out = mod.harden(src, "../kit")
-    assert "${btns}${dot}${btns}${AdamKit.esc(name)}" in out
+    assert "${btns}${dot}${btns}${AdamKit.esc(name)}${md2}${lst}" in out
     assert "AdamKit.markdown(md)" in out and "AdamKit.markdown(raw)" in out and "marked.parse" not in out
     assert mod.harden(out, "../kit") == out
