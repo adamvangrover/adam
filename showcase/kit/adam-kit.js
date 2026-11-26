@@ -1,7 +1,7 @@
 /* ADAM showcase kit: shared escaping helpers and the machine operator surface.
  * Load with <script src=".../kit/adam-kit.js"></script> in <head> so inline scripts can call AdamKit.esc (scripts/apply_showcase_kit.py does this).
  *   AdamKit.esc(value)             -> HTML-escaped string for interpolation into innerHTML
- *   AdamKit.markdown(src)          -> marked.parse(src) with raw HTML blocks/inline HTML escaped
+ *   AdamKit.markdown(src)          -> marked.parse(src) passed through an allowlist HTML sanitizer
  *   AdamKit.html`<b>${value}</b>`  -> tagged template that escapes every interpolation
  *   AdamKit.publish(key, data)     -> add page data to the operator JSON view
  *   AdamKit.snapshot()             -> {page, role, family, canonical, hooks, data}
@@ -92,13 +92,35 @@
     if (wantJson) showJson();
   }
 
-  // Markdown via window.marked with raw HTML escaped (code fences and formatting kept); plain text without marked.
+  // Markdown via window.marked, then an allowlist sanitizer: unknown tags are unwrapped (script/style/etc. dropped),
+  // only href/src/alt/title/class attributes survive and URLs go through safeUrl. Plain text without marked.
+  const MD_TAGS = new Set("a b blockquote br code del div em h1 h2 h3 h4 h5 h6 hr i img li ol p pre s span strong sub sup table tbody td th thead tr ul".split(" "));
+  const MD_DROP = new Set(["script", "style", "iframe", "object", "embed", "template", "noscript", "svg", "math", "form", "link", "meta", "base"]);
+  const MD_ATTRS = new Set(["href", "src", "alt", "title", "class"]);
+  const sanitize = (node) => {
+    Array.from(node.childNodes).forEach((child) => {
+      if (child.nodeType !== 1) {
+        if (child.nodeType !== 3) child.remove();
+        return;
+      }
+      const tag = child.tagName.toLowerCase();
+      if (MD_DROP.has(tag)) return child.remove();
+      sanitize(child);
+      if (!MD_TAGS.has(tag)) return child.replaceWith(...child.childNodes);
+      Array.from(child.attributes).forEach((at) => {
+        const name = at.name.toLowerCase();
+        if (!MD_ATTRS.has(name)) child.removeAttribute(at.name);
+        else if (name === "href" || name === "src") child.setAttribute(name, safeUrl(at.value));
+      });
+    });
+    return node;
+  };
   const markdown = (src) => {
     const m = window.marked;
-    if (!m || !m.Renderer) return esc(src);
-    const renderer = new m.Renderer();
-    renderer.html = (t) => esc(typeof t === "string" ? t : t.text || t.raw || "");
-    return (m.parse || m)(String(src === undefined || src === null ? "" : src), { renderer });
+    const text = String(src === undefined || src === null ? "" : src);
+    if (!m || typeof DOMParser === "undefined") return esc(text);
+    const doc = new DOMParser().parseFromString("<body>" + (m.parse || m)(text) + "</body>", "text/html");
+    return sanitize(doc.body).innerHTML;
   };
 
   window.AdamKit = { esc, html, safeUrl, markdown, publish, snapshot, showJson };
