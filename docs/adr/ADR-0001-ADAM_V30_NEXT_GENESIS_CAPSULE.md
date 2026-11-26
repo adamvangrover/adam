@@ -404,3 +404,47 @@ python3 adam_verify.py --prov market_mayhem_2026_11_25.prov.json --pdil pdil_v30
 
 ```
 ```
+Append **Section 10** below as the final block of `ADAM_V30_NEXT_GENESIS_CAPSULE.md` (`ADR-0001`). It makes the committed file self-extracting and locks the exact binary criteria to freeze `v1` and cut `v2`.
+
+```markdown
+---
+
+## 10. V1 FREEZE, SELF-EXTRACTION & V2 GRADUATION CONTRACT
+
+### 10.1 Zero-Copy Self-Extraction (Run Locally or in Devin)
+Unpack `pdil_v30_next.json` and `adam_verify.py` directly from this committed ADR without manual copy-paste:
+
+```bash
+python3 -c '
+import re, pathlib
+t = pathlib.Path("docs/ADAM_V30_NEXT_GENESIS_CAPSULE.md").read_text(encoding="utf-8")
+m_json = re.search(r"### 6\.1.*?```json\n(.*?)\n```", t, re.S)
+m_py = re.search(r"### 6\.2.*?```python\n(.*?)\n```", t, re.S)
+pathlib.Path("pdil_v30_next.json").write_text(m_json.group(1).strip() + "\n", encoding="utf-8")
+pathlib.Path("adam_verify.py").write_text(m_py.group(1).strip() + "\n", encoding="utf-8")
+print("Extracted pdil_v30_next.json and adam_verify.py")
+'
+
+```
+
+### 10.2 V1 Freeze -> V2 Cutover Criteria (Stop Appending When All 4 Are True)
+
+Do not append further architectural specs to `ADR-0001`. Freeze `v1` and open `ADR-0002 (v2)` once `release/v30.next` satisfies all four binary gates:
+
+1. **Branch Harvest Complete:** All 204 open PRs triaged into `docs/V30_NEXT_TRIAGE_REPORT.md` and canonical namespaces (`src/adam/`, `rust/adam_core/`, `apps/studio/`, `lab/`) merged on `release/v30.next`.
+2. **Red-Team Floor Green:** `RT-01` through `RT-08` pass in CI with zero Path B imports in `src/adam/` and zero P0 security defects.
+3. **100-Agent Soak Proven:** `scripts/bench_swarm_100.py` passes with bounded p99 latency, zero deadlocks, and verified `.adam_halt` mid-flight stop.
+4. **Live Sealed Acceptance:** One end-to-end Market Mayhem bundle executes against `adam_verify.py --seal-hashes` and clears Expert Human Bottleneck sign-off (`exit 0`).
+
+### 10.3 Append-Only Freeze Marker (`MERGE_LEDGER.jsonl`)
+
+```jsonl
+{"entry_id":"GENESIS-0002","timestamp_utc":"2026-11-25T23:45:00Z","actor":"Adam Van Grover","artifact_id":"ADAM-V30-NEXT-GENESIS-2026-11-25","action":"FREEZE_ADR_0001_V1","layer0_status":"HOLD","next_milestone":"Execute Phase 0-1 in Devin on release/v30.next; cut ADR-0002 (v2) upon 4-gate graduation."}
+
+```
+
+```
+
+<FollowUp label="Ready for the single-shot Devin dispatch prompt pointing directly at this committed ADR-0001 to start Phase 0 and Phase 1?" query="Write a concise, token-efficient Devin dispatch prompt that points directly at docs/ADAM_V30_NEXT_GENESIS_CAPSULE.md (ADR-0001) to execute Phase 0 (unified runtime fabric) and Phase 1 (204-PR triage and namespace consolidation) on release/v30.next."/>
+
+```
