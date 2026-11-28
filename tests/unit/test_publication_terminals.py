@@ -17,7 +17,7 @@ def test_terminal_page_is_kit_wired_and_hooked(name):
     assert 'data-adam-family="publications"' in html and "not investment advice" in html
     for tag in _INTERACTIVE_RE.finditer(html):
         assert "data-adam-hook=" in tag.group(0), tag.group(0)
-    inline = [s for s in re.findall(r"<script\b([^>]*)>(.*?)</script>", html, re.S) if "src=" not in s[0]]
+    inline = [s for s in re.findall(r"<script\b([^>]*)>(.*?)</script>", html, re.S | re.IGNORECASE) if "src=" not in s[0]]
     assert not inline, "terminals must not embed inline scripts / literal datasets"
 
 
