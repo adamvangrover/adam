@@ -10,6 +10,7 @@
 
     <!-- Chart.js for Visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
     <!-- Marked.js for LLM Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -971,7 +972,7 @@
                 
                 const content = document.createElement('div');
                 content.className = "relative z-10";
-                content.innerHTML = typeof marked !== 'undefined' ? AdamKit.markdown(text) : text;
+                content.innerHTML = DOMPurify.sanitize(typeof marked !== 'undefined' ? AdamKit.markdown(text) : text);
                 div.appendChild(content);
             } else {
                 div.innerText = text;
