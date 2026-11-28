@@ -1,0 +1,30 @@
+name: showcase-manifest-fresh
+
+# Fails when a committed generated showcase artifact is stale: regenerate the catalogs/manifests,
+# re-apply the shared kit and re-harden the Adam Daily pages, then require a clean tree.
+on:
+  pull_request:
+    paths: ["showcase/**", "scripts/build_dashboard_manifest.py", "scripts/apply_showcase_kit.py", "scripts/harden_adam_daily.py", "scripts/templates/**"]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  manifest-fresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate showcase manifests and kit wiring
+        run: |
+          python scripts/build_dashboard_manifest.py
+          python scripts/build_dashboard_manifest.py --root showcase --hub catalog.html \
+            --include dashboards apps portal status_terminal events widgets templates archive_v2
+          python scripts/apply_showcase_kit.py
+          python scripts/harden_adam_daily.py
+      - name: Committed artifacts must be fresh
+        run: git diff --exit-code -- showcase

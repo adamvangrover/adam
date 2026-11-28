@@ -383,6 +383,10 @@
   .covenant-watch { color: var(--accent-amber); }
   .covenant-breach { color: var(--accent-rose); }
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -1240,7 +1244,7 @@ function renderEntTable() {
     p.innerHTML = `
       <button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage=0;renderEntTable()">«</button>
       <button class="sim-btn" ${cPage === 0 ? 'disabled' : ''} onclick="cPage--;renderEntTable()">‹</button>
-      <span style="font-size:11px;color:var(--text-secondary)">Page ${cPage + 1} / ${tp}</span>
+      <span style="font-size:11px;color:var(--text-secondary)">Page ${cPage + 1} / ${AdamKit.esc(tp)}</span>
       <button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage++;renderEntTable()">›</button>
       <button class="sim-btn" ${cPage >= tp - 1 ? 'disabled' : ''} onclick="cPage=${tp - 1};renderEntTable()">»</button>`;
   } else {
@@ -1270,13 +1274,13 @@ function showDetail(id) {
   document.getElementById('entityModalContent').innerHTML = `
     <button class="modal-close" onclick="document.getElementById('entityModal').classList.remove('show')">✕</button>
     <div style="margin-bottom:16px">
-      <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${e.name}</h2>
+      <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${AdamKit.esc(e.name)}</h2>
       <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
-        <span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${e.sector}</span>
-        <span style="font-size:11px;color:var(--text-muted)">${e.region}</span>
-        <span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : (e.ratingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.rating}</span>
-        <span style="color:${mc2};font-weight:700;font-size:12px">${mi} (${Math.abs(e.migN)}n)</span>
-        <span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : (e.fwdRatingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${e.fwdRating}</span>
+        <span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${AdamKit.esc(e.sector)}</span>
+        <span style="font-size:11px;color:var(--text-muted)">${AdamKit.esc(e.region)}</span>
+        <span class="rating-badge ${e.ratingIdx <= IG_BOUND ? 'rating-ig' : (e.ratingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${AdamKit.esc(e.rating)}</span>
+        <span style="color:${AdamKit.esc(mc2)};font-weight:700;font-size:12px">${AdamKit.esc(mi)} (${Math.abs(e.migN)}n)</span>
+        <span class="rating-badge ${e.fwdRatingIdx <= IG_BOUND ? 'rating-ig' : (e.fwdRatingIdx >= 20 ? 'rating-dist' : 'rating-hy')}">${AdamKit.esc(e.fwdRating)}</span>
       </div>
     </div>
     
@@ -1288,16 +1292,16 @@ function showDetail(id) {
     </div>
     
     <div class="stat-row">
-      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage > 5 ? 'var(--accent-rose)' : (e.leverage > 4 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${e.leverage}x</div></div>
-      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr < 2 ? 'var(--accent-rose)' : (e.icr < 3 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${e.icr}x</div></div>
-      <div class="stat-item"><div class="stat-label">FCCR</div><div class="stat-value">${e.fccr}x</div></div>
+      <div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage > 5 ? 'var(--accent-rose)' : (e.leverage > 4 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${AdamKit.esc(e.leverage)}x</div></div>
+      <div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr < 2 ? 'var(--accent-rose)' : (e.icr < 3 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${AdamKit.esc(e.icr)}x</div></div>
+      <div class="stat-item"><div class="stat-label">FCCR</div><div class="stat-value">${AdamKit.esc(e.fccr)}x</div></div>
       <div class="stat-item"><div class="stat-label">Forward PD</div><div class="stat-value" style="color:var(--accent-rose)">${e.pd.toLocaleString(undefined, {maximumFractionDigits:1})} bps</div></div>
     </div>
     
     <div class="stat-row">
       <div class="stat-item"><div class="stat-label">LGD</div><div class="stat-value">${(e.lgd * 100).toFixed(1)}%</div></div>
       <div class="stat-item"><div class="stat-label">Expected Loss</div><div class="stat-value">${(e.el * 10000).toLocaleString(undefined, {maximumFractionDigits:1})} bps</div></div>
-      <div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${e.cov.status}" style="text-transform:uppercase;font-size:14px">${e.cov.status}</div></div>
+      <div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${AdamKit.esc(e.cov.status)}" style="text-transform:uppercase;font-size:14px">${AdamKit.esc(e.cov.status)}</div></div>
       <div class="stat-item"><div class="stat-label">Lev Headroom</div><div class="stat-value" style="color:${e.cov.lh < 0 ? 'var(--accent-rose)' : (e.cov.lh < 0.1 ? 'var(--accent-amber)' : 'var(--accent-emerald)')}">${(e.cov.lh * 100).toFixed(1)}%</div></div>
     </div>
     

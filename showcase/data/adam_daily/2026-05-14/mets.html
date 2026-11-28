@@ -72,6 +72,10 @@
         /* 3D Canvas focus ring removal */
         canvas { outline: none; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="min-h-screen p-4 md:p-6 lg:p-8">
 
@@ -785,21 +789,21 @@
                     <td class="py-4 pr-4 text-slate-200">
                         <div class="font-medium flex items-center">
                             ${isVerified ? '<i class="fas fa-check-circle text-emerald-500 mr-2 text-xs"></i>' : ''}
-                            ${item.claim}
+                            ${AdamKit.esc(item.claim)}
                         </div>
-                        <div class="text-xs text-slate-500 mono mt-1">ID: ${item.id}</div>
+                        <div class="text-xs text-slate-500 mono mt-1">ID: ${AdamKit.esc(item.id)}</div>
                     </td>
                     <td class="py-4 px-4 text-slate-400 text-xs italic">
-                        <i class="fas fa-link text-slate-600 mr-1"></i>${item.source}
+                        <i class="fas fa-link text-slate-600 mr-1"></i>${AdamKit.esc(item.source)}
                     </td>
                     <td class="py-4 px-4">
-                        <div id="conf-${item.id}">${getConfidenceBar(item.confidence, item.color)}</div>
+                        <div id="conf-${AdamKit.esc(item.id)}">${getConfidenceBar(item.confidence, item.color)}</div>
                     </td>
                     <td class="py-4 px-4 text-center">
-                        <div id="conv-${item.id}">${getConvictionBadge(item.conviction, isVerified)}</div>
+                        <div id="conv-${AdamKit.esc(item.id)}">${getConvictionBadge(item.conviction, isVerified)}</div>
                     </td>
                     <td class="py-4 pl-4 text-right mono">
-                        <span class="px-2 py-1 rounded transition-all duration-300 border ${weightClass}" id="weight-${item.id}">w=${item.weight.toFixed(2)}</span>
+                        <span class="px-2 py-1 rounded transition-all duration-300 border ${AdamKit.esc(weightClass)}" id="weight-${AdamKit.esc(item.id)}">w=${item.weight.toFixed(2)}</span>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -854,8 +858,8 @@
 
             for (let i = 0; i < provenanceData.length; i++) {
                 const item = provenanceData[i];
-                terminal.innerHTML += `<div class="mt-2 text-slate-300">> <span class="text-yellow-400">STEP ${i+1}:</span> Verifying Claim [${item.id}]</div>`;
-                terminal.innerHTML += `<div class="text-slate-500 pl-4">> Requesting: <span class="text-slate-400">${item.verifyEndpoint}</span></div>`;
+                terminal.innerHTML += `<div class="mt-2 text-slate-300">> <span class="text-yellow-400">STEP ${i+1}:</span> Verifying Claim [${AdamKit.esc(item.id)}]</div>`;
+                terminal.innerHTML += `<div class="text-slate-500 pl-4">> Requesting: <span class="text-slate-400">${AdamKit.esc(item.verifyEndpoint)}</span></div>`;
                 terminal.scrollTop = terminal.scrollHeight;
                 await sleep(600); 
 

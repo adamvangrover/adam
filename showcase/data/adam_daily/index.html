@@ -130,6 +130,10 @@
         .log-error { border-left-color: theme('colors.cyber.red'); color: theme('colors.cyber.red'); }
         .log-warn { border-left-color: theme('colors.cyber.amber'); color: theme('colors.cyber.amber'); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../kit/adam-kit.css">
+<script src="../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="font-sans antialiased text-sm">
     <div class="crt-overlay"></div>
@@ -293,7 +297,7 @@
         dates2026.forEach(date => {
             const el = document.createElement('div');
             el.className = 'nav-item p-2 text-xs font-mono rounded';
-            el.innerHTML = `${date}`;
+            el.innerHTML = `${AdamKit.esc(date)}`;
             el.onclick = () => loadDate(date, el);
             nexusDatesContainer.appendChild(el);
         });
@@ -559,7 +563,7 @@
             const div = document.createElement('div');
             div.className = `log-line ${type === 'error' ? 'log-error' : type === 'warn' ? 'log-warn' : 'text-os-text'}`;
             const time = new Date().toISOString().substring(11, 23);
-            div.innerHTML = `<span class="text-os-muted">[${time}]</span> ${msg}`;
+            div.innerHTML = `<span class="text-os-muted">[${AdamKit.esc(time)}]</span> ${AdamKit.esc(msg)}`;
             logsContainer.appendChild(div);
             
             if (logsContainer.children.length > 100) {

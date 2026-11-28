@@ -72,6 +72,10 @@
         }
         .pulse-status { animation: pulse-red 2s infinite; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="antialiased">
 
@@ -353,12 +357,12 @@
             <div class="animate-in slide-in-from-right duration-300">
                 <div class="flex items-center gap-4 mb-6">
                     <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-2xl">${s.icon}</div>
-                    <h3 class="text-2xl font-bold text-slate-900">${s.title} Analysis</h3>
+                    <h3 class="text-2xl font-bold text-slate-900">${AdamKit.esc(s.title)} Analysis</h3>
                 </div>
-                <p class="text-xl text-slate-700 leading-relaxed mb-8 border-l-4 border-amber-500 pl-6">${s.content}</p>
+                <p class="text-xl text-slate-700 leading-relaxed mb-8 border-l-4 border-amber-500 pl-6">${AdamKit.esc(s.content)}</p>
                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                     <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Institutional Indicator</h4>
-                    <p class="text-sm font-medium text-slate-900">${s.detail}</p>
+                    <p class="text-sm font-medium text-slate-900">${AdamKit.esc(s.detail)}</p>
                 </div>
             </div>
             <div class="mt-auto pt-8 flex justify-between items-center border-t border-slate-100">
@@ -397,8 +401,8 @@
                     </div>
                 </div>
                 <div class="bg-slate-100 rounded-3xl p-8 border border-slate-200 flex flex-col items-center justify-center text-center">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">${data.label}</span>
-                    <div class="text-6xl font-bold mono text-slate-900 mb-8">${data.metric}</div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">${AdamKit.esc(data.label)}</span>
+                    <div class="text-6xl font-bold mono text-slate-900 mb-8">${AdamKit.esc(data.metric)}</div>
                     <div class="chart-container !h-48 w-full bg-white rounded-xl p-4"><canvas id="sliceMiniChart"></canvas></div>
                 </div>
             </div>
@@ -420,10 +424,10 @@
                     <div class="flex justify-between items-start mb-8">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">${id.toUpperCase()} Dashboard</h2>
-                            <span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase mt-2 inline-block">${data.outlook}</span>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase mt-2 inline-block">${AdamKit.esc(data.outlook)}</span>
                         </div>
                         <div class="text-right">
-                            <div class="text-3xl font-bold mono">${data.price}</div>
+                            <div class="text-3xl font-bold mono">${AdamKit.esc(data.price)}</div>
                             <span class="text-[10px] font-bold text-slate-400">INDEX SPOT / SPREAD</span>
                         </div>
                     </div>
@@ -439,7 +443,7 @@
                     </div>
                     <div class="bg-white border border-slate-200 rounded-3xl p-8">
                         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Institutional Rec</h4>
-                        <p class="text-sm font-bold text-slate-900">${data.rec}</p>
+                        <p class="text-sm font-bold text-slate-900">${AdamKit.esc(data.rec)}</p>
                     </div>
                 </div>
             </div>

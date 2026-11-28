@@ -95,6 +95,10 @@
             counter-reset: line;
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
     <div class="crt-scanlines"></div>
@@ -932,8 +936,8 @@
                 btn.className = `w-full text-left px-3 py-2 rounded-lg border-l-2 border-transparent transition-all duration-150 flex flex-col ${ws.id === activeWorkspaceId ? 'nav-tab-active' : 'text-slate-400 hover:bg-white/5'}`;
                 btn.onclick = () => switchWorkspace(ws.id);
                 btn.innerHTML = `
-                    <span class="font-bold text-[11px] text-white tracking-wide">M${ws.id.toString().padStart(2, '0')}: ${ws.title}</span>
-                    <span class="text-[9px] text-slate-500 truncate">${ws.subtitle}</span>
+                    <span class="font-bold text-[11px] text-white tracking-wide">M${ws.id.toString().padStart(2, '0')}: ${AdamKit.esc(ws.title)}</span>
+                    <span class="text-[9px] text-slate-500 truncate">${AdamKit.esc(ws.subtitle)}</span>
                 `;
                 navEl.appendChild(btn);
 
@@ -1028,7 +1032,7 @@
             
             const uMsg = document.createElement('div');
             uMsg.className = 'glass-panel p-2.5 rounded-lg text-white border-l-2 border-term-amber';
-            uMsg.innerHTML = `<span class="text-[9px] text-term-amber font-bold block uppercase">OPERATOR PROMPT</span><p>${query}</p>`;
+            uMsg.innerHTML = `<span class="text-[9px] text-term-amber font-bold block uppercase">OPERATOR PROMPT</span><p>${AdamKit.esc(query)}</p>`;
             log.appendChild(uMsg);
             input.value = '';
 
@@ -1050,7 +1054,7 @@
 
                 const rMsg = document.createElement('div');
                 rMsg.className = 'glass-panel p-2.5 rounded-lg text-slate-200 border-l-2 border-term-cyan';
-                rMsg.innerHTML = `<span class="text-[9px] text-term-cyan font-bold block uppercase">ADAM v30 REASONING</span><p>${response}</p>`;
+                rMsg.innerHTML = `<span class="text-[9px] text-term-cyan font-bold block uppercase">ADAM v30 REASONING</span><p>${AdamKit.esc(response)}</p>`;
                 log.appendChild(rMsg);
                 log.scrollTop = log.scrollHeight;
             }, 250);
@@ -1077,8 +1081,8 @@
                     line.innerHTML = `
                         <span class="text-term-green font-bold">[PASS]</span>
                         <div>
-                            <span class="text-white font-bold">${g.name}</span>
-                            <div class="text-[10px] text-slate-400 font-sans">${g.detail}</div>
+                            <span class="text-white font-bold">${AdamKit.esc(g.name)}</span>
+                            <div class="text-[10px] text-slate-400 font-sans">${AdamKit.esc(g.detail)}</div>
                         </div>
                     `;
                     consoleEl.appendChild(line);

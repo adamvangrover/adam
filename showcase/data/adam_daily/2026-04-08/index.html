@@ -140,6 +140,10 @@
         @keyframes pulse-chart { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
         .chart-container { animation: pulse-chart 4s infinite; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-green selection:text-white">
     <div class="crt-overlay"></div>
@@ -799,7 +803,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-2.5 rounded-r-lg flex flex-col mb-0.5 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${m.title}</span><span class="opacity-70 text-[10px] truncate">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[13px] mb-0.5 font-display tracking-wide uppercase">M${m.id.toString().padStart(2,'0')} ${AdamKit.esc(m.title)}</span><span class="opacity-70 text-[10px] truncate">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
 
                 // Mobile Option
@@ -900,7 +904,7 @@
                 title.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> ADAM V26.0';
                 div.appendChild(title);
                 const content = document.createElement('div');
-                content.innerHTML = marked.parse(text);
+                content.innerHTML = AdamKit.markdown(text);
                 div.appendChild(content);
             } else {
                 div.innerText = text;

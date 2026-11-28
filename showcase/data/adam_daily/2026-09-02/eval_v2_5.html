@@ -136,6 +136,10 @@ table.dt tr:hover td{background:rgba(59,130,246,0.03)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(100,116,139,0.2);border-radius:3px}
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -523,17 +527,17 @@ function renderNewsletter(){
   <hr class="nl-divider">
 
   <div class="nl-section">
-    <h3>📊 Credit Landscape Summary — ${N} Issuers</h3>
+    <h3>📊 Credit Landscape Summary — ${AdamKit.esc(N)} Issuers</h3>
     <div class="metrics">
-      <div class="metric"><div class="metric-label">Investment Grade</div><div class="metric-value" style="color:var(--accent-emerald)">${ig} <span style="font-size:11px;font-weight:400">(${(ig/N*100).toFixed(1)}%)</span></div></div>
-      <div class="metric"><div class="metric-label">High Yield</div><div class="metric-value" style="color:var(--accent-amber)">${hy}</div></div>
-      <div class="metric"><div class="metric-label">Distressed / D</div><div class="metric-value" style="color:var(--accent-rose)">${dist}</div></div>
+      <div class="metric"><div class="metric-label">Investment Grade</div><div class="metric-value" style="color:var(--accent-emerald)">${AdamKit.esc(ig)} <span style="font-size:11px;font-weight:400">(${(ig/N*100).toFixed(1)}%)</span></div></div>
+      <div class="metric"><div class="metric-label">High Yield</div><div class="metric-value" style="color:var(--accent-amber)">${AdamKit.esc(hy)}</div></div>
+      <div class="metric"><div class="metric-label">Distressed / D</div><div class="metric-value" style="color:var(--accent-rose)">${AdamKit.esc(dist)}</div></div>
       <div class="metric"><div class="metric-label">Avg Forward PD</div><div class="metric-value" style="color:${avgPD>200?'var(--accent-rose)':'var(--accent-emerald)'}">${avgPD.toFixed(1)} bps</div></div>
-      <div class="metric"><div class="metric-label">Covenant Breaches</div><div class="metric-value" style="color:var(--accent-rose)">${breaches}</div></div>
-      <div class="metric"><div class="metric-label">Fallen Angels</div><div class="metric-value" style="color:var(--accent-rose)">${fallenAngels}</div></div>
+      <div class="metric"><div class="metric-label">Covenant Breaches</div><div class="metric-value" style="color:var(--accent-rose)">${AdamKit.esc(breaches)}</div></div>
+      <div class="metric"><div class="metric-label">Fallen Angels</div><div class="metric-value" style="color:var(--accent-rose)">${AdamKit.esc(fallenAngels)}</div></div>
     </div>
-    <p><strong>Migration outlook:</strong> <span class="nl-stat nl-up">↑ ${upgrades} upgrades</span> vs <span class="nl-stat nl-down">↓ ${downgrades} downgrades</span> with <span class="nl-stat nl-neutral">→ ${stables} stable</span>. Net migration tilt: <strong>${downgrades>upgrades?'NEGATIVE — credit cycle deteriorating':'POSITIVE — credit cycle firming'}</strong>.</p>
-    <p><strong>${fallenAngels} fallen angels</strong> (IG→HY crossover) identified, offset by <strong>${risingStars} rising stars</strong> (HY→IG recovery). The ${fallenAngels>risingStars?'net negative':'net positive'} crossover pipeline signals ${fallenAngels>risingStars?'mounting':'abating'} pressure on HY index composition.</p>
+    <p><strong>Migration outlook:</strong> <span class="nl-stat nl-up">↑ ${AdamKit.esc(upgrades)} upgrades</span> vs <span class="nl-stat nl-down">↓ ${AdamKit.esc(downgrades)} downgrades</span> with <span class="nl-stat nl-neutral">→ ${AdamKit.esc(stables)} stable</span>. Net migration tilt: <strong>${downgrades>upgrades?'NEGATIVE — credit cycle deteriorating':'POSITIVE — credit cycle firming'}</strong>.</p>
+    <p><strong>${AdamKit.esc(fallenAngels)} fallen angels</strong> (IG→HY crossover) identified, offset by <strong>${AdamKit.esc(risingStars)} rising stars</strong> (HY→IG recovery). The ${fallenAngels>risingStars?'net negative':'net positive'} crossover pipeline signals ${fallenAngels>risingStars?'mounting':'abating'} pressure on HY index composition.</p>
   </div>
 
   <hr class="nl-divider">
@@ -588,7 +592,7 @@ function renderNewsletter(){
     <div class="metrics">
       <div class="metric"><div class="metric-label">Mean Divergence (Δ)</div><div class="metric-value" style="color:var(--accent-amber)">${(avgDelta*100).toFixed(2)}%</div></div>
       <div class="metric"><div class="metric-label">Max Divergence Node</div><div class="metric-value" style="font-size:12px">${maxDeltaEntity.ticker||maxDeltaEntity.name.substring(0,16)}</div></div>
-      <div class="metric"><div class="metric-label">High Div. Count (Δ>.25)</div><div class="metric-value" style="color:${highDivCount>50?'var(--accent-rose)':'var(--accent-emerald)'}">${highDivCount}</div></div>
+      <div class="metric"><div class="metric-label">High Div. Count (Δ>.25)</div><div class="metric-value" style="color:${highDivCount>50?'var(--accent-rose)':'var(--accent-emerald)'}">${AdamKit.esc(highDivCount)}</div></div>
     </div>
     <table class="dt"><thead><tr><th>Entity</th><th>Sector</th><th>α PD</th><th>β PD</th><th>Δ Spread</th><th>Rating</th></tr></thead>
     <tbody>${topDiv.map(e=>`<tr>
@@ -612,7 +616,7 @@ function renderNewsletter(){
       <div class="metric"><div class="metric-label">Target Cash/Hedge</div><div class="metric-value" style="color:var(--accent-blue)">5.0%</div></div>
     </div>
     <div class="nl-callout">
-      <p>💡 <strong>Citations & Rationale:</strong> The 65/30/5 split is mathematically justified by the computed CVaR(99.9%) of ${cvar999.toFixed(1)} bps and the heightened high-divergence node count (${highDivCount} entities). This allocation minimizes the risk of catastrophic drawdown during the tail-event scenario mapped by the quantum amplitude estimation model (Ref: ADAM Quant Core, "Adversarial Portfolio Optimization," Vol 4. 2026).</p>
+      <p>💡 <strong>Citations & Rationale:</strong> The 65/30/5 split is mathematically justified by the computed CVaR(99.9%) of ${cvar999.toFixed(1)} bps and the heightened high-divergence node count (${AdamKit.esc(highDivCount)} entities). This allocation minimizes the risk of catastrophic drawdown during the tail-event scenario mapped by the quantum amplitude estimation model (Ref: ADAM Quant Core, "Adversarial Portfolio Optimization," Vol 4. 2026).</p>
     </div>
   </div>
 
@@ -622,7 +626,7 @@ function renderNewsletter(){
 
   <div style="text-align:center;margin-top:20px;font-size:9px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">
     ADAM Financial Operating System — Market Mayhem Intelligence Division<br>
-    Generated deterministically via PRNG seed ${SEED} | All projections are forward-looking model outputs | Not investment advice
+    Generated deterministically via PRNG seed ${AdamKit.esc(SEED)} | All projections are forward-looking model outputs | Not investment advice
   </div>`;
 }
 

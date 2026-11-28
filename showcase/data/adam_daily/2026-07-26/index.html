@@ -79,6 +79,10 @@
             background: var(--slate-800);
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="antialiased">
 
@@ -557,8 +561,8 @@
                 const div = document.createElement('div');
                 div.className = `p-4 border-l-4 border-${item.color}-600 bg-${item.color}-50 rounded flex justify-between items-center`;
                 div.innerHTML = `
-                    <span class="font-bold text-slate-800">${item.asset}</span>
-                    <span class="text-xs font-black uppercase text-${item.color}-700">${item.pos}</span>
+                    <span class="font-bold text-slate-800">${AdamKit.esc(item.asset)}</span>
+                    <span class="text-xs font-black uppercase text-${AdamKit.esc(item.color)}-700">${AdamKit.esc(item.pos)}</span>
                 `;
                 grid.appendChild(div);
             });

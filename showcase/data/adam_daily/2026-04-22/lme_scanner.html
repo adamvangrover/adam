@@ -295,6 +295,10 @@
             .side-col { position: static; max-height: none; }
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
     <header>
@@ -576,19 +580,19 @@
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h2 style="color: ${colorVar};">${d.ticker}</h2>
-                            <div style="color: var(--neon-blue); font-size: 0.9em; margin-bottom: 5px;">${d.name}</div>
+                            <h2 style="color: ${AdamKit.esc(colorVar)};">${AdamKit.esc(d.ticker)}</h2>
+                            <div style="color: var(--neon-blue); font-size: 0.9em; margin-bottom: 5px;">${AdamKit.esc(d.name)}</div>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 0.7em; color: var(--text-muted); text-transform: uppercase;">Distress Score</div>
-                            <div style="color: ${colorVar}; font-size: 1.8em; font-weight: bold; ${blinkCss}">${score}%</div>
+                            <div style="color: ${AdamKit.esc(colorVar)}; font-size: 1.8em; font-weight: bold; ${AdamKit.esc(blinkCss)}">${AdamKit.esc(score)}%</div>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; margin-bottom: 10px; font-size: 0.85em; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;">
-                        <div><strong>Status:</strong><br><span style="color:var(--text-muted)">${d.filing}</span></div>
-                        <div><strong>Cash:</strong><br><span style="color:var(--text-muted)">${d.cash}</span></div>
-                        <div style="grid-column: span 2;"><strong>Catalyst:</strong><br><span style="color:var(--warning-orange)">${d.catalyst}</span></div>
+                        <div><strong>Status:</strong><br><span style="color:var(--text-muted)">${AdamKit.esc(d.filing)}</span></div>
+                        <div><strong>Cash:</strong><br><span style="color:var(--text-muted)">${AdamKit.esc(d.cash)}</span></div>
+                        <div style="grid-column: span 2;"><strong>Catalyst:</strong><br><span style="color:var(--warning-orange)">${AdamKit.esc(d.catalyst)}</span></div>
                     </div>
                     
                     <div class="pricing-block">
@@ -598,15 +602,15 @@
                         </div>
                         <div class="price-col" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 0 15px;">
                             <span class="price-label">Expected FV</span>
-                            <span class="price-val" style="color: ${colorVar};">${formatMoney(fv)}</span>
+                            <span class="price-val" style="color: ${AdamKit.esc(colorVar)};">${formatMoney(fv)}</span>
                         </div>
                         <div class="price-col">
                             <span class="price-label">Dislocation</span>
-                            <span class="${disClass}">${disFormatted}</span>
+                            <span class="${AdamKit.esc(disClass)}">${AdamKit.esc(disFormatted)}</span>
                         </div>
                     </div>
 
-                    <h3 style="color: ${colorVar};">Capital Stack Depth</h3>
+                    <h3 style="color: ${AdamKit.esc(colorVar)};">Capital Stack Depth</h3>
                     <table class="cap-stack-table">
                         <tr>
                             <th>Tranche</th>
@@ -616,7 +620,7 @@
                         ${capStackHtml}
                     </table>
                     
-                    <h3 style="color: ${colorVar};">Actionable Scenario Insights</h3>
+                    <h3 style="color: ${AdamKit.esc(colorVar)};">Actionable Scenario Insights</h3>
                     <ul>
                         ${predictionsHtml}
                     </ul>
@@ -659,7 +663,7 @@
                 block.className = 'ml-data-block';
                 block.innerHTML = `
                     <div class="ml-data-block-header">
-                        <strong>${d.ticker}_DATA</strong>
+                        <strong>${AdamKit.esc(d.ticker)}_DATA</strong>
                         <button class="copy-btn" onclick="copyText(this)">COPY</button>
                     </div>
                     <pre>${JSON.stringify(mlObj, null, 2)}</pre>

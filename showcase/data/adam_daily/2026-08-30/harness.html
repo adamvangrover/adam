@@ -129,6 +129,10 @@ input[type=range]::-webkit-slider-thumb {
   "compliance_target": "Tier 1 G-SIB Fiduciary Standard"
 }
 </script>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
 
@@ -741,20 +745,20 @@ function renderNewsletter() {
     <!-- Section: Credit Metrics -->
     <div class="space-y-3 pt-4 border-t border-slate-800/80">
       <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-        <span>📊</span> Credit Landscape Summary — ${TOTAL_ENTITIES} Issuers
+        <span>📊</span> Credit Landscape Summary — ${AdamKit.esc(TOTAL_ENTITIES)} Issuers
       </h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">Investment Grade</div>
-          <div class="text-lg font-black font-mono text-emerald-400">${m.ig} <span class="text-[10px] font-normal text-slate-400">(${(m.ig/TOTAL_ENTITIES*100).toFixed(1)}%)</span></div>
+          <div class="text-lg font-black font-mono text-emerald-400">${AdamKit.esc(m.ig)} <span class="text-[10px] font-normal text-slate-400">(${(m.ig/TOTAL_ENTITIES*100).toFixed(1)}%)</span></div>
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">High Yield</div>
-          <div class="text-lg font-black font-mono text-amber-400">${m.hy}</div>
+          <div class="text-lg font-black font-mono text-amber-400">${AdamKit.esc(m.hy)}</div>
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">Distressed / D</div>
-          <div class="text-lg font-black font-mono text-rose-400">${m.dist}</div>
+          <div class="text-lg font-black font-mono text-rose-400">${AdamKit.esc(m.dist)}</div>
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">Avg Forward PD</div>
@@ -762,15 +766,15 @@ function renderNewsletter() {
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">Covenant Breaches</div>
-          <div class="text-lg font-black font-mono text-rose-400">${m.breaches}</div>
+          <div class="text-lg font-black font-mono text-rose-400">${AdamKit.esc(m.breaches)}</div>
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-3">
           <div class="text-[9px] uppercase font-mono text-slate-400">Fallen Angels</div>
-          <div class="text-lg font-black font-mono text-rose-400">${m.fallenAngels}</div>
+          <div class="text-lg font-black font-mono text-rose-400">${AdamKit.esc(m.fallenAngels)}</div>
         </div>
       </div>
       <p class="text-xs text-slate-300">
-        <strong>Migration Outlook:</strong> <span class="font-mono text-emerald-400">↑ ${m.upgrades} upgrades</span> vs <span class="font-mono text-rose-400">↓ ${m.downgrades} downgrades</span> (<span class="font-mono text-slate-400">→ ${m.stables} stable</span>). Net crossover pipeline indicates <strong>${m.fallenAngels} fallen angels</strong> vs <strong>${m.risingStars} rising stars</strong>.
+        <strong>Migration Outlook:</strong> <span class="font-mono text-emerald-400">↑ ${AdamKit.esc(m.upgrades)} upgrades</span> vs <span class="font-mono text-rose-400">↓ ${AdamKit.esc(m.downgrades)} downgrades</span> (<span class="font-mono text-slate-400">→ ${AdamKit.esc(m.stables)} stable</span>). Net crossover pipeline indicates <strong>${AdamKit.esc(m.fallenAngels)} fallen angels</strong> vs <strong>${AdamKit.esc(m.risingStars)} rising stars</strong>.
       </p>
     </div>
 
@@ -878,7 +882,7 @@ function renderNewsletter() {
         💡 Fiduciary Target Allocation & Mathematical Rationale
       </h4>
       <p class="text-xs text-slate-300 leading-relaxed">
-        The target allocation matrix (<strong>65% Investment Grade / 30% High Yield / 5% Liquidity Hedge</strong>) is mathematically grounded in the quantum tail risk threshold (<span class="font-mono text-cyan-300">CVaR 99.9% = ${m.cvar999.toFixed(1)} bps</span>) and adversarial spread divergence (<span class="font-mono text-cyan-300">${m.highDivCount}</span> high-divergence nodes). This satisfies G-SIB Tier 1 capital preservation constraints under extreme stress scenarios (Ref: ADAM Quant Core, <em>"Adversarial Portfolio Optimization"</em>, Vol 4. 2026).
+        The target allocation matrix (<strong>65% Investment Grade / 30% High Yield / 5% Liquidity Hedge</strong>) is mathematically grounded in the quantum tail risk threshold (<span class="font-mono text-cyan-300">CVaR 99.9% = ${m.cvar999.toFixed(1)} bps</span>) and adversarial spread divergence (<span class="font-mono text-cyan-300">${AdamKit.esc(m.highDivCount)}</span> high-divergence nodes). This satisfies G-SIB Tier 1 capital preservation constraints under extreme stress scenarios (Ref: ADAM Quant Core, <em>"Adversarial Portfolio Optimization"</em>, Vol 4. 2026).
       </p>
     </div>
 
@@ -1680,12 +1684,12 @@ function openAgentModal(id) {
         <div>
           <div class="flex items-center gap-2">
             ${e.ticker ? `<span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-bold text-xs">${e.ticker}</span>` : ''}
-            <h3 class="text-lg font-bold text-slate-100">${e.name}</h3>
+            <h3 class="text-lg font-bold text-slate-100">${AdamKit.esc(e.name)}</h3>
           </div>
-          <div class="text-xs font-mono text-slate-400 mt-0.5">${e.sector} • ${e.region} • ID: #${e.id}</div>
+          <div class="text-xs font-mono text-slate-400 mt-0.5">${AdamKit.esc(e.sector)} • ${AdamKit.esc(e.region)} • ID: #${AdamKit.esc(e.id)}</div>
         </div>
         <span class="px-2.5 py-1 rounded text-xs font-mono font-bold ${e.ratingIdx <= IG_BOUND ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
-          ${e.rating} → ${e.fwdRating}
+          ${AdamKit.esc(e.rating)} → ${AdamKit.esc(e.fwdRating)}
         </span>
       </div>
 
@@ -1700,7 +1704,7 @@ function openAgentModal(id) {
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-2.5">
           <div class="text-[9px] uppercase text-slate-500">Leverage</div>
-          <div class="font-bold ${e.leverage > 4 ? 'text-rose-400' : 'text-emerald-400'} mt-0.5">${e.leverage}x</div>
+          <div class="font-bold ${e.leverage > 4 ? 'text-rose-400' : 'text-emerald-400'} mt-0.5">${AdamKit.esc(e.leverage)}x</div>
         </div>
         <div class="bg-black/40 border border-slate-800 rounded-lg p-2.5">
           <div class="text-[9px] uppercase text-slate-500">Fwd PD (bps)</div>
@@ -1724,7 +1728,7 @@ function openAgentModal(id) {
 
       <div class="bg-cyan-950/20 border border-cyan-500/30 rounded-xl p-3.5 space-y-1.5 font-mono text-xs">
         <div class="text-[10px] text-cyan-400 font-bold uppercase">Article IV Cryptographic Provenance Record</div>
-        <div class="text-slate-300 break-all"><span class="text-slate-500">PROV-O Nonce:</span> <strong class="text-cyan-300">${e.nonce}</strong></div>
+        <div class="text-slate-300 break-all"><span class="text-slate-500">PROV-O Nonce:</span> <strong class="text-cyan-300">${AdamKit.esc(e.nonce)}</strong></div>
         <div class="text-slate-300"><span class="text-slate-500">Adversarial Model α PD:</span> ${(e.pdAlpha*100).toFixed(1)}% | <span class="text-slate-500">β PD:</span> ${(e.pdBeta*100).toFixed(1)}% (Δ = ${(e.delta*100).toFixed(1)}%)</div>
       </div>
     </div>

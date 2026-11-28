@@ -114,6 +114,10 @@
             background: rgba(6, 182, 212, 0.1);
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
@@ -348,9 +352,9 @@
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-terminal-card/80 transition-colors group cursor-default';
             tr.innerHTML = `
-                <td class="p-3 font-semibold text-white group-hover:text-terminal-cyan transition-colors">${item.asset}</td>
-                <td class="p-3 font-mono text-right ${colorClass} ${isAlert}">${item.level}</td>
-                <td class="p-3 text-gray-400 hidden sm:table-cell group-hover:text-gray-200 transition-colors">${item.narrative}</td>
+                <td class="p-3 font-semibold text-white group-hover:text-terminal-cyan transition-colors">${AdamKit.esc(item.asset)}</td>
+                <td class="p-3 font-mono text-right ${AdamKit.esc(colorClass)} ${AdamKit.esc(isAlert)}">${AdamKit.esc(item.level)}</td>
+                <td class="p-3 text-gray-400 hidden sm:table-cell group-hover:text-gray-200 transition-colors">${AdamKit.esc(item.narrative)}</td>
             `;
             tableBody.appendChild(tr);
         });

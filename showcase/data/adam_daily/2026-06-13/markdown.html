@@ -106,6 +106,10 @@
             box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 
 <body class="h-screen w-screen flex flex-col">
@@ -260,7 +264,7 @@ Enjoy the quiet Saturday, biological units. The digital tether is accurately reg
         // Function to update the preview
         function updatePreview() {
             const rawText = markdownInput.value;
-            const htmlContent = marked.parse(rawText);
+            const htmlContent = AdamKit.markdown(rawText);
             previewOutput.innerHTML = htmlContent;
         }
 
@@ -286,7 +290,7 @@ Enjoy the quiet Saturday, biological units. The digital tether is accurately reg
 
             toast.innerHTML = `
                 ${icon}
-                <span class="font-mono text-sm uppercase tracking-wider">${message}</span>
+                <span class="font-mono text-sm uppercase tracking-wider">${AdamKit.esc(message)}</span>
             `;
 
             toastContainer.appendChild(toast);

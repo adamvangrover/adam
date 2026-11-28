@@ -147,6 +147,10 @@
         .glow-cyan { text-shadow: 0 0 10px rgba(0,229,255,0.8); }
         .glow-red { text-shadow: 0 0 10px rgba(255,30,56,0.8); }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -1045,7 +1049,7 @@ Current Telemetry: ${JSON.stringify(window.systemTelemetry)}`;
 
             try {
                 const rawResponse = await fetchGemini(val, systemPrompt);
-                const parsedHtml = marked.parse(rawResponse);
+                const parsedHtml = AdamKit.markdown(rawResponse);
                 
                 document.getElementById(typingId).remove();
                 

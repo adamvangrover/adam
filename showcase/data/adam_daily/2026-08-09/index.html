@@ -89,6 +89,10 @@
 
         .math-block { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 6px; border: 1px solid #1f2937; color: #06b6d4; font-size: 0.85rem; line-height: 1.5; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black relative">
     
@@ -635,7 +639,7 @@
             else if (type === 'error') { colorClass = 'border-term-red text-term-red'; iconClass = 'fa-circle-xmark'; }
 
             toast.className = `glass-panel border-l-4 ${colorClass} px-4 py-3 rounded shadow-xl font-mono text-[11px] transform transition-all duration-300 translate-y-8 opacity-0 pointer-events-auto flex items-center justify-between gap-4 min-w-[280px]`;
-            toast.innerHTML = `<div class="flex items-center gap-2.5"><i class="fa-solid ${iconClass} text-sm"></i><span class="text-white">${message}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+            toast.innerHTML = `<div class="flex items-center gap-2.5"><i class="fa-solid ${iconClass} text-sm"></i><span class="text-white">${AdamKit.esc(message)}</span></div><button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
             container.appendChild(toast);
             requestAnimationFrame(() => setTimeout(() => toast.classList.remove('translate-y-8', 'opacity-0'), 10));
             setTimeout(() => { if(toast.parentElement) { toast.classList.add('translate-y-8', 'opacity-0'); setTimeout(() => toast.remove(), 300); } }, 3500);
@@ -745,10 +749,10 @@
 
             try {
                 const text = await callAdamAI(prompt, "Act as ADAM v30.4, an elite sovereign AI institutional quant & supervisory risk engine. Provide publication-grade, rigorous financial memos.");
-                output.innerHTML = marked.parse(text);
+                output.innerHTML = AdamKit.markdown(text);
                 showToast('Regulatory memo synthesized successfully via Gemini API.', 'success');
             } catch(e) {
-                output.innerHTML = marked.parse(`# REGULATORY RATING JUSTIFICATION MEMORANDUM\n**BORROWER:** ${borrower} | **FACILITY:** $${facility}M\n\n### 1. EXECUTIVE SUMMARY\nDue to network latency connecting to Gemini API, displaying local fallback template. Leverage is recorded at ${lev}x with ICR of ${icr}x. Assigned risk rating: **${rating}**.`);
+                output.innerHTML = AdamKit.markdown(`# REGULATORY RATING JUSTIFICATION MEMORANDUM\n**BORROWER:** ${borrower} | **FACILITY:** $${facility}M\n\n### 1. EXECUTIVE SUMMARY\nDue to network latency connecting to Gemini API, displaying local fallback template. Leverage is recorded at ${lev}x with ICR of ${icr}x. Assigned risk rating: **${rating}**.`);
                 showToast('API call failed, loaded deterministic fallback memo.', 'warning');
             }
         }
@@ -992,7 +996,7 @@
 
             try {
                 const text = await callAdamAI(prompt, "Act as ADAM v30.4 institutional portfolio risk director.");
-                content.innerHTML = marked.parse(text);
+                content.innerHTML = AdamKit.markdown(text);
                 showToast('AI Portfolio Risk Audit completed successfully.', 'success');
             } catch(e) {
                 content.innerHTML = `<p class="text-term-red">API request failed. Portfolio audit indicates extreme concentration in 2027 Q3-Q4 refinancing maturities ($890M) requiring proactive covenant enforcement.</p>`;
@@ -1045,7 +1049,7 @@
             chatLog.innerHTML += `
                 <div class="bg-term-surface p-3 rounded-lg border border-term-border text-slate-200 ml-6 shadow-sm">
                     <div class="text-[9px] text-slate-500 font-bold mb-1 flex justify-end items-center gap-1 uppercase">USER <i class="fa-solid fa-user"></i></div>
-                    <p class="font-sans text-right text-xs">${prompt}</p>
+                    <p class="font-sans text-right text-xs">${AdamKit.esc(prompt)}</p>
                 </div>
             `;
             input.value = '';
@@ -1053,7 +1057,7 @@
 
             const loadId = 'load-' + Date.now();
             chatLog.innerHTML += `
-                <div id="${loadId}" class="bg-term-card p-3 rounded-lg border-l-2 border-term-cyan text-term-cyan animate-pulse mr-6 flex items-center gap-2">
+                <div id="${AdamKit.esc(loadId)}" class="bg-term-card p-3 rounded-lg border-l-2 border-term-cyan text-term-cyan animate-pulse mr-6 flex items-center gap-2">
                     <i class="fa-solid fa-spinner fa-spin"></i> <span class="text-xs font-mono">Gemini-3-Flash computing response...</span>
                 </div>
             `;
@@ -1065,7 +1069,7 @@
                 chatLog.innerHTML += `
                     <div class="bg-term-card/90 p-4 rounded-lg border-l-2 border-term-neon text-slate-200 shadow-md mr-6 markdown-body !text-xs !bg-transparent !border-none">
                         <div class="text-[9px] text-term-neon font-bold mb-2 flex items-center gap-1.5 uppercase tracking-wider"><i class="fa-solid fa-microchip"></i> GEMINI VERDICT</div>
-                        <div class="font-sans text-xs space-y-2 text-slate-300">${marked.parse(reply)}</div>
+                        <div class="font-sans text-xs space-y-2 text-slate-300">${AdamKit.markdown(reply)}</div>
                     </div>
                 `;
             } catch(err) {

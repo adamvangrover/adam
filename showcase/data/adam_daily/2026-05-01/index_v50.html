@@ -116,6 +116,10 @@
         .prose-custom ul { margin-top: 0.25em; margin-bottom: 0.25em; }
         .prose-custom li { margin-top: 0; margin-bottom: 0; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col font-sans">
     <div class="crt-overlay"></div>
@@ -789,7 +793,7 @@
                     document.getElementById(typingId).remove();
                     
                     if (success) {
-                        responseHtmlStr = marked.parse(resultText);
+                        responseHtmlStr = AdamKit.markdown(resultText);
                         appendAIResponse(responseHtmlStr);
                     } else {
                          throw lastError || new Error("Failed to connect after multiple retries.");

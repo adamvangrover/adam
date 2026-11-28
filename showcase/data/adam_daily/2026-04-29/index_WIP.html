@@ -240,6 +240,10 @@
         .traceable { cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.4); transition: color 0.2s; }
         .traceable:hover { color: rgb(var(--color-primary)) !important; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="h-screen w-screen flex flex-col selection:bg-primary selection:text-black relative theme-cyan text-sm" id="appBody">
     
@@ -2136,8 +2140,8 @@
                             card.onclick = () => loadModule(m.id);
                             card.innerHTML = `
                                 <div>
-                                    <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">MOD ${m.id.toString().padStart(2,'0')} // ${m.group}</span>
-                                    <h4 class="font-display text-white text-sm tracking-wide m-0">${m.title}</h4>
+                                    <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">MOD ${m.id.toString().padStart(2,'0')} // ${AdamKit.esc(m.group)}</span>
+                                    <h4 class="font-display text-white text-sm tracking-wide m-0">${AdamKit.esc(m.title)}</h4>
                                 </div>
                                 <span class="text-primary text-[10px] font-mono mt-3">Load ➔</span>
                             `;
@@ -2281,7 +2285,7 @@
                 // Desktop Nav Item
                 const navItem = document.createElement('div');
                 navItem.className = 'nav-item p-2 rounded hover:bg-white/5 cursor-pointer text-xs font-sans text-slate-300 transition-colors border-l-2 border-transparent hover:border-primary flex flex-col gap-1';
-                navItem.innerHTML = `<span class="font-bold text-white">${m.title}</span><span class="text-[10px] text-slate-500 font-mono">${m.subtitle}</span>`;
+                navItem.innerHTML = `<span class="font-bold text-white">${AdamKit.esc(m.title)}</span><span class="text-[10px] text-slate-500 font-mono">${AdamKit.esc(m.subtitle)}</span>`;
                 navItem.onclick = () => loadModule(m.id);
                 nav.appendChild(navItem);
 
@@ -2521,7 +2525,7 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = 'bg-primary text-black font-mono text-xs px-4 py-3 shadow-[0_0_20px_rgba(var(--color-primary),0.5)] clip-path-toast transition-all duration-500 opacity-0 translate-y-4';
-            toast.innerHTML = `<span class="font-bold mr-2">SYS_MSG:</span> ${message}`;
+            toast.innerHTML = `<span class="font-bold mr-2">SYS_MSG:</span> ${AdamKit.esc(message)}`;
             container.appendChild(toast);
             
             requestAnimationFrame(() => {
@@ -2637,8 +2641,8 @@
                 const hash = Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
                 traceTooltip.innerHTML = `
                     <div class="text-white mb-2 font-bold" style="font-size: 11px;">DATA PROVENANCE VERIFIED</div>
-                    <div class="text-slate-400 mb-1">SOURCE: <span class="text-primary">${type}</span></div>
-                    <div class="text-slate-400 mb-1">HASH: <span class="text-secondary">0x${hash}</span></div>
+                    <div class="text-slate-400 mb-1">SOURCE: <span class="text-primary">${AdamKit.esc(type)}</span></div>
+                    <div class="text-slate-400 mb-1">HASH: <span class="text-secondary">0x${AdamKit.esc(hash)}</span></div>
                     <div class="text-slate-400">SYNC: <span class="text-core-green">T-0.0${Math.floor(Math.random()*99)}s</span></div>
                 `;
                 const rect = traceEl.getBoundingClientRect();

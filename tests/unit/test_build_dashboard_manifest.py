@@ -25,6 +25,13 @@ _SPEC.loader.exec_module(bdm)
         ("analyst_os", "adam_os", None),
         ("comprehensive_credit_dashboard", "credit", None),
         ("summary", "other", None),
+        ("editions_browser", "publications", None),
+        ("review_panel", "publications", None),
+        ("black_scholes", "valuation", None),
+        ("13f_tracker", "markets", None),
+        ("knowledge_graph", "knowledge", None),
+        ("workflow_orchestrator", "platform", None),
+        ("research", "knowledge", None),
     ],
 )
 def test_family_and_edition_date(stem, family, date):
@@ -145,3 +152,8 @@ def test_hub_gets_kit_after_render(tmp_path):
     out = (sub / "index.html").read_text()
     assert '<script src="../kit/adam-kit.js"></script>' in out
     assert 'data-adam-role="duplicate" data-adam-family="hub" data-adam-canonical="../catalog.html"' in out
+
+
+def test_committed_showcase_has_no_unclassified_pages():
+    pages = json.loads((Path(__file__).resolve().parents[2] / "showcase" / "manifest.json").read_text())["dashboards"]
+    assert [p["path"] for p in pages if p["family"] == "other"] == []

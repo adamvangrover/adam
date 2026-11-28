@@ -73,6 +73,10 @@
             width: 100%;
         }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="antialiased">
     <!-- Chosen Palette: Warm Professionalism (Neutral Off-white base with Indigo and Crimson accents) -->
@@ -282,15 +286,15 @@
                 const trendColor = asset.trend === 'up' ? 'text-green-600' : asset.trend === 'down' ? 'text-red-600' : 'text-gray-400';
 
                 row.innerHTML = `
-                    <td class="px-6 py-5 font-semibold text-gray-900">${asset.name}</td>
+                    <td class="px-6 py-5 font-semibold text-gray-900">${AdamKit.esc(asset.name)}</td>
                     <td class="px-6 py-5 mono text-sm">
-                        <span class="${trendColor} mr-2 font-bold">${trendIcon}</span>
-                        ${asset.level}
+                        <span class="${AdamKit.esc(trendColor)} mr-2 font-bold">${trendIcon}</span>
+                        ${AdamKit.esc(asset.level)}
                     </td>
                     <td class="px-6 py-5">
-                        <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-600 uppercase tracking-tighter">${asset.target}</span>
+                        <span class="px-2 py-1 bg-gray-100 rounded text-[10px] font-bold text-gray-600 uppercase tracking-tighter">${AdamKit.esc(asset.target)}</span>
                     </td>
-                    <td class="px-6 py-5 text-sm text-gray-500">${asset.implication}</td>
+                    <td class="px-6 py-5 text-sm text-gray-500">${AdamKit.esc(asset.implication)}</td>
                 `;
                 body.appendChild(row);
             });

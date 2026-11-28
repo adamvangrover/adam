@@ -10,6 +10,7 @@
 
     <!-- Chart.js for Visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
     <!-- Marked.js for LLM Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -139,6 +140,10 @@
         .chart-container { animation: pulse-chart 6s infinite alternate; }
         @keyframes pulse-chart { 0% { box-shadow: inset 0 0 0 rgba(239,68,68,0); } 100% { box-shadow: inset 0 0 20px rgba(239,68,68,0.05); } }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen overflow-hidden flex flex-col selection:bg-term-red selection:text-white">
     <div class="crt-overlay"></div>
@@ -820,7 +825,7 @@
                 const btn = document.createElement('button');
                 btn.className = `nav-item text-left px-4 py-2.5 rounded-r flex flex-col mb-1 ${m.id === currentModuleId ? 'nav-active' : 'text-slate-400 hover:bg-white/5 border-l-2 border-transparent'}`;
                 btn.onclick = () => loadModule(m.id);
-                btn.innerHTML = `<span class="font-bold text-[12px] uppercase tracking-wide">${m.title}</span><span class="opacity-70 text-[10px] truncate mt-0.5">${m.subtitle}</span>`;
+                btn.innerHTML = `<span class="font-bold text-[12px] uppercase tracking-wide">${AdamKit.esc(m.title)}</span><span class="opacity-70 text-[10px] truncate mt-0.5">${AdamKit.esc(m.subtitle)}</span>`;
                 navEl.appendChild(btn);
                 
                 // Mobile Nav
@@ -967,7 +972,7 @@
                 
                 const content = document.createElement('div');
                 content.className = "relative z-10";
-                content.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
+                content.innerHTML = DOMPurify.sanitize(typeof marked !== 'undefined' ? AdamKit.markdown(text) : text);
                 div.appendChild(content);
             } else {
                 div.innerText = text;

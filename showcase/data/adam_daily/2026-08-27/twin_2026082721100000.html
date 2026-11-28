@@ -506,6 +506,10 @@
   .capstruct-bar { height: 28px; border-radius: 4px; display: flex; overflow: hidden; margin: 4px 0; }
   .capstruct-bar > div { display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
 </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body>
 
@@ -1132,7 +1136,7 @@ function renderEntTable(){
   }).join('');
 
   const tp=Math.ceil(fEnt.length/PS),p=document.getElementById('entityPagination');
-  if(tp>1){p.innerHTML=`<button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage+1} / ${tp}</span><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage=${tp-1};renderEntTable()">»</button>`;}else{p.innerHTML='';}
+  if(tp>1){p.innerHTML=`<button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage=0;renderEntTable()">«</button><button class="sim-btn" ${cPage===0?'disabled':''} onclick="cPage--;renderEntTable()">‹</button><span style="font-size:11px;color:var(--text-secondary)">Page ${cPage+1} / ${AdamKit.esc(tp)}</span><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage++;renderEntTable()">›</button><button class="sim-btn" ${cPage>=tp-1?'disabled':''} onclick="cPage=${tp-1};renderEntTable()">»</button>`;}else{p.innerHTML='';}
 }
 
 function showDetail(id){
@@ -1142,11 +1146,11 @@ function showDetail(id){
   const si=SECTORS.indexOf(e.sector);
   document.getElementById('entityModalContent').innerHTML=`
     <button class="modal-close" onclick="document.getElementById('entityModal').classList.remove('show')">✕</button>
-    <div style="margin-bottom:16px"><h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${e.name}</h2>
-    <div style="display:flex;gap:8px;margin-top:6px;align-items:center"><span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${e.sector}</span><span style="font-size:11px;color:var(--text-muted)">${e.region}</span><span class="rating-badge ${e.ratingIdx<=IG_BOUND?'rating-ig':(e.ratingIdx>=20?'rating-dist':'rating-hy')}">${e.rating}</span><span style="color:${mc2};font-weight:700;font-size:12px">${mi} (${Math.abs(e.migN)}n)</span><span class="rating-badge ${e.fwdRatingIdx<=IG_BOUND?'rating-ig':(e.fwdRatingIdx>=20?'rating-dist':'rating-hy')}">${e.fwdRating}</span></div></div>
+    <div style="margin-bottom:16px"><h2 style="font-size:20px;font-weight:800;letter-spacing:-0.02em">${AdamKit.esc(e.name)}</h2>
+    <div style="display:flex;gap:8px;margin-top:6px;align-items:center"><span class="sector-tag" style="border-left:3px solid ${S_COLORS[si]}">${AdamKit.esc(e.sector)}</span><span style="font-size:11px;color:var(--text-muted)">${AdamKit.esc(e.region)}</span><span class="rating-badge ${e.ratingIdx<=IG_BOUND?'rating-ig':(e.ratingIdx>=20?'rating-dist':'rating-hy')}">${AdamKit.esc(e.rating)}</span><span style="color:${AdamKit.esc(mc2)};font-weight:700;font-size:12px">${AdamKit.esc(mi)} (${Math.abs(e.migN)}n)</span><span class="rating-badge ${e.fwdRatingIdx<=IG_BOUND?'rating-ig':(e.fwdRatingIdx>=20?'rating-dist':'rating-hy')}">${AdamKit.esc(e.fwdRating)}</span></div></div>
     <div class="stat-row"><div class="stat-item"><div class="stat-label">Revenue</div><div class="stat-value">$${e.revenue.toLocaleString()}M</div></div><div class="stat-item"><div class="stat-label">EBITDA</div><div class="stat-value">$${e.ebitda.toLocaleString()}M</div></div><div class="stat-item"><div class="stat-label">EBITDA Margin</div><div class="stat-value">${(e.ebitdaMargin*100).toFixed(1)}%</div></div><div class="stat-item"><div class="stat-label">EV</div><div class="stat-value">$${e.ev.toLocaleString()}M</div></div></div>
-    <div class="stat-row"><div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage>5?'var(--accent-rose)':(e.leverage>4?'var(--accent-amber)':'var(--accent-emerald)')}">${e.leverage}x</div></div><div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr<2?'var(--accent-rose)':(e.icr<3?'var(--accent-amber)':'var(--accent-emerald)')}">${e.icr}x</div></div><div class="stat-item"><div class="stat-label">FCCR</div><div class="stat-value">${e.fccr}x</div></div><div class="stat-item"><div class="stat-label">Forward PD</div><div class="stat-value" style="color:var(--accent-rose)">${e.pd.toFixed(1)} bps</div></div></div>
-    <div class="stat-row"><div class="stat-item"><div class="stat-label">LGD</div><div class="stat-value">${(e.lgd*100).toFixed(1)}%</div></div><div class="stat-item"><div class="stat-label">Expected Loss</div><div class="stat-value">${(e.el*10000).toFixed(1)} bps</div></div><div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${e.cov.status}" style="text-transform:uppercase;font-size:14px">${e.cov.status}</div></div><div class="stat-item"><div class="stat-label">Lev Headroom</div><div class="stat-value" style="color:${e.cov.lh<0?'var(--accent-rose)':(e.cov.lh<0.1?'var(--accent-amber)':'var(--accent-emerald)')}">${(e.cov.lh*100).toFixed(1)}%</div></div></div>
+    <div class="stat-row"><div class="stat-item"><div class="stat-label">Leverage</div><div class="stat-value" style="color:${e.leverage>5?'var(--accent-rose)':(e.leverage>4?'var(--accent-amber)':'var(--accent-emerald)')}">${AdamKit.esc(e.leverage)}x</div></div><div class="stat-item"><div class="stat-label">ICR</div><div class="stat-value" style="color:${e.icr<2?'var(--accent-rose)':(e.icr<3?'var(--accent-amber)':'var(--accent-emerald)')}">${AdamKit.esc(e.icr)}x</div></div><div class="stat-item"><div class="stat-label">FCCR</div><div class="stat-value">${AdamKit.esc(e.fccr)}x</div></div><div class="stat-item"><div class="stat-label">Forward PD</div><div class="stat-value" style="color:var(--accent-rose)">${e.pd.toFixed(1)} bps</div></div></div>
+    <div class="stat-row"><div class="stat-item"><div class="stat-label">LGD</div><div class="stat-value">${(e.lgd*100).toFixed(1)}%</div></div><div class="stat-item"><div class="stat-label">Expected Loss</div><div class="stat-value">${(e.el*10000).toFixed(1)} bps</div></div><div class="stat-item"><div class="stat-label">Covenant Status</div><div class="stat-value covenant-${AdamKit.esc(e.cov.status)}" style="text-transform:uppercase;font-size:14px">${AdamKit.esc(e.cov.status)}</div></div><div class="stat-item"><div class="stat-label">Lev Headroom</div><div class="stat-value" style="color:${e.cov.lh<0?'var(--accent-rose)':(e.cov.lh<0.1?'var(--accent-amber)':'var(--accent-emerald)')}">${(e.cov.lh*100).toFixed(1)}%</div></div></div>
     <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid var(--border-glass)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px">W3C PROV-O Record</div><pre style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-secondary);white-space:pre-wrap">${JSON.stringify({source_data_object:'entity_'+e.id+'_'+e.name.replace(/\s/g,'_'),extraction_agent:'ADAM_DigitalTwin_WorldModel',jsonLogic_version:'2.0.0',confidence_score:+(0.85+rng.next()*0.14).toFixed(3),timestamp:new Date().toISOString(),rating_model:'MarketMayhemLedger_v26.0.4',migration_model:'TransitionMatrix_MC_10K',covenant_engine:'DeterministicCovenantEngine_v1.4'},null,2)}</pre></div>`;
   document.getElementById('entityModal').classList.add('show');
   logT('EntityView',`Inspected: ${e.name} [${e.rating}→${e.fwdRating}]`);
@@ -1505,7 +1509,7 @@ function selectAdvNode(id) {
     .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
     .replace(/: ([0-9.]+)/g, ': <span class="json-number">$1</span>');
 
-  document.getElementById('llmContextWindow').innerHTML = `<pre style="margin:0;white-space:pre-wrap">${formatted}</pre>`;
+  document.getElementById('llmContextWindow').innerHTML = `<pre style="margin:0;white-space:pre-wrap">${AdamKit.esc(formatted)}</pre>`;
   logT('LLMContext', `Context extracted for ${d.name} [Δ ${(d.spread * 100).toFixed(1)}%]`, 'info');
 }
 

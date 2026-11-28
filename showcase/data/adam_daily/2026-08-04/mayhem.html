@@ -101,6 +101,10 @@
         .markdown-body td { @apply p-2.5 border border-term-border/60 text-slate-300 bg-term-surface/40; }
         .markdown-body hr { @apply border-term-border my-6; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="bg-term-bg text-slate-300 font-sans h-screen flex flex-col overflow-hidden selection:bg-term-cyan selection:text-black">
     <div id="crtOverlay" class="crt-scanlines"></div>
@@ -601,7 +605,7 @@
             toast.innerHTML = `
                 <div class="flex items-center gap-2">
                     <i class="fa-solid ${iconClass}"></i> 
-                    <span class="text-white">${message}</span>
+                    <span class="text-white">${AdamKit.esc(message)}</span>
                 </div>
                 <button class="text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()">
                     <i class="fa-solid fa-xmark"></i>
@@ -925,7 +929,7 @@ Maintain 65% Fortress capital stack in zero-duration floaters and tariff-protect
 
             document.getElementById('readerEditionTag').innerText = edition.tag;
             document.getElementById('readerTitle').innerText = edition.title;
-            document.getElementById('markdownOutput').innerHTML = marked.parse(edition.markdown);
+            document.getElementById('markdownOutput').innerHTML = AdamKit.markdown(edition.markdown);
         }
 
         function copyMarkdownText() {
@@ -1196,7 +1200,7 @@ Maintain 65% Fortress capital stack in zero-duration floaters and tariff-protect
                             <div class="text-[10px] text-term-cyan font-bold mb-2 flex items-center gap-1">
                                 <i class="fa-solid fa-brain"></i> ADAM v26.0 VERDICT
                             </div>
-                            <div class="font-sans leading-relaxed text-xs ai-rendered-content">${marked.parse(replyText)}</div>
+                            <div class="font-sans leading-relaxed text-xs ai-rendered-content">${AdamKit.markdown(replyText)}</div>
                         </div>
                     `;
                     chatLog.insertAdjacentHTML('beforeend', aiMsgHtml);

@@ -257,6 +257,10 @@
         }
         .blink { animation: blink 1s step-end infinite; }
     </style>
+<!-- adam-kit -->
+<link rel="stylesheet" href="../../../kit/adam-kit.css">
+<script src="../../../kit/adam-kit.js"></script>
+<!-- /adam-kit -->
 </head>
 <body class="theme-cyan">
 
@@ -1221,7 +1225,7 @@ System ready. Type 'help' for commands.
             let delay = 0;
             lines.forEach((line, i) => {
                 setTimeout(() => {
-                    bootText.innerHTML += `<div class="mb-1">> ${line}</div>`;
+                    bootText.innerHTML += `<div class="mb-1">> ${AdamKit.esc(line)}</div>`;
                 }, delay);
                 delay += 250 + Math.random() * 250;
             });
@@ -1418,7 +1422,7 @@ System ready. Type 'help' for commands.
                 btn.className = "text-left px-3 py-2 rounded text-xs font-mono transition-colors bg-theme-glow border border-theme text-theme";
             }
             const mdContent = document.getElementById(templateId).innerHTML;
-            document.getElementById('briefing-content').innerHTML = marked.parse(mdContent);
+            document.getElementById('briefing-content').innerHTML = AdamKit.markdown(mdContent);
         }
 
         function initBriefingApp() {
@@ -2077,7 +2081,7 @@ System ready. Type 'help' for commands.
                 const val = input.value.trim();
                 const output = document.getElementById('terminal-output');
                 
-                output.innerHTML += `\n<span class="text-white">root@adam-node:~#</span> ${val}\n`;
+                output.innerHTML += `\n<span class="text-white">root@adam-node:~#</span> ${AdamKit.esc(val)}\n`;
                 
                 if(val === 'help') {
                     output.innerHTML += `Available commands:\n  help    - Show this message\n  status  - Print system diagnostics\n  clear   - Clear terminal output\n  matrix  - Inject matrix overlay\n  defcon  - Escalate threat level`;
@@ -2092,7 +2096,7 @@ System ready. Type 'help' for commands.
                     setTheme('matrix');
                     output.innerHTML += `\n[SYS] Simulating green-screen terminal overlay.`;
                 } else if (val !== '') {
-                    output.innerHTML += `bash: ${val}: command not found`;
+                    output.innerHTML += `bash: ${AdamKit.esc(val)}: command not found`;
                 }
                 
                 input.value = '';
@@ -2170,7 +2174,7 @@ System ready. Type 'help' for commands.
                                     <span class="text-xs font-display font-bold text-theme">A</span>
                                 </div>
                                 <div class="glass-panel p-4 border border-theme/20 text-[#cbd5e1] max-w-[85%] text-xs prose prose-invert rounded-tl-none shadow-lg">
-                                    ${marked.parse(responseHtml)}
+                                    ${AdamKit.markdown(responseHtml)}
                                 </div>
                             </div>
                         `);
@@ -2197,7 +2201,7 @@ Current Telemetry: ${JSON.stringify(payload.kpis)}`;
                         })
                     });
                     const data = await rawResponse.json();
-                    const parsedHtml = marked.parse(data.candidates[0].content.parts[0].text);
+                    const parsedHtml = AdamKit.markdown(data.candidates[0].content.parts[0].text);
                     
                     document.getElementById(typingId).remove();
                     chatLog.insertAdjacentHTML('beforeend', `
