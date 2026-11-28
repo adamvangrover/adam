@@ -23,16 +23,35 @@ Shared rules for every prompt below:
 > into `sys.modules` and fix the leak with `monkeypatch`/fixtures. If it fails alone, fix the code or the
 > stale test. Remove fixed entries from the quarantine file (XPASS shows them). Batch ~20 per PR.
 
-## 2. Backfill newsletter / briefing editions (data first, then HTML)
+## 2. Publications: real inputs, more families, LLM review
 
-> Families: Market Mayhem, Daily Briefing, Market Pulse, House View (see `showcase/catalog.html`,
-> filter by family, and `docs/TEMPLATES.md`). For one family: list edition dates present in
-> `showcase/manifest.json`, pick the generator that produced the newest edition (grep `scripts/` and
-> `core/newsletter_layout/` for the filename pattern), and generate missing editions as structured data
-> (JSON/MD with `_estimated: true` on hand-picked values per `docs/PROVENANCE.md`) before rendering HTML.
-> Add a regression test that the generator output validates against its schema. Regenerate the catalog:
-> `python scripts/build_dashboard_manifest.py --root showcase --hub catalog.html --include dashboards apps
-> portal status_terminal events widgets templates archive_v2`.
+The Apr–Nov 2026 backfill is done (see `docs/CONTENT_COVERAGE.md`): schema `core/schemas/publication.py`,
+generator `scripts/publications/backfill_editions.py`, review `core/publication/review/`, terminals
+`showcase/{editions_browser,price_target_explorer,review_panel}.html`. Pick one:
+
+> **2a. Real-data inputs.** Add an offline-ingestable dataset (e.g. a committed FRED/EDGAR extract with its
+> source URL and retrieval date) under `data/`, a loader returning the same shape as `ScenarioPath`, and a
+> `--path` switch on `backfill_editions.py`. Values from the committed extract drop `_estimated`; everything
+> else keeps it. Add provenance for the extract to `docs/PROVENANCE.md`. Do not call live APIs in tests.
+
+> **2b. Credit memo + deep dive editions.** Both families have templates but no records. Build them from
+> `showcase/data/credit_memo_*.json` (one edition per memo, date = memo date) and
+> `core/engine/deep_dive_graph.py` output, through the same `Edition` schema, and extend
+> `tests/unit/test_publication_backfill.py` cadence/validation tests.
+
+> **2c. DCF calibration.** Most DCF names are flagged `target_out_of_range` because
+> `config/valuation/coverage_2026.yaml` inputs are illustrative. Add terminal-growth / horizon knobs to the
+> YAML (not Python), pass them through `core/publication/valuation.py`, and re-run the review so
+> `publication_review` stays at its 100% floor. Report the flag count before/after.
+
+> **2d. LLM review path.** With `llm.enabled: true` in `config/publication_review.yaml`, wire the desk,
+> red-team and judge prompts in `prompt_library/publication_review/` to the routed model, keep the
+> deterministic critics as the gate (LLM text is narrative only), and cache responses under `data/` so CI
+> stays offline.
+
+> **2e. Convert the old pages.** Turn the hand-made 2025–early-2026 Daily Briefing / Market Pulse /
+> House View HTML into `Edition` records (parse, do not invent numbers; unknown values become
+> `_estimated`) so the editions browser covers the full history. Keep the original HTML as templates.
 
 ## 3. AFOS / Adam OS terminal refinement
 
@@ -43,10 +62,10 @@ Shared rules for every prompt below:
 
 ## 4. Showcase catalog follow-ups
 
-> `scripts/build_dashboard_manifest.py` + `scripts/templates/showcase_catalog.html.tmpl`. Ideas:
-> reduce the `other` family (inspect its titles, add `_FAMILIES` patterns, extend
-> `tests/unit/test_build_dashboard_manifest.py`); add a CI check that the committed manifests are fresh
-> (regenerate and `git diff --exit-code`); link `catalog.html` from `showcase/index.html`.
+> Families now classify every page (0 `other`) and CI checks manifest freshness. Next: link
+> `catalog.html` and the three publication terminals from `showcase/index.html`; move the remaining
+> `innerHTML` sinks outside `showcase/data/adam_daily/` to `AdamKit.html` (grep `innerHTML\s*=\s*\``),
+> using `scripts/harden_adam_daily.py` as the pattern; add `node --check` for `showcase/js/*.js` to CI.
 
 ## 5. Open-PR backlog
 

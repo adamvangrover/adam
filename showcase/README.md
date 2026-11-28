@@ -20,6 +20,9 @@ Related: [README](../README.md#-templates--brands) · [REPO_MAP §1](../REPO_MAP
 | [`dashboards/index.html`](dashboards/index.html) | Searchable dashboard catalog, filterable by kind and family (built from `dashboards/manifest.json`) |
 | [`portal/index.html`](portal/index.html) | Portal variant (analytics, intelligence) |
 | [`../index.html`](../index.html) | Repo-root system portal |
+| [`editions_browser.html`](editions_browser.html) | Canonical editions terminal: schema editions by family/date/ticker, A/B diff of calls and price targets |
+| [`price_target_explorer.html`](price_target_explorer.html) | Bull/Bear/Base weight sliders over `data/publications/price_targets_latest.json` |
+| [`review_panel.html`](review_panel.html) | Expert desk, red-team and judge review of every edition |
 | `browser/index.html` | Generated repo browser (see [below](#repo-browser-showcasebrowser)); not committed |
 
 ## Template families & manifest classification
@@ -56,7 +59,20 @@ subfolder) and, when the filename carries one, an ISO `date` (`2026_03_27`, `202
   `graph`, `gallery`, `explorer`, `browser`), else `dashboard`.
 * `family` is the template family, by the first matching pattern in `_FAMILIES` (specific before broad):
   Market Mayhem, Daily Briefing, Market Pulse, House View, Newsletter, AFOS, Adam OS, Credit, Scenario,
-  Research, Eval/Governance, Agents, Operations, Hub, else `other`.
+  Research, Eval/Governance, Agents, Operations, Hub, Publications (schema terminals, reports, outlooks),
+  Valuation, Markets, Knowledge, Platform, else `other` (0 pages today;
+  `test_committed_showcase_has_no_unclassified_pages` keeps it there).
+* CI (`.github/workflows/showcase-manifest-fresh.yml`) regenerates both catalogs, re-applies the kit and
+  `scripts/harden_adam_daily.py`, then fails on `git diff --exit-code -- showcase`. Commit regenerated
+  output with any page change.
+
+### Schema editions (`data/publications/`)
+
+Apr–Nov 2026 editions are `Edition` JSON records (+ MD, + HTML at the family's usual filename) generated
+from the synthetic `data/scenarios/2026H2_path.json`; every one is `_estimated: true`. Edit the YAML in
+`config/` or the templates in `templates/publication/`, never the output, then run
+`python scripts/publications/backfill_editions.py` and rebuild the catalogs. Coverage:
+[`docs/CONTENT_COVERAGE.md`](../docs/CONTENT_COVERAGE.md).
 
 The unified catalog is the machine-readable inventory for the UI/UX overhaul (Phase A): pick a family,
 open the newest edition as the starting template, and use **copy path** to clone it. `deprecated_archive/`

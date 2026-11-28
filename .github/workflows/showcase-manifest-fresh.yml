@@ -4,7 +4,7 @@ name: showcase-manifest-fresh
 # re-apply the shared kit and re-harden the Adam Daily pages, then require a clean tree.
 on:
   pull_request:
-    paths: ["showcase/**", "scripts/build_dashboard_manifest.py", "scripts/apply_showcase_kit.py", "scripts/harden_adam_daily.py", "scripts/templates/**"]
+    paths: ["showcase/**", "scripts/build_dashboard_manifest.py", "scripts/apply_showcase_kit.py", "scripts/harden_adam_daily.py", "scripts/templates/**", "scripts/publications/**", "config/publications.yaml", "docs/CONTENT_COVERAGE.md"]
   push:
     branches: [main]
 
@@ -27,4 +27,6 @@ jobs:
           python scripts/apply_showcase_kit.py
           python scripts/harden_adam_daily.py
       - name: Committed artifacts must be fresh
-        run: git diff --exit-code -- showcase
+        run: |
+          python scripts/publications/coverage_report.py
+          git diff --exit-code -- showcase docs/CONTENT_COVERAGE.md
